@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>dTVSteams TV (10-foot UI)</title>
+<style>
+:root{--bg:#0b0b0b;--red:#e50914}
+*{box-sizing:border-box}body{background:var(--bg);color:#fff;font-family:system-ui,sans-serif;margin:0;font-size:1.5rem}
+.top{padding:1rem 2rem;color:var(--red);font-weight:800;font-size:2rem}
+#title{padding:0 2rem;font-size:2.5rem;margin:0.5rem 0}
+#meta{padding:0 2rem;color:#aaa;font-size:1.25rem}
+.row{display:flex;gap:1rem;padding:1rem 2rem;overflow-x:auto}
+.card{flex:0 0 22rem;background:#1f1f1f;border-radius:0.5rem;overflow:hidden;border:0.25rem solid transparent}
+.card .thumb{aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;font-size:4rem;font-weight:800;background:linear-gradient(135deg,#3a3a3a,#101010)}
+.card .t{padding:1rem;font-size:1.5rem}
+.card.focused{border-color:#fff;transform:scale(1.05)}
+.hint{padding:1rem 2rem;color:#aaa}video{width:calc(100% - 4rem);margin:0 2rem;background:#000}
+#parts{padding:1rem 2rem;display:flex;gap:1rem}
+#parts button{font-size:1.5rem;padding:1rem 2rem;background:#333;color:#fff;border:0.25rem solid transparent;border-radius:0.5rem}
+#parts button.focused{border-color:#fff;background:var(--red)}
+</style>
+</head>
+<body>
+<div class="top">dTVSteams TV</div>
+<h1 id="title">載入中…</h1>
+<p id="meta" role="status"></p>
+<div class="row" id="rows" role="listbox" aria-label="集數"></div>
+<video id="player" controls preload="metadata"></video>
+<div id="parts"></div>
+<p class="hint">方向鍵移動 · Enter 播放 · 數字 1/2/3 切換 Part（遙控器對應：上下左右 + 確認鍵）</p>
+<script>
+let eps = [], focus = 0, partFocus = -1;
+async function load() {
+  try {
+    const r = await fetch("./catalog.json", { cache: "no-store" });
+    const j = await r.json();
+    eps = j.episodes || [];
+  } catch (e) { eps = []; }
+  document.getElementById("meta").textContent = eps.length + " 集";
+  render();
+}
+function render() {
+  const rows = document.getElementById("rows");
+  rows.innerHTML = "";
+  eps.forEach((ep, i) => {
+    const c = document.createElement("div");
+    c.className = "card" + (i === focus && partFocus < 0 ? " focused" : "");
+    c.setAttribute("role", "option");
+    c.innerHTML = "<div class='thumb'>" + (ep.title || "?")[0] + "</div><div class='t'>" + ep.title + "</div>";
+    c.onclick = () => { focus = i; partFocus = -1; play(); };
+    rows.appendChild(c);
+  });
+  const f = eps[focus];
+  document.getElementById("title").textContent = f ? f.title : "尚無內容";
+  const cards = rows.children;
+  if (cards[focus]) cards[focus].scrollIntoView({ inline: "center", block: "nearest" });
+  renderParts();
+}
+function parts() {
+  const ep = eps[focus];
+  if (!ep) return [];
+  return ep.parts && ep.parts.length ? ep.parts : [{ label: "Part 1", url: ep.url }];
+}
+function renderParts() {
+  const el = document.getElementById("parts");
+  el.innerHTML = "";
+  parts().forEach((p, i) => {
+    const b = document.createElement("button");
+    b.textContent = p.label;
+    if (i === partFocus) b.className = "focused";
+    b.onclick = () => { partFocus = i; playPart(i); render(); };
+    el.appendChild(b);
+  });
+}
+function play() { partFocus = 0; const p = parts()[0]; if (p) document.getElementById("player").src = p.url; render(); }
+function playPart(i) { const p = parts()[i]; if (p) { const v = document.getElementById("player"); v.src = p.url; v.play().catch(() => {}); } }
+document.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowRight") { if (partFocus >= 0) partFocus = Math.min(parts().length - 1, partFocus + 1); else focus = Math.min(eps.length - 1, focus + 1); render(); e.preventDefault(); }
+  if (e.key === "ArrowLeft") { if (partFocus >= 0) partFocus = Math.max(0, partFocus - 1); else focus = Math.max(0, focus - 1); render(); e.preventDefault(); }
+  if (e.key === "ArrowDown") { if (partFocus < 0 && parts().length) partFocus = 0; render(); e.preventDefault(); }
+  if (e.key === "ArrowUp") { partFocus = -1; render(); e.preventDefault(); }
+  if (e.key === "Enter") { if (partFocus >= 0) playPart(partFocus); else play(); e.preventDefault(); }
+  if (["1","2","3"].includes(e.key)) { const i = Number(e.key) - 1; if (parts()[i]) { partFocus = i; playPart(i); render(); } }
+});
+load();
+</script>
+</body>
+</html>

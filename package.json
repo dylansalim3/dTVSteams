@@ -7,7 +7,9 @@
     "build": "tsc --noEmit",
     "test": "vitest run --coverage",
     "lint": "tsc --noEmit",
-    "dev": "vitest"
+    "dev": "vitest",
+    "start": "node scripts/serve.mjs web-app 8000",
+    "start:tv": "node scripts/serve.mjs tv-web 8100"
   },
   "devDependencies": {
     "@types/jsdom": "^30.0.0",
