@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>dTVSteams Personal</title>
+<style>body{background:#111;color:#eee;font-family:sans-serif;margin:0}header{padding:12px 16px;background:#000;display:flex;gap:12px;align-items:center}input{padding:8px}button{padding:8px 12px}.row{display:flex;gap:12px;overflow-x:auto;padding:12px 16px}.card{min-width:220px;background:#222;border-radius:8px;padding:10px}.card a{color:#fff;text-decoration:none}video{width:100%;max-width:720px;background:#000}#meta{padding:0 16px;color:#aaa}</style>
+</head>
+<body>
+<header><h1>dTVSteams</h1><input id="q" placeholder="搜尋"><button id="refresh">手動更新</button><span id="ts"></span></header>
+<div id="meta"></div>
+<div class="row" id="rows"></div>
+<h2 style="padding:0 16px">播放器 (Part 1→2→3)</h2>
+<div style="padding:0 16px"><video id="player" controls></video><div id="parts"></div></div>
+<script src="./app.js"></script>
+</body>
+</html>
