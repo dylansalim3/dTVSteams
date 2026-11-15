@@ -238,6 +238,19 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
+    const proxyMode = parsedUrl.searchParams.get("proxy") === "true";
+    if (!proxyMode) {
+      res.writeHead(307, {
+        "Location": targetUrl,
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
+        "Access-Control-Expose-Headers": "Location, Range",
+        "Cache-Control": "public, max-age=1800"
+      });
+      res.end();
+      return;
+    }
+
     const headers = { "User-Agent": USER_AGENT, "Referer": "https://srgoideas.com/" };
     if (req.headers.range) {
       headers["range"] = req.headers.range;

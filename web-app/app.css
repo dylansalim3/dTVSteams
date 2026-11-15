@@ -349,6 +349,59 @@ html, body {
   outline: 2px solid var(--yt-focus-ring);
 }
 
+/* Playback Speed Picker */
+.yt-speed-picker {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 10px;
+  margin-top: 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.yt-speed-label {
+  font-size: 0.82rem;
+  color: var(--yt-text-secondary);
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+.yt-speed-chip {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--yt-text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 5px 12px;
+  border-radius: 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.yt-speed-chip:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.yt-speed-chip.active {
+  background: var(--yt-red);
+  color: #fff;
+  border-color: var(--yt-red);
+  box-shadow: 0 2px 8px rgba(255, 0, 0, 0.35);
+}
+
+.yt-speed-chip:focus-visible {
+  outline: 2px solid var(--yt-focus-ring);
+}
+
+.yt-speed-pill {
+  background: rgba(255, 193, 7, 0.18) !important;
+  color: #ffc107 !important;
+  border: 1px solid rgba(255, 193, 7, 0.4) !important;
+  font-weight: 700;
+}
+
 /* Episode List Section */
 .yt-list-section {
   display: flex;

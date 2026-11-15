@@ -52,7 +52,7 @@
           id="main-player"
           class="yt-native-player video-js vjs-theme-yt"
           controls
-          preload="metadata"
+          preload="auto"
           playsinline
           webkit-playsinline
           poster="./media/thumb-default.svg"
@@ -83,11 +83,23 @@
           <span class="yt-meta-pill" id="player-date-badge">2026</span>
           <span class="yt-meta-pill">1080p HD</span>
           <span class="yt-meta-pill">自動連續播放</span>
+          <span class="yt-meta-pill yt-speed-pill" id="player-speed-badge">⚡ 1.0x</span>
           <span class="yt-stream-source" id="player-stream-status">串流狀態：準備中</span>
         </div>
 
         <!-- Part Picker Pills (Part 1, Part 2, Part 3) -->
         <div class="yt-parts-picker" id="player-parts-nav" role="group" aria-label="集數分段切換"></div>
+
+        <!-- Playback Speed Picker (0.75x, 1.0x, 1.25x, 1.5x, 1.75x, 2.0x) -->
+        <div class="yt-speed-picker" id="player-speed-picker" role="group" aria-label="播放速度調整">
+          <span class="yt-speed-label">播放速度：</span>
+          <button class="yt-speed-chip" data-speed="0.75" aria-label="切換至 0.75 倍速">0.75x</button>
+          <button class="yt-speed-chip active" data-speed="1.0" aria-label="切換至 1.0 倍速">1.0x (正常)</button>
+          <button class="yt-speed-chip" data-speed="1.25" aria-label="切換至 1.25 倍速">1.25x (推薦)</button>
+          <button class="yt-speed-chip" data-speed="1.5" aria-label="切換至 1.5 倍速">1.5x (快看)</button>
+          <button class="yt-speed-chip" data-speed="1.75" aria-label="切換至 1.75 倍速">1.75x</button>
+          <button class="yt-speed-chip" data-speed="2.0" aria-label="切換至 2.0 倍速">2.0x (超快)</button>
+        </div>
 
         <!-- Resume Notice Banner -->
         <div id="player-resume-toast" class="yt-resume-toast" style="display:none;" role="status"></div>
@@ -118,7 +130,7 @@
 
   <!-- YouTube Footer -->
   <footer class="yt-footer" role="contentinfo">
-    <p>dTVStream 個人播放平台 · 支援電視遙控鍵盤快捷鍵：<code>Space / Enter</code> (播放/暫停)、<code>← / →</code> (快退/快進 10s)、<code>1 / 2 / 3</code> (切換分段)、<code>F</code> (全螢幕)</p>
+    <p>dTVStream 個人播放平台 · 快捷鍵支援：<code>Space / Enter</code> (播放/暫停)、<code>← / →</code> (快退/快進 10s)、<code>1 / 2 / 3</code> (切換分段)、<code>&gt; / &lt;</code> (倍速調整)、<code>F</code> (全螢幕)</p>
   </footer>
 
   <script src="./frame-thumbnails.js"></script>

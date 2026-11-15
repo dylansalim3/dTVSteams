@@ -1,14 +1,22 @@
 const USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
 
-async function resolveFreshStreamUrl(pageUrl) {
+const streamCache = new Map();
+
+async function resolveFreshStreamUrl(pageUrl, bypassCache = false) {
   if (!pageUrl) return null;
+  const cached = streamCache.get(pageUrl);
+  if (!bypassCache && cached && Date.now() - cached.timestamp < 30 * 60 * 1000) {
+    return cached.streamUrl;
+  }
   try {
     const res = await fetch(pageUrl, { headers: { "User-Agent": USER_AGENT } });
     if (!res.ok) return null;
     const html = await res.text();
     const match = html.match(/<source\s+src=['"]([^'"]+)['"]/i);
     if (match && match[1]) {
-      return match[1];
+      const freshUrl = match[1];
+      streamCache.set(pageUrl, { streamUrl: freshUrl, timestamp: Date.now() });
+      return freshUrl;
     }
   } catch (err) {
     console.warn("Failed to resolve stream from", pageUrl, err.message);
@@ -27,7 +35,7 @@ export async function onRequest(context) {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
         "Access-Control-Allow-Headers": "Range, Content-Type, Accept",
-        "Access-Control-Expose-Headers": "Content-Range, Content-Length, Accept-Ranges",
+        "Access-Control-Expose-Headers": "Content-Range, Content-Length, Accept-Ranges, Location",
         "Access-Control-Max-Age": "86400"
       }
     });
@@ -37,22 +45,38 @@ export async function onRequest(context) {
   let targetUrl = url.searchParams.get("url");
   const pageUrl = url.searchParams.get("pageUrl");
   const forceRefresh = url.searchParams.get("refresh") === "true";
+  const proxyMode = url.searchParams.get("proxy") === "true";
 
   if (forceRefresh && pageUrl) {
-    const fresh = await resolveFreshStreamUrl(pageUrl);
+    const fresh = await resolveFreshStreamUrl(pageUrl, true);
     if (fresh) targetUrl = fresh;
   } else if (pageUrl && (!targetUrl || targetUrl.includes("sample-part") || targetUrl.startsWith("./") || targetUrl.startsWith("/media/"))) {
-    targetUrl = await resolveFreshStreamUrl(pageUrl);
+    targetUrl = await resolveFreshStreamUrl(pageUrl, false);
   }
 
   if (!targetUrl && pageUrl) {
-    targetUrl = await resolveFreshStreamUrl(pageUrl);
+    targetUrl = await resolveFreshStreamUrl(pageUrl, false);
   }
 
   if (!targetUrl) {
     return new Response("Missing stream url or pageUrl", {
       status: 400,
       headers: { "Access-Control-Allow-Origin": "*" }
+    });
+  }
+
+  // Fast direct 307 Temporary Redirect to high-speed CDN unless explicit proxy mode is requested.
+  // This bypasses serverless bandwidth caps and provides instant buffering directly from the CDN.
+  if (!proxyMode) {
+    return new Response(null, {
+      status: 307,
+      headers: {
+        "Location": targetUrl,
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
+        "Access-Control-Expose-Headers": "Location, Range",
+        "Cache-Control": "public, max-age=1800"
+      }
     });
   }
 

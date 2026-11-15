@@ -170,6 +170,108 @@ function updateCardResume(episodeId, record) {
   }
 }
 
+// Playback Speed State & Preference
+const SPEED_STORAGE_KEY = "dtv_playback_rate";
+const SPEED_STEPS = [0.75, 1.0, 1.25, 1.5, 1.75, 2.0];
+let currentSpeed = 1.0;
+
+function initPlaybackSpeed() {
+  try {
+    const saved = localStorage.getItem(SPEED_STORAGE_KEY);
+    if (saved) {
+      const parsed = parseFloat(saved);
+      if (SPEED_STEPS.includes(parsed) || (parsed >= 0.5 && parsed <= 3.0)) {
+        currentSpeed = parsed;
+      }
+    }
+  } catch (_) {}
+  applyPlaybackSpeed(currentSpeed, false);
+  setupSpeedPicker();
+}
+
+function applyPlaybackSpeed(speed, notify = true) {
+  currentSpeed = speed;
+  try {
+    localStorage.setItem(SPEED_STORAGE_KEY, String(speed));
+  } catch (_) {}
+
+  if (player) {
+    player.playbackRate = speed;
+  }
+
+  const speedBadge = document.getElementById("player-speed-badge");
+  if (speedBadge) {
+    speedBadge.textContent = `⚡ ${speed}x`;
+  }
+
+  document.querySelectorAll(".yt-speed-chip").forEach((chip) => {
+    const s = parseFloat(chip.getAttribute("data-speed") || "1");
+    if (Math.abs(s - speed) < 0.01) {
+      chip.classList.add("active");
+    } else {
+      chip.classList.remove("active");
+    }
+  });
+
+  if (notify && playerStreamStatus) {
+    const prev = playerStreamStatus.textContent;
+    playerStreamStatus.textContent = `⚡ 播放速度已切換為 ${speed}x`;
+    setTimeout(() => {
+      if (playerStreamStatus && playerStreamStatus.textContent.includes("速度")) {
+        playerStreamStatus.textContent = prev;
+      }
+    }, 2500);
+  }
+}
+
+function cycleSpeed(direction = 1) {
+  let idx = SPEED_STEPS.findIndex((s) => Math.abs(s - currentSpeed) < 0.01);
+  if (idx === -1) idx = 1;
+  let nextIdx = idx + direction;
+  if (nextIdx < 0) nextIdx = 0;
+  if (nextIdx >= SPEED_STEPS.length) nextIdx = SPEED_STEPS.length - 1;
+  applyPlaybackSpeed(SPEED_STEPS[nextIdx], true);
+}
+
+function setupSpeedPicker() {
+  document.querySelectorAll(".yt-speed-chip").forEach((chip) => {
+    chip.addEventListener("click", () => {
+      const speed = parseFloat(chip.getAttribute("data-speed") || "1.0");
+      applyPlaybackSpeed(speed, true);
+    });
+  });
+}
+
+// In-memory & session direct stream cache for instantaneous 0ms playback buffering
+const clientStreamCache = new Map();
+
+async function resolveDirectStream(pageUrl) {
+  if (!pageUrl) return null;
+  if (clientStreamCache.has(pageUrl)) {
+    return clientStreamCache.get(pageUrl);
+  }
+  try {
+    const sessionVal = sessionStorage.getItem("dtv_stream_" + pageUrl);
+    if (sessionVal) {
+      clientStreamCache.set(pageUrl, sessionVal);
+      return sessionVal;
+    }
+  } catch (_) {}
+
+  try {
+    const res = await fetch(`/api/resolve-stream?url=${encodeURIComponent(pageUrl)}`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.ok && data.streamUrl) {
+        clientStreamCache.set(pageUrl, data.streamUrl);
+        try { sessionStorage.setItem("dtv_stream_" + pageUrl, data.streamUrl); } catch (_) {}
+        return data.streamUrl;
+      }
+    }
+  } catch (_) {}
+  return null;
+}
+
 // Initialize Native HTML5 Video Player with Resume Tracking & Auto-advance
 function initPlayer() {
   const el = document.getElementById("main-player");
@@ -182,6 +284,7 @@ function initPlayer() {
   try {
     player.addEventListener("playing", () => {
       if (playerStreamStatus) playerStreamStatus.textContent = "串流狀態：播放中 (1080p HD)";
+      player.playbackRate = currentSpeed;
       // Check if we need to apply pending seek from localStorage resume
       if (pendingSeekTime > 0) {
         const target = pendingSeekTime;
@@ -192,6 +295,7 @@ function initPlayer() {
     });
 
     player.addEventListener("loadedmetadata", () => {
+      player.playbackRate = currentSpeed;
       if (pendingSeekTime > 0 && player.duration > 0) {
         const target = Math.min(pendingSeekTime, player.duration - 2);
         pendingSeekTime = 0;
@@ -311,7 +415,9 @@ function playPart(episode, partIndex = 0, autoPlay = true, fromExplicitPartClick
 
   activePartIndex = Math.max(0, Math.min(partIndex, episode.parts.length - 1));
   const part = episode.parts[activePartIndex];
-  const streamUrl = resolveStreamUrl(part);
+  // Check if we already cached the direct high-speed CDN stream
+  const directCdnUrl = clientStreamCache.get(part.url);
+  const streamUrl = directCdnUrl || resolveStreamUrl(part);
 
   // Update Player Header & Details
   if (playerTitle) playerTitle.textContent = episode.title || "綜藝玩很大";
@@ -331,10 +437,11 @@ function playPart(episode, partIndex = 0, autoPlay = true, fromExplicitPartClick
   // Update Active Card in Grid
   highlightActiveCard(episode.id);
 
-  // Load Source into Native Player
+  // Load Source into Native Player with Speed Preservation
   if (player) {
     player.src = streamUrl;
     try { player.load(); } catch (_) {}
+    player.playbackRate = currentSpeed;
 
     if (autoPlay) {
       const playPromise = player.play();
@@ -344,6 +451,28 @@ function playPart(episode, partIndex = 0, autoPlay = true, fromExplicitPartClick
           if (playerStreamStatus) playerStreamStatus.textContent = "串流已就緒，請點擊播放";
         });
       }
+    }
+
+    // Resolve direct CDN stream in background for instantaneous buffering if not cached
+    if (!directCdnUrl && part.url && window.location.protocol.startsWith("http")) {
+      resolveDirectStream(part.url).then((direct) => {
+        if (direct && player && activeEpisode?.id === episode.id && activePartIndex === partIndex) {
+          if (player.src !== direct && (!player.currentTime || player.currentTime < 3)) {
+            const curTime = player.currentTime || 0;
+            const wasPlaying = !player.paused;
+            player.src = direct;
+            if (curTime > 0) player.currentTime = curTime;
+            player.playbackRate = currentSpeed;
+            if (wasPlaying) player.play().catch(() => {});
+          }
+        }
+      });
+    }
+
+    // Pre-resolve next part in background for instant transition
+    if (episode.parts && activePartIndex < episode.parts.length - 1) {
+      const nextPart = episode.parts[activePartIndex + 1];
+      if (nextPart?.url) resolveDirectStream(nextPart.url);
     }
   }
 }
@@ -676,6 +805,20 @@ function setupShortcuts() {
         e.preventDefault();
         player.muted = !player.muted;
         break;
+
+      case ">":
+      case ".":
+      case "]":
+        e.preventDefault();
+        cycleSpeed(1);
+        break;
+
+      case "<":
+      case ",":
+      case "[":
+        e.preventDefault();
+        cycleSpeed(-1);
+        break;
     }
   });
 }
@@ -701,6 +844,7 @@ if (refreshBtn) {
 if (typeof window !== "undefined") {
   window.addEventListener("DOMContentLoaded", () => {
     initPlayer();
+    initPlaybackSpeed();
     setupShortcuts();
     loadCatalog();
   });
@@ -713,11 +857,15 @@ if (typeof window !== "undefined") {
   window.renderGrid = renderGrid;
   window.handleSearch = handleSearch;
   window.resolveStreamUrl = resolveStreamUrl;
+  window.resolveDirectStream = resolveDirectStream;
   window.saveResume = saveResume;
   window.getEpisodeResume = getEpisodeResume;
   window.clearEpisodeResume = clearEpisodeResume;
   window.formatTime = formatTime;
   window.loadNextPage = loadNextPage;
+  window.applyPlaybackSpeed = applyPlaybackSpeed;
+  window.cycleSpeed = cycleSpeed;
+  window.SPEED_STEPS = SPEED_STEPS;
   window.STORAGE_KEY = STORAGE_KEY;
 }
 
@@ -729,10 +877,14 @@ if (typeof module !== "undefined" && module.exports) {
     renderGrid,
     handleSearch,
     resolveStreamUrl,
+    resolveDirectStream,
     saveResume,
     getEpisodeResume,
     clearEpisodeResume,
     formatTime,
+    applyPlaybackSpeed,
+    cycleSpeed,
+    SPEED_STEPS,
     STORAGE_KEY
   };
 }

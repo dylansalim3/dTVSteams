@@ -138,4 +138,32 @@ describe("YouTube Web App UI & Video.js Compliance", () => {
     win.clearEpisodeResume(testId);
     expect(win.getEpisodeResume(testId)).toBeNull();
   });
+
+  it("implements playback speed controls and persistence in web-app app.js", () => {
+    const html = fs.readFileSync(htmlPath, "utf-8");
+    const js = fs.readFileSync(jsPath, "utf-8");
+    const dom = new JSDOM(html, { runScripts: "dangerously", url: "http://localhost/" });
+    const win = dom.window as any;
+
+    win.eval(js);
+
+    expect(typeof win.applyPlaybackSpeed).toBe("function");
+    expect(typeof win.cycleSpeed).toBe("function");
+    expect(Array.isArray(win.SPEED_STEPS)).toBe(true);
+    expect(win.SPEED_STEPS).toContain(1.25);
+    expect(win.SPEED_STEPS).toContain(1.5);
+    expect(win.SPEED_STEPS).toContain(2.0);
+
+    // Apply speed 1.5x
+    win.applyPlaybackSpeed(1.5, false);
+    expect(win.localStorage.getItem("dtv_playback_rate")).toBe("1.5");
+
+    const badge = win.document.getElementById("player-speed-badge");
+    expect(badge?.textContent).toContain("1.5x");
+
+    // Cycle speed forward
+    win.cycleSpeed(1); // 1.5 -> 1.75
+    expect(win.localStorage.getItem("dtv_playback_rate")).toBe("1.75");
+    expect(badge?.textContent).toContain("1.75x");
+  });
 });
