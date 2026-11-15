@@ -199,6 +199,18 @@ html, body {
   max-height: 70vh;
 }
 
+/* Native Video Player (Rock-solid Mobile & Desktop) */
+.yt-native-player {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 16 / 9;
+  display: block;
+  object-fit: contain;
+  background: #000;
+  border: 0;
+  outline: none;
+}
+
 /* Video.js Override Theme */
 .video-js.vjs-theme-yt {
   width: 100% !important;

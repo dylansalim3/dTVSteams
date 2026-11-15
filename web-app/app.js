@@ -106,7 +106,7 @@ function showResumeToast(partIndex, seekTime) {
   if (restartBtn) {
     restartBtn.onclick = () => {
       if (player) {
-        player.currentTime(0);
+        player.currentTime = 0;
         player.play().catch(() => {});
       }
       if (activeEpisode) {
@@ -170,73 +170,63 @@ function updateCardResume(episodeId, record) {
   }
 }
 
-// Initialize Video.js Player with Resume Tracking
+// Initialize Native HTML5 Video Player with Resume Tracking & Auto-advance
 function initPlayer() {
-  if (typeof videojs === "undefined") {
-    console.warn("Video.js is not loaded yet");
+  const el = document.getElementById("main-player");
+  if (!el) {
+    console.warn("Main player element not found");
     return;
   }
+  player = el;
 
   try {
-    player = videojs("main-player", {
-      controls: true,
-      autoplay: false,
-      preload: "auto",
-      fluid: true,
-      playbackRates: [0.75, 1, 1.25, 1.5, 2],
-      controlBar: {
-        pictureInPictureToggle: true,
-        volumePanel: { inline: false }
-      }
-    });
-
-    player.on("playing", () => {
+    player.addEventListener("playing", () => {
       if (playerStreamStatus) playerStreamStatus.textContent = "串流狀態：播放中 (1080p HD)";
       // Check if we need to apply pending seek from localStorage resume
       if (pendingSeekTime > 0) {
         const target = pendingSeekTime;
         pendingSeekTime = 0;
-        player.currentTime(target);
+        player.currentTime = target;
         showResumeToast(activePartIndex, target);
       }
     });
 
-    player.on("loadedmetadata", () => {
-      if (pendingSeekTime > 0 && player.duration() > 0) {
-        const target = Math.min(pendingSeekTime, player.duration() - 2);
+    player.addEventListener("loadedmetadata", () => {
+      if (pendingSeekTime > 0 && player.duration > 0) {
+        const target = Math.min(pendingSeekTime, player.duration - 2);
         pendingSeekTime = 0;
-        player.currentTime(target);
+        player.currentTime = target;
         showResumeToast(activePartIndex, target);
       }
     });
 
     // Save resume position periodically (every 2 seconds)
-    player.on("timeupdate", () => {
+    player.addEventListener("timeupdate", () => {
       const now = Date.now();
       if (now - lastSaveTime > 2000) {
         lastSaveTime = now;
-        if (activeEpisode && player && !player.paused()) {
-          saveResume(activeEpisode.id, activePartIndex, player.currentTime(), player.duration());
+        if (activeEpisode && player && !player.paused) {
+          saveResume(activeEpisode.id, activePartIndex, player.currentTime, player.duration);
         }
       }
     });
 
-    player.on("pause", () => {
+    player.addEventListener("pause", () => {
       if (playerStreamStatus) playerStreamStatus.textContent = "串流狀態：已暫停";
       if (activeEpisode && player) {
-        saveResume(activeEpisode.id, activePartIndex, player.currentTime(), player.duration());
+        saveResume(activeEpisode.id, activePartIndex, player.currentTime, player.duration);
       }
     });
 
-    player.on("waiting", () => {
+    player.addEventListener("waiting", () => {
       if (playerStreamStatus) playerStreamStatus.textContent = "串流狀態：緩衝載入中...";
     });
 
     // Auto-advance to next part when current part finishes
-    player.on("ended", () => {
+    player.addEventListener("ended", () => {
       if (activeEpisode) {
         // Mark current part completed
-        saveResume(activeEpisode.id, activePartIndex, player.duration(), player.duration());
+        saveResume(activeEpisode.id, activePartIndex, player.duration, player.duration);
       }
 
       if (activeEpisode && activeEpisode.parts && activePartIndex < activeEpisode.parts.length - 1) {
@@ -250,14 +240,14 @@ function initPlayer() {
     });
 
     // Handle stream playback error with automatic fresh token retry
-    player.on("error", () => {
-      const err = player.error();
-      console.warn("Video.js playback error:", err);
+    player.addEventListener("error", () => {
+      console.warn("Video playback error:", player.error);
       const currentPart = activeEpisode?.parts?.[activePartIndex];
       if (currentPart?.url && window.location.protocol.startsWith("http")) {
         if (playerStreamStatus) playerStreamStatus.textContent = "串流重新獲取最新線路...";
         const freshStream = `/api/stream?pageUrl=${encodeURIComponent(currentPart.url)}&refresh=true`;
-        player.src({ src: freshStream, type: "video/mp4" });
+        player.src = freshStream;
+        try { player.load(); } catch (_) {}
         player.play().catch(() => {});
         return;
       }
@@ -267,11 +257,11 @@ function initPlayer() {
     // Save on tab close
     window.addEventListener("beforeunload", () => {
       if (activeEpisode && player) {
-        saveResume(activeEpisode.id, activePartIndex, player.currentTime(), player.duration());
+        saveResume(activeEpisode.id, activePartIndex, player.currentTime, player.duration);
       }
     });
   } catch (e) {
-    console.error("Failed to initialize videojs:", e);
+    console.error("Failed to initialize player:", e);
   }
 }
 
@@ -341,17 +331,19 @@ function playPart(episode, partIndex = 0, autoPlay = true, fromExplicitPartClick
   // Update Active Card in Grid
   highlightActiveCard(episode.id);
 
-  // Load Source into Video.js Player
+  // Load Source into Native Player
   if (player) {
-    player.src({
-      src: streamUrl,
-      type: "video/mp4"
-    });
+    player.src = streamUrl;
+    try { player.load(); } catch (_) {}
 
     if (autoPlay) {
-      player.play().catch((err) => {
-        console.log("Autoplay blocked or waiting user gesture:", err);
-      });
+      const playPromise = player.play();
+      if (playPromise !== undefined) {
+        playPromise.catch((err) => {
+          console.log("Autoplay waiting for user tap:", err);
+          if (playerStreamStatus) playerStreamStatus.textContent = "串流已就緒，請點擊播放";
+        });
+      }
     }
   }
 }
@@ -627,30 +619,30 @@ function setupShortcuts() {
       case " ":
       case "k":
         e.preventDefault();
-        if (player.paused()) player.play();
+        if (player.paused) player.play().catch(() => {});
         else player.pause();
         break;
 
       case "ArrowLeft":
       case "j":
         e.preventDefault();
-        player.currentTime(Math.max(0, player.currentTime() - 10));
+        player.currentTime = Math.max(0, player.currentTime - 10);
         break;
 
       case "ArrowRight":
       case "l":
         e.preventDefault();
-        player.currentTime(Math.min(player.duration() || 0, player.currentTime() + 10));
+        player.currentTime = Math.min(player.duration || 0, player.currentTime + 10);
         break;
 
       case "ArrowUp":
         e.preventDefault();
-        player.volume(Math.min(1, player.volume() + 0.1));
+        player.volume = Math.min(1, player.volume + 0.1);
         break;
 
       case "ArrowDown":
         e.preventDefault();
-        player.volume(Math.max(0, player.volume() - 0.1));
+        player.volume = Math.max(0, player.volume - 0.1);
         break;
 
       case "1":
@@ -668,14 +660,21 @@ function setupShortcuts() {
       case "f":
       case "F":
         e.preventDefault();
-        if (player.isFullscreen()) player.exitFullscreen();
-        else player.requestFullscreen();
+        if (document.fullscreenElement) {
+          if (document.exitFullscreen) document.exitFullscreen();
+        } else {
+          if (player.requestFullscreen) {
+            player.requestFullscreen().catch(() => {});
+          } else if (player.webkitEnterFullscreen) {
+            player.webkitEnterFullscreen();
+          }
+        }
         break;
 
       case "m":
       case "M":
         e.preventDefault();
-        player.muted(!player.muted());
+        player.muted = !player.muted;
         break;
     }
   });

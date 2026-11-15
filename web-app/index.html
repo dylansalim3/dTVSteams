@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>dTVStream - 綜藝玩很大線上看</title>
   <link rel="stylesheet" href="./vendor/video-js.min.css">
-  <link rel="stylesheet" href="./vendor/videojs10-skin.css">
   <link rel="stylesheet" href="./app.css">
 </head>
 <body>
@@ -49,21 +48,18 @@
     <!-- Theater / Active Video Player Section -->
     <section class="yt-player-section" aria-label="目前播放影片">
       <div class="yt-player-container">
-        <video-player>
-          <video-skin style="display: block; width: 100%; aspect-ratio: 16 / 9;">
-            <video
-              id="main-player"
-              class="video-js vjs-big-play-centered vjs-theme-yt"
-              controls
-              preload="auto"
-              playsinline
-              crossorigin="anonymous"
-              referrerpolicy="no-referrer"
-            >
-              <a href="https://videojs.org/help" target="_blank" rel="noopener noreferrer">Video player not working?</a>
-            </video>
-          </video-skin>
-        </video-player>
+        <video
+          id="main-player"
+          class="yt-native-player video-js vjs-theme-yt"
+          controls
+          preload="metadata"
+          playsinline
+          webkit-playsinline
+          poster="./media/thumb-default.svg"
+        >
+          <source src="./media/sample-part1.mp4" type="video/mp4">
+          您的瀏覽器不支援 HTML5 影片播放。
+        </video>
       </div>
 
       <!-- Video Details & Part Selector Under Player -->
@@ -125,8 +121,6 @@
     <p>dTVStream 個人播放平台 · 支援電視遙控鍵盤快捷鍵：<code>Space / Enter</code> (播放/暫停)、<code>← / →</code> (快退/快進 10s)、<code>1 / 2 / 3</code> (切換分段)、<code>F</code> (全螢幕)</p>
   </footer>
 
-  <script type="module" src="./vendor/videojs10.min.js"></script>
-  <script src="./vendor/video.min.js"></script>
   <script src="./frame-thumbnails.js"></script>
   <script src="./app.js"></script>
 </body>
