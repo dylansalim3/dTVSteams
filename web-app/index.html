@@ -1,49 +1,133 @@
 <!doctype html>
 <html lang="zh-Hant">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>dTVSteams Personal</title>
-<style>
-:root{--bg:#141414;--surface:#1f1f1f;--text:#fff;--muted:#aaa;--red:#e50914;--radius:0.25rem;--gap:0.75rem}
-*{box-sizing:border-box}body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif;margin:0}
-a{color:inherit}.skip{position:absolute;left:-9999px}.skip:focus{left:1rem;top:1rem;background:#fff;color:#000;padding:0.5rem}
-nav.top{display:flex;align-items:center;gap:1rem;padding:0.75rem 1rem;background:linear-gradient(#000,transparent);position:sticky;top:0;z-index:10;background-color:rgba(0,0,0,.85)}
-.logo{color:var(--red);font-weight:800;font-size:1.25rem;letter-spacing:.05em;margin:0}
-.navlinks{display:flex;gap:1rem;font-size:0.875rem;color:var(--muted)}.navlinks a{text-decoration:none}.navlinks a[aria-current="page"]{color:var(--text)}
-.search{margin-left:auto;display:flex;gap:0.5rem;align-items:center}
-.search input{background:#000;border:1px solid #444;color:var(--text);padding:0.5rem;border-radius:var(--radius)}
-.search button,.btn{background:var(--red);border:0;color:#fff;padding:0.5rem 1rem;border-radius:var(--radius);cursor:pointer;font-weight:600}
-.btn.secondary{background:rgba(109,109,110,.7)}
-.btn:focus-visible,.cardbtn:focus-visible,input:focus-visible{outline:2px solid #fff;outline-offset:2px}
-.hero{position:relative;padding:3rem 1rem 2rem;min-height:40vh;display:flex;align-items:flex-end;background:linear-gradient(77deg,#000 20%,transparent 60%),linear-gradient(transparent 50%,var(--bg));}
-.hero .inner{max-width:36rem}.kicker{color:var(--muted);letter-spacing:.2em;font-size:0.75rem}.hero h2{font-size:2rem;margin:0.5rem 0}.hero p{color:var(--muted)}.actions{display:flex;gap:0.5rem;margin-top:1rem}
-section.rowsec{padding:0 0 0 1rem}section.rowsec h2{font-size:1.125rem;margin:1rem 0 0.5rem}
-.row{display:flex;gap:var(--gap);overflow-x:auto;padding:0.5rem 1rem 1rem 0;scroll-snap-type:x mandatory}
-.card{flex:0 0 15rem;scroll-snap-align:start;background:var(--surface);border-radius:var(--radius);overflow:hidden;border:1px solid #333;transition:transform .15s}
-.card:hover,.card:focus-within{transform:scale(1.04)}
-.thumb{aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:800;color:#fff;background:linear-gradient(135deg,#3a3a3a,#101010)}
-.cardbody{padding:0.5rem 0.75rem 0.75rem}.cardbody .t{font-size:0.875rem;margin:0 0 0.25rem}.badge{font-size:0.75rem;color:var(--muted)}
-.cardbtn{display:block;width:100%;background:none;border:0;color:inherit;text-align:left;padding:0;cursor:pointer}
-#meta{padding:0 1rem;color:var(--muted);font-size:0.875rem}
-.notice{margin:0.5rem 1rem;padding:0.5rem 0.75rem;border-radius:var(--radius);background:#2a2a2a;border:1px solid #444}
-.playerwrap{padding:0 1rem 3rem}video{width:100%;max-width:45rem;background:#000;border-radius:var(--radius)}
-.skel{display:flex;gap:var(--gap);padding:0.5rem 1rem}.skel div{flex:0 0 15rem;aspect-ratio:16/9;background:#2a2a2a;border-radius:var(--radius);animation:pulse 1.2s infinite}
-@keyframes pulse{50%{opacity:.5}}
-@media(max-width:40rem){.card{flex-basis:10rem}.hero h2{font-size:1.5rem}.navlinks{display:none}}
-</style>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>dTVStream - 綜藝玩很大線上看</title>
+  <link rel="stylesheet" href="./vendor/video-js.min.css">
+  <link rel="stylesheet" href="./vendor/videojs10-skin.css">
+  <link rel="stylesheet" href="./app.css">
 </head>
 <body>
-<a class="skip" href="#rows">跳到片單</a>
-<nav class="top" aria-label="主導覽"><h1 class="logo">dTVSteams</h1>
-<div class="navlinks"><a href="#" aria-current="page">首頁</a><a href="#rows">影集</a><a href="#player">我的片單</a></div>
-<div class="search"><input id="q" type="search" aria-label="搜尋集數" placeholder="搜尋"><button id="refresh">手動更新</button></div>
-</nav>
-<div id="alert"></div>
-<header class="hero"><div class="inner"><div class="kicker">本週精選</div><h2 id="herotitle">載入中…</h2><p id="herometa"></p>
-<div class="actions"><button class="btn" id="heroplay">▶ 播放</button><button class="btn secondary" id="heroinfo">更多資訊</button></div></div></header>
-<div id="meta" role="status"></div>
-<section class="rowsec" aria-labelledby="rowh"><h2 id="rowh">最新上架</h2><div class="row" id="rows"><div class="skel" aria-hidden="true"><div></div><div></div><div></div></div></div></section>
-<section class="playerwrap" aria-labelledby="ph"><h2 id="ph">播放器 (Part 1→2→3)</h2>
-<video id="player" controls preload="metadata"></video><div id="parts" style="margin-top:0.5rem"></div><p id="ts" style="color:var(--muted)"></p></section>
-<script src="./app.js"></script>
+  <a href="#episodes-section" class="skip-link">跳到影片清單</a>
+
+  <!-- YouTube-Style Header -->
+  <header class="yt-header" role="banner">
+    <div class="yt-header-left">
+      <a href="./" class="yt-brand" aria-label="dTVStream 首頁">
+        <div class="yt-logo-badge">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
+            <path d="M10 15l5.19-3L10 9v6m11.56-7.83c.13.47.22 1.1.28 1.9.07.8.1 1.49.1 2.09L22 12c0 2.19-.16 3.8-.44 4.83-.25.9-.83 1.48-1.73 1.73-.47.13-1.33.22-2.65.28-1.3.07-2.49.1-3.59.1L12 22c-4.19 0-6.8-.16-7.83-.44-.9-.25-1.48-.83-1.73-1.73-.13-.47-.22-1.1-.28-1.9-.07-.8-.1-1.49-.1-2.09L2 12c0-2.19.16-3.8.44-4.83.25-.9.83-1.48 1.73-1.73.47-.13 1.33-.22 2.65-.28 1.3-.07 2.49-.1 3.59-.1L12 2c4.19 0 6.8.16 7.83.44.9.25 1.48.83 1.73 1.73z"/>
+          </svg>
+        </div>
+        <span class="yt-brand-title">dTVStream</span>
+        <span class="yt-brand-sub">綜藝玩很大</span>
+      </a>
+    </div>
+
+    <div class="yt-header-center">
+      <div class="yt-search-box">
+        <input type="search" id="q" placeholder="搜尋集數、日期、地名 (例如: 嘉義, 11-08)..." aria-label="搜尋集數">
+        <button id="search-clear-btn" class="yt-search-clear" aria-label="清除搜尋" style="display:none;">✕</button>
+      </div>
+    </div>
+
+    <div class="yt-header-right">
+      <a href="./react/" class="yt-btn yt-btn-secondary" style="font-size:0.85rem; padding: 6px 14px; text-decoration: none; border-radius: 20px;" title="切換至 Video.js 10 React 官方組件版">React v10 版</a>
+      <span class="yt-status-badge" id="catalog-status">載入中...</span>
+      <button class="yt-icon-btn" id="refresh-btn" aria-label="重新整理集數清單" title="重新整理">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M23 4v6h-6M1 20v-6h6"/>
+          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content Layout -->
+  <main class="yt-main" role="main">
+    <!-- Theater / Active Video Player Section -->
+    <section class="yt-player-section" aria-label="目前播放影片">
+      <div class="yt-player-container">
+        <video-player>
+          <video-skin style="display: block; width: 100%; aspect-ratio: 16 / 9;">
+            <video
+              id="main-player"
+              class="video-js vjs-big-play-centered vjs-theme-yt"
+              controls
+              preload="auto"
+              playsinline
+              crossorigin="anonymous"
+              referrerpolicy="no-referrer"
+            >
+              <a href="https://videojs.org/help" target="_blank" rel="noopener noreferrer">Video player not working?</a>
+            </video>
+          </video-skin>
+        </video-player>
+      </div>
+
+      <!-- Video Details & Part Selector Under Player -->
+      <div class="yt-player-details">
+        <div class="yt-details-header">
+          <h1 class="yt-video-title" id="player-title">請選擇下方集數開始播放</h1>
+          <div class="yt-video-actions">
+            <button class="yt-btn yt-btn-secondary" id="open-source-btn" aria-label="在外部新視窗開啟來源網頁">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                <polyline points="15 3 21 3 21 9"/>
+                <line x1="10" y1="14" x2="21" y2="3"/>
+              </svg>
+              <span>來源網頁</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="yt-meta-row">
+          <span class="yt-meta-pill yt-badge-red" id="player-part-badge">Part 1</span>
+          <span class="yt-meta-pill" id="player-date-badge">2026</span>
+          <span class="yt-meta-pill">1080p HD</span>
+          <span class="yt-meta-pill">自動連續播放</span>
+          <span class="yt-stream-source" id="player-stream-status">串流狀態：準備中</span>
+        </div>
+
+        <!-- Part Picker Pills (Part 1, Part 2, Part 3) -->
+        <div class="yt-parts-picker" id="player-parts-nav" role="group" aria-label="集數分段切換"></div>
+
+        <!-- Resume Notice Banner -->
+        <div id="player-resume-toast" class="yt-resume-toast" style="display:none;" role="status"></div>
+      </div>
+    </section>
+
+    <!-- Simple Episode List Section (YouTube Grid) -->
+    <section class="yt-list-section" id="episodes-section" aria-label="集數列表">
+      <div class="yt-section-header">
+        <h2 class="yt-section-title">全部集數列表</h2>
+        <span class="yt-item-count" id="episode-count-badge">共 10 集</span>
+      </div>
+
+      <div class="yt-episodes-grid" id="episodes-grid">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Load More / Pagination Bar -->
+      <div class="yt-pagination-bar" id="pagination-bar">
+        <button class="yt-btn yt-btn-load-more" id="load-more-btn" aria-label="載入更多歷史集數">
+          <span class="yt-load-icon">▼</span>
+          <span id="load-more-text">載入更多歷史集數 (第 2 頁 / 共 64 頁)</span>
+        </button>
+        <span class="yt-pagination-info" id="pagination-info">已顯示 10 集 / 全劇 640+ 集</span>
+      </div>
+    </section>
+  </main>
+
+  <!-- YouTube Footer -->
+  <footer class="yt-footer" role="contentinfo">
+    <p>dTVStream 個人播放平台 · 支援電視遙控鍵盤快捷鍵：<code>Space / Enter</code> (播放/暫停)、<code>← / →</code> (快退/快進 10s)、<code>1 / 2 / 3</code> (切換分段)、<code>F</code> (全螢幕)</p>
+  </footer>
+
+  <script type="module" src="./vendor/videojs10.min.js"></script>
+  <script src="./vendor/video.min.js"></script>
+  <script src="./frame-thumbnails.js"></script>
+  <script src="./app.js"></script>
 </body>
 </html>

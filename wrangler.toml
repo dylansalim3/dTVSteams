@@ -1,0 +1,8 @@
+name = "dtvsteams"
+compatibility_date = "2026-11-15"
+pages_build_output_dir = "./dist"
+
+# Deployment Configuration for Cloudflare Pages
+# Run 'npm run deploy' to deploy the unified portal + normal web + tv web + edge functions
+# Run 'npm run deploy:web' to deploy standalone normal web app
+# Run 'npm run deploy:tv' to deploy standalone TV web app

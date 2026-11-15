@@ -34,3 +34,14 @@ export function parseParts(html: string, baseUrl: string): Part[] {
   });
   return out;
 }
+
+export function parseStreamUrl(html: string): string | null {
+  const dom = new JSDOM(html);
+  const source = dom.window.document.querySelector("video source");
+  if (source) {
+    const src = (source as HTMLSourceElement).getAttribute("src") ?? "";
+    if (src) return src;
+  }
+  const match = html.match(/<source[^>]+src=['"]([^'"]+)['"]/i);
+  return match ? match[1] : null;
+}

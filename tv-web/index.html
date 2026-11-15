@@ -1,87 +1,873 @@
 <!doctype html>
 <html lang="zh-Hant">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>dTVSteams TV (10-foot UI)</title>
-<style>
-:root{--bg:#0b0b0b;--red:#e50914}
-*{box-sizing:border-box}body{background:var(--bg);color:#fff;font-family:system-ui,sans-serif;margin:0;font-size:1.5rem}
-.top{padding:1rem 2rem;color:var(--red);font-weight:800;font-size:2rem}
-#title{padding:0 2rem;font-size:2.5rem;margin:0.5rem 0}
-#meta{padding:0 2rem;color:#aaa;font-size:1.25rem}
-.row{display:flex;gap:1rem;padding:1rem 2rem;overflow-x:auto}
-.card{flex:0 0 22rem;background:#1f1f1f;border-radius:0.5rem;overflow:hidden;border:0.25rem solid transparent}
-.card .thumb{aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;font-size:4rem;font-weight:800;background:linear-gradient(135deg,#3a3a3a,#101010)}
-.card .t{padding:1rem;font-size:1.5rem}
-.card.focused{border-color:#fff;transform:scale(1.05)}
-.hint{padding:1rem 2rem;color:#aaa}video{width:calc(100% - 4rem);margin:0 2rem;background:#000}
-#parts{padding:1rem 2rem;display:flex;gap:1rem}
-#parts button{font-size:1.5rem;padding:1rem 2rem;background:#333;color:#fff;border:0.25rem solid transparent;border-radius:0.5rem}
-#parts button.focused{border-color:#fff;background:var(--red)}
-</style>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>dTVStream TV - 綜藝玩很大線上看</title>
+  <link rel="stylesheet" href="./vendor/video-js.min.css">
+  <link rel="stylesheet" href="./vendor/videojs10-skin.css">
+  <link rel="stylesheet" href="./tv.css">
 </head>
 <body>
-<div class="top">dTVSteams TV</div>
-<h1 id="title">載入中…</h1>
-<p id="meta" role="status"></p>
-<div class="row" id="rows" role="listbox" aria-label="集數"></div>
-<video id="player" controls preload="metadata"></video>
-<div id="parts"></div>
-<p class="hint">方向鍵移動 · Enter 播放 · 數字 1/2/3 切換 Part（遙控器對應：上下左右 + 確認鍵）</p>
-<script>
-let eps = [], focus = 0, partFocus = -1;
-async function load() {
-  try {
-    const r = await fetch("./catalog.json", { cache: "no-store" });
-    const j = await r.json();
-    eps = j.episodes || [];
-  } catch (e) { eps = []; }
-  document.getElementById("meta").textContent = eps.length + " 集";
-  render();
-}
-function render() {
-  const rows = document.getElementById("rows");
-  rows.innerHTML = "";
-  eps.forEach((ep, i) => {
-    const c = document.createElement("div");
-    c.className = "card" + (i === focus && partFocus < 0 ? " focused" : "");
-    c.setAttribute("role", "option");
-    c.innerHTML = "<div class='thumb'>" + (ep.title || "?")[0] + "</div><div class='t'>" + ep.title + "</div>";
-    c.onclick = () => { focus = i; partFocus = -1; play(); };
-    rows.appendChild(c);
-  });
-  const f = eps[focus];
-  document.getElementById("title").textContent = f ? f.title : "尚無內容";
-  const cards = rows.children;
-  if (cards[focus]) cards[focus].scrollIntoView({ inline: "center", block: "nearest" });
-  renderParts();
-}
-function parts() {
-  const ep = eps[focus];
-  if (!ep) return [];
-  return ep.parts && ep.parts.length ? ep.parts : [{ label: "Part 1", url: ep.url }];
-}
-function renderParts() {
-  const el = document.getElementById("parts");
-  el.innerHTML = "";
-  parts().forEach((p, i) => {
-    const b = document.createElement("button");
-    b.textContent = p.label;
-    if (i === partFocus) b.className = "focused";
-    b.onclick = () => { partFocus = i; playPart(i); render(); };
-    el.appendChild(b);
-  });
-}
-function play() { partFocus = 0; const p = parts()[0]; if (p) document.getElementById("player").src = p.url; render(); }
-function playPart(i) { const p = parts()[i]; if (p) { const v = document.getElementById("player"); v.src = p.url; v.play().catch(() => {}); } }
-document.addEventListener("keydown", (e) => {
-  if (e.key === "ArrowRight") { if (partFocus >= 0) partFocus = Math.min(parts().length - 1, partFocus + 1); else focus = Math.min(eps.length - 1, focus + 1); render(); e.preventDefault(); }
-  if (e.key === "ArrowLeft") { if (partFocus >= 0) partFocus = Math.max(0, partFocus - 1); else focus = Math.max(0, focus - 1); render(); e.preventDefault(); }
-  if (e.key === "ArrowDown") { if (partFocus < 0 && parts().length) partFocus = 0; render(); e.preventDefault(); }
-  if (e.key === "ArrowUp") { partFocus = -1; render(); e.preventDefault(); }
-  if (e.key === "Enter") { if (partFocus >= 0) playPart(partFocus); else play(); e.preventDefault(); }
-  if (["1","2","3"].includes(e.key)) { const i = Number(e.key) - 1; if (parts()[i]) { partFocus = i; playPart(i); render(); } }
-});
-load();
-</script>
+  <div class="tv-app-shell">
+    <!-- TV Header -->
+    <header class="tv-header" role="banner">
+      <div class="tv-brand">
+        <div class="tv-logo-badge" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+            <path d="M10 15l5.19-3L10 9v6m11.56-7.83c.13.47.22 1.1.28 1.9.07.8.1 1.49.1 2.09L22 12c0 2.19-.16 3.8-.44 4.83-.25.9-.83 1.48-1.73 1.73-.47.13-1.33.22-2.65.28-1.3.07-2.49.1-3.59.1L12 22c-4.19 0-6.8-.16-7.83-.44-.9-.25-1.48-.83-1.73-1.73-.13-.47-.22-1.1-.28-1.9-.07-.8-.1-1.49-.1-2.09L2 12c0-2.19.16-3.8.44-4.83.25-.9.83-1.48 1.73-1.73.47-.13 1.33-.22 2.65-.28 1.3-.07 2.49-.1 3.59-.1L12 2c4.19 0 6.8.16 7.83.44.9.25 1.48.83 1.73 1.73z"/>
+          </svg>
+        </div>
+        <span class="tv-brand-title">dTVStream TV</span>
+        <span class="tv-brand-sub">綜藝玩很大</span>
+      </div>
+
+      <div class="tv-header-status">
+        <span class="tv-status-badge" id="tv-catalog-status">載入中...</span>
+        <span class="tv-status-badge" id="tv-episode-count">共 10 集</span>
+      </div>
+    </header>
+
+    <!-- TV Theater Player Section -->
+    <section class="tv-player-section" aria-label="電視主播放器">
+      <div class="tv-player-wrapper">
+        <button class="tv-exit-fs-btn" id="tv-exit-fs-btn" aria-label="退出全螢幕" title="退出全螢幕 (Esc / Back)">✕ 退出全螢幕</button>
+        <video-player>
+          <video-skin style="display: block; width: 100%; height: 100%; aspect-ratio: 16 / 9;">
+            <video
+              id="tv-player"
+              class="video-js vjs-big-play-centered vjs-theme-yt"
+              controls
+              preload="auto"
+              playsinline
+              crossorigin="anonymous"
+              tabindex="0"
+            >
+              <a href="https://videojs.org/help" target="_blank" rel="noopener noreferrer">Video player not working?</a>
+            </video>
+          </video-skin>
+        </video-player>
+      </div>
+
+      <div class="tv-player-details">
+        <div class="tv-details-top">
+          <h1 class="tv-video-title" id="tv-title">綜藝玩很大</h1>
+          <span class="tv-stream-status" id="tv-stream-status">串流狀態：準備就緒</span>
+        </div>
+
+        <div class="tv-meta-row">
+          <span class="tv-meta-pill tv-badge-red" id="tv-part-badge">Part 1</span>
+          <span class="tv-meta-pill" id="tv-date-badge">2026</span>
+          <span class="tv-meta-pill">1080p HD</span>
+          <span class="tv-meta-pill">遙控器快捷鍵：1 / 2 / 3 切換分段 · 0 從頭播放</span>
+        </div>
+
+        <!-- TV Part Selector Bar (D-Pad focusable) -->
+        <div class="tv-parts-bar" id="tv-parts-bar" role="group" aria-label="集數分段切換">
+          <button class="tv-part-btn active" id="tv-part-btn-0" data-part="0" tabindex="0">▶ Part 1</button>
+          <button class="tv-part-btn" id="tv-part-btn-1" data-part="1" tabindex="0">▶ Part 2</button>
+          <button class="tv-part-btn" id="tv-part-btn-2" data-part="2" tabindex="0">▶ Part 3</button>
+        </div>
+
+        <!-- TV Resume Notice Banner -->
+        <div id="tv-resume-toast" class="tv-resume-toast" style="display:none;" role="status"></div>
+      </div>
+    </section>
+
+    <!-- TV Simple Episode List Section (YouTube TV Grid) -->
+    <section class="tv-list-section" aria-label="電視影片清單">
+      <div class="tv-section-header">
+        <h2 class="tv-section-title">全部集數清單</h2>
+        <span class="tv-item-count">使用電視遙控器 ◀ ▶ 選擇，按 OK 播放</span>
+      </div>
+
+      <div class="tv-episodes-grid" id="tv-episodes-grid">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+
+    <!-- TV Remote Control Navigation Hints Footer -->
+    <footer class="tv-remote-hints" role="contentinfo">
+      <span><span class="tv-key-badge">◀ ▶</span> 選擇影片 / 分段</span>
+      <span><span class="tv-key-badge">▲ ▼</span> 切換分段列與影片清單</span>
+      <span><span class="tv-key-badge">OK / Enter</span> 播放影片</span>
+      <span><span class="tv-key-badge">1 2 3</span> 遙控器數字鍵秒切 Part</span>
+      <span><span class="tv-key-badge">0</span> 從頭播放</span>
+      <span><span class="tv-key-badge">Space</span> 暫停 / 播放</span>
+      <span><span class="tv-key-badge">F</span> 全螢幕</span>
+    </footer>
+  </div>
+
+  <script type="module" src="./vendor/videojs10.min.js"></script>
+  <script src="./vendor/video.min.js"></script>
+  <script src="./frame-thumbnails.js"></script>
+  <script>
+    // YouTube-Style TV Controller Engine with Spatial D-Pad Navigation & Resume
+    const STORAGE_KEY = "dtv_resume_history";
+
+    let episodes = [];
+    let activeEpisodeIndex = 0;
+    let activePartIndex = 0;
+    let tvPlayer = null;
+    let pendingSeekTime = 0;
+    let lastSaveTime = 0;
+    let toastTimeout = null;
+
+    // Navigation focus state: "parts" | "cards"
+    let focusZone = "cards";
+    let focusCardIndex = 0;
+    let focusPartIndex = 0;
+
+    const tvTitle = document.getElementById("tv-title");
+    const tvPartBadge = document.getElementById("tv-part-badge");
+    const tvDateBadge = document.getElementById("tv-date-badge");
+    const tvStreamStatus = document.getElementById("tv-stream-status");
+    const tvCatalogStatus = document.getElementById("tv-catalog-status");
+    const tvEpisodeCount = document.getElementById("tv-episode-count");
+    const tvPartsBar = document.getElementById("tv-parts-bar");
+    const tvEpisodesGrid = document.getElementById("tv-episodes-grid");
+    const tvResumeToast = document.getElementById("tv-resume-toast");
+
+    function formatTime(seconds) {
+      if (isNaN(seconds) || seconds < 0) return "00:00";
+      const s = Math.floor(seconds);
+      const hrs = Math.floor(s / 3600);
+      const mins = Math.floor((s % 3600) / 60);
+      const secs = s % 60;
+      if (hrs > 0) {
+        return `${hrs}:${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+      }
+      return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+    }
+
+    // LocalStorage Resume Helpers
+    function getResumeHistory() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : {};
+      } catch (err) {
+        return {};
+      }
+    }
+
+    function saveResume(episodeId, partIndex, currentTime, duration) {
+      if (!episodeId || !duration || isNaN(currentTime) || currentTime < 3) return;
+      const history = getResumeHistory();
+      const completed = currentTime >= duration - 15;
+      const record = {
+        episodeId,
+        partIndex,
+        currentTime: Math.round(currentTime),
+        duration: Math.round(duration),
+        percentage: Math.min(100, Math.round((currentTime / duration) * 100)),
+        completed,
+        updatedAt: Date.now()
+      };
+      history[episodeId] = record;
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+      } catch (err) {}
+      updateCardResume(episodeId, record);
+    }
+
+    function getEpisodeResume(episodeId) {
+      if (!episodeId) return null;
+      return getResumeHistory()[episodeId] || null;
+    }
+
+    function clearEpisodeResume(episodeId) {
+      if (!episodeId) return;
+      const history = getResumeHistory();
+      delete history[episodeId];
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+      } catch (err) {}
+      updateCardResume(episodeId, null);
+    }
+
+    function showResumeToast(partIndex, seekTime) {
+      if (!tvResumeToast) return;
+      clearTimeout(toastTimeout);
+      tvResumeToast.innerHTML = `
+        <span>⏱️ 已為您恢復至上次播放進度：Part ${partIndex + 1} (${formatTime(seekTime)})</span>
+        <button id="tv-restart-btn" aria-label="從頭播放 (按 0)">從頭播放 (按 0)</button>
+      `;
+      tvResumeToast.style.display = "flex";
+
+      const restartBtn = document.getElementById("tv-restart-btn");
+      if (restartBtn) {
+        restartBtn.onclick = () => {
+          if (tvPlayer) {
+            tvPlayer.currentTime(0);
+            tvPlayer.play().catch(() => {});
+          }
+          const ep = episodes[activeEpisodeIndex];
+          if (ep) clearEpisodeResume(ep.id);
+          hideResumeToast();
+        };
+      }
+
+      toastTimeout = setTimeout(() => {
+        hideResumeToast();
+      }, 9000);
+    }
+
+    function hideResumeToast() {
+      if (tvResumeToast) tvResumeToast.style.display = "none";
+    }
+
+    function updateCardResume(episodeId, record) {
+      const card = document.querySelector(`.tv-card[data-id="${episodeId}"]`);
+      if (!card) return;
+
+      const thumbWrapper = card.querySelector(".tv-thumb-wrapper");
+      const cardBody = card.querySelector(".tv-card-body");
+      if (!thumbWrapper || !cardBody) return;
+
+      let progressBar = thumbWrapper.querySelector(".tv-thumb-progress");
+      let resumeMeta = cardBody.querySelector(".tv-card-resume-meta");
+
+      if (!record || record.percentage <= 0) {
+        if (progressBar) progressBar.remove();
+        if (resumeMeta) resumeMeta.remove();
+        return;
+      }
+
+      if (!progressBar) {
+        progressBar = document.createElement("div");
+        progressBar.className = "tv-thumb-progress";
+        thumbWrapper.appendChild(progressBar);
+      }
+      progressBar.style.width = `${record.percentage}%`;
+
+      if (!resumeMeta) {
+        resumeMeta = document.createElement("div");
+        resumeMeta.className = "tv-card-resume-meta";
+        const titleEl = cardBody.querySelector(".tv-card-title");
+        if (titleEl && titleEl.nextSibling) {
+          cardBody.insertBefore(resumeMeta, titleEl.nextSibling);
+        } else {
+          cardBody.appendChild(resumeMeta);
+        }
+      }
+
+      if (record.completed) {
+        resumeMeta.innerHTML = `<span class="tv-card-watched-badge">✓ 已看完</span>`;
+      } else {
+        resumeMeta.innerHTML = `<span class="tv-card-resume-text">上次看至 Part ${record.partIndex + 1} (${formatTime(record.currentTime)})</span>`;
+      }
+    }
+
+    function initTvPlayer() {
+      if (typeof videojs === "undefined") {
+        console.warn("Video.js not loaded");
+        return;
+      }
+      try {
+        tvPlayer = videojs("tv-player", {
+          controls: true,
+          autoplay: false,
+          preload: "auto",
+          fluid: true,
+          playbackRates: [0.75, 1, 1.25, 1.5, 2]
+        });
+
+        tvPlayer.on("playing", () => {
+          if (tvStreamStatus) tvStreamStatus.textContent = "串流狀態：播放中 (1080p HD)";
+          if (pendingSeekTime > 0) {
+            const target = pendingSeekTime;
+            pendingSeekTime = 0;
+            tvPlayer.currentTime(target);
+            showResumeToast(activePartIndex, target);
+          }
+        });
+
+        tvPlayer.on("loadedmetadata", () => {
+          if (pendingSeekTime > 0 && tvPlayer.duration() > 0) {
+            const target = Math.min(pendingSeekTime, tvPlayer.duration() - 2);
+            pendingSeekTime = 0;
+            tvPlayer.currentTime(target);
+            showResumeToast(activePartIndex, target);
+          }
+        });
+
+        // Periodic resume save
+        tvPlayer.on("timeupdate", () => {
+          const now = Date.now();
+          if (now - lastSaveTime > 2000) {
+            lastSaveTime = now;
+            const ep = episodes[activeEpisodeIndex];
+            if (ep && tvPlayer && !tvPlayer.paused()) {
+              saveResume(ep.id, activePartIndex, tvPlayer.currentTime(), tvPlayer.duration());
+            }
+          }
+        });
+
+        tvPlayer.on("pause", () => {
+          if (tvStreamStatus) tvStreamStatus.textContent = "串流狀態：已暫停";
+          const ep = episodes[activeEpisodeIndex];
+          if (ep && tvPlayer) {
+            saveResume(ep.id, activePartIndex, tvPlayer.currentTime(), tvPlayer.duration());
+          }
+        });
+
+        tvPlayer.on("waiting", () => {
+          if (tvStreamStatus) tvStreamStatus.textContent = "串流狀態：緩衝載入中...";
+        });
+
+        tvPlayer.on("ended", () => {
+          const ep = episodes[activeEpisodeIndex];
+          if (ep && tvPlayer) {
+            saveResume(ep.id, activePartIndex, tvPlayer.duration(), tvPlayer.duration());
+          }
+
+          if (ep && ep.parts && activePartIndex < ep.parts.length - 1) {
+            if (tvStreamStatus) tvStreamStatus.textContent = `Part ${activePartIndex + 1} 完畢，自動切換至 Part ${activePartIndex + 2}...`;
+            setTimeout(() => {
+              playPart(activeEpisodeIndex, activePartIndex + 1, true, true);
+            }, 1200);
+          } else {
+            if (tvStreamStatus) tvStreamStatus.textContent = "全集播放完畢";
+          }
+        });
+
+        tvPlayer.on("error", () => {
+          const err = tvPlayer.error();
+          console.warn("TV Player playback error:", err);
+          const ep = episodes[activeEpisodeIndex];
+          const part = ep?.parts?.[activePartIndex];
+          if (part?.url && window.location.protocol.startsWith("http")) {
+            if (tvStreamStatus) tvStreamStatus.textContent = "串流重新獲取最新線路...";
+            const freshStream = `/api/stream?pageUrl=${encodeURIComponent(part.url)}&refresh=true`;
+            tvPlayer.src({ src: freshStream, type: "video/mp4" });
+            tvPlayer.play().catch(() => {});
+            return;
+          }
+          if (tvStreamStatus) tvStreamStatus.textContent = "串流線路異常，請重新選擇集數";
+        });
+
+        window.addEventListener("beforeunload", () => {
+          const ep = episodes[activeEpisodeIndex];
+          if (ep && tvPlayer) {
+            saveResume(ep.id, activePartIndex, tvPlayer.currentTime(), tvPlayer.duration());
+          }
+        });
+      } catch (err) {
+        console.error("TV Player init error:", err);
+      }
+    }
+
+    function setupPlayerUi() {
+      const wrapper = document.querySelector(".tv-player-wrapper");
+      const exitFsBtn = document.getElementById("tv-exit-fs-btn");
+      if (exitFsBtn) {
+        exitFsBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          exitTvFullscreen();
+        });
+      }
+      if (wrapper) {
+        wrapper.addEventListener("click", (e) => {
+          if (e.target.closest(".vjs-control-bar") || e.target.closest(".tv-exit-fs-btn")) return;
+          enterTvFullscreen();
+        });
+      }
+
+      document.addEventListener("fullscreenchange", () => {
+        if (!document.fullscreenElement && wrapper) {
+          wrapper.classList.remove("tv-fullscreen-mode");
+        }
+      });
+    }
+
+    function resolveStreamUrl(part) {
+      if (!part) return "./media/sample-part1.mp4";
+      const pageUrl = part.url || "";
+      let streamUrl = part.streamUrl || "";
+      if (streamUrl.includes("sample-part")) {
+        streamUrl = "";
+      }
+      if (window.location.protocol.startsWith("http")) {
+        const params = new URLSearchParams();
+        if (streamUrl) params.set("url", streamUrl);
+        if (pageUrl) params.set("pageUrl", pageUrl);
+        return `/api/stream?${params.toString()}`;
+      }
+      return streamUrl || part.fallbackStreamUrl || "./media/sample-part1.mp4";
+    }
+
+    function playPart(epIndex, partIdx = 0, autoPlay = true, fromExplicitPartClick = false) {
+      if (!episodes.length) return;
+      activeEpisodeIndex = Math.max(0, Math.min(epIndex, episodes.length - 1));
+      const ep = episodes[activeEpisodeIndex];
+      hideResumeToast();
+
+      // Check localStorage resume progress
+      if (!fromExplicitPartClick) {
+        const saved = getEpisodeResume(ep.id);
+        if (saved && saved.currentTime > 5 && !saved.completed) {
+          if (saved.partIndex >= 0 && saved.partIndex < (ep.parts?.length || 1)) {
+            partIdx = saved.partIndex;
+            pendingSeekTime = saved.currentTime;
+          }
+        } else {
+          pendingSeekTime = 0;
+        }
+      } else {
+        const saved = getEpisodeResume(ep.id);
+        if (saved && saved.partIndex === partIdx && saved.currentTime > 5 && !saved.completed) {
+          pendingSeekTime = saved.currentTime;
+        } else {
+          pendingSeekTime = 0;
+        }
+      }
+
+      activePartIndex = Math.max(0, Math.min(partIdx, (ep.parts?.length || 1) - 1));
+      const part = ep.parts?.[activePartIndex] || { label: "Part 1" };
+
+      if (tvTitle) tvTitle.textContent = ep.title || "綜藝玩很大";
+      if (tvPartBadge) tvPartBadge.textContent = part.label || `Part ${activePartIndex + 1}`;
+      if (tvDateBadge) tvDateBadge.textContent = ep.date || "最新";
+      if (tvStreamStatus) tvStreamStatus.textContent = "串流狀態：連線中...";
+
+      // Update active state in part buttons
+      updatePartsBar(ep, activePartIndex);
+
+      // Update active card highlight
+      document.querySelectorAll(".tv-card").forEach((card, idx) => {
+        if (idx === activeEpisodeIndex) card.classList.add("active-episode");
+        else card.classList.remove("active-episode");
+      });
+
+      const streamUrl = resolveStreamUrl(part);
+      if (tvPlayer) {
+        tvPlayer.src({ src: streamUrl, type: "video/mp4" });
+        if (autoPlay) {
+          tvPlayer.play().catch(() => {});
+        }
+      }
+    }
+
+    function updatePartsBar(ep, activeIdx) {
+      if (!tvPartsBar) return;
+      tvPartsBar.innerHTML = "";
+      (ep.parts || []).forEach((p, idx) => {
+        const btn = document.createElement("button");
+        btn.className = `tv-part-btn ${idx === activeIdx ? "active" : ""}`;
+        btn.id = `tv-part-btn-${idx}`;
+        btn.setAttribute("data-part", idx);
+        btn.textContent = `▶ ${p.label || "Part " + (idx + 1)} · ${p.duration || "35分"}`;
+        btn.tabIndex = 0;
+        btn.onclick = () => {
+          focusZone = "parts";
+          focusPartIndex = idx;
+          updateFocus();
+          playPart(activeEpisodeIndex, idx, true, true);
+          enterTvFullscreen();
+        };
+        tvPartsBar.appendChild(btn);
+      });
+    }
+
+    function enterTvFullscreen() {
+      const wrapper = document.querySelector(".tv-player-wrapper");
+      if (!wrapper) return;
+
+      wrapper.classList.add("tv-fullscreen-mode");
+
+      if (tvPlayer) {
+        if (tvPlayer.paused()) {
+          tvPlayer.play().catch(() => {});
+        }
+        try {
+          if (typeof tvPlayer.requestFullscreen === "function") {
+            tvPlayer.requestFullscreen().catch(() => {});
+          }
+        } catch {}
+      }
+    }
+
+    function exitTvFullscreen() {
+      const wrapper = document.querySelector(".tv-player-wrapper");
+      if (wrapper) {
+        wrapper.classList.remove("tv-fullscreen-mode");
+      }
+      try {
+        if (tvPlayer && typeof tvPlayer.exitFullscreen === "function" && tvPlayer.isFullscreen()) {
+          tvPlayer.exitFullscreen();
+        }
+      } catch {}
+      try {
+        if (document.fullscreenElement && document.exitFullscreen) {
+          document.exitFullscreen().catch(() => {});
+        }
+      } catch {}
+    }
+
+    function resolveEpisodeThumb(ep) {
+      if (ep.poster && !ep.poster.includes("tmdb.org") && !ep.poster.includes("preview.png")) return ep.poster;
+      if (ep.backdrop && !ep.backdrop.includes("tmdb.org") && !ep.backdrop.includes("preview.png")) return ep.backdrop;
+      const dateSlug = (ep.date || "").replace(/-/g, "");
+      if (dateSlug) {
+        return `./media/thumbnails/ep-${dateSlug}.svg`;
+      }
+      return `./media/thumb-default.svg`;
+    }
+
+    function renderEpisodes() {
+      if (!tvEpisodesGrid) return;
+      tvEpisodesGrid.innerHTML = "";
+
+      if (tvEpisodeCount) tvEpisodeCount.textContent = `共 ${episodes.length} 集`;
+
+      if (!episodes.length) {
+        tvEpisodesGrid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 4rem; color: var(--yt-text-secondary);">
+            <p style="font-size: 1.3rem; margin-bottom: 0.5rem;">無可用的集數內容</p>
+            <p style="font-size: 1rem;">請確認網路連線或重新載入</p>
+          </div>
+        `;
+        return;
+      }
+
+      episodes.forEach((ep, idx) => {
+        const card = document.createElement("article");
+        card.className = `tv-card ${idx === activeEpisodeIndex ? "active-episode" : ""}`;
+        card.id = `tv-card-${idx}`;
+        card.setAttribute("data-index", idx);
+        card.setAttribute("data-id", ep.id);
+        card.tabIndex = 0;
+
+        const thumb = resolveEpisodeThumb(ep);
+        const resume = getEpisodeResume(ep.id);
+
+        const progressBarHtml = resume && resume.percentage > 0
+          ? `<div class="tv-thumb-progress" style="width: ${resume.percentage}%;"></div>`
+          : "";
+
+        const resumeMetaHtml = resume && resume.percentage > 0
+          ? `<div class="tv-card-resume-meta">
+               ${resume.completed
+                 ? `<span class="tv-card-watched-badge">✓ 已看完</span>`
+                 : `<span class="tv-card-resume-text">上次看至 Part ${resume.partIndex + 1} (${formatTime(resume.currentTime)})</span>`
+               }
+             </div>`
+          : "";
+
+        card.innerHTML = `
+          <div class="tv-thumb-wrapper">
+            <img class="tv-thumb-img" width="360" height="202" src="${thumb}" alt="${ep.title}" loading="lazy" onerror="this.src='./media/thumb-default.svg'">
+            <span class="tv-thumb-badge">${ep.duration || "1小時 48分"}</span>
+            ${progressBarHtml}
+          </div>
+          <div class="tv-card-body">
+            <h3 class="tv-card-title">${ep.title}</h3>
+            ${resumeMetaHtml}
+            <div class="tv-card-meta">${ep.date} · 綜藝玩很大 · 共 ${ep.parts?.length || 3} 個分段</div>
+            <div class="tv-card-parts">
+              ${(ep.parts || []).map((p, pIdx) => `
+                <button class="tv-card-part-btn" data-part="${pIdx}">
+                  ▶ ${p.label || 'Part ' + (pIdx + 1)}
+                </button>
+              `).join("")}
+            </div>
+          </div>
+        `;
+
+        // Replace the poster with the real middle frame of Part 1 when possible.
+        const thumbImg = card.querySelector(".tv-thumb-img");
+        const partOne = ep.parts?.[0];
+        if (thumbImg && partOne && window.DTVFrameThumbs) {
+          window.DTVFrameThumbs.attach(ep.id, thumbImg, resolveStreamUrl(partOne));
+        }
+
+        card.onclick = (e) => {
+          const pBtn = e.target.closest(".tv-card-part-btn");
+          focusZone = "cards";
+          focusCardIndex = idx;
+          updateFocus();
+          if (pBtn) {
+            const pIdx = parseInt(pBtn.getAttribute("data-part") || "0", 10);
+            playPart(idx, pIdx, true, true);
+          } else {
+            playPart(idx, 0, true, false);
+          }
+          enterTvFullscreen();
+        };
+
+        tvEpisodesGrid.appendChild(card);
+      });
+
+      // Render "載入更多歷史集數" special TV card at the end
+      if (currentTvPage < 64) {
+        const loadMoreCard = document.createElement("article");
+        loadMoreCard.className = "tv-card tv-card-load-more";
+        loadMoreCard.id = `tv-card-${episodes.length}`;
+        loadMoreCard.tabIndex = 0;
+        loadMoreCard.setAttribute("data-index", episodes.length);
+        loadMoreCard.innerHTML = `
+          <div class="tv-thumb-wrapper tv-thumb-load-more">
+            <div class="tv-load-more-circle">＋</div>
+            <span class="tv-thumb-badge">第 ${currentTvPage + 1} 頁</span>
+          </div>
+          <div class="tv-card-body">
+            <h3 class="tv-card-title">載入更多歷史集數</h3>
+            <div class="tv-card-meta">按 OK 載入第 ${currentTvPage + 1} 頁 (10 集)</div>
+          </div>
+        `;
+        loadMoreCard.onclick = () => {
+          loadMoreTvEpisodes();
+        };
+        tvEpisodesGrid.appendChild(loadMoreCard);
+      }
+    }
+
+    let currentTvPage = 1;
+    let isLoadingTvPage = false;
+
+    async function loadMoreTvEpisodes() {
+      if (isLoadingTvPage || currentTvPage >= 64) return;
+      isLoadingTvPage = true;
+      if (tvCatalogStatus) tvCatalogStatus.textContent = "載入下一頁中...";
+
+      const nextPage = currentTvPage + 1;
+      try {
+        const res = await fetch(`/api/episodes?page=${nextPage}`);
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const data = await res.json();
+        if (!data.ok || !data.episodes || !data.episodes.length) throw new Error("無更多集數");
+
+        const seen = new Set(episodes.map(e => e.id));
+        const newItems = data.episodes.filter(e => !seen.has(e.id));
+        const prevCount = episodes.length;
+        episodes.push(...newItems);
+        currentTvPage = nextPage;
+
+        renderEpisodes();
+        focusCardIndex = prevCount;
+        updateFocus();
+
+        if (tvEpisodeCount) tvEpisodeCount.textContent = `共 ${episodes.length} 集 (第 ${currentTvPage} 頁)`;
+        if (tvCatalogStatus) tvCatalogStatus.textContent = "連線正常";
+      } catch (err) {
+        console.error("TV loadMore error:", err);
+        if (tvCatalogStatus) tvCatalogStatus.textContent = "載入失敗";
+      } finally {
+        isLoadingTvPage = false;
+      }
+    }
+
+    function updateFocus() {
+      document.querySelectorAll(".focused").forEach(el => el.classList.remove("focused"));
+
+      if (focusZone === "cards") {
+        const targetCard = document.getElementById(`tv-card-${focusCardIndex}`);
+        if (targetCard) {
+          targetCard.classList.add("focused");
+          targetCard.focus();
+          targetCard.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+        }
+      } else if (focusZone === "parts") {
+        const targetPart = document.getElementById(`tv-part-btn-${focusPartIndex}`);
+        if (targetPart) {
+          targetPart.classList.add("focused");
+          targetPart.focus();
+          targetPart.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }
+      }
+    }
+
+    function handleDpad(key) {
+      if (focusZone === "cards") {
+        const maxCard = (currentTvPage < 64) ? episodes.length : episodes.length - 1;
+        if (key === "ArrowLeft") {
+          if (focusCardIndex > 0) {
+            focusCardIndex--;
+            updateFocus();
+          }
+        } else if (key === "ArrowRight") {
+          if (focusCardIndex < maxCard) {
+            focusCardIndex++;
+            updateFocus();
+          }
+        } else if (key === "ArrowUp") {
+          focusZone = "parts";
+          focusPartIndex = activePartIndex;
+          updateFocus();
+        } else if (key === "Enter") {
+          if (focusCardIndex === episodes.length) {
+            loadMoreTvEpisodes();
+          } else {
+            playPart(focusCardIndex, 0, true, false);
+            enterTvFullscreen();
+          }
+        }
+      } else if (focusZone === "parts") {
+        const partsCount = episodes[activeEpisodeIndex]?.parts?.length || 3;
+        if (key === "ArrowLeft") {
+          if (focusPartIndex > 0) {
+            focusPartIndex--;
+            updateFocus();
+          }
+        } else if (key === "ArrowRight") {
+          if (focusPartIndex < partsCount - 1) {
+            focusPartIndex++;
+            updateFocus();
+          }
+        } else if (key === "ArrowDown") {
+          focusZone = "cards";
+          updateFocus();
+        } else if (key === "Enter") {
+          playPart(activeEpisodeIndex, focusPartIndex, true, true);
+          enterTvFullscreen();
+        }
+      }
+    }
+
+    function setupRemoteControls() {
+      window.addEventListener("keydown", (e) => {
+        switch (e.key) {
+          case "ArrowLeft":
+          case "ArrowRight":
+          case "ArrowUp":
+          case "ArrowDown":
+            e.preventDefault();
+            handleDpad(e.key);
+            break;
+
+          case "Enter":
+            e.preventDefault();
+            handleDpad("Enter");
+            break;
+
+          case "0":
+            e.preventDefault();
+            if (tvPlayer) {
+              tvPlayer.currentTime(0);
+              tvPlayer.play().catch(() => {});
+            }
+            const currentEp = episodes[activeEpisodeIndex];
+            if (currentEp) clearEpisodeResume(currentEp.id);
+            hideResumeToast();
+            break;
+
+          case "1":
+            e.preventDefault();
+            playPart(activeEpisodeIndex, 0, true, true);
+            focusPartIndex = 0;
+            break;
+
+          case "2":
+            e.preventDefault();
+            playPart(activeEpisodeIndex, 1, true, true);
+            focusPartIndex = 1;
+            break;
+
+          case "3":
+            e.preventDefault();
+            playPart(activeEpisodeIndex, 2, true, true);
+            focusPartIndex = 2;
+            break;
+
+          case " ":
+            e.preventDefault();
+            if (tvPlayer) {
+              if (tvPlayer.paused()) tvPlayer.play();
+              else tvPlayer.pause();
+            }
+            break;
+
+          case "f":
+          case "F":
+            e.preventDefault();
+            if (tvPlayer) {
+              if (tvPlayer.isFullscreen()) tvPlayer.exitFullscreen();
+              else tvPlayer.requestFullscreen();
+            }
+            break;
+
+          case "Escape":
+          case "Backspace":
+          case "GoBack":
+          case "Back":
+            const wrapper = document.querySelector(".tv-player-wrapper");
+            if (document.fullscreenElement || wrapper?.classList.contains("tv-fullscreen-mode")) {
+              e.preventDefault();
+              exitTvFullscreen();
+            } else {
+              focusZone = "cards";
+              updateFocus();
+            }
+            break;
+        }
+
+        // TV Remote Back Buttons for Tizen (10009), WebOS (461), Android KeyCode (4)
+        if (e.keyCode === 10009 || e.keyCode === 461 || e.keyCode === 4) {
+          const wrapper = document.querySelector(".tv-player-wrapper");
+          if (document.fullscreenElement || wrapper?.classList.contains("tv-fullscreen-mode")) {
+            e.preventDefault();
+            exitTvFullscreen();
+          }
+        }
+      });
+    }
+
+    async function loadCatalog() {
+      if (tvCatalogStatus) tvCatalogStatus.textContent = "載入中...";
+      try {
+        const res = await fetch(`./catalog.json?_t=${Date.now()}`, { cache: "no-store" });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const data = await res.json();
+        episodes = data.episodes || [];
+        if (!episodes.length) throw new Error("影片清單為空");
+      } catch (err) {
+        console.warn("TV offline fallback:", err);
+        episodes = [
+          {
+            id: "https://srgoideas.com/ep1/",
+            title: "綜藝玩很大 2026-11-08 台北 搗蛋鬼到你家",
+            date: "2026-11-08",
+            url: "https://srgoideas.com/ep1/",
+            duration: "1小時 48分",
+            backdrop: "./media/thumbnails/ep-20261108.svg",
+            poster: "./media/thumbnails/ep-20261108.svg",
+            parts: [
+              { label: "Part 1", streamUrl: "./media/sample-part1.mp4", duration: "35分" },
+              { label: "Part 2", streamUrl: "./media/sample-part2.mp4", duration: "35分" },
+              { label: "Part 3", streamUrl: "./media/sample-part3.mp4", duration: "35分" }
+            ]
+          }
+        ];
+      }
+
+      if (tvCatalogStatus) tvCatalogStatus.textContent = "連線正常";
+      renderEpisodes();
+      if (episodes.length) {
+        playPart(0, 0, false, false);
+      }
+      updateFocus();
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      setupPlayerUi();
+      initTvPlayer();
+      setupRemoteControls();
+      loadCatalog();
+    });
+
+    // Exports for vitest
+    window.setupPlayerUi = setupPlayerUi;
+    window.loadCatalog = loadCatalog;
+    window.playPart = playPart;
+    window.handleDpad = handleDpad;
+    window.getEpisodes = () => episodes;
+    window.getFocusState = () => ({ focusZone, focusCardIndex, focusPartIndex });
+    window.saveResume = saveResume;
+    window.getEpisodeResume = getEpisodeResume;
+    window.clearEpisodeResume = clearEpisodeResume;
+    window.enterTvFullscreen = enterTvFullscreen;
+    window.exitTvFullscreen = exitTvFullscreen;
+    window.loadMoreTvEpisodes = loadMoreTvEpisodes;
+  </script>
 </body>
 </html>

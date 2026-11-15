@@ -1,0 +1,549 @@
+/* YouTube TV (10-Foot UI) Design System */
+:root {
+  --yt-bg: #0f0f0f;
+  --yt-surface: #181818;
+  --yt-card-bg: #212121;
+  --yt-card-hover: #2a2a2a;
+  --yt-card-focus: #383838;
+  --yt-border: #303030;
+  --yt-red: #ff0000;
+  --yt-red-hover: #cc0000;
+  --yt-text-primary: #f1f1f1;
+  --yt-text-secondary: #aaaaaa;
+  --yt-focus-ring: #ff0000;
+  --yt-focus-glow: rgba(255, 0, 0, 0.6);
+  --tv-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  background-color: var(--yt-bg);
+  color: var(--yt-text-primary);
+  font-family: var(--tv-font);
+  width: 100vw;
+  height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* TV App Layout Shell */
+.tv-app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 1.5rem 2.5rem;
+  gap: 1.5rem;
+}
+
+/* TV Top Header */
+.tv-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--yt-border);
+}
+
+.tv-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.tv-logo-badge {
+  background: var(--yt-red);
+  color: #fff;
+  width: 44px;
+  height: 32px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(255, 0, 0, 0.4);
+}
+
+.tv-brand-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.tv-brand-sub {
+  font-size: 1.1rem;
+  color: var(--yt-text-secondary);
+  font-weight: 500;
+}
+
+.tv-header-status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tv-status-badge {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  color: var(--yt-text-secondary);
+}
+
+/* TV Player Section (Theater) */
+.tv-player-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background: var(--yt-surface);
+  border: 1px solid var(--yt-border);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.tv-player-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+  transition: all 0.25s ease;
+}
+
+/* TV Fullscreen Mode */
+.tv-player-wrapper.tv-fullscreen-mode {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: 100vw !important;
+  border-radius: 0 !important;
+  z-index: 99999 !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+}
+
+.tv-player-wrapper.tv-fullscreen-mode video {
+  object-fit: contain;
+}
+
+/* TV Exit Fullscreen Overlay Button */
+.tv-exit-fs-btn {
+  display: none;
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  z-index: 100000;
+  background: rgba(18, 18, 18, 0.85);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: all 0.2s ease;
+}
+
+.tv-exit-fs-btn:hover,
+.tv-exit-fs-btn:focus-visible {
+  background: var(--yt-red);
+  border-color: var(--yt-red);
+  outline: none;
+  transform: scale(1.05);
+}
+
+.tv-player-wrapper.tv-fullscreen-mode .tv-exit-fs-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Video.js TV Custom Skin */
+.video-js.vjs-theme-yt {
+  width: 100% !important;
+  height: 100% !important;
+  font-family: inherit;
+}
+
+.video-js.vjs-theme-yt .vjs-big-play-button {
+  background-color: var(--yt-red);
+  border: none;
+  border-radius: 50%;
+  width: 72px;
+  height: 72px;
+  line-height: 72px;
+  font-size: 36px;
+  box-shadow: 0 4px 20px rgba(255, 0, 0, 0.5);
+  transition: transform 0.2s ease;
+}
+
+.video-js.vjs-theme-yt:hover .vjs-big-play-button,
+.video-js.vjs-theme-yt .vjs-big-play-button:focus {
+  background-color: var(--yt-red-hover);
+  transform: scale(1.1);
+  outline: 3px solid #fff;
+}
+
+.video-js.vjs-theme-yt .vjs-play-progress {
+  background-color: var(--yt-red);
+}
+
+/* TV Video Details Under Player */
+.tv-player-details {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.tv-details-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.tv-video-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--yt-text-primary);
+}
+
+.tv-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.tv-meta-pill {
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 4px 12px;
+  border-radius: 16px;
+}
+
+.tv-badge-red {
+  background: var(--yt-red) !important;
+  border-color: var(--yt-red) !important;
+  color: #fff !important;
+}
+
+.tv-stream-status {
+  font-size: 0.85rem;
+  color: #46d369;
+  margin-left: auto;
+  font-weight: 600;
+}
+
+/* TV Part Selector Bar Under Player */
+.tv-parts-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tv-part-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid transparent;
+  color: var(--yt-text-primary);
+  padding: 10px 22px;
+  border-radius: 24px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tv-part-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.tv-part-btn.active {
+  background: var(--yt-red);
+  color: #fff;
+}
+
+.tv-part-btn.focused,
+.tv-part-btn:focus-visible {
+  outline: 4px solid var(--yt-focus-ring);
+  box-shadow: 0 0 16px var(--yt-focus-glow);
+  transform: scale(1.05);
+}
+
+/* TV Simple Episode List Section */
+.tv-list-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.tv-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tv-section-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.tv-item-count {
+  font-size: 0.95rem;
+  color: var(--yt-text-secondary);
+}
+
+/* TV Episode Grid / Shelf */
+.tv-episodes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 1.5rem;
+}
+
+/* TV Card (10-foot YouTube Style) */
+.tv-card {
+  background: var(--yt-card-bg);
+  border: 2px solid transparent;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.tv-card:hover {
+  background: var(--yt-card-hover);
+}
+
+.tv-card.active-episode {
+  border-color: var(--yt-red);
+}
+
+/* High Visibility TV Remote Focus Ring */
+.tv-card.focused,
+.tv-card:focus-visible {
+  outline: 4px solid var(--yt-focus-ring);
+  border-color: var(--yt-focus-ring);
+  box-shadow: 0 0 20px var(--yt-focus-glow);
+  transform: scale(1.04);
+  z-index: 10;
+}
+
+.tv-thumb-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #111;
+  overflow: hidden;
+}
+
+.tv-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tv-thumb-badge {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.85);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.tv-card-body {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.tv-card-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--yt-text-primary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.tv-card-meta {
+  font-size: 0.85rem;
+  color: var(--yt-text-secondary);
+}
+
+.tv-card-parts {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+.tv-card-part-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--yt-text-primary);
+  padding: 6px 14px;
+  border-radius: 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tv-card-part-btn:hover {
+  background: var(--yt-red);
+  color: #fff;
+}
+
+/* TV Resume Progress Bar on Thumbnails */
+.tv-thumb-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 6px;
+  background: var(--yt-red);
+  box-shadow: 0 0 8px rgba(255, 0, 0, 0.8);
+  transition: width 0.3s ease;
+  z-index: 5;
+}
+
+.tv-card-resume-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.tv-card-resume-text {
+  font-size: 0.8rem;
+  color: #ff4e45;
+  font-weight: 700;
+}
+
+.tv-card-watched-badge {
+  background: rgba(70, 211, 105, 0.2);
+  color: #46d369;
+  border: 1px solid rgba(70, 211, 105, 0.4);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.tv-resume-toast {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: rgba(255, 0, 0, 0.2);
+  border: 1px solid rgba(255, 0, 0, 0.5);
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+  margin-top: 8px;
+}
+
+.tv-resume-toast button {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 16px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tv-resume-toast button:hover,
+.tv-resume-toast button:focus {
+  background: var(--yt-red);
+  outline: 3px solid #fff;
+}
+
+/* TV Remote Control Navigation Hints Footer */
+.tv-remote-hints {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 1.25rem 0;
+  border-top: 1px solid var(--yt-border);
+  color: var(--yt-text-secondary);
+  font-size: 0.9rem;
+  flex-wrap: wrap;
+}
+
+.tv-key-badge {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+  margin-right: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* TV Load More Card */
+.tv-card.tv-card-load-more {
+  border: 2px dashed rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.tv-card.tv-card-load-more.focused {
+  border: 3px solid var(--yt-red);
+  background: rgba(255, 0, 0, 0.1);
+  transform: scale(1.05);
+}
+
+.tv-thumb-load-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.tv-load-more-circle {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 300;
+  color: #fff;
+}

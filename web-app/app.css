@@ -1,0 +1,626 @@
+/* YouTube-Style Design System & Tokens */
+:root {
+  --yt-bg: #0f0f0f;
+  --yt-surface: #181818;
+  --yt-card-bg: #212121;
+  --yt-card-hover: #2a2a2a;
+  --yt-card-focus: #383838;
+  --yt-border: #303030;
+  --yt-red: #ff0000;
+  --yt-red-hover: #cc0000;
+  --yt-text-primary: #f1f1f1;
+  --yt-text-secondary: #aaaaaa;
+  --yt-radius: 8px;
+  --yt-focus-ring: #3ea6ff;
+  --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  background-color: var(--yt-bg);
+  color: var(--yt-text-primary);
+  font-family: var(--font-family);
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+.skip-link {
+  position: absolute;
+  top: -60px;
+  left: 1rem;
+  background: var(--yt-red);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: var(--yt-radius);
+  z-index: 1000;
+  font-weight: 700;
+  text-decoration: none;
+  transition: top 0.2s ease;
+}
+.skip-link:focus {
+  top: 1rem;
+}
+
+/* YouTube Top Header */
+.yt-header {
+  position: sticky;
+  top: 0;
+  height: 64px;
+  background: var(--yt-surface);
+  border-bottom: 1px solid var(--yt-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+  z-index: 200;
+}
+
+.yt-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.yt-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.yt-logo-badge {
+  background: var(--yt-red);
+  color: #fff;
+  border-radius: 6px;
+  width: 34px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.yt-brand-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.yt-brand-sub {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  color: var(--yt-text-secondary);
+}
+
+.yt-header-center {
+  flex: 1;
+  max-width: 580px;
+  margin: 0 1.5rem;
+}
+
+.yt-search-box {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.yt-search-box input {
+  width: 100%;
+  background: #121212;
+  border: 1px solid var(--yt-border);
+  border-radius: 20px;
+  padding: 8px 36px 8px 16px;
+  color: var(--yt-text-primary);
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.yt-search-box input:focus {
+  border-color: var(--yt-focus-ring);
+  box-shadow: 0 0 0 2px rgba(62, 166, 255, 0.2);
+}
+
+.yt-search-clear {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  color: var(--yt-text-secondary);
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.yt-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.yt-status-badge {
+  font-size: 0.85rem;
+  color: var(--yt-text-secondary);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+
+.yt-icon-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid transparent;
+  color: var(--yt-text-primary);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.yt-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Main Layout */
+.yt-main {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Video Player Theater Section */
+.yt-player-section {
+  background: var(--yt-surface);
+  border: 1px solid var(--yt-border);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.yt-player-container {
+  position: relative;
+  width: 100%;
+  background: #000;
+  aspect-ratio: 16 / 9;
+  max-height: 70vh;
+}
+
+/* Video.js Override Theme */
+.video-js.vjs-theme-yt {
+  width: 100% !important;
+  height: 100% !important;
+  font-family: inherit;
+}
+.video-js.vjs-theme-yt .vjs-big-play-button {
+  background-color: rgba(255, 0, 0, 0.85) !important;
+  border-color: transparent !important;
+  border-radius: 16px !important;
+  width: 68px !important;
+  height: 48px !important;
+  line-height: 48px !important;
+}
+.video-js.vjs-theme-yt .vjs-control-bar {
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.9) 0%, transparent 100%) !important;
+  height: 48px !important;
+}
+.video-js.vjs-theme-yt .vjs-play-progress {
+  background-color: var(--yt-red) !important;
+}
+
+/* Details Under Player */
+.yt-player-details {
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.yt-details-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.yt-video-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.yt-video-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.yt-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 18px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.yt-btn-primary {
+  background: var(--yt-red);
+  color: #fff;
+}
+.yt-btn-primary:hover {
+  background: var(--yt-red-hover);
+}
+
+.yt-btn-secondary {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--yt-text-primary);
+}
+.yt-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.yt-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.yt-meta-pill {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--yt-text-secondary);
+  font-size: 0.8rem;
+  padding: 3px 10px;
+  border-radius: 4px;
+}
+
+.yt-badge-red {
+  background: var(--yt-red);
+  color: #fff;
+  font-weight: 700;
+}
+
+.yt-stream-source {
+  font-size: 0.8rem;
+  color: #46d369;
+  margin-left: auto;
+}
+
+/* Parts Picker */
+.yt-parts-picker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.yt-part-chip {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--yt-text-primary);
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.yt-part-chip:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+.yt-part-chip.active {
+  background: var(--yt-red);
+  border-color: var(--yt-red);
+  color: #fff;
+}
+.yt-part-chip:focus-visible {
+  outline: 2px solid var(--yt-focus-ring);
+}
+
+/* Episode List Section */
+.yt-list-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.yt-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.yt-section-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.yt-item-count {
+  font-size: 0.85rem;
+  color: var(--yt-text-secondary);
+}
+
+.yt-episodes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.25rem;
+}
+
+/* Episode Card (YouTube Style) */
+.yt-card {
+  background: var(--yt-card-bg);
+  border: 1px solid var(--yt-border);
+  border-radius: var(--yt-radius);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.yt-card:hover {
+  transform: translateY(-4px);
+  background: var(--yt-card-hover);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.yt-card.active-episode {
+  border-color: var(--yt-red);
+  box-shadow: 0 0 12px rgba(255, 0, 0, 0.4);
+}
+
+.yt-card:focus-visible, .yt-card.tv-focused {
+  outline: 3px solid var(--yt-focus-ring);
+  box-shadow: 0 0 16px rgba(62, 166, 255, 0.6);
+  transform: scale(1.02);
+}
+
+.yt-thumb-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #111;
+  overflow: hidden;
+}
+
+.yt-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+.yt-card:hover .yt-thumb-img {
+  transform: scale(1.04);
+}
+
+.yt-thumb-badge {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.85);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.yt-card-body {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.yt-card-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: var(--yt-text-primary);
+}
+
+.yt-card-meta {
+  font-size: 0.8rem;
+  color: var(--yt-text-secondary);
+}
+
+.yt-card-parts {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 6px;
+}
+
+.yt-card-part-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--yt-text-primary);
+  padding: 4px 10px;
+  border-radius: 14px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.yt-card-part-btn:hover {
+  background: var(--yt-red);
+  border-color: var(--yt-red);
+  color: #fff;
+}
+.yt-card-part-btn:focus-visible {
+  outline: 2px solid var(--yt-focus-ring);
+}
+
+/* Pagination / Load More Bar */
+.yt-pagination-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 2rem;
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--yt-border);
+}
+
+.yt-btn-load-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--yt-surface-hover);
+  color: var(--yt-text);
+  border: 1px solid var(--yt-border);
+  padding: 10px 24px;
+  border-radius: 20px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.yt-btn-load-more:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.yt-btn-load-more:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.yt-pagination-info {
+  font-size: 0.85rem;
+  color: var(--yt-text-secondary);
+}
+
+/* Resume Progress Bar & Badges */
+.yt-thumb-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 4px;
+  background: var(--yt-red);
+  box-shadow: 0 0 6px rgba(255, 0, 0, 0.8);
+  transition: width 0.3s ease;
+  z-index: 5;
+}
+
+.yt-card-resume-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.yt-card-resume-text {
+  font-size: 0.75rem;
+  color: #ff4e45;
+  font-weight: 600;
+}
+
+.yt-card-watched-badge {
+  background: rgba(70, 211, 105, 0.2);
+  color: #46d369;
+  border: 1px solid rgba(70, 211, 105, 0.4);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+/* Resume Toast under Video Player */
+.yt-resume-toast {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: rgba(255, 0, 0, 0.15);
+  border: 1px solid rgba(255, 0, 0, 0.35);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #fff;
+  margin-top: 6px;
+  animation: fadeInToast 0.3s ease;
+}
+
+.yt-resume-toast button {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.yt-resume-toast button:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+@keyframes fadeInToast {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Footer */
+.yt-footer {
+  text-align: center;
+  padding: 2rem 1.5rem;
+  border-top: 1px solid var(--yt-border);
+  color: var(--yt-text-secondary);
+  font-size: 0.85rem;
+}
+.yt-footer code {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: #fff;
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 768px) {
+  .yt-header {
+    padding: 0 1rem;
+    height: 56px;
+  }
+  .yt-brand-sub {
+    display: none;
+  }
+  .yt-main {
+    padding: 1rem;
+    gap: 1.5rem;
+  }
+  .yt-episodes-grid {
+    grid-template-columns: 1fr;
+  }
+}

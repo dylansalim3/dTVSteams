@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import fs from "node:fs";
-import { parseList, parseParts } from "../src/parser.js";
+import { parseList, parseParts, parseStreamUrl } from "../src/parser.js";
 
 function loadFixture(name: string): string {
   return fs.readFileSync(new URL(`./fixtures/${name}`, import.meta.url), "utf-8");
@@ -30,5 +30,16 @@ describe("parseParts", () => {
 
   it("returns empty array when parts missing", () => {
     expect(parseParts("<html></html>", "https://x/")).toEqual([]);
+  });
+});
+
+describe("parseStreamUrl", () => {
+  it("extracts direct mp4 video stream url from fixture", () => {
+    const stream = parseStreamUrl(loadFixture("episode.html"));
+    expect(stream).toBe("https://example.xyz/vplay-001.mp4?st=abc&e=123");
+  });
+
+  it("returns null when no source exists", () => {
+    expect(parseStreamUrl("<html><body><div>No video</div></body></html>")).toBeNull();
   });
 });

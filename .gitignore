@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Build outputs
+dist/
+build/
+coverage/
+.gradle/
+
+# Agent / Tool cache
+.agents/
+.ui-craft/
+skills-lock.json
+
+# Environment / Logs
+*.log
+.env
+.env.local
+
+# OS files
+.DS_Store
+Thumbs.db

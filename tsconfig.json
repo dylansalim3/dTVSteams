@@ -3,9 +3,10 @@
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "bundler",
+    "jsx": "react-jsx",
     "strict": true,
     "skipLibCheck": true,
     "types": ["node"]
   },
-  "include": ["catalog-core/src", "catalog-core/tests"]
+  "include": ["catalog-core/src", "catalog-core/tests", "tests", "src"]
 }
