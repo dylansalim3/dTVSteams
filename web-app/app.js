@@ -285,21 +285,25 @@ function initPlayer() {
     player.addEventListener("playing", () => {
       if (playerStreamStatus) playerStreamStatus.textContent = "串流狀態：播放中 (1080p HD)";
       player.playbackRate = currentSpeed;
-      // Check if we need to apply pending seek from localStorage resume
-      if (pendingSeekTime > 0) {
-        const target = pendingSeekTime;
-        pendingSeekTime = 0;
-        player.currentTime = target;
-        showResumeToast(activePartIndex, target);
-      }
+    });
+
+    player.addEventListener("seeking", () => {
+      if (playerStreamStatus) playerStreamStatus.textContent = "串流狀態：跳轉緩衝中...";
+    });
+
+    player.addEventListener("seeked", () => {
+      if (playerStreamStatus) playerStreamStatus.textContent = "串流狀態：播放中 (1080p HD)";
     });
 
     player.addEventListener("loadedmetadata", () => {
       player.playbackRate = currentSpeed;
-      if (pendingSeekTime > 0 && player.duration > 0) {
-        const target = Math.min(pendingSeekTime, player.duration - 2);
+      if (pendingSeekTime > 0) {
+        const dur = player.duration || (pendingSeekTime + 10);
+        const target = Math.min(pendingSeekTime, dur - 2);
         pendingSeekTime = 0;
-        player.currentTime = target;
+        if (Math.abs(player.currentTime - target) > 1.5) {
+          player.currentTime = target;
+        }
         showResumeToast(activePartIndex, target);
       }
     });
@@ -437,9 +441,10 @@ function playPart(episode, partIndex = 0, autoPlay = true, fromExplicitPartClick
   // Update Active Card in Grid
   highlightActiveCard(episode.id);
 
-  // Load Source into Native Player with Speed Preservation
+  // Load Source into Native Player with Speed Preservation and Media Fragment instant seeking
   if (player) {
-    player.src = streamUrl;
+    const mediaFragment = pendingSeekTime > 0 ? `#t=${Math.floor(pendingSeekTime)}` : "";
+    player.src = streamUrl + mediaFragment;
     try { player.load(); } catch (_) {}
     player.playbackRate = currentSpeed;
 
@@ -453,18 +458,11 @@ function playPart(episode, partIndex = 0, autoPlay = true, fromExplicitPartClick
       }
     }
 
-    // Resolve direct CDN stream in background for instantaneous buffering if not cached
+    // Cache direct CDN stream in background without mutating active player.src
     if (!directCdnUrl && part.url && window.location.protocol.startsWith("http")) {
       resolveDirectStream(part.url).then((direct) => {
-        if (direct && player && activeEpisode?.id === episode.id && activePartIndex === partIndex) {
-          if (player.src !== direct && (!player.currentTime || player.currentTime < 3)) {
-            const curTime = player.currentTime || 0;
-            const wasPlaying = !player.paused;
-            player.src = direct;
-            if (curTime > 0) player.currentTime = curTime;
-            player.playbackRate = currentSpeed;
-            if (wasPlaying) player.play().catch(() => {});
-          }
+        if (direct) {
+          clientStreamCache.set(part.url, direct);
         }
       });
     }
@@ -729,6 +727,60 @@ async function loadNextPage() {
   }
 }
 
+// Fast-forward & Rewind with Debounced Seeking and Visual HUD
+let seekDebounceTimer = null;
+let seekTargetTime = null;
+let seekHudTimer = null;
+
+function seekRelative(deltaSeconds) {
+  if (!player) return;
+  const baseTime = seekTargetTime !== null ? seekTargetTime : (player.currentTime || 0);
+  const dur = player.duration || (baseTime + 3600);
+  const target = Math.max(0, Math.min(dur - 2, baseTime + deltaSeconds));
+  seekTargetTime = target;
+
+  showSeekHud(target, deltaSeconds);
+
+  clearTimeout(seekDebounceTimer);
+  seekDebounceTimer = setTimeout(() => {
+    if (player && seekTargetTime !== null) {
+      player.currentTime = seekTargetTime;
+      seekTargetTime = null;
+    }
+  }, 220);
+}
+
+function showSeekHud(targetTime, delta) {
+  let hud = document.getElementById("yt-seek-hud");
+  if (!hud) {
+    hud = document.createElement("div");
+    hud.id = "yt-seek-hud";
+    hud.className = "yt-seek-hud";
+    const container = document.querySelector(".yt-player-container");
+    if (container) container.appendChild(hud);
+  }
+  const sign = delta > 0 ? "+" : "";
+  hud.innerHTML = `<span>${delta > 0 ? "⏩" : "⏪"} ${formatTime(targetTime)} (${sign}${delta}s)</span>`;
+  hud.classList.add("visible");
+
+  clearTimeout(seekHudTimer);
+  seekHudTimer = setTimeout(() => {
+    hud.classList.remove("visible");
+  }, 1000);
+}
+
+function setupQuickSkipButtons() {
+  const btnBack10 = document.getElementById("skip-back-10");
+  const btnFwd10 = document.getElementById("skip-fwd-10");
+  const btnFwd30 = document.getElementById("skip-fwd-30");
+  const btnFwd60 = document.getElementById("skip-fwd-60");
+
+  if (btnBack10) btnBack10.addEventListener("click", () => seekRelative(-10));
+  if (btnFwd10) btnFwd10.addEventListener("click", () => seekRelative(10));
+  if (btnFwd30) btnFwd30.addEventListener("click", () => seekRelative(30));
+  if (btnFwd60) btnFwd60.addEventListener("click", () => seekRelative(60));
+}
+
 // Global Keyboard Shortcuts (Remote / Desktop friendly)
 function setupShortcuts() {
   window.addEventListener("keydown", (e) => {
@@ -755,13 +807,13 @@ function setupShortcuts() {
       case "ArrowLeft":
       case "j":
         e.preventDefault();
-        player.currentTime = Math.max(0, player.currentTime - 10);
+        seekRelative(-10);
         break;
 
       case "ArrowRight":
       case "l":
         e.preventDefault();
-        player.currentTime = Math.min(player.duration || 0, player.currentTime + 10);
+        seekRelative(10);
         break;
 
       case "ArrowUp":
@@ -845,6 +897,7 @@ if (typeof window !== "undefined") {
   window.addEventListener("DOMContentLoaded", () => {
     initPlayer();
     initPlaybackSpeed();
+    setupQuickSkipButtons();
     setupShortcuts();
     loadCatalog();
   });
@@ -852,6 +905,7 @@ if (typeof window !== "undefined") {
 
 // Exports for testing & window exposure
 if (typeof window !== "undefined") {
+  window.initPlayer = initPlayer;
   window.loadCatalog = loadCatalog;
   window.playPart = playPart;
   window.renderGrid = renderGrid;
@@ -865,6 +919,7 @@ if (typeof window !== "undefined") {
   window.loadNextPage = loadNextPage;
   window.applyPlaybackSpeed = applyPlaybackSpeed;
   window.cycleSpeed = cycleSpeed;
+  window.seekRelative = seekRelative;
   window.SPEED_STEPS = SPEED_STEPS;
   window.STORAGE_KEY = STORAGE_KEY;
 }
@@ -884,6 +939,7 @@ if (typeof module !== "undefined" && module.exports) {
     formatTime,
     applyPlaybackSpeed,
     cycleSpeed,
+    seekRelative,
     SPEED_STEPS,
     STORAGE_KEY
   };

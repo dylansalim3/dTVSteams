@@ -220,16 +220,11 @@ const server = http.createServer(async (req, res) => {
     const pageUrl = parsedUrl.searchParams.get("pageUrl");
     const forceRefresh = parsedUrl.searchParams.get("refresh") === "true";
 
-    // If targetUrl is a dummy sample, empty, or refresh requested, resolve genuine stream from pageUrl
-    if (forceRefresh && pageUrl) {
-      const fresh = await resolveFreshStreamUrl(pageUrl, true);
+    // Always prioritize authentic live token resolved from pageUrl (cached for 30m)
+    // to prevent stale 404 tokens from breaking seeking and playback
+    if (pageUrl) {
+      const fresh = await resolveFreshStreamUrl(pageUrl, forceRefresh);
       if (fresh) targetUrl = fresh;
-    } else if (pageUrl && (!targetUrl || targetUrl.includes("sample-part") || targetUrl.startsWith("./") || targetUrl.startsWith("/media/"))) {
-      targetUrl = await resolveFreshStreamUrl(pageUrl, false);
-    }
-
-    if (!targetUrl && pageUrl) {
-      targetUrl = await resolveFreshStreamUrl(pageUrl, true);
     }
 
     if (!targetUrl) {

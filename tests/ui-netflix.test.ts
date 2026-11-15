@@ -166,4 +166,28 @@ describe("YouTube Web App UI & Video.js Compliance", () => {
     expect(win.localStorage.getItem("dtv_playback_rate")).toBe("1.75");
     expect(badge?.textContent).toContain("1.75x");
   });
+
+  it("implements debounced seeking and quick skip buttons", () => {
+    const html = fs.readFileSync(htmlPath, "utf-8");
+    const js = fs.readFileSync(jsPath, "utf-8");
+    const dom = new JSDOM(html, { runScripts: "dangerously", url: "http://localhost/" });
+    const win = dom.window as any;
+
+    win.eval(js);
+    win.initPlayer();
+
+    expect(typeof win.seekRelative).toBe("function");
+
+    // Quick skip buttons present
+    expect(win.document.getElementById("skip-back-10")).not.toBeNull();
+    expect(win.document.getElementById("skip-fwd-10")).not.toBeNull();
+    expect(win.document.getElementById("skip-fwd-30")).not.toBeNull();
+    expect(win.document.getElementById("skip-fwd-60")).not.toBeNull();
+
+    // Trigger seek
+    win.seekRelative(30);
+    const hud = win.document.getElementById("yt-seek-hud");
+    expect(hud).not.toBeNull();
+    expect(hud.textContent).toContain("+30s");
+  });
 });

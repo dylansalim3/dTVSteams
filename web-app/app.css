@@ -349,6 +349,69 @@ html, body {
   outline: 2px solid var(--yt-focus-ring);
 }
 
+/* Quick Skip Action Buttons */
+.yt-quick-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 6px;
+}
+
+.yt-skip-btn {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--yt-text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 5px 12px;
+  border-radius: 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.yt-skip-btn:hover {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.35);
+  transform: translateY(-1px);
+}
+
+.yt-skip-btn:active {
+  transform: translateY(1px);
+  background: rgba(255, 0, 0, 0.4);
+}
+
+.yt-skip-btn:focus-visible {
+  outline: 2px solid var(--yt-focus-ring);
+}
+
+/* Seek HUD Overlay on Video Player */
+.yt-seek-hud {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  background: rgba(0, 0, 0, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff;
+  font-size: 1.15rem;
+  font-weight: 700;
+  padding: 10px 22px;
+  border-radius: 24px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  z-index: 20;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+}
+
+.yt-seek-hud.visible {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
 /* Playback Speed Picker */
 .yt-speed-picker {
   display: flex;

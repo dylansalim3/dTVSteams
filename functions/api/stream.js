@@ -47,15 +47,11 @@ export async function onRequest(context) {
   const forceRefresh = url.searchParams.get("refresh") === "true";
   const proxyMode = url.searchParams.get("proxy") === "true";
 
-  if (forceRefresh && pageUrl) {
-    const fresh = await resolveFreshStreamUrl(pageUrl, true);
+  // Always prioritize authentic live token resolved from pageUrl (cached for 30m)
+  // to prevent stale 404 tokens from breaking seeking and playback
+  if (pageUrl) {
+    const fresh = await resolveFreshStreamUrl(pageUrl, forceRefresh);
     if (fresh) targetUrl = fresh;
-  } else if (pageUrl && (!targetUrl || targetUrl.includes("sample-part") || targetUrl.startsWith("./") || targetUrl.startsWith("/media/"))) {
-    targetUrl = await resolveFreshStreamUrl(pageUrl, false);
-  }
-
-  if (!targetUrl && pageUrl) {
-    targetUrl = await resolveFreshStreamUrl(pageUrl, false);
   }
 
   if (!targetUrl) {
