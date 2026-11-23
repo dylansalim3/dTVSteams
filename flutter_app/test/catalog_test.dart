@@ -5,7 +5,7 @@ import 'package:dtvsteams/catalog/cache.dart';
 
 void main() {
   group('CatalogParser (Pure Dart native port of catalog-core)', () {
-    test('parseList returns 10 items from fixture', () {
+    test('parseList returns 10 items from fixture with auto-populated parts and metadata', () {
       final file = File('test/fixtures/list.html');
       final html = file.readAsStringSync();
       final list = CatalogParser.parseList(html);
@@ -14,6 +14,11 @@ void main() {
       expect(list.first.title, contains('2026-10-04 嘉義 命運奪壘賽'));
       expect(list.first.date, '2026-10-04');
       expect(list.first.url, 'https://srgoideas.com/ep1/');
+      expect(list.first.parts.length, 3);
+      expect(list.first.parts[0].label, 'Part 1');
+      expect(list.first.parts[1].label, 'Part 2');
+      expect(list.first.parts[2].label, 'Part 3');
+      expect(list.first.tags, contains('嘉義'));
     });
 
     test('parseParts returns 3 parts from fixture', () {
@@ -30,12 +35,30 @@ void main() {
       expect(parts[2].url, 'https://srgoideas.com/ep1/3/');
     });
 
-    test('parseStreamUrl extracts video mp4 src', () {
+    test('parseStreamUrl extracts video mp4 src and decodes entities', () {
       final file = File('test/fixtures/episode.html');
       final html = file.readAsStringSync();
       final streamUrl = CatalogParser.parseStreamUrl(html);
 
       expect(streamUrl, 'https://example.xyz/vplay-001.mp4?st=abc&e=123');
+
+      // Test with HTML encoded entity
+      const encodedHtml = '<video><source src="https://example.xyz/vplay.mp4?st=abc&amp;e=123" /></video>';
+      expect(CatalogParser.parseStreamUrl(encodedHtml), 'https://example.xyz/vplay.mp4?st=abc&e=123');
+    });
+
+    test('extractLocation identifies known Taiwan and overseas destinations', () {
+      expect(CatalogParser.extractLocation('綜藝玩很大 2026-11-08 台北 搗蛋鬼到你家'), '台北');
+      expect(CatalogParser.extractLocation('綜藝玩很大 2026-10-25 宜蘭 心機搶孤賽'), '宜蘭');
+      expect(CatalogParser.extractLocation('綜藝玩很大 2026-10-11 沖繩 十週年特輯'), '沖繩');
+      expect(CatalogParser.extractLocation('綜藝玩很大 無特別地名特輯'), '台灣');
+    });
+
+    test('categorizeTitle correctly classifies episode themes', () {
+      expect(CatalogParser.categorizeTitle('心機搶孤賽 極限競技'), 'action');
+      expect(CatalogParser.categorizeTitle('姊姊我來罩 泥漿爆笑大亂鬥'), 'comedy');
+      expect(CatalogParser.categorizeTitle('沖繩十週年特輯'), 'originals');
+      expect(CatalogParser.categorizeTitle('台北美食大冒險'), 'trending');
     });
   });
 

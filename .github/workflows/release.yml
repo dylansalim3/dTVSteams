@@ -1,0 +1,123 @@
+name: Release & Publish Android APK
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      force_build:
+        description: 'Force build and attach APK to latest release even without a new Release PR'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    name: Release Please (Versioning & Changelog)
+    runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs['flutter_app--release_created'] || steps.release.outputs.release_created || steps.release.outputs.releases_created }}
+      tag_name: ${{ steps.release.outputs['flutter_app--tag_name'] || steps.release.outputs.tag_name }}
+      version: ${{ steps.release.outputs['flutter_app--version'] || steps.release.outputs.version }}
+      upload_url: ${{ steps.release.outputs['flutter_app--upload_url'] || steps.release.outputs.upload_url }}
+    steps:
+      - name: Run Release Please Action
+        id: release
+        uses: googleapis/release-please-action@v4
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+
+  build-and-release-apk:
+    name: Build & Release Android APK
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created == 'true' || inputs.force_build == true }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Verify Flutter Installation
+        run: flutter doctor -v
+
+      - name: Install Dependencies
+        run: |
+          cd flutter_app
+          flutter pub get
+
+      - name: Run Automated Test Suite
+        run: |
+          cd flutter_app
+          flutter test
+
+      - name: Build Android Release APK
+        run: |
+          cd flutter_app
+          flutter build apk --release
+
+      - name: Prepare Release Artifacts & Checksums
+        id: prep
+        run: |
+          VERSION="${{ needs.release-please.outputs.version || '1.0.0' }}"
+          TAG="${{ needs.release-please.outputs.tag_name || '' }}"
+          
+          if [ -z "$TAG" ]; then
+            TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v$VERSION")
+          fi
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+          OUTPUT_DIR="flutter_app/build/app/outputs/flutter-apk"
+          cd "$OUTPUT_DIR"
+          
+          # Copy to branded and versioned naming
+          cp app-release.apk "dTVSteams-v${VERSION}.apk"
+          cp app-release.apk "dTVSteams-release.apk"
+          
+          # Compute SHA-256 Checksums
+          sha256sum dTVSteams-*.apk app-release.apk > checksums-sha256.txt
+          echo "Generated Checksums:"
+          cat checksums-sha256.txt
+
+      - name: Upload APK Assets Directly to GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ steps.prep.outputs.tag }}"
+          OUTPUT_DIR="flutter_app/build/app/outputs/flutter-apk"
+          
+          echo "Attaching APKs to GitHub Release tag: $TAG"
+          gh release upload "$TAG" \
+            "$OUTPUT_DIR/dTVSteams-v${{ steps.prep.outputs.version }}.apk" \
+            "$OUTPUT_DIR/dTVSteams-release.apk" \
+            "$OUTPUT_DIR/checksums-sha256.txt" \
+            --clobber
+
+      - name: Upload APK as Workflow Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dTVSteams-v${{ steps.prep.outputs.version }}-apk
+          path: |
+            flutter_app/build/app/outputs/flutter-apk/dTVSteams-*.apk
+            flutter_app/build/app/outputs/flutter-apk/checksums-sha256.txt
+          retention-days: 30
