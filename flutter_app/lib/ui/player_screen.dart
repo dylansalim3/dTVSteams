@@ -39,6 +39,7 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> {
   final DownloadManager _downloadManager = DownloadManager();
   final PlaybackHistoryManager _historyManager = PlaybackHistoryManager();
   final PipManager _pipManager = PipManager();
+  bool _isExiting = false;
 
   @override
   void initState() {
@@ -153,9 +154,17 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> {
       try {
         final controller = VideoPlayerController.file(fileToPlay);
         await controller.initialize();
+        if (!mounted || _isExiting) {
+          await controller.dispose();
+          return;
+        }
         await _checkAndResumeHistory(controller, part);
         controller.addListener(_videoPlayerListener);
         await controller.setPlaybackSpeed(_playbackSpeed);
+        if (!mounted || _isExiting) {
+          await controller.dispose();
+          return;
+        }
         await controller.play();
 
         if (mounted) {
@@ -227,9 +236,17 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> {
       );
 
       await controller.initialize();
+      if (!mounted || _isExiting) {
+        await controller.dispose();
+        return;
+      }
       await _checkAndResumeHistory(controller, part);
       controller.addListener(_videoPlayerListener);
       await controller.setPlaybackSpeed(_playbackSpeed);
+      if (!mounted || _isExiting) {
+        await controller.dispose();
+        return;
+      }
       await controller.play();
 
       if (mounted) {
@@ -330,8 +347,35 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> {
     _resetOsdTimer();
   }
 
+  Future<void> _handleExitPlayer() async {
+    if (_isExiting) return;
+    _isExiting = true;
+
+    // 1. Instantly silence and pause audio/video
+    try {
+      await _controller?.pause();
+    } catch (_) {}
+
+    // 2. Disable Auto-PiP immediately so system back gesture doesn't trigger PiP
+    try {
+      await _pipManager.setAutoPip(false);
+    } catch (_) {}
+
+    // 3. Persist current watch history
+    _persistCurrentPosition(force: true);
+
+    // 4. Restore system navigation/status bar
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+
+    // 5. Pop screen
+    if (mounted) {
+      Navigator.of(context).pop();
+    }
+  }
+
   @override
   void dispose() {
+    _isExiting = true;
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     _persistCurrentPosition(force: true);
     _pipManager.setAutoPip(false);
@@ -339,6 +383,9 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> {
     _downloadManager.removeListener(_onDownloadUpdate);
     _osdTimer?.cancel();
     _controller?.removeListener(_videoPlayerListener);
+    try {
+      _controller?.pause();
+    } catch (_) {}
     _controller?.dispose();
     super.dispose();
   }
@@ -456,38 +503,51 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> {
         : null;
 
     if (_pipManager.isInPipMode.value) {
-      return Scaffold(
-        backgroundColor: Colors.black,
-        body: Center(
-          child: isInitialized
-              ? AspectRatio(
-                  aspectRatio: controller.value.aspectRatio > 0 ? controller.value.aspectRatio : 16 / 9,
-                  child: VideoPlayer(controller),
-                )
-              : const SizedBox(),
+      return PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) {
+          if (didPop) return;
+          _handleExitPlayer();
+        },
+        child: Scaffold(
+          backgroundColor: Colors.black,
+          body: Center(
+            child: isInitialized
+                ? AspectRatio(
+                    aspectRatio: controller.value.aspectRatio > 0 ? controller.value.aspectRatio : 16 / 9,
+                    child: VideoPlayer(controller),
+                  )
+                : const SizedBox(),
+          ),
         ),
       );
     }
 
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: CallbackShortcuts(
-        bindings: <ShortcutActivator, VoidCallback>{
-          const SingleActivator(LogicalKeyboardKey.space): _togglePlayPause,
-          const SingleActivator(LogicalKeyboardKey.select): _togglePlayPause,
-          const SingleActivator(LogicalKeyboardKey.enter): _togglePlayPause,
-          const SingleActivator(LogicalKeyboardKey.mediaPlayPause): _togglePlayPause,
-          const SingleActivator(LogicalKeyboardKey.mediaPlay): () => controller?.play(),
-          const SingleActivator(LogicalKeyboardKey.mediaPause): () => controller?.pause(),
-          const SingleActivator(LogicalKeyboardKey.arrowLeft): () => _seekRelative(-10),
-          const SingleActivator(LogicalKeyboardKey.mediaRewind): () => _seekRelative(-10),
-          const SingleActivator(LogicalKeyboardKey.arrowRight): () => _seekRelative(10),
-          const SingleActivator(LogicalKeyboardKey.mediaFastForward): () => _seekRelative(10),
-          const SingleActivator(LogicalKeyboardKey.arrowUp): _toggleOsd,
-          const SingleActivator(LogicalKeyboardKey.arrowDown): _toggleOsd,
-          const SingleActivator(LogicalKeyboardKey.escape): () => Navigator.of(context).pop(),
-          const SingleActivator(LogicalKeyboardKey.gameButtonB): () => Navigator.of(context).pop(),
-        },
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        _handleExitPlayer();
+      },
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        body: CallbackShortcuts(
+          bindings: <ShortcutActivator, VoidCallback>{
+            const SingleActivator(LogicalKeyboardKey.space): _togglePlayPause,
+            const SingleActivator(LogicalKeyboardKey.select): _togglePlayPause,
+            const SingleActivator(LogicalKeyboardKey.enter): _togglePlayPause,
+            const SingleActivator(LogicalKeyboardKey.mediaPlayPause): _togglePlayPause,
+            const SingleActivator(LogicalKeyboardKey.mediaPlay): () => controller?.play(),
+            const SingleActivator(LogicalKeyboardKey.mediaPause): () => controller?.pause(),
+            const SingleActivator(LogicalKeyboardKey.arrowLeft): () => _seekRelative(-10),
+            const SingleActivator(LogicalKeyboardKey.mediaRewind): () => _seekRelative(-10),
+            const SingleActivator(LogicalKeyboardKey.arrowRight): () => _seekRelative(10),
+            const SingleActivator(LogicalKeyboardKey.mediaFastForward): () => _seekRelative(10),
+            const SingleActivator(LogicalKeyboardKey.arrowUp): _toggleOsd,
+            const SingleActivator(LogicalKeyboardKey.arrowDown): _toggleOsd,
+            const SingleActivator(LogicalKeyboardKey.escape): _handleExitPlayer,
+            const SingleActivator(LogicalKeyboardKey.gameButtonB): _handleExitPlayer,
+          },
         child: Focus(
           autofocus: true,
           child: GestureDetector(
@@ -592,7 +652,7 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> {
                                 children: [
                                   IconButton(
                                     icon: const Icon(Icons.arrow_back, color: Colors.white, size: 24),
-                                    onPressed: () => Navigator.of(context).pop(),
+                                    onPressed: _handleExitPlayer,
                                   ),
                                   const SizedBox(width: 8),
                                   Expanded(
@@ -829,8 +889,9 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   String _formatDuration(Duration d) {
     final minutes = d.inMinutes.remainder(60).toString().padLeft(2, '0');
