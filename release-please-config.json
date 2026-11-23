@@ -5,14 +5,7 @@
     "flutter_app": {
       "release-type": "dart",
       "package-name": "dtvsteams",
-      "changelog-path": "CHANGELOG.md",
-      "extra-files": [
-        {
-          "type": "json",
-          "path": "../package.json",
-          "jsonpath": "$.version"
-        }
-      ]
+      "changelog-path": "CHANGELOG.md"
     }
   }
 }

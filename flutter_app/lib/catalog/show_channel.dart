@@ -41,6 +41,8 @@ class ShowChannels {
         title: '綜藝玩很大 2026-11-08 台北 搗蛋鬼到你家',
         date: '2026-11-08',
         url: 'https://srgoideas.com/%e7%b6%9c%e8%97%9d%e7%8e%a9%e5%be%88%e5%a4%a7-2026-11-08-%e5%8f%b0%e5%8c%97-%e6%90%97%e8%9b%8b%e9%ac%bc%e5%88%b0%e4%bd%a0%e5%ae%b6/',
+        showId: 'mr_player',
+        showName: '綜藝玩很大',
         overview: '玩很大全員前進台北展開精采冒險！黃隊與黑隊宿命對決，爆笑遊戲與緊張刺激的命運金球爭奪戰！',
         match: 99,
         rating: '13+',
@@ -59,6 +61,8 @@ class ShowChannels {
         title: '綜藝玩很大 2026-10-31 台北 搗蛋鬼到你家',
         date: '2026-10-31',
         url: 'https://srgoideas.com/%e7%b6%9c%e8%97%9d%e7%8e%a9%e5%be%88%e5%a4%a7-2026-10-31-%e5%8f%b0%e5%8c%97-%e6%90%97%e8%9b%8b%e9%ac%bc%e5%88%b0%e4%bd%a0%e5%ae%b6/',
+        showId: 'mr_player',
+        showName: '綜藝玩很大',
         overview: '黃隊與黑隊宿命對決，萬聖節特別企劃！搗蛋鬼現身引爆全員大混亂！',
         match: 97,
         rating: '13+',
@@ -88,6 +92,8 @@ class ShowChannels {
         title: '飢餓遊戲 2026-11-22 飢餓指數特別企劃',
         date: '2026-11-22',
         url: 'https://srgoideas.com/%e9%a3%a2%e9%a4%93%e9%81%8a%e6%88%b2-2026-11-22-%e9%a3%a2%e9%a4%93%e6%8c%87%e6%95%b8%e7%89%b9%e5%88%a5%e4%bc%81%e5%8a%83/',
+        showId: 'hunger_games',
+        showName: '飢餓遊戲',
         overview: '飢餓遊戲全員挑戰飢餓指數與高難度關卡！充飢美食與殘酷淘汰賽全面引爆！',
         match: 98,
         rating: '13+',
@@ -106,6 +112,8 @@ class ShowChannels {
         title: '飢餓遊戲 2026-11-15 說好的提早下班之主謀騙你的',
         date: '2026-11-15',
         url: 'https://srgoideas.com/%e9%a3%a2%e9%a4%93%e9%81%8a%e6%88%b2-2026-11-15-%e8%aa%aa%e5%a5%bd%e7%9a%84%e6%8f%90%e6%97%a9%e4%b8%8b%e7%8f%ad%e4%b9%8b%e4%b8%bb%e8%ac%80%e9%a8%99%e4%bd%a0%e7%9a%84/',
+        showId: 'hunger_games',
+        showName: '飢餓遊戲',
         overview: '主謀精心策劃騙局！全員為了提早下班拼盡全力，真相大白時引發爆笑反彈！',
         match: 96,
         rating: '13+',
@@ -135,6 +143,8 @@ class ShowChannels {
         title: '全明星運動會 2023-01-08 總冠軍賽殊死戰',
         date: '2023-01-08',
         url: 'https://srgoideas.com/%e5%85%a8%e6%98%8e%e6%98%9f%e9%81%8b%e5%8b%95%e6%9c%83-2023-01-08/',
+        showId: 'all_stars',
+        showName: '全明星運動會',
         overview: '紅藍兩隊頂尖對決！挑戰各項體育極限，爭奪榮譽總冠軍！',
         match: 99,
         rating: '13+',
@@ -164,6 +174,8 @@ class ShowChannels {
         title: '小明星大跟班 2026-11-20 演藝圈真心話大冒險',
         date: '2026-11-20',
         url: 'https://srgoideas.com/%e5%b0%8f%e6%98%8e%e6%98%9f%e5%a4%a7%e8%b7%9f%e7%8f%ad-2026-11-20/',
+        showId: 'super_ent',
+        showName: '小明星大跟班',
         overview: '憲哥與Sandy父女聯手主持！麻辣話題與演藝圈八卦獨家大揭密！',
         match: 95,
         rating: '13+',
@@ -191,6 +203,8 @@ class ShowChannels {
         title: '11點熱吵店 2026-11-19 荒謬日常大吐槽',
         date: '2026-11-19',
         url: 'https://srgoideas.com/11%e9%bb%9e%e7%86%b1%e5%90%b5%e5%ba%97-2026-11-19/',
+        showId: 'hot_shop',
+        showName: '11點熱吵店',
         overview: '沈玉琳與Melody瘋狂開講！熱門辛辣話題、生活爆笑日常大解密！',
         match: 94,
         rating: '13+',
@@ -217,5 +231,34 @@ class ShowChannels {
 
   static ShowChannel findById(String id) {
     return all.firstWhere((c) => c.id == id, orElse: () => defaultChannel);
+  }
+
+  static String getEmoji(String showId) {
+    for (final c in all) {
+      if (c.id == showId) return c.iconEmoji;
+    }
+    return '📺';
+  }
+
+  static String getShowName(String showId) {
+    for (final c in all) {
+      if (c.id == showId) return c.name;
+    }
+    return '';
+  }
+
+  static ShowChannel? findChannelForEpisode({String? showId, String? title, String? url}) {
+    if (showId != null && showId.isNotEmpty) {
+      for (final c in all) {
+        if (c.id == showId) return c;
+      }
+    }
+    final text = '${title ?? ''} ${url ?? ''}'.toLowerCase();
+    for (final c in all) {
+      if (text.contains(c.name.toLowerCase()) || text.contains(c.id.toLowerCase())) {
+        return c;
+      }
+    }
+    return null;
   }
 }

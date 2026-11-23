@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../catalog/parser.dart';
+import '../catalog/show_channel.dart';
 import '../services/download_manager.dart';
 import '../services/playback_history_manager.dart';
 import 'downloads_screen.dart';
@@ -35,9 +36,12 @@ class TripleCircleDownloadButton extends StatelessWidget {
     for (int i = 0; i < totalParts; i++) {
       if (i < parts.length) {
         final p = parts[i];
-        final isDown = downloadManager.isDownloaded(episode.id, p.label);
-        final isDl = downloadManager.isDownloading(episode.id, p.label);
-        final item = downloadManager.getItem(episode.id, p.label);
+        final isDown = downloadManager.isDownloaded(episode.id, p.label,
+            showId: episode.showId, title: episode.title);
+        final isDl = downloadManager.isDownloading(episode.id, p.label,
+            showId: episode.showId, title: episode.title);
+        final item = downloadManager.getItem(episode.id, p.label,
+            showId: episode.showId, title: episode.title);
 
         isDownloadedList.add(isDown);
         isDownloadingList.add(isDl);
@@ -237,8 +241,19 @@ void showDownloadSelectionSheet(
     builder: (ctx) {
       return StatefulBuilder(
         builder: (sheetContext, setSheetState) {
+          final showId = episode.showId.isNotEmpty
+              ? episode.showId
+              : CatalogParser.detectShowId('${episode.title} ${episode.id}');
+          final showName = episode.showName.isNotEmpty
+              ? episode.showName
+              : ShowChannels.getShowName(showId);
+          final showEmoji = ShowChannels.getEmoji(showId);
+
           final parts = episode.parts;
-          final downloadedCount = parts.where((p) => downloadManager.isDownloaded(episode.id, p.label)).length;
+          final downloadedCount = parts
+              .where((p) => downloadManager.isDownloaded(episode.id, p.label,
+                  showId: showId, title: episode.title))
+              .length;
           final allDone = parts.isNotEmpty && downloadedCount == parts.length;
           final bottomInset = MediaQuery.of(sheetContext).padding.bottom;
 
@@ -246,7 +261,7 @@ void showDownloadSelectionSheet(
             top: false,
             bottom: true,
             child: Padding(
-              padding: EdgeInsets.fromLTRB(16.0, 12.0, 16.0, bottomInset + 16.0),
+              padding: EdgeInsets.fromLTRB(16.0, 12.0, 16.0, (bottomInset + 16.0) / 2),
               child: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -267,6 +282,17 @@ void showDownloadSelectionSheet(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              if (showName.isNotEmpty) ...[
+                                Text(
+                                  '$showEmoji $showName',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Color(0xFFE50914),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                              ],
                               const Text(
                                 '下載分段管理',
                                 style: TextStyle(
@@ -342,9 +368,12 @@ void showDownloadSelectionSheet(
                       Builder(
                         builder: (partContext) {
                           final p = parts[i];
-                          final isDown = downloadManager.isDownloaded(episode.id, p.label);
-                          final isDl = downloadManager.isDownloading(episode.id, p.label);
-                          final item = downloadManager.getItem(episode.id, p.label);
+                          final isDown = downloadManager.isDownloaded(episode.id, p.label,
+                              showId: showId, title: episode.title);
+                          final isDl = downloadManager.isDownloading(episode.id, p.label,
+                              showId: showId, title: episode.title);
+                          final item = downloadManager.getItem(episode.id, p.label,
+                              showId: showId, title: episode.title);
                           final sizeStr = item != null && item.downloadedBytes > 0
                               ? downloadManager.formatBytes(item.downloadedBytes)
                               : '';
@@ -442,7 +471,9 @@ void showDownloadSelectionSheet(
                                         tooltip: '播放本機離線檔案',
                                         onPressed: () {
                                           Navigator.of(ctx).pop();
-                                          final localFile = downloadManager.getLocalFile(episode.id, p.label);
+                                          final localFile = downloadManager.getLocalFile(
+                                              episode.id, p.label,
+                                              showId: showId, title: episode.title);
                                           if (localFile != null) {
                                             Navigator.of(context).push(
                                               MaterialPageRoute(
@@ -463,7 +494,9 @@ void showDownloadSelectionSheet(
                                         icon: const Icon(Icons.delete_outline, color: Colors.white38, size: 20),
                                         tooltip: '刪除下載檔案',
                                         onPressed: () {
-                                          downloadManager.deleteDownload(episode.id, p.label);
+                                          downloadManager.deleteDownload(
+                                              episode.id, p.label,
+                                              showId: showId, title: episode.title);
                                           setSheetState(() {});
                                         },
                                       ),
@@ -621,16 +654,28 @@ class YouTubeEpisodeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final location = CatalogParser.extractLocation(episode.title);
+    final showId = episode.showId.isNotEmpty
+        ? episode.showId
+        : CatalogParser.detectShowId('${episode.title} ${episode.id}');
+    final showName = episode.showName.isNotEmpty
+        ? episode.showName
+        : ShowChannels.getShowName(showId);
+    final showEmoji = ShowChannels.getEmoji(showId);
+
     final downloadManager = DownloadManager();
     final historyManager = PlaybackHistoryManager();
-    final downloadedParts = episode.parts.where((p) => downloadManager.isDownloaded(episode.id, p.label)).length;
+    final downloadedParts = episode.parts
+        .where((p) => downloadManager.isDownloaded(episode.id, p.label,
+            showId: showId, title: episode.title))
+        .length;
     final isEpDone = historyManager.isEpisodeCompleted(episode.id, episode.parts.length);
     final epProgress = historyManager.getEpisodeProgress(episode.id, episode.parts.length);
 
     // Compute total downloaded bytes for this episode if in download view
     int totalDownloadedBytes = 0;
     for (final p in episode.parts) {
-      final item = downloadManager.getItem(episode.id, p.label);
+      final item = downloadManager.getItem(episode.id, p.label,
+          showId: showId, title: episode.title);
       if (item != null && item.downloadedBytes > 0) {
         totalDownloadedBytes += item.downloadedBytes;
       }
@@ -714,6 +759,25 @@ class YouTubeEpisodeCard extends StatelessWidget {
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
+                            if (showName.isNotEmpty) ...[
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFE50914).withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(3),
+                                  border: Border.all(color: const Color(0xFFE50914).withValues(alpha: 0.4)),
+                                ),
+                                child: Text(
+                                  '$showEmoji $showName',
+                                  style: const TextStyle(
+                                    fontSize: 10,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
                             if (location.isNotEmpty) ...[
                               const SizedBox(width: 8),
                               Text(
@@ -832,9 +896,12 @@ class YouTubeEpisodeCard extends StatelessWidget {
                 runSpacing: 4,
                 children: List.generate(episode.parts.length, (idx) {
                   final p = episode.parts[idx];
-                  final isPartDown = downloadManager.isDownloaded(episode.id, p.label);
-                  final isPartDownloading = downloadManager.isDownloading(episode.id, p.label);
-                  final item = downloadManager.getItem(episode.id, p.label);
+                  final isPartDown = downloadManager.isDownloaded(episode.id, p.label,
+                      showId: showId, title: episode.title);
+                  final isPartDownloading = downloadManager.isDownloading(episode.id, p.label,
+                      showId: showId, title: episode.title);
+                  final item = downloadManager.getItem(episode.id, p.label,
+                      showId: showId, title: episode.title);
                   final partRec = historyManager.getRecord(episode.id, p.label);
                   final isPartWatched = partRec != null && partRec.isCompleted;
                   final inProgressWatched = partRec != null && !partRec.isCompleted && partRec.progress > 0.05;

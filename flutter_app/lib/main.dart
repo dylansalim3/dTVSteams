@@ -126,7 +126,13 @@ class _HomeScreenState extends State<HomeScreen> {
         final jsonStr = await rootBundle.loadString('assets/catalog.json');
         final data = json.decode(jsonStr) as Map<String, dynamic>;
         final eps = (data['episodes'] as List<dynamic>)
-            .map((e) => CatalogEpisode.fromJson(e as Map<String, dynamic>))
+            .map((e) {
+              final ep = CatalogEpisode.fromJson(e as Map<String, dynamic>);
+              return ep.copyWith(
+                showId: ep.showId.isNotEmpty ? ep.showId : ShowChannels.defaultChannel.id,
+                showName: ep.showName.isNotEmpty ? ep.showName : ShowChannels.defaultChannel.name,
+              );
+            })
             .toList();
         eps.sort(CatalogParser.compareDateDescending);
         setState(() {
@@ -179,7 +185,11 @@ class _HomeScreenState extends State<HomeScreen> {
           .timeout(const Duration(seconds: 10));
 
       if (res.statusCode == 200) {
-        final parsed = CatalogParser.parseList(res.body, defaultShowName: currentChannel.name);
+        final parsed = CatalogParser.parseList(
+          res.body,
+          showId: currentChannel.id,
+          defaultShowName: currentChannel.name,
+        );
         if (parsed.isNotEmpty && mounted) {
           final existingUrls = allEpisodes.map((e) => e.url).toSet();
           final newEps = parsed.where((p) => !existingUrls.contains(p.url)).toList();
@@ -247,7 +257,7 @@ class _HomeScreenState extends State<HomeScreen> {
               color: Color(0xFF1E1E1E),
               borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
             ),
-            padding: EdgeInsets.fromLTRB(20, 16, 20, bottomInset + 24),
+            padding: EdgeInsets.fromLTRB(20, 16, 20, (bottomInset + 24) / 2),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -429,7 +439,11 @@ class _HomeScreenState extends State<HomeScreen> {
         },
       ).timeout(const Duration(seconds: 10));
       if (res.statusCode == 200) {
-        final parsed = CatalogParser.parseList(res.body, defaultShowName: currentChannel.name);
+        final parsed = CatalogParser.parseList(
+          res.body,
+          showId: currentChannel.id,
+          defaultShowName: currentChannel.name,
+        );
         if (parsed.isNotEmpty && mounted) {
           parsed.sort(CatalogParser.compareDateDescending);
           _pageCache[page] = parsed;

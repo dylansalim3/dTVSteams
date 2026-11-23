@@ -37,7 +37,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
         ? ep.parts[partIndex]
         : (ep.parts.isNotEmpty ? ep.parts.first : CatalogPart(label: 'Part 1', url: ep.url));
 
-    final localFile = _manager.getLocalFile(ep.id, part.label);
+    final localFile = _manager.getLocalFile(ep.id, part.label, showId: ep.showId, title: ep.title);
 
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -70,8 +70,8 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
             onPressed: () {
               Navigator.of(ctx).pop();
               for (final p in ep.parts) {
-                if (_manager.isDownloaded(ep.id, p.label)) {
-                  _manager.deleteDownload(ep.id, p.label);
+                if (_manager.isDownloaded(ep.id, p.label, showId: ep.showId, title: ep.title)) {
+                  _manager.deleteDownload(ep.id, p.label, showId: ep.showId, title: ep.title);
                 }
               }
               if (mounted) setState(() {});
@@ -111,11 +111,20 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
         }
       }
 
+      final showId = first.showId.isNotEmpty
+          ? first.showId
+          : CatalogParser.detectShowId('${first.episodeTitle} ${first.episodeId}');
+      final showName = first.showName.isNotEmpty
+          ? first.showName
+          : CatalogParser.detectShowName('${first.episodeTitle} ${first.episodeId} $showId');
+
       episodes.add(CatalogEpisode(
         id: entry.key,
         title: first.episodeTitle,
         date: first.date,
         url: first.partUrl,
+        showId: showId,
+        showName: showName,
         overview: '本機離線影片',
         parts: parts,
       ));

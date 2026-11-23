@@ -125,15 +125,15 @@ void main() {
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(channel, (MethodCall call) async {
         if (call.method == 'getAppVersion') {
-          return {'versionName': '1.0.2', 'versionCode': 3};
+          return {'versionName': '1.0.3', 'versionCode': 4};
         }
         return null;
       });
 
       final manager = UpdateManager();
       await manager.init();
-      expect(UpdateManager.currentAppVersion, '1.0.2');
-      expect(UpdateManager.currentAppVersionCode, 3);
+      expect(UpdateManager.currentAppVersion, '1.0.3');
+      expect(UpdateManager.currentAppVersionCode, 4);
     });
   });
 

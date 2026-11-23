@@ -109,7 +109,7 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
           20,
           16,
           20,
-          MediaQuery.of(context).viewInsets.bottom + bottomInset + 24,
+          MediaQuery.of(context).viewInsets.bottom + (bottomInset + 24) / 2,
         ),
         child: SingleChildScrollView(
         child: Column(

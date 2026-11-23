@@ -144,7 +144,12 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> {
     if (widget.localFile != null && partIndex == widget.initialPartIndex && widget.localFile!.existsSync()) {
       fileToPlay = widget.localFile;
     } else if (part != null) {
-      final downloaded = _downloadManager.getLocalFile(widget.episode.id, part.label);
+      final downloaded = _downloadManager.getLocalFile(
+        widget.episode.id,
+        part.label,
+        showId: widget.episode.showId,
+        title: widget.episode.title,
+      );
       if (downloaded != null && downloaded.existsSync()) {
         fileToPlay = downloaded;
       }
@@ -289,7 +294,9 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> {
         // Offer quick cleanup for offline downloaded file once watched to completion
         final parts = widget.episode.parts;
         final finishedPart = parts.isNotEmpty && _currentPartIndex < parts.length ? parts[_currentPartIndex] : null;
-        if (finishedPart != null && _downloadManager.isDownloaded(widget.episode.id, finishedPart.label)) {
+        if (finishedPart != null &&
+            _downloadManager.isDownloaded(widget.episode.id, finishedPart.label,
+                showId: widget.episode.showId, title: widget.episode.title)) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('已看完「${finishedPart.label}」，可清理離線檔以節省空間'),
@@ -420,7 +427,8 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> {
     if (parts.isEmpty || _currentPartIndex >= parts.length) return;
     final part = parts[_currentPartIndex];
 
-    if (_downloadManager.isDownloaded(widget.episode.id, part.label)) {
+    if (_downloadManager.isDownloaded(widget.episode.id, part.label,
+        showId: widget.episode.showId, title: widget.episode.title)) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('已下載至本機：${widget.episode.title} - ${part.label}'),
@@ -438,8 +446,10 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> {
       return;
     }
 
-    if (_downloadManager.isDownloading(widget.episode.id, part.label)) {
-      final item = _downloadManager.getItem(widget.episode.id, part.label);
+    if (_downloadManager.isDownloading(widget.episode.id, part.label,
+        showId: widget.episode.showId, title: widget.episode.title)) {
+      final item = _downloadManager.getItem(widget.episode.id, part.label,
+          showId: widget.episode.showId, title: widget.episode.title);
       final pct = item?.progressPercentage ?? '';
       final dlStr = _downloadManager.formatBytes(item?.downloadedBytes ?? 0);
       final totStr = item != null && item.totalBytes > 0 ? _downloadManager.formatBytes(item.totalBytes) : '';
@@ -495,11 +505,14 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> {
         : 0.0;
 
     final isCurPartDownloaded = currentPart != null &&
-        _downloadManager.isDownloaded(widget.episode.id, currentPart.label);
+        _downloadManager.isDownloaded(widget.episode.id, currentPart.label,
+            showId: widget.episode.showId, title: widget.episode.title);
     final isCurPartDownloading = currentPart != null &&
-        _downloadManager.isDownloading(widget.episode.id, currentPart.label);
+        _downloadManager.isDownloading(widget.episode.id, currentPart.label,
+            showId: widget.episode.showId, title: widget.episode.title);
     final downloadItem = currentPart != null
-        ? _downloadManager.getItem(widget.episode.id, currentPart.label)
+        ? _downloadManager.getItem(widget.episode.id, currentPart.label,
+            showId: widget.episode.showId, title: widget.episode.title)
         : null;
 
     if (_pipManager.isInPipMode.value) {

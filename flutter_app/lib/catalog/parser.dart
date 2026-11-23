@@ -5,6 +5,8 @@ class CatalogEpisode {
   final String title;
   final String date;
   final String url;
+  final String showId;
+  final String showName;
   final String overview;
   final String backdrop;
   final String poster;
@@ -21,6 +23,8 @@ class CatalogEpisode {
     required this.title,
     required this.date,
     required this.url,
+    this.showId = '',
+    this.showName = '',
     this.overview = '',
     this.backdrop = '',
     this.poster = '',
@@ -38,6 +42,8 @@ class CatalogEpisode {
     String? title,
     String? date,
     String? url,
+    String? showId,
+    String? showName,
     String? overview,
     String? backdrop,
     String? poster,
@@ -54,6 +60,8 @@ class CatalogEpisode {
       title: title ?? this.title,
       date: date ?? this.date,
       url: url ?? this.url,
+      showId: showId ?? this.showId,
+      showName: showName ?? this.showName,
       overview: overview ?? this.overview,
       backdrop: backdrop ?? this.backdrop,
       poster: poster ?? this.poster,
@@ -72,6 +80,8 @@ class CatalogEpisode {
         'title': title,
         'date': date,
         'url': url,
+        'showId': showId,
+        'showName': showName,
         'overview': overview,
         'backdrop': backdrop,
         'poster': poster,
@@ -85,11 +95,25 @@ class CatalogEpisode {
       };
 
   factory CatalogEpisode.fromJson(Map<String, dynamic> json) {
+    final title = json['title'] as String? ?? 'Untitled';
+    final url = json['url'] as String? ?? '';
+    final id = json['id'] as String? ?? '';
+    var sId = json['showId'] as String? ?? '';
+    var sName = json['showName'] as String? ?? '';
+    if (sId.isEmpty) {
+      sId = CatalogParser.detectShowId('$title $url $id');
+    }
+    if (sName.isEmpty) {
+      sName = CatalogParser.detectShowName('$title $url $id');
+    }
+
     return CatalogEpisode(
-      id: json['id'] as String? ?? '',
-      title: json['title'] as String? ?? 'Untitled',
+      id: id,
+      title: title,
       date: json['date'] as String? ?? '',
-      url: json['url'] as String? ?? '',
+      url: url,
+      showId: sId,
+      showName: sName,
       overview: json['overview'] as String? ?? '',
       backdrop: json['backdrop'] as String? ?? '',
       poster: json['poster'] as String? ?? '',
@@ -220,8 +244,42 @@ class CatalogParser {
     return 'trending';
   }
 
+  /// Helper to detect showId from title, url, or path
+  static String detectShowId(String text) {
+    var s = text;
+    try {
+      s = Uri.decodeComponent(text);
+    } catch (_) {}
+    final lower = s.toLowerCase();
+    if (s.contains('綜藝玩很大') || lower.contains('mr_player') || lower.contains('mr-player')) return 'mr_player';
+    if (s.contains('飢餓遊戲') || lower.contains('hunger_games') || lower.contains('hunger-games')) return 'hunger_games';
+    if (s.contains('全明星運動會') || lower.contains('all_stars') || lower.contains('all-stars')) return 'all_stars';
+    if (s.contains('小明星大跟班') || lower.contains('super_ent') || lower.contains('super-ent')) return 'super_ent';
+    if (s.contains('11點熱吵店') || lower.contains('hot_shop') || lower.contains('hot-shop')) return 'hot_shop';
+    return '';
+  }
+
+  /// Helper to detect showName from title, url, or showId
+  static String detectShowName(String text) {
+    var s = text;
+    try {
+      s = Uri.decodeComponent(text);
+    } catch (_) {}
+    final lower = s.toLowerCase();
+    if (s.contains('綜藝玩很大') || lower.contains('mr_player')) return '綜藝玩很大';
+    if (s.contains('飢餓遊戲') || lower.contains('hunger_games')) return '飢餓遊戲';
+    if (s.contains('全明星運動會') || lower.contains('all_stars')) return '全明星運動會';
+    if (s.contains('小明星大跟班') || lower.contains('super_ent')) return '小明星大跟班';
+    if (s.contains('11點熱吵店') || lower.contains('hot_shop')) return '11點熱吵店';
+    return '';
+  }
+
   /// Native Dart port of parseList from catalog-core
-  static List<CatalogEpisode> parseList(String html, {String? defaultShowName}) {
+  static List<CatalogEpisode> parseList(
+    String html, {
+    String? showId,
+    String? defaultShowName,
+  }) {
     final document = html_parser.parse(html);
     // Support WordPress category pages (.entry-title a, article h2 a) as well as legacy/plugin lists (ul.lcp_catlist a)
     final anchors = document.querySelectorAll('.entry-title a, ul.lcp_catlist a, article h2 a');
@@ -239,6 +297,13 @@ class CatalogParser {
       final date = match != null ? match.group(0)! : '';
       final location = extractLocation(title);
       final category = categorizeTitle(title);
+
+      final epShowId = (showId != null && showId.isNotEmpty)
+          ? showId
+          : detectShowId('$title $url');
+      final epShowName = (defaultShowName != null && defaultShowName.isNotEmpty)
+          ? defaultShowName
+          : detectShowName('$title $url $epShowId');
 
       final baseUrl = url.endsWith('/') ? url : '$url/';
       final defaultParts = [
@@ -280,12 +345,14 @@ class CatalogParser {
         title: title,
         date: date,
         url: url,
+        showId: epShowId,
+        showName: epShowName,
         overview: overview,
         match: 99 - (i % 10),
         rating: '13+',
         duration: '1小時 45分',
         category: category,
-        tags: [location, defaultShowName ?? '台灣綜藝', '熱門推薦'],
+        tags: [location, epShowName.isNotEmpty ? epShowName : (defaultShowName ?? '台灣綜藝'), '熱門推薦'],
         top10: i < 5 ? (i + 1) : null,
         parts: defaultParts,
       ));

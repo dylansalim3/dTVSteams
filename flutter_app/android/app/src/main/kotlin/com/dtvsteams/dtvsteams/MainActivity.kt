@@ -63,7 +63,7 @@ class MainActivity : FlutterActivity() {
                 "getAppVersion" -> {
                     try {
                         val pInfo = packageManager.getPackageInfo(packageName, 0)
-                        val vName = pInfo.versionName ?: "1.0.2"
+                        val vName = pInfo.versionName ?: "1.0.3"
                         val vCode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                             pInfo.longVersionCode
                         } else {
@@ -76,8 +76,8 @@ class MainActivity : FlutterActivity() {
                         ))
                     } catch (e: Exception) {
                         result.success(mapOf(
-                            "versionName" to "1.0.2",
-                            "versionCode" to 3L
+                            "versionName" to "1.0.3",
+                            "versionCode" to 4L
                         ))
                     }
                 }

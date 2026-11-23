@@ -110,5 +110,62 @@ void main() {
       expect(find.byType(YouTubeEpisodeCard), findsOneWidget);
       expect(f3.existsSync(), isFalse);
     });
+
+    testWidgets('Cross-show download isolation: shows sharing same broadcast date do NOT cross-contaminate downloads',
+        (WidgetTester tester) async {
+      final showAFile = File('${tempDir.path}/mr_player_2026-11-15_Part1.mp4')
+        ..writeAsStringSync('mr_player_content');
+
+      const showAUrl = 'https://srgoideas.com/%e7%b6%9c%e8%97%9d%e7%8e%a9%e5%be%88%e5%a4%a7-2026-11-15-%e5%8f%b0%e4%b8%ad-%e5%89%8d%e8%bc%a9%e8%aa%aa%e4%ba%86%e7%ae%97/';
+      const showBUrl = 'https://srgoideas.com/%e9%a3%a2%e9%a4%93%e9%81%8a%e6%88%b2-2026-11-15-%e8%aa%aa%e5%a5%bd%e7%9a%84%e6%8f%90%e6%97%a9%e4%b8%8b%e7%8f%ad%e4%b9%8b%e4%b8%bb%e8%ac%80%e9%a8%99%e4%bd%a0%e7%9a%84/';
+
+      // Download Part 1 for Show A (綜藝玩很大, 2026-11-15)
+      manager.addItemForTesting(DownloadItem(
+        episodeId: showAUrl,
+        episodeTitle: '綜藝玩很大 2026-11-15 台中 前輩說了算',
+        showId: 'mr_player',
+        showName: '綜藝玩很大',
+        partLabel: 'Part 1',
+        partUrl: showAUrl,
+        localFilePath: showAFile.path,
+        date: '2026-11-15',
+        totalBytes: 50 * 1024 * 1024,
+        downloadedBytes: 50 * 1024 * 1024,
+        status: DownloadStatus.completed,
+      ));
+
+      // 1. Show A must be reported as downloaded
+      expect(
+        manager.isDownloaded(showAUrl, 'Part 1', showId: 'mr_player', title: '綜藝玩很大 2026-11-15 台中 前輩說了算'),
+        isTrue,
+      );
+      expect(
+        manager.getLocalFile(showAUrl, 'Part 1', showId: 'mr_player', title: '綜藝玩很大 2026-11-15 台中 前輩說了算'),
+        isNotNull,
+      );
+
+      // 2. Show B on the exact same date (2026-11-15) must NEVER match Show A
+      expect(
+        manager.isDownloaded(showBUrl, 'Part 1', showId: 'hunger_games', title: '飢餓遊戲 2026-11-15 說好的提早下班之主謀騙你的'),
+        isFalse,
+      );
+      expect(
+        manager.getLocalFile(showBUrl, 'Part 1', showId: 'hunger_games', title: '飢餓遊戲 2026-11-15 說好的提早下班之主謀騙你的'),
+        isNull,
+      );
+      expect(
+        manager.getItem(showBUrl, 'Part 1', showId: 'hunger_games', title: '飢餓遊戲 2026-11-15 說好的提早下班之主謀騙你的'),
+        isNull,
+      );
+
+      // 3. Render DownloadsScreen and verify show badge
+      await tester.pumpWidget(const MaterialApp(
+        home: DownloadsScreen(),
+      ));
+      await tester.pumpAndSettle();
+
+      // Show badge with emoji should be visible
+      expect(find.textContaining('🔥 綜藝玩很大'), findsWidgets);
+    });
   });
 }

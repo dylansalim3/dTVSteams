@@ -11,6 +11,8 @@ enum DownloadStatus { idle, downloading, paused, completed, failed }
 class DownloadItem {
   final String episodeId;
   final String episodeTitle;
+  final String showId;
+  final String showName;
   final String partLabel;
   final String partUrl;
   final String localFilePath;
@@ -24,6 +26,8 @@ class DownloadItem {
   DownloadItem({
     required this.episodeId,
     required this.episodeTitle,
+    this.showId = '',
+    this.showName = '',
     required this.partLabel,
     required this.partUrl,
     required this.localFilePath,
@@ -58,6 +62,8 @@ class DownloadItem {
   Map<String, dynamic> toJson() => {
         'episodeId': episodeId,
         'episodeTitle': episodeTitle,
+        'showId': showId,
+        'showName': showName,
         'partLabel': partLabel,
         'partUrl': partUrl,
         'localFilePath': localFilePath,
@@ -67,20 +73,36 @@ class DownloadItem {
         'status': status.name,
       };
 
-  factory DownloadItem.fromJson(Map<String, dynamic> json) => DownloadItem(
-        episodeId: json['episodeId'] as String? ?? '',
-        episodeTitle: json['episodeTitle'] as String? ?? '',
-        partLabel: json['partLabel'] as String? ?? 'Part 1',
-        partUrl: json['partUrl'] as String? ?? '',
-        localFilePath: json['localFilePath'] as String? ?? '',
-        date: json['date'] as String? ?? '',
-        totalBytes: (json['totalBytes'] as num?)?.toInt() ?? 0,
-        downloadedBytes: (json['downloadedBytes'] as num?)?.toInt() ?? 0,
-        status: DownloadStatus.values.firstWhere(
-          (e) => e.name == json['status'],
-          orElse: () => DownloadStatus.idle,
-        ),
-      );
+  factory DownloadItem.fromJson(Map<String, dynamic> json) {
+    final title = json['episodeTitle'] as String? ?? '';
+    final epId = json['episodeId'] as String? ?? '';
+    final path = json['localFilePath'] as String? ?? '';
+    var sId = json['showId'] as String? ?? '';
+    var sName = json['showName'] as String? ?? '';
+    if (sId.isEmpty) {
+      sId = CatalogParser.detectShowId('$title $epId $path');
+    }
+    if (sName.isEmpty) {
+      sName = CatalogParser.detectShowName('$title $epId $path $sId');
+    }
+
+    return DownloadItem(
+      episodeId: epId,
+      episodeTitle: title,
+      showId: sId,
+      showName: sName,
+      partLabel: json['partLabel'] as String? ?? 'Part 1',
+      partUrl: json['partUrl'] as String? ?? '',
+      localFilePath: path,
+      date: json['date'] as String? ?? '',
+      totalBytes: (json['totalBytes'] as num?)?.toInt() ?? 0,
+      downloadedBytes: (json['downloadedBytes'] as num?)?.toInt() ?? 0,
+      status: DownloadStatus.values.firstWhere(
+        (e) => e.name == json['status'],
+        orElse: () => DownloadStatus.idle,
+      ),
+    );
+  }
 }
 
 class DownloadManager extends ChangeNotifier {
@@ -152,8 +174,10 @@ class DownloadManager extends ChangeNotifier {
   DownloadItem? _findItem(
     String episodeId,
     String partLabel, {
+    String? showId,
     String? localFilePath,
     String? date,
+    String? title,
   }) {
     final directKey = _buildKey(episodeId, partLabel);
     if (_items.containsKey(directKey)) {
@@ -184,15 +208,30 @@ class DownloadManager extends ChangeNotifier {
       }
     }
 
-    // 3. Match by date + partLabel (e.g. 2026-10-31 + Part 1)
+    // 3. Match by showId + date + partLabel (NEVER match date alone across different shows!)
+    var effectiveShowId = (showId != null && showId.isNotEmpty)
+        ? showId
+        : CatalogParser.detectShowId('$episodeId ${title ?? ''}');
+
     String? epDate = date;
     if (epDate == null || epDate.isEmpty) {
       final match = RegExp(r'\d{4}-\d{2}-\d{2}').firstMatch(episodeId);
       if (match != null) epDate = match.group(0);
     }
-    if (epDate != null && epDate.isNotEmpty) {
+
+    if (epDate != null && epDate.isNotEmpty && effectiveShowId.isNotEmpty) {
       for (final item in _items.values) {
         if (item.partLabel.toLowerCase().replaceAll(' ', '') != normPart) continue;
+
+        final itemShowId = item.showId.isNotEmpty
+            ? item.showId
+            : CatalogParser.detectShowId('${item.episodeTitle} ${item.episodeId} ${item.localFilePath}');
+
+        // Strict guard: MUST belong to the SAME show!
+        if (itemShowId.isNotEmpty && itemShowId != effectiveShowId) {
+          continue;
+        }
+
         if (item.date == epDate || item.episodeId.contains(epDate) || item.localFilePath.contains(epDate)) {
           _items[directKey] = item;
           return item;
@@ -206,9 +245,6 @@ class DownloadManager extends ChangeNotifier {
   @visibleForTesting
   void addItemForTesting(DownloadItem item) {
     _items[_buildKey(item.episodeId, item.partLabel)] = item;
-    if (item.date.isNotEmpty) {
-      _items['${item.date}_${item.partLabel}'] = item;
-    }
     notifyListeners();
   }
 
@@ -254,9 +290,6 @@ class DownloadManager extends ChangeNotifier {
 
               final key = _buildKey(item.episodeId, item.partLabel);
               _items[key] = item;
-              if (item.date.isNotEmpty) {
-                _items['${item.date}_${item.partLabel}'] = item;
-              }
             }
           }
         } catch (e) {
@@ -288,22 +321,40 @@ class DownloadManager extends ChangeNotifier {
           final fileSize = entity.lengthSync();
           if (fileSize <= 0) continue;
 
-          // Parse pattern: {date}_{sanitizedTitle}_{partLabel}.mp4
-          final match = RegExp(r'^([0-9]{4}-[0-9]{2}-[0-9]{2})_(.+)_(Part\s*\d+)\.mp4$', caseSensitive: false)
+          // Parse pattern: ({showId}_)?{date}_{sanitizedTitle}_{partLabel}.mp4
+          final matchWithShow = RegExp(r'^([a-z_]+)_([0-9]{4}-[0-9]{2}-[0-9]{2})_(.+)_(Part\s*\d+)\.mp4$', caseSensitive: false)
+              .firstMatch(fileName);
+          final matchWithoutShow = RegExp(r'^([0-9]{4}-[0-9]{2}-[0-9]{2})_(.+)_(Part\s*\d+)\.mp4$', caseSensitive: false)
               .firstMatch(fileName);
 
+          String showId = '';
           String date = '';
           String title = fileName.replaceAll('.mp4', '');
           String partLabel = 'Part 1';
 
-          if (match != null) {
-            date = match.group(1) ?? '';
-            title = (match.group(2) ?? '').replaceAll('_', ' ');
-            partLabel = (match.group(3) ?? 'Part 1').replaceAll('_', ' ');
+          if (matchWithShow != null) {
+            showId = matchWithShow.group(1) ?? '';
+            date = matchWithShow.group(2) ?? '';
+            title = (matchWithShow.group(3) ?? '').replaceAll('_', ' ');
+            partLabel = (matchWithShow.group(4) ?? 'Part 1').replaceAll('_', ' ');
+          } else if (matchWithoutShow != null) {
+            date = matchWithoutShow.group(1) ?? '';
+            title = (matchWithoutShow.group(2) ?? '').replaceAll('_', ' ');
+            partLabel = (matchWithoutShow.group(3) ?? 'Part 1').replaceAll('_', ' ');
+            showId = CatalogParser.detectShowId(title);
           }
 
+          final showName = CatalogParser.detectShowName('$title $showId');
+
           // Check if already registered by localFilePath or date+part
-          final existing = _findItem('', partLabel, localFilePath: entity.path, date: date);
+          final existing = _findItem(
+            '',
+            partLabel,
+            showId: showId,
+            localFilePath: entity.path,
+            date: date,
+            title: title,
+          );
           if (existing != null) {
             continue;
           }
@@ -312,6 +363,8 @@ class DownloadManager extends ChangeNotifier {
           final item = DownloadItem(
             episodeId: epId,
             episodeTitle: title,
+            showId: showId,
+            showName: showName,
             partLabel: partLabel,
             partUrl: '',
             localFilePath: entity.path,
@@ -322,9 +375,6 @@ class DownloadManager extends ChangeNotifier {
           );
 
           _items[_buildKey(epId, partLabel)] = item;
-          if (date.isNotEmpty) {
-            _items['${date}_$partLabel'] = item;
-          }
         }
       }
     } catch (e) {
@@ -358,23 +408,23 @@ class DownloadManager extends ChangeNotifier {
     }
   }
 
-  bool isDownloaded(String episodeId, String partLabel) {
-    final item = _findItem(episodeId, partLabel);
+  bool isDownloaded(String episodeId, String partLabel, {String? showId, String? title}) {
+    final item = _findItem(episodeId, partLabel, showId: showId, title: title);
     if (item == null || item.status != DownloadStatus.completed) return false;
     return File(item.localFilePath).existsSync();
   }
 
-  bool isDownloading(String episodeId, String partLabel) {
-    final item = _findItem(episodeId, partLabel);
+  bool isDownloading(String episodeId, String partLabel, {String? showId, String? title}) {
+    final item = _findItem(episodeId, partLabel, showId: showId, title: title);
     return item?.status == DownloadStatus.downloading;
   }
 
-  DownloadItem? getItem(String episodeId, String partLabel) {
-    return _findItem(episodeId, partLabel);
+  DownloadItem? getItem(String episodeId, String partLabel, {String? showId, String? title}) {
+    return _findItem(episodeId, partLabel, showId: showId, title: title);
   }
 
-  File? getLocalFile(String episodeId, String partLabel) {
-    final item = _findItem(episodeId, partLabel);
+  File? getLocalFile(String episodeId, String partLabel, {String? showId, String? title}) {
+    final item = _findItem(episodeId, partLabel, showId: showId, title: title);
     if (item != null && item.status == DownloadStatus.completed) {
       final f = File(item.localFilePath);
       if (f.existsSync()) return f;
@@ -382,8 +432,8 @@ class DownloadManager extends ChangeNotifier {
     return null;
   }
 
-  void cancelDownload(String episodeId, String partLabel) {
-    final item = _findItem(episodeId, partLabel);
+  void cancelDownload(String episodeId, String partLabel, {String? showId, String? title}) {
+    final item = _findItem(episodeId, partLabel, showId: showId, title: title);
     final key = _buildKey(episodeId, partLabel);
     _activeClients.remove(key)?.close();
     if (item != null) {
@@ -396,9 +446,9 @@ class DownloadManager extends ChangeNotifier {
     }
   }
 
-  Future<void> finalizeDownload(String episodeId, String partLabel) async {
-    final item = _findItem(episodeId, partLabel);
-    cancelDownload(episodeId, partLabel);
+  Future<void> finalizeDownload(String episodeId, String partLabel, {String? showId, String? title}) async {
+    final item = _findItem(episodeId, partLabel, showId: showId, title: title);
+    cancelDownload(episodeId, partLabel, showId: showId, title: title);
 
     if (item != null) {
       final file = File(item.localFilePath);
@@ -427,32 +477,40 @@ class DownloadManager extends ChangeNotifier {
     try {
       await init();
 
+      final showId = episode.showId.isNotEmpty ? episode.showId : CatalogParser.detectShowId('${episode.title} ${episode.id}');
+      final showName = episode.showName.isNotEmpty ? episode.showName : CatalogParser.detectShowName('${episode.title} ${episode.id}');
+
       final sanitizedTitle = episode.title
           .replaceAll(RegExp(r'[\\/:*?"<>| ]'), '_')
           .replaceAll(RegExp(r'_+'), '_');
-      final filename = '${episode.date}_${sanitizedTitle}_${part.label}.mp4';
+      final showPrefix = showId.isNotEmpty ? '${showId}_' : '';
+      final filename = '$showPrefix${episode.date}_${sanitizedTitle}_${part.label}.mp4';
       final targetPath = '$_downloadDirectoryPath/$filename';
       final targetFile = File(targetPath);
 
       // Check if already downloaded or existing file on disk is complete
-      final existingItem = _findItem(episode.id, part.label, localFilePath: targetPath, date: episode.date);
-      if (isDownloaded(episode.id, part.label) ||
+      final existingItem = _findItem(
+        episode.id,
+        part.label,
+        showId: showId,
+        localFilePath: targetPath,
+        date: episode.date,
+        title: episode.title,
+      );
+      if (isDownloaded(episode.id, part.label, showId: showId, title: episode.title) ||
           (existingItem != null && existingItem.status == DownloadStatus.completed && targetFile.existsSync()) ||
           (targetFile.existsSync() && targetFile.lengthSync() > 1024 * 1024 && existingItem?.status == DownloadStatus.completed)) {
         debugPrint('Episode ${episode.title} - ${part.label} is already downloaded.');
         if (existingItem != null) {
           existingItem.status = DownloadStatus.completed;
           _items[_buildKey(episode.id, part.label)] = existingItem;
-          if (episode.date.isNotEmpty) {
-            _items['${episode.date}_${part.label}'] = existingItem;
-          }
           await _saveManifest();
           notifyListeners();
         }
         return;
       }
 
-      if (isDownloading(episode.id, part.label)) {
+      if (isDownloading(episode.id, part.label, showId: showId, title: episode.title)) {
         debugPrint('Already downloading: ${episode.id} - ${part.label}');
         return;
       }
@@ -468,6 +526,8 @@ class DownloadManager extends ChangeNotifier {
         downloadItem = DownloadItem(
           episodeId: episode.id,
           episodeTitle: episode.title,
+          showId: showId,
+          showName: showName,
           partLabel: part.label,
           partUrl: part.url,
           localFilePath: targetPath,
@@ -476,9 +536,6 @@ class DownloadManager extends ChangeNotifier {
           status: DownloadStatus.downloading,
         );
         _items[key] = downloadItem;
-        if (episode.date.isNotEmpty) {
-          _items['${episode.date}_${part.label}'] = downloadItem;
-        }
       } else {
         downloadItem.status = DownloadStatus.downloading;
         downloadItem.downloadedBytes = existingBytes;
@@ -486,6 +543,7 @@ class DownloadManager extends ChangeNotifier {
         _items[key] = downloadItem;
       }
       final DownloadItem currentItem = downloadItem;
+      notifyListeners();
       notifyListeners();
 
       final client = http.Client();
@@ -626,9 +684,9 @@ class DownloadManager extends ChangeNotifier {
     }
   }
 
-  Future<void> deleteDownload(String episodeId, String partLabel) async {
-    final item = _findItem(episodeId, partLabel);
-    cancelDownload(episodeId, partLabel);
+  Future<void> deleteDownload(String episodeId, String partLabel, {String? showId, String? title}) async {
+    final item = _findItem(episodeId, partLabel, showId: showId, title: title);
+    cancelDownload(episodeId, partLabel, showId: showId, title: title);
 
     if (item != null) {
       final filePath = item.localFilePath;
@@ -647,7 +705,8 @@ class DownloadManager extends ChangeNotifier {
   /// One-click batch download all un-downloaded parts of an episode sequentially
   Future<void> startBatchDownload(CatalogEpisode episode) async {
     for (final part in episode.parts) {
-      if (!isDownloaded(episode.id, part.label) && !isDownloading(episode.id, part.label)) {
+      if (!isDownloaded(episode.id, part.label, showId: episode.showId, title: episode.title) &&
+          !isDownloading(episode.id, part.label, showId: episode.showId, title: episode.title)) {
         await startDownload(episode, part);
       }
     }
@@ -677,10 +736,10 @@ class DownloadManager extends ChangeNotifier {
   }
 
   /// Auto-clean single watched downloaded file to free up storage
-  Future<bool> cleanupWatchedDownload(String episodeId, String partLabel) async {
-    final item = _findItem(episodeId, partLabel);
+  Future<bool> cleanupWatchedDownload(String episodeId, String partLabel, {String? showId, String? title}) async {
+    final item = _findItem(episodeId, partLabel, showId: showId, title: title);
     if (item != null && item.status == DownloadStatus.completed) {
-      await deleteDownload(episodeId, partLabel);
+      await deleteDownload(episodeId, partLabel, showId: showId, title: title);
       return true;
     }
     return false;
