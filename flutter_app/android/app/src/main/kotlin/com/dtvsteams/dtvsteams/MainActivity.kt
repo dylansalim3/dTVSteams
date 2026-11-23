@@ -1,11 +1,14 @@
 package com.dtvsteams.dtvsteams
 
+import android.app.Activity
 import android.app.PictureInPictureParams
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
+import android.provider.DocumentsContract
 import android.provider.Settings
 import android.util.Rational
 import android.view.WindowManager
@@ -20,9 +23,14 @@ class MainActivity : FlutterActivity() {
     private val PIP_CHANNEL = "com.dtvsteams.dtvsteams/pip"
     private val UPDATE_CHANNEL = "com.dtvsteams.dtvsteams/update"
     private val PLAYBACK_CHANNEL = "com.dtvsteams.dtvsteams/playback"
+    private val STORAGE_CHANNEL = "com.dtvsteams.dtvsteams/storage"
+    private val REQUEST_CODE_PICK_DIR = 3001
+
     private var pipChannel: MethodChannel? = null
     private var updateChannel: MethodChannel? = null
     private var playbackChannel: MethodChannel? = null
+    private var storageChannel: MethodChannel? = null
+    private var pendingDirResult: MethodChannel.Result? = null
     private var autoPipEnabled: Boolean = false
 
     override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
@@ -79,8 +87,8 @@ class MainActivity : FlutterActivity() {
                         ))
                     } catch (e: Exception) {
                         result.success(mapOf(
-                            "versionName" to "1.0.4",
-                            "versionCode" to 5L
+                            "versionName" to "1.0.5",
+                            "versionCode" to 6L
                         ))
                     }
                 }
@@ -210,6 +218,136 @@ class MainActivity : FlutterActivity() {
                 else -> result.notImplemented()
             }
         }
+
+        storageChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, STORAGE_CHANNEL)
+        storageChannel?.setMethodCallHandler { call, result ->
+            when (call.method) {
+                "hasStoragePermission" -> {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        result.success(Environment.isExternalStorageManager())
+                    } else {
+                        val granted = checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+                        result.success(granted)
+                    }
+                }
+                "requestStoragePermission" -> {
+                    try {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                            val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION).apply {
+                                data = Uri.parse("package:$packageName")
+                                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            }
+                            startActivity(intent)
+                            result.success(true)
+                        } else {
+                            requestPermissions(arrayOf(
+                                android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                android.Manifest.permission.READ_EXTERNAL_STORAGE
+                            ), 2001)
+                            result.success(true)
+                        }
+                    } catch (e: Exception) {
+                        try {
+                            val intent = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION).apply {
+                                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            }
+                            startActivity(intent)
+                            result.success(true)
+                        } catch (ex: Exception) {
+                            result.error("PERMISSION_ERROR", ex.message, null)
+                        }
+                    }
+                }
+                "getPublicStorageLocations" -> {
+                    val locations = mutableMapOf<String, String>()
+                    try {
+                        val downloads = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                        if (downloads != null) {
+                            locations["downloads"] = File(downloads, "dTVSteams").absolutePath
+                        }
+                    } catch (_: Exception) {}
+                    try {
+                        val movies = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES)
+                        if (movies != null) {
+                            locations["movies"] = File(movies, "dTVSteams").absolutePath
+                        }
+                    } catch (_: Exception) {}
+                    try {
+                        val extApp = getExternalFilesDir(null)
+                        if (extApp != null) {
+                            locations["appExternal"] = File(extApp, "Downloads").absolutePath
+                        }
+                    } catch (_: Exception) {}
+                    result.success(locations)
+                }
+                "pickDirectory" -> {
+                    try {
+                        pendingDirResult = result
+                        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
+                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+                        }
+                        startActivityForResult(intent, REQUEST_CODE_PICK_DIR)
+                    } catch (e: Exception) {
+                        pendingDirResult = null
+                        result.error("PICK_ERROR", e.message, null)
+                    }
+                }
+                else -> result.notImplemented()
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_CODE_PICK_DIR) {
+            val res = pendingDirResult
+            pendingDirResult = null
+            if (resultCode == Activity.RESULT_OK && data?.data != null) {
+                val uri = data.data
+                try {
+                    contentResolver.takePersistableUriPermission(
+                        uri!!,
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                    )
+                } catch (_: Exception) {}
+                val resolvedPath = getPathFromTreeUri(uri)
+                res?.success(resolvedPath)
+            } else {
+                res?.success(null)
+            }
+        }
+    }
+
+    private fun getPathFromTreeUri(uri: Uri?): String? {
+        if (uri == null) return null
+        try {
+            val docId = DocumentsContract.getTreeDocumentId(uri)
+            if (docId != null) {
+                val parts = docId.split(":")
+                val type = parts[0]
+                val relativePath = if (parts.size > 1) parts[1] else ""
+                if ("primary".equals(type, ignoreCase = true)) {
+                    val base = Environment.getExternalStorageDirectory().absolutePath
+                    return if (relativePath.isNotEmpty()) "$base/$relativePath" else base
+                } else {
+                    val externalDirs = getExternalFilesDirs(null)
+                    for (f in externalDirs) {
+                        if (f != null) {
+                            val path = f.absolutePath
+                            val index = path.indexOf("/Android/data/")
+                            if (index > 0) {
+                                val root = path.substring(0, index)
+                                if (root.contains(type)) {
+                                    return if (relativePath.isNotEmpty()) "$root/$relativePath" else root
+                                }
+                            }
+                        }
+                    }
+                    return "/storage/$type/$relativePath"
+                }
+            }
+        } catch (_: Exception) {}
+        return uri.path
     }
 
     private fun enterPipMode(): Boolean {

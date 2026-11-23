@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import '../catalog/parser.dart';
+import 'settings_manager.dart';
 
 enum DownloadStatus { idle, downloading, paused, completed, failed }
 
@@ -15,7 +16,7 @@ class DownloadItem {
   final String showName;
   final String partLabel;
   final String partUrl;
-  final String localFilePath;
+  String localFilePath;
   final String date;
   int totalBytes;
   int downloadedBytes;
@@ -119,6 +120,16 @@ class DownloadManager extends ChangeNotifier {
   Map<String, DownloadItem> get items => Map.unmodifiable(_items);
   String get downloadDirectoryPath => _downloadDirectoryPath ?? '';
   bool get isInitialized => _isInitialized;
+
+  bool get isUsingCustomDirectory {
+    final custom = SettingsManager().customDownloadPath;
+    return custom != null && custom.isNotEmpty;
+  }
+
+  Future<String> getDefaultDownloadDirectory() async {
+    final docDir = await getApplicationDocumentsDirectory();
+    return '${docDir.path}/dTVSteams_Downloads';
+  }
 
   List<DownloadItem> get activeDownloads {
     final seen = <String>{};
@@ -256,13 +267,37 @@ class DownloadManager extends ChangeNotifier {
     notifyListeners();
   }
 
+  @visibleForTesting
+  void setDirectoryForTesting(String path) {
+    _downloadDirectoryPath = path;
+  }
+
   Future<void> init() async {
     if (_isInitialized) return;
     try {
-      final docDir = await getApplicationDocumentsDirectory();
-      final downloadDir = Directory('${docDir.path}/dTVSteams_Downloads');
-      if (!await downloadDir.exists()) {
-        await downloadDir.create(recursive: true);
+      await SettingsManager().init();
+      final defaultPath = await getDefaultDownloadDirectory();
+      final customPath = SettingsManager().customDownloadPath;
+
+      Directory downloadDir;
+      if (customPath != null && customPath.isNotEmpty) {
+        try {
+          downloadDir = Directory(customPath);
+          if (!await downloadDir.exists()) {
+            await downloadDir.create(recursive: true);
+          }
+        } catch (e) {
+          debugPrint('DownloadManager custom dir failed, fallback: $e');
+          downloadDir = Directory(defaultPath);
+          if (!await downloadDir.exists()) {
+            await downloadDir.create(recursive: true);
+          }
+        }
+      } else {
+        downloadDir = Directory(defaultPath);
+        if (!await downloadDir.exists()) {
+          await downloadDir.create(recursive: true);
+        }
       }
       _downloadDirectoryPath = downloadDir.path;
 
@@ -406,6 +441,121 @@ class DownloadManager extends ChangeNotifier {
     } catch (e) {
       debugPrint('Save manifest error: $e');
     }
+  }
+
+  /// Migrates all downloaded videos and manifest to [targetPath].
+  /// Returns the count of files successfully migrated.
+  Future<int> migrateDownloadDirectory(String targetPath) async {
+    await init();
+    final defaultPath = await getDefaultDownloadDirectory();
+
+    final targetDir = Directory(targetPath);
+    if (!await targetDir.exists()) {
+      await targetDir.create(recursive: true);
+    }
+
+    final oldDirPath = _downloadDirectoryPath;
+    if (oldDirPath == null || oldDirPath == targetPath) {
+      if (targetPath == defaultPath) {
+        await SettingsManager().setCustomDownloadPath(null);
+      } else {
+        await SettingsManager().setCustomDownloadPath(targetPath);
+      }
+      notifyListeners();
+      return 0;
+    }
+
+    final oldDir = Directory(oldDirPath);
+    int migratedCount = 0;
+
+    // 1. Migrate items tracked in memory
+    for (final item in _items.values) {
+      final oldFile = File(item.localFilePath);
+      final fileName = oldFile.uri.pathSegments.isNotEmpty
+          ? oldFile.uri.pathSegments.last
+          : item.localFilePath.split(Platform.pathSeparator).last;
+      final newFilePath = '$targetPath/$fileName';
+      final newFile = File(newFilePath);
+
+      if (await oldFile.exists()) {
+        try {
+          if (!await newFile.exists() || await newFile.length() != await oldFile.length()) {
+            await oldFile.copy(newFilePath);
+          }
+          if (await newFile.exists() && await newFile.length() == await oldFile.length()) {
+            try {
+              await oldFile.delete();
+            } catch (_) {}
+            item.localFilePath = newFilePath;
+            migratedCount++;
+          }
+        } catch (e) {
+          debugPrint('Error migrating item ${oldFile.path}: $e');
+        }
+      } else {
+        item.localFilePath = newFilePath;
+      }
+    }
+
+    // 2. Scan old directory for any unindexed .mp4 files on disk and move them
+    if (await oldDir.exists()) {
+      try {
+        final entities = oldDir.listSync();
+        for (final entity in entities) {
+          if (entity is File && entity.path.endsWith('.mp4')) {
+            final fileName = entity.uri.pathSegments.last;
+            final newFilePath = '$targetPath/$fileName';
+            final newFile = File(newFilePath);
+            try {
+              if (!await newFile.exists()) {
+                await entity.copy(newFilePath);
+              }
+              if (await newFile.exists()) {
+                await entity.delete();
+              }
+            } catch (e) {
+              debugPrint('Error moving unindexed file ${entity.path}: $e');
+            }
+          }
+        }
+      } catch (e) {
+        debugPrint('Error scanning oldDir during migration: $e');
+      }
+    }
+
+    // 3. Update active directory path
+    _downloadDirectoryPath = targetPath;
+
+    // 4. Save manifest in new directory
+    await _saveManifest();
+
+    // 5. Remove old manifest file
+    try {
+      final oldManifest = File('$oldDirPath/manifest.json');
+      if (await oldManifest.exists()) {
+        await oldManifest.delete();
+      }
+    } catch (_) {}
+
+    // 6. Persist custom path in SettingsManager
+    if (targetPath == defaultPath) {
+      await SettingsManager().setCustomDownloadPath(null);
+    } else {
+      await SettingsManager().setCustomDownloadPath(targetPath);
+    }
+
+    // 7. Rescan the new directory to ensure all files are registered
+    await _scanDirectoryForFiles(targetDir);
+    await _saveManifest();
+
+    notifyListeners();
+    return migratedCount;
+  }
+
+  /// Resets download storage back to the default app documents directory.
+  Future<int> resetToDefaultDownloadDirectory() async {
+    final defaultPath = await getDefaultDownloadDirectory();
+    return await migrateDownloadDirectory(defaultPath);
   }
 
   bool isDownloaded(String episodeId, String partLabel, {String? showId, String? title}) {

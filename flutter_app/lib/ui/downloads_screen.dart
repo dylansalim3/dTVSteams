@@ -4,6 +4,7 @@ import '../catalog/parser.dart';
 import '../services/download_manager.dart';
 import 'episode_card.dart';
 import 'player_screen.dart';
+import 'storage_location_sheet.dart';
 
 class DownloadsScreen extends StatefulWidget {
   const DownloadsScreen({super.key});
@@ -153,6 +154,16 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.drive_file_move_outlined, color: Colors.white70),
+            tooltip: '變更下載儲存位置',
+            onPressed: () => StorageLocationHelper.showStoragePickerSheet(
+              context,
+              onStorageChanged: () {
+                if (mounted) setState(() {});
+              },
+            ),
+          ),
           if (completedList.isNotEmpty || activeList.isNotEmpty)
             IconButton(
               icon: const Icon(Icons.delete_sweep, color: Colors.white70),
@@ -259,6 +270,49 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      if (_manager.isUsingCustomDirectory) ...[
+                        OutlinedButton.icon(
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.white70,
+                            side: const BorderSide(color: Colors.white24),
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                            minimumSize: const Size(0, 32),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          ),
+                          onPressed: () => StorageLocationHelper.handleResetStorage(
+                            context,
+                            onStorageChanged: () {
+                              if (mounted) setState(() {});
+                            },
+                          ),
+                          icon: const Icon(Icons.restore, size: 14),
+                          label: const Text('還原預設', style: TextStyle(fontSize: 12)),
+                        ),
+                        const SizedBox(width: 8),
+                      ],
+                      ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFE50914),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          minimumSize: const Size(0, 32),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                        onPressed: () => StorageLocationHelper.showStoragePickerSheet(
+                          context,
+                          onStorageChanged: () {
+                            if (mounted) setState(() {});
+                          },
+                        ),
+                        icon: const Icon(Icons.drive_file_move_outlined, size: 14),
+                        label: const Text('變更位置', style: TextStyle(fontSize: 12)),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -273,9 +327,13 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                   children: [
                     const Icon(Icons.check_circle_outline, size: 16, color: Color(0xFF46D369)),
                     const SizedBox(width: 6),
-                    Text(
-                      '已下載節目清單 (${episodes.length})',
-                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white),
+                    Flexible(
+                      child: Text(
+                        '已下載節目清單 (${episodes.length})',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white),
+                      ),
                     ),
                   ],
                 ),

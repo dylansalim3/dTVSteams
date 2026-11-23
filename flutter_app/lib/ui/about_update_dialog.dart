@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import '../services/download_manager.dart';
 import '../services/settings_manager.dart';
 import '../services/update_manager.dart';
+import 'storage_location_sheet.dart';
 
 class AboutUpdateDialog {
   /// Shows the full "About & System Updates" modal dialog
@@ -77,19 +79,23 @@ class _AboutUpdateSheet extends StatefulWidget {
 
 class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
   final SettingsManager _settingsManager = SettingsManager();
+  final DownloadManager _downloadManager = DownloadManager();
 
   @override
   void initState() {
     super.initState();
     widget.updateManager.addListener(_onUpdateChange);
     _settingsManager.addListener(_onUpdateChange);
+    _downloadManager.addListener(_onUpdateChange);
     _settingsManager.init();
+    _downloadManager.init();
   }
 
   @override
   void dispose() {
     widget.updateManager.removeListener(_onUpdateChange);
     _settingsManager.removeListener(_onUpdateChange);
+    _downloadManager.removeListener(_onUpdateChange);
     super.dispose();
   }
 
@@ -287,6 +293,20 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
 
             const SizedBox(height: 16),
 
+            // Download Storage Location Section
+            const Text(
+              '下載儲存位置 (Download Storage)',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            _buildStorageLocationCard(context),
+
+            const SizedBox(height: 16),
+
             // If Update Available
             if (mgr.updateAvailable && update != null) ...[
               _buildUpdateAvailableCard(context, mgr, update),
@@ -320,9 +340,13 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  '遇到下載問題？可直接使用瀏覽器',
-                  style: TextStyle(color: Colors.white38, fontSize: 12),
+                const Flexible(
+                  child: Text(
+                    '遇到下載問題？可直接使用瀏覽器',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: Colors.white38, fontSize: 12),
+                  ),
                 ),
                 TextButton.icon(
                   onPressed: () => mgr.openBrowserFallback(),
@@ -337,6 +361,129 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
     ),
   );
 }
+
+  Widget _buildStorageLocationCard(BuildContext context) {
+    final isCustom = _downloadManager.isUsingCustomDirectory;
+    final currentPath = _downloadManager.downloadDirectoryPath;
+
+    return Material(
+      color: const Color(0xFF2A2A2A),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: const BorderSide(color: Colors.white12),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(
+                  isCustom ? Icons.sd_storage : Icons.folder,
+                  color: isCustom ? const Color(0xFFE50914) : Colors.white70,
+                  size: 26,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            isCustom ? '自訂儲存目錄' : '預設內部儲存空間',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: isCustom
+                                  ? const Color(0xFFE50914).withValues(alpha: 0.2)
+                                  : Colors.white12,
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(
+                                color: isCustom
+                                    ? const Color(0xFFE50914).withValues(alpha: 0.5)
+                                    : Colors.white24,
+                              ),
+                            ),
+                            child: Text(
+                              isCustom ? '已自訂' : '預設',
+                              style: TextStyle(
+                                color: isCustom ? const Color(0xFFE50914) : Colors.white70,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        currentPath.isEmpty ? '載入中...' : currentPath,
+                        style: const TextStyle(
+                          color: Colors.white60,
+                          fontSize: 12,
+                          fontFamily: 'monospace',
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                if (isCustom) ...[
+                  OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.white70,
+                      side: const BorderSide(color: Colors.white24),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      minimumSize: const Size(0, 32),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                    onPressed: () => StorageLocationHelper.handleResetStorage(context, onStorageChanged: () {
+                      if (mounted) setState(() {});
+                    }),
+                    icon: const Icon(Icons.restore, size: 14),
+                    label: const Text('還原預設', style: TextStyle(fontSize: 12)),
+                  ),
+                  const SizedBox(width: 8),
+                ],
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFE50914),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    minimumSize: const Size(0, 32),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  onPressed: () => StorageLocationHelper.showStoragePickerSheet(context, onStorageChanged: () {
+                    if (mounted) setState(() {});
+                  }),
+                  icon: const Icon(Icons.drive_file_move_outlined, size: 14),
+                  label: const Text('變更位置', style: TextStyle(fontSize: 12)),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   Widget _buildUpdateAvailableCard(BuildContext context, UpdateManager mgr, AppUpdateInfo update) {
     return Container(

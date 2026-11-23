@@ -11,9 +11,11 @@ class SettingsManager extends ChangeNotifier {
 
   bool _backgroundPlay = true; // Default ON: Background play & lock screen audio
   bool _keepScreenAwake = true; // Default ON: Prevent sleep during playback
+  String? _customDownloadPath; // Null means default app storage
 
   bool get backgroundPlay => _backgroundPlay;
   bool get keepScreenAwake => _keepScreenAwake;
+  String? get customDownloadPath => _customDownloadPath;
 
   File? _settingsFile;
   bool _initialized = false;
@@ -32,6 +34,9 @@ class SettingsManager extends ChangeNotifier {
         }
         if (json.containsKey('keepScreenAwake')) {
           _keepScreenAwake = json['keepScreenAwake'] as bool? ?? true;
+        }
+        if (json.containsKey('customDownloadPath')) {
+          _customDownloadPath = json['customDownloadPath'] as String?;
         }
       }
     } catch (e) {
@@ -55,6 +60,13 @@ class SettingsManager extends ChangeNotifier {
     await _persist();
   }
 
+  Future<void> setCustomDownloadPath(String? path) async {
+    if (_customDownloadPath == path) return;
+    _customDownloadPath = path;
+    notifyListeners();
+    await _persist();
+  }
+
   Future<void> _persist() async {
     try {
       if (_settingsFile == null) {
@@ -64,6 +76,7 @@ class SettingsManager extends ChangeNotifier {
       final data = {
         'backgroundPlay': _backgroundPlay,
         'keepScreenAwake': _keepScreenAwake,
+        'customDownloadPath': _customDownloadPath,
       };
       await _settingsFile!.writeAsString(jsonEncode(data));
     } catch (e) {
@@ -72,9 +85,14 @@ class SettingsManager extends ChangeNotifier {
   }
 
   @visibleForTesting
-  void resetForTesting({bool backgroundPlay = true, bool keepScreenAwake = true}) {
+  void resetForTesting({
+    bool backgroundPlay = true,
+    bool keepScreenAwake = true,
+    String? customDownloadPath,
+  }) {
     _backgroundPlay = backgroundPlay;
     _keepScreenAwake = keepScreenAwake;
+    _customDownloadPath = customDownloadPath;
     _initialized = true;
   }
 }

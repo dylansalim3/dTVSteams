@@ -418,49 +418,63 @@ void showDownloadSelectionSheet(
 
                                     // Status Badge
                                     if (isDown)
-                                      Row(
-                                        children: [
-                                          const Icon(Icons.check_circle, size: 14, color: Color(0xFF46D369)),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            '已下載完成 ${sizeStr.isNotEmpty ? "($sizeStr)" : ""}',
-                                            style: const TextStyle(
-                                              color: Color(0xFF46D369),
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.bold,
+                                      Expanded(
+                                        child: Row(
+                                          children: [
+                                            const Icon(Icons.check_circle, size: 14, color: Color(0xFF46D369)),
+                                            const SizedBox(width: 4),
+                                            Flexible(
+                                              child: Text(
+                                                '已下載完成 ${sizeStr.isNotEmpty ? "($sizeStr)" : ""}',
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(
+                                                  color: Color(0xFF46D369),
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
                                             ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       )
                                     else if (isDl)
-                                      Row(
-                                        children: [
-                                          const SizedBox(
-                                            width: 12,
-                                            height: 12,
-                                            child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFFE50914)),
-                                          ),
-                                          const SizedBox(width: 6),
-                                          Text(
-                                            '下載中 ${item != null ? item.progressPercentage : ""}',
-                                            style: const TextStyle(
-                                              color: Color(0xFFE50914),
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.bold,
+                                      Expanded(
+                                        child: Row(
+                                          children: [
+                                            const SizedBox(
+                                              width: 12,
+                                              height: 12,
+                                              child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFFE50914)),
                                             ),
-                                          ),
-                                        ],
+                                            const SizedBox(width: 6),
+                                            Flexible(
+                                              child: Text(
+                                                '下載中 ${item != null ? item.progressPercentage : ""}',
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(
+                                                  color: Color(0xFFE50914),
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       )
                                     else
-                                      const Text(
-                                        '未下載 (支援離線播放)',
-                                        style: TextStyle(
-                                          color: Colors.white54,
-                                          fontSize: 12,
+                                      const Expanded(
+                                        child: Text(
+                                          '未下載 (支援離線播放)',
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            color: Colors.white54,
+                                            fontSize: 12,
+                                          ),
                                         ),
                                       ),
-
-                                    const Spacer(),
 
                                     // Action for Already Downloaded: Play or Delete
                                     if (isDown) ...[
@@ -749,7 +763,10 @@ class YouTubeEpisodeCard extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 4),
-                        Row(
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 4,
+                          crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
                             Text(
                               episode.date,
@@ -760,7 +777,6 @@ class YouTubeEpisodeCard extends StatelessWidget {
                               ),
                             ),
                             if (showName.isNotEmpty) ...[
-                              const SizedBox(width: 8),
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                                 decoration: BoxDecoration(
@@ -779,7 +795,6 @@ class YouTubeEpisodeCard extends StatelessWidget {
                               ),
                             ],
                             if (location.isNotEmpty) ...[
-                              const SizedBox(width: 8),
                               Text(
                                 '📍 $location',
                                 style: const TextStyle(
@@ -789,7 +804,6 @@ class YouTubeEpisodeCard extends StatelessWidget {
                                 ),
                               ),
                             ],
-                            const SizedBox(width: 8),
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                               decoration: BoxDecoration(
@@ -807,7 +821,6 @@ class YouTubeEpisodeCard extends StatelessWidget {
                               ),
                             ),
                             if (isEpDone) ...[
-                              const SizedBox(width: 8),
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                                 decoration: BoxDecoration(
@@ -820,12 +833,16 @@ class YouTubeEpisodeCard extends StatelessWidget {
                                   children: [
                                     Icon(Icons.check, size: 10, color: Color(0xFF46D369)),
                                     SizedBox(width: 2),
-                                    Text(
-                                      '已看完',
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        color: Color(0xFF46D369),
-                                        fontWeight: FontWeight.bold,
+                                    Flexible(
+                                      child: Text(
+                                        '已看完',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          color: Color(0xFF46D369),
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -833,7 +850,6 @@ class YouTubeEpisodeCard extends StatelessWidget {
                               ),
                             ],
                             if (downloadedParts > 0) ...[
-                              const SizedBox(width: 8),
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                                 decoration: BoxDecoration(
@@ -846,14 +862,18 @@ class YouTubeEpisodeCard extends StatelessWidget {
                                   children: [
                                     const Icon(Icons.check_circle, size: 10, color: Color(0xFF46D369)),
                                     const SizedBox(width: 3),
-                                    Text(
-                                      isDownloadView && totalDownloadedBytes > 0
-                                          ? '已儲存 ${downloadManager.formatBytes(totalDownloadedBytes)}'
-                                          : '已載 $downloadedParts/${episode.parts.length}',
-                                      style: const TextStyle(
-                                        fontSize: 10,
-                                        color: Color(0xFF46D369),
-                                        fontWeight: FontWeight.bold,
+                                    Flexible(
+                                      child: Text(
+                                        isDownloadView && totalDownloadedBytes > 0
+                                            ? '已儲存 ${downloadManager.formatBytes(totalDownloadedBytes)}'
+                                            : '已載 $downloadedParts/${episode.parts.length}',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          fontSize: 10,
+                                          color: Color(0xFF46D369),
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                     ),
                                   ],
