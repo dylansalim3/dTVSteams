@@ -65,7 +65,7 @@ class AppUpdateInfo {
 
 /// Service managing remote update discovery, background downloads, and native Android APK installation.
 class UpdateManager extends ChangeNotifier {
-  static const String currentAppVersion = '1.0.0';
+  static const String currentAppVersion = '1.0.2';
   static const String githubRepo = 'dylansalim3/dTVSteams';
   static const String latestReleaseEndpoint =
       'https://api.github.com/repos/$githubRepo/releases/latest';
