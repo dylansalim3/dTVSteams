@@ -43,11 +43,11 @@ class DownloadItem {
     final remainingBytes = totalBytes - downloadedBytes;
     final remainingSec = (remainingBytes / speedBytesPerSec).round();
     if (remainingSec < 60) {
-      return '剩餘約 ${remainingSec} 秒';
+      return '剩餘約 $remainingSec 秒';
     } else if (remainingSec < 3600) {
       final m = remainingSec ~/ 60;
       final s = remainingSec % 60;
-      return '剩餘約 $m 分 ${s} 秒';
+      return '剩餘約 $m 分 $s 秒';
     } else {
       final h = remainingSec ~/ 3600;
       final m = (remainingSec % 3600) ~/ 60;
@@ -154,7 +154,6 @@ class DownloadManager extends ChangeNotifier {
     String partLabel, {
     String? localFilePath,
     String? date,
-    String? title,
   }) {
     final directKey = _buildKey(episodeId, partLabel);
     if (_items.containsKey(directKey)) {
@@ -194,7 +193,7 @@ class DownloadManager extends ChangeNotifier {
     if (epDate != null && epDate.isNotEmpty) {
       for (final item in _items.values) {
         if (item.partLabel.toLowerCase().replaceAll(' ', '') != normPart) continue;
-        if (item.date == epDate || item.episodeId.contains(epDate!) || item.localFilePath.contains(epDate!)) {
+        if (item.date == epDate || item.episodeId.contains(epDate) || item.localFilePath.contains(epDate)) {
           _items[directKey] = item;
           return item;
         }

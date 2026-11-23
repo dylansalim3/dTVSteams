@@ -147,12 +147,56 @@ class CatalogPart {
 
 class CatalogParser {
   static final RegExp _dateRegex = RegExp(r'\d{4}-\d{2}-\d{2}');
+  static final RegExp _flexibleDateRegex = RegExp(r'(\d{4})[-./]?(\d{2})[-./]?(\d{2})');
 
   static const List<String> _knownLocations = [
     '台北', '新北', '基隆', '桃園', '新竹', '苗栗', '台中', '彰化',
     '南投', '雲林', '嘉義', '台南', '高雄', '屏東', '宜蘭', '花蓮',
     '台東', '澎湖', '金門', '馬祖', '沖繩', '關西', '東京', '北投',
   ];
+
+  /// Parses date string into comparable DateTime, falling back to title regex
+  static DateTime? extractDate(String? dateStr, String title) {
+    if (dateStr != null && dateStr.isNotEmpty) {
+      final normalized = dateStr.replaceAll('.', '-').replaceAll('/', '-').trim();
+      final parsed = DateTime.tryParse(normalized);
+      if (parsed != null) return parsed;
+      final m = _flexibleDateRegex.firstMatch(normalized);
+      if (m != null) {
+        final y = int.tryParse(m.group(1)!);
+        final mo = int.tryParse(m.group(2)!);
+        final d = int.tryParse(m.group(3)!);
+        if (y != null && mo != null && d != null) {
+          return DateTime(y, mo, d);
+        }
+      }
+    }
+    final m = _flexibleDateRegex.firstMatch(title);
+    if (m != null) {
+      final y = int.tryParse(m.group(1)!);
+      final mo = int.tryParse(m.group(2)!);
+      final d = int.tryParse(m.group(3)!);
+      if (y != null && mo != null && d != null) {
+        return DateTime(y, mo, d);
+      }
+    }
+    return null;
+  }
+
+  /// Sort comparator ordering episodes strictly descending by date (newest broadcast first)
+  static int compareDateDescending(CatalogEpisode a, CatalogEpisode b) {
+    final dateA = extractDate(a.date, a.title);
+    final dateB = extractDate(b.date, b.title);
+    if (dateA != null && dateB != null) {
+      final cmp = dateB.compareTo(dateA); // Newest first
+      if (cmp != 0) return cmp;
+    } else if (dateA != null) {
+      return -1; // a has date, b doesn't -> a comes first
+    } else if (dateB != null) {
+      return 1;
+    }
+    return b.title.compareTo(a.title);
+  }
 
   /// Extract known location tag from title
   static String extractLocation(String title) {

@@ -27,11 +27,11 @@ void main() {
         if (find.text('dTV').evaluate().isNotEmpty) break;
       }
 
-      // 1.1 Brand logos and action buttons in top bar
+      // 1.1 Brand logos and action buttons in top bar (minimalist icon buttons)
       expect(find.text('dTV'), findsWidgets);
       expect(find.text('STEAMS'), findsOneWidget);
-      expect(find.text('下載庫'), findsOneWidget);
-      expect(find.text('刷新'), findsOneWidget);
+      expect(find.byTooltip('下載庫'), findsOneWidget);
+      expect(find.byTooltip('刷新'), findsOneWidget);
 
       // 1.2 Search input is mounted and prominent
       expect(find.byType(TextField), findsOneWidget);
@@ -133,7 +133,7 @@ void main() {
       // =========================================================================
       // STEP 5: BB-04 Downloads Folder Screen Navigation & Storage Layout
       // =========================================================================
-      await tester.tap(find.text('下載庫'));
+      await tester.tap(find.byTooltip('下載庫'));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 300));
 
@@ -306,15 +306,14 @@ void main() {
       ));
       await tester.pump(const Duration(milliseconds: 100));
 
-      // 8.1 Verify useful information stands out clearly
-      expect(find.text('Part 1'), findsOneWidget);
-      expect(find.text('已下載離線'), findsOneWidget);
-      expect(find.text('1080p FHD'), findsOneWidget);
+      // 8.1 Verify useful information stands out clearly on the unified episode card
+      expect(find.byType(YouTubeEpisodeCard), findsOneWidget);
       expect(find.text('綜藝玩很大 2026-11-08 台北 搗蛋鬼到你家'), findsOneWidget);
+      expect(find.text('2026-11-08'), findsOneWidget);
       expect(find.text('📍 台北'), findsOneWidget);
-      expect(find.text('📅 2026-11-08'), findsOneWidget);
-      expect(find.text('💾 25.0 MB'), findsOneWidget);
-      expect(find.text('播放'), findsOneWidget);
+      expect(find.text('1080p FHD'), findsOneWidget);
+      expect(find.textContaining('已儲存 25.0 MB'), findsOneWidget);
+      expect(find.text('Part 1 (已下載)'), findsOneWidget);
 
       // 8.2 Verify feed card reflects downloaded item clearly
       final testEp = CatalogEpisode(

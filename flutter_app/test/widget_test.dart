@@ -20,7 +20,7 @@ void main() {
     expect(find.text('STEAMS'), findsOneWidget);
 
     // 2. Verify Downloads folder button in header
-    expect(find.text('下載庫'), findsOneWidget);
+    expect(find.byTooltip('下載庫'), findsOneWidget);
 
     // 3. Verify search bar input
     expect(find.byType(TextField), findsOneWidget);

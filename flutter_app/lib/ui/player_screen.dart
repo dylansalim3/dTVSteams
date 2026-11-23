@@ -43,6 +43,7 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> {
   @override
   void initState() {
     super.initState();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     _currentPartIndex = widget.initialPartIndex;
     _pipManager.isInPipMode.addListener(_onPipUpdate);
     _pipManager.setAutoPip(true);
@@ -331,6 +332,7 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> {
 
   @override
   void dispose() {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     _persistCurrentPosition(force: true);
     _pipManager.setAutoPip(false);
     _pipManager.isInPipMode.removeListener(_onPipUpdate);
@@ -684,7 +686,12 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> {
                           left: 0,
                           right: 0,
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                            padding: EdgeInsets.fromLTRB(
+                              20,
+                              16,
+                              20,
+                              MediaQuery.of(context).padding.bottom + 16,
+                            ),
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 colors: [Colors.transparent, Colors.black.withValues(alpha: 0.92)],
@@ -694,6 +701,7 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> {
                             ),
                             child: SafeArea(
                               top: false,
+                              bottom: true,
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 crossAxisAlignment: CrossAxisAlignment.start,
