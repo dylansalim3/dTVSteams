@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -117,6 +118,22 @@ void main() {
       final manager = UpdateManager();
       manager.dismissVersion('1.2.0');
       expect(manager.dismissedVersion, equals('1.2.0'));
+    });
+
+    test('init reads dynamic native version from MethodChannel', () async {
+      const channel = MethodChannel('com.dtvsteams.dtvsteams/update');
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(channel, (MethodCall call) async {
+        if (call.method == 'getAppVersion') {
+          return {'versionName': '1.0.2', 'versionCode': 3};
+        }
+        return null;
+      });
+
+      final manager = UpdateManager();
+      await manager.init();
+      expect(UpdateManager.currentAppVersion, '1.0.2');
+      expect(UpdateManager.currentAppVersionCode, 3);
     });
   });
 

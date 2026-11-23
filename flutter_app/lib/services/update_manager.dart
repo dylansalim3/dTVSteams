@@ -65,7 +65,17 @@ class AppUpdateInfo {
 
 /// Service managing remote update discovery, background downloads, and native Android APK installation.
 class UpdateManager extends ChangeNotifier {
-  static const String currentAppVersion = '1.0.2';
+  static const String fallbackAppVersion = '1.0.2';
+  static String _nativeVersion = fallbackAppVersion;
+  static int _nativeVersionCode = 3;
+
+  static String get currentAppVersion => _nativeVersion;
+  static int get currentAppVersionCode => _nativeVersionCode;
+
+  static void setVersionForTesting(String version, {int code = 3}) {
+    _nativeVersion = version;
+    _nativeVersionCode = code;
+  }
   static const String githubRepo = 'dylansalim3/dTVSteams';
   static const String latestReleaseEndpoint =
       'https://api.github.com/repos/$githubRepo/releases/latest';
@@ -102,6 +112,17 @@ class UpdateManager extends ChangeNotifier {
   Future<void> init() async {
     if (_initialized) return;
     _initialized = true;
+    try {
+      if (!kIsWeb) {
+        final versionData = await _channel.invokeMethod<Map<dynamic, dynamic>>('getAppVersion');
+        if (versionData != null && versionData['versionName'] != null) {
+          _nativeVersion = versionData['versionName'].toString();
+          if (versionData['versionCode'] != null) {
+            _nativeVersionCode = (versionData['versionCode'] as num).toInt();
+          }
+        }
+      }
+    } catch (_) {}
     try {
       final file = await _getCacheFile();
       if (await file.exists()) {
