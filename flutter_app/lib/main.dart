@@ -698,20 +698,22 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(width: 4),
 
-                    // About & Remote Update Icon Button
+                    // Settings & Updates Icon Button
                     TvFocusableButton(
                       onPressed: () => AboutUpdateDialog.show(context, _updateManager),
                       child: IconButton(
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                         icon: Icon(
-                          Icons.info_outline,
+                          _updateManager.updateAvailable
+                              ? Icons.system_update_alt
+                              : Icons.settings_outlined,
                           color: _updateManager.updateAvailable
                               ? const Color(0xFFE50914)
                               : Colors.white70,
                           size: 20,
                         ),
-                        tooltip: '關於與更新',
+                        tooltip: '設定與關於',
                         onPressed: () => AboutUpdateDialog.show(context, _updateManager),
                       ),
                     ),

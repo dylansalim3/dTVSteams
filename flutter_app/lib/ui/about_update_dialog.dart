@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/settings_manager.dart';
 import '../services/update_manager.dart';
 
 class AboutUpdateDialog {
@@ -75,15 +76,20 @@ class _AboutUpdateSheet extends StatefulWidget {
 }
 
 class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
+  final SettingsManager _settingsManager = SettingsManager();
+
   @override
   void initState() {
     super.initState();
     widget.updateManager.addListener(_onUpdateChange);
+    _settingsManager.addListener(_onUpdateChange);
+    _settingsManager.init();
   }
 
   @override
   void dispose() {
     widget.updateManager.removeListener(_onUpdateChange);
+    _settingsManager.removeListener(_onUpdateChange);
     super.dispose();
   }
 
@@ -234,6 +240,50 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                 ),
               ),
             ],
+
+            const SizedBox(height: 16),
+
+            // Playback Preferences Settings Section
+            const Text(
+              '播放偏好設定 (Settings)',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Material(
+              color: const Color(0xFF2A2A2A),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: const BorderSide(color: Colors.white12),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: Column(
+                children: [
+                  SwitchListTile(
+                    activeColor: const Color(0xFFE50914),
+                    title: const Text('背景播放 (鎖定螢幕繼續播放音訊)',
+                        style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
+                    subtitle: const Text('螢幕關閉鎖定或切換應用時，背景繼續播放節目聲音',
+                        style: TextStyle(color: Colors.white60, fontSize: 12)),
+                    value: _settingsManager.backgroundPlay,
+                    onChanged: (val) => _settingsManager.setBackgroundPlay(val),
+                  ),
+                  const Divider(color: Colors.white12, height: 1),
+                  SwitchListTile(
+                    activeColor: const Color(0xFFE50914),
+                    title: const Text('播放時保持螢幕常亮 (防止休眠)',
+                        style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
+                    subtitle: const Text('影片播放中螢幕不會因逾時自動變暗或關閉',
+                        style: TextStyle(color: Colors.white60, fontSize: 12)),
+                    value: _settingsManager.keepScreenAwake,
+                    onChanged: (val) => _settingsManager.setKeepScreenAwake(val),
+                  ),
+                ],
+              ),
+            ),
 
             const SizedBox(height: 16),
 

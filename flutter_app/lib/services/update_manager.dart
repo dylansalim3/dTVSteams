@@ -65,9 +65,9 @@ class AppUpdateInfo {
 
 /// Service managing remote update discovery, background downloads, and native Android APK installation.
 class UpdateManager extends ChangeNotifier {
-  static const String fallbackAppVersion = '1.0.3';
+  static const String fallbackAppVersion = '1.0.4';
   static String _nativeVersion = fallbackAppVersion;
-  static int _nativeVersionCode = 3;
+  static int _nativeVersionCode = 5;
 
   static String get currentAppVersion => _nativeVersion;
   static int get currentAppVersionCode => _nativeVersionCode;

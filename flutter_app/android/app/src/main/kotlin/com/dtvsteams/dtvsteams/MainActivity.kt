@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import android.util.Rational
+import android.view.WindowManager
 import androidx.annotation.NonNull
 import androidx.core.content.FileProvider
 import io.flutter.embedding.android.FlutterActivity
@@ -18,8 +19,10 @@ import java.io.File
 class MainActivity : FlutterActivity() {
     private val PIP_CHANNEL = "com.dtvsteams.dtvsteams/pip"
     private val UPDATE_CHANNEL = "com.dtvsteams.dtvsteams/update"
+    private val PLAYBACK_CHANNEL = "com.dtvsteams.dtvsteams/playback"
     private var pipChannel: MethodChannel? = null
     private var updateChannel: MethodChannel? = null
+    private var playbackChannel: MethodChannel? = null
     private var autoPipEnabled: Boolean = false
 
     override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
@@ -76,8 +79,8 @@ class MainActivity : FlutterActivity() {
                         ))
                     } catch (e: Exception) {
                         result.success(mapOf(
-                            "versionName" to "1.0.3",
-                            "versionCode" to 4L
+                            "versionName" to "1.0.4",
+                            "versionCode" to 5L
                         ))
                     }
                 }
@@ -159,6 +162,54 @@ class MainActivity : FlutterActivity() {
                 else -> result.notImplemented()
             }
         }
+
+        playbackChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, PLAYBACK_CHANNEL)
+        playbackChannel?.setMethodCallHandler { call, result ->
+            when (call.method) {
+                "setKeepScreenOn" -> {
+                    val enabled = call.argument<Boolean>("enabled") ?: false
+                    runOnUiThread {
+                        if (enabled) {
+                            window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                        } else {
+                            window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                        }
+                    }
+                    result.success(true)
+                }
+                "startBackgroundPlay" -> {
+                    val title = call.argument<String>("title") ?: "dTV 影音播放"
+                    val part = call.argument<String>("part") ?: "背景播放中"
+                    try {
+                        val serviceIntent = Intent(this, BackgroundAudioService::class.java).apply {
+                            action = BackgroundAudioService.ACTION_START
+                            putExtra(BackgroundAudioService.EXTRA_TITLE, title)
+                            putExtra(BackgroundAudioService.EXTRA_PART, part)
+                        }
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            startForegroundService(serviceIntent)
+                        } else {
+                            startService(serviceIntent)
+                        }
+                        result.success(true)
+                    } catch (e: Exception) {
+                        result.error("SERVICE_ERROR", e.message, null)
+                    }
+                }
+                "stopBackgroundPlay" -> {
+                    try {
+                        val serviceIntent = Intent(this, BackgroundAudioService::class.java).apply {
+                            action = BackgroundAudioService.ACTION_STOP
+                        }
+                        startService(serviceIntent)
+                        result.success(true)
+                    } catch (e: Exception) {
+                        result.error("SERVICE_ERROR", e.message, null)
+                    }
+                }
+                else -> result.notImplemented()
+            }
+        }
     }
 
     private fun enterPipMode(): Boolean {
@@ -188,5 +239,16 @@ class MainActivity : FlutterActivity() {
     override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration?) {
         super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
         pipChannel?.invokeMethod("onPipModeChanged", isInPictureInPictureMode)
+    }
+
+    override fun onDestroy() {
+        try {
+            window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            val serviceIntent = Intent(this, BackgroundAudioService::class.java).apply {
+                action = BackgroundAudioService.ACTION_STOP
+            }
+            startService(serviceIntent)
+        } catch (_: Exception) {}
+        super.onDestroy()
     }
 }

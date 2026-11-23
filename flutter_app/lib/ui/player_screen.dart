@@ -7,7 +7,9 @@ import 'package:video_player/video_player.dart';
 import '../catalog/parser.dart';
 import '../services/download_manager.dart';
 import '../services/pip_manager.dart';
+import '../services/playback_bridge.dart';
 import '../services/playback_history_manager.dart';
+import '../services/settings_manager.dart';
 import 'downloads_screen.dart';
 
 class NativePlayerScreen extends StatefulWidget {
@@ -26,7 +28,7 @@ class NativePlayerScreen extends StatefulWidget {
   State<NativePlayerScreen> createState() => _NativePlayerScreenState();
 }
 
-class _NativePlayerScreenState extends State<NativePlayerScreen> {
+class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBindingObserver {
   late int _currentPartIndex;
   VideoPlayerController? _controller;
   bool _isLoading = true;
@@ -39,18 +41,74 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> {
   final DownloadManager _downloadManager = DownloadManager();
   final PlaybackHistoryManager _historyManager = PlaybackHistoryManager();
   final PipManager _pipManager = PipManager();
+  final SettingsManager _settingsManager = SettingsManager();
+  final PlaybackBridge _playbackBridge = PlaybackBridge();
   bool _isExiting = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     _currentPartIndex = widget.initialPartIndex;
     _pipManager.isInPipMode.addListener(_onPipUpdate);
     _pipManager.setAutoPip(true);
     _downloadManager.addListener(_onDownloadUpdate);
     _historyManager.init();
+    _settingsManager.init();
+    _settingsManager.addListener(_onSettingsUpdate);
     _initPlayerForPart(_currentPartIndex);
+  }
+
+  void _onSettingsUpdate() {
+    if (mounted) {
+      _syncPlaybackState();
+      setState(() {});
+    }
+  }
+
+  void _syncPlaybackState() {
+    if (_isExiting) {
+      _playbackBridge.setKeepScreenOn(false);
+      _playbackBridge.stopBackgroundPlay();
+      return;
+    }
+
+    final isPlaying = _controller?.value.isPlaying ?? false;
+
+    // 1. Keep Screen Awake
+    if (isPlaying && _settingsManager.keepScreenAwake) {
+      _playbackBridge.setKeepScreenOn(true);
+    } else {
+      _playbackBridge.setKeepScreenOn(false);
+    }
+
+    // 2. Background Audio Service (Keeps CPU awake & media notification on lock screen)
+    if (isPlaying && _settingsManager.backgroundPlay) {
+      final parts = widget.episode.parts;
+      final partLabel = parts.isNotEmpty && _currentPartIndex < parts.length
+          ? parts[_currentPartIndex].label
+          : '播放中';
+      _playbackBridge.startBackgroundPlay(
+        title: widget.episode.title,
+        part: partLabel,
+      );
+    } else {
+      _playbackBridge.stopBackgroundPlay();
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (_isExiting) return;
+
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.hidden) {
+      // If background play is disabled AND not in PiP mode, pause video playback
+      if (!_settingsManager.backgroundPlay && !_pipManager.isInPipMode.value) {
+        _controller?.pause();
+      }
+    }
   }
 
   void _onPipUpdate() {
@@ -280,6 +338,8 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> {
     final controller = _controller;
     if (controller == null || !mounted || !controller.value.isInitialized) return;
 
+    _syncPlaybackState();
+
     // Track real-time playback position
     if (controller.value.isPlaying) {
       _persistCurrentPosition(force: false);
@@ -363,6 +423,12 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> {
       await _controller?.pause();
     } catch (_) {}
 
+    // Disable screen wakelock and background audio immediately
+    try {
+      await _playbackBridge.setKeepScreenOn(false);
+      await _playbackBridge.stopBackgroundPlay();
+    } catch (_) {}
+
     // 2. Disable Auto-PiP immediately so system back gesture doesn't trigger PiP
     try {
       await _pipManager.setAutoPip(false);
@@ -373,16 +439,15 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> {
 
     // 4. Restore system navigation/status bar
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-
-    // 5. Pop screen
-    if (mounted) {
-      Navigator.of(context).pop();
-    }
   }
 
   @override
   void dispose() {
     _isExiting = true;
+    _playbackBridge.setKeepScreenOn(false);
+    _playbackBridge.stopBackgroundPlay();
+    _settingsManager.removeListener(_onSettingsUpdate);
+    WidgetsBinding.instance.removeObserver(this);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     _persistCurrentPosition(force: true);
     _pipManager.setAutoPip(false);
@@ -408,7 +473,95 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> {
       c.play();
       _resetOsdTimer();
     }
+    _syncPlaybackState();
     setState(() {});
+  }
+
+  void _showPlaybackSettingsSheet() {
+    _osdTimer?.cancel();
+    final bottomInset = MediaQuery.of(context).padding.bottom;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (ctx) => ListenableBuilder(
+        listenable: _settingsManager,
+        builder: (ctx, _) => SafeArea(
+          top: false,
+          bottom: true,
+          child: Container(
+            decoration: const BoxDecoration(
+              color: Color(0xFF1E1E1E),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            ),
+            padding: EdgeInsets.fromLTRB(20, 16, 20, (bottomInset + 24) / 2),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: const [
+                        Icon(Icons.tune, color: Color(0xFFE50914), size: 22),
+                        SizedBox(width: 8),
+                        Text(
+                          '播放偏好設定 (Settings)',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close, color: Colors.white70),
+                      onPressed: () => Navigator.of(ctx).pop(),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Material(
+                  color: const Color(0xFF2A2A2A),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: const BorderSide(color: Colors.white12),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: Column(
+                    children: [
+                      SwitchListTile(
+                        activeColor: const Color(0xFFE50914),
+                        title: const Text('背景播放 (鎖定螢幕繼續播放音訊)',
+                            style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
+                        subtitle: const Text('螢幕關閉鎖定或切換應用時，背景繼續播放聲音',
+                            style: TextStyle(color: Colors.white60, fontSize: 12)),
+                        value: _settingsManager.backgroundPlay,
+                        onChanged: (val) => _settingsManager.setBackgroundPlay(val),
+                      ),
+                      const Divider(color: Colors.white12, height: 1),
+                      SwitchListTile(
+                        activeColor: const Color(0xFFE50914),
+                        title: const Text('播放中防止裝置休眠 (保持螢幕常亮)',
+                            style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
+                        subtitle: const Text('影片播放中螢幕不會因逾時自動變暗或關閉',
+                            style: TextStyle(color: Colors.white60, fontSize: 12)),
+                        value: _settingsManager.keepScreenAwake,
+                        onChanged: (val) => _settingsManager.setKeepScreenAwake(val),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    ).then((_) {
+      if (mounted) _resetOsdTimer();
+    });
   }
 
   void _seekRelative(int seconds) {
@@ -517,9 +670,8 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> {
 
     if (_pipManager.isInPipMode.value) {
       return PopScope(
-        canPop: false,
+        canPop: true,
         onPopInvokedWithResult: (didPop, result) {
-          if (didPop) return;
           _handleExitPlayer();
         },
         child: Scaffold(
@@ -537,9 +689,8 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> {
     }
 
     return PopScope(
-      canPop: false,
+      canPop: true,
       onPopInvokedWithResult: (didPop, result) {
-        if (didPop) return;
         _handleExitPlayer();
       },
       child: Scaffold(
@@ -665,7 +816,12 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> {
                                 children: [
                                   IconButton(
                                     icon: const Icon(Icons.arrow_back, color: Colors.white, size: 24),
-                                    onPressed: _handleExitPlayer,
+                                    onPressed: () {
+                                      _handleExitPlayer();
+                                      if (mounted) {
+                                        Navigator.of(context).maybePop();
+                                      }
+                                    },
                                   ),
                                   const SizedBox(width: 8),
                                   Expanded(
@@ -746,6 +902,15 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> {
                                         ),
                                       ),
                                     ),
+                                  ),
+
+                                  const SizedBox(width: 4),
+
+                                  // Playback Settings Button in OSD
+                                  IconButton(
+                                    tooltip: '播放偏好設定 (背景播放 / 防止休眠)',
+                                    icon: const Icon(Icons.tune, color: Colors.white, size: 22),
+                                    onPressed: _showPlaybackSettingsSheet,
                                   ),
                                 ],
                               ),
