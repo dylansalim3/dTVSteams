@@ -7,10 +7,10 @@ import '../services/playback_history_manager.dart';
 import 'downloads_screen.dart';
 import 'player_screen.dart';
 
-/// Triple-Ring Concentric Circular Progress Download Icon
-/// Outer Ring: Part 1
-/// Middle Ring: Part 2
-/// Inner Ring: Part 3
+/// Segmented Single-Border Circular Progress Download Icon (3-piece pie border)
+/// Slice 1 (Top-Right): Part 1
+/// Slice 2 (Bottom):    Part 2
+/// Slice 3 (Top-Left):  Part 3
 class TripleCircleDownloadButton extends StatelessWidget {
   final CatalogEpisode episode;
   final DownloadManager downloadManager;
@@ -51,7 +51,6 @@ class TripleCircleDownloadButton extends StatelessWidget {
 
     final allDownloaded = isDownloadedList.isNotEmpty && isDownloadedList.every((d) => d);
     final anyDownloading = isDownloadingList.any((d) => d);
-    final anyDownloaded = isDownloadedList.any((d) => d);
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -65,19 +64,11 @@ class TripleCircleDownloadButton extends StatelessWidget {
           height: 36,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.05),
+            color: Colors.white.withValues(alpha: 0.04),
             shape: BoxShape.circle,
-            border: Border.all(
-              color: allDownloaded
-                  ? const Color(0xFF46D369).withValues(alpha: 0.6)
-                  : (anyDownloading
-                      ? const Color(0xFFE50914).withValues(alpha: 0.6)
-                      : (anyDownloaded ? Colors.white30 : Colors.white10)),
-              width: 1.2,
-            ),
           ),
           child: CustomPaint(
-            size: const Size(28, 28),
+            size: const Size(30, 30),
             painter: TripleRingPainter(
               progresses: progresses,
               isDownloading: isDownloadingList,
@@ -92,7 +83,7 @@ class TripleCircleDownloadButton extends StatelessWidget {
   }
 }
 
-/// Custom painter for triple concentric rings
+/// Custom painter for single circular border segmented into 3 pie pieces
 class TripleRingPainter extends CustomPainter {
   final List<double> progresses;
   final List<bool> isDownloading;
@@ -111,72 +102,118 @@ class TripleRingPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final maxRadius = size.width / 2;
+    const strokeWidth = 2.4;
+    final radius = (size.width - strokeWidth) / 2;
 
-    const ringCount = 3;
-    const strokeWidth = 2.2;
-    const gap = 1.6;
+    const totalParts = 3;
+    const totalAnglePerPart = (2 * math.pi) / totalParts;
+    // Gap angle between each pie slice (~9 degrees)
+    const gapAngle = 0.16;
+    const arcLength = totalAnglePerPart - gapAngle;
 
-    for (int i = 0; i < ringCount; i++) {
-      final radius = maxRadius - (i * (strokeWidth + gap));
-      if (radius <= strokeWidth / 2) break;
+    // Start angle centered around top (-90 degrees)
+    const baseStart = -math.pi / 2;
 
-      final progress = i < progresses.length ? progresses[i] : 0.0;
+    for (int i = 0; i < totalParts; i++) {
+      final partStart = baseStart + (i * totalAnglePerPart) + (gapAngle / 2);
       final isDown = i < isDownloaded.length && isDownloaded[i];
       final isDl = i < isDownloading.length && isDownloading[i];
+      final progress = i < progresses.length ? progresses[i] : 0.0;
 
+      // 1. Background arc track for this pie piece
       final bgPaint = Paint()
         ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
         ..strokeWidth = strokeWidth
         ..color = isDown
             ? const Color(0xFF46D369).withValues(alpha: 0.25)
-            : Colors.white.withValues(alpha: 0.12);
+            : (isDl
+                ? const Color(0xFFE50914).withValues(alpha: 0.25)
+                : Colors.white.withValues(alpha: 0.20));
 
-      canvas.drawCircle(center, radius, bgPaint);
+      canvas.drawArc(
+        Rect.fromCircle(center: center, radius: radius),
+        partStart,
+        arcLength,
+        false,
+        bgPaint,
+      );
 
-      if (progress > 0.0) {
+      // 2. Completed / Downloading arc for this pie piece
+      if (isDown) {
         final fgPaint = Paint()
           ..style = PaintingStyle.stroke
           ..strokeCap = StrokeCap.round
           ..strokeWidth = strokeWidth
-          ..color = isDown
-              ? const Color(0xFF46D369)
-              : (isDl ? const Color(0xFFE50914) : Colors.white70);
+          ..color = const Color(0xFF46D369);
 
-        final sweepAngle = 2 * math.pi * progress;
         canvas.drawArc(
           Rect.fromCircle(center: center, radius: radius),
-          -math.pi / 2,
-          sweepAngle,
+          partStart,
+          arcLength,
+          false,
+          fgPaint,
+        );
+      } else if (isDl && progress > 0.0) {
+        final fgPaint = Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeCap = StrokeCap.round
+          ..strokeWidth = strokeWidth
+          ..color = const Color(0xFFE50914);
+
+        final fillSweep = math.max(arcLength * 0.12, arcLength * progress);
+        canvas.drawArc(
+          Rect.fromCircle(center: center, radius: radius),
+          partStart,
+          fillSweep,
           false,
           fgPaint,
         );
       }
     }
 
-    final iconPaint = Paint()
-      ..color = allDownloaded
-          ? const Color(0xFF46D369)
-          : (anyDownloading ? const Color(0xFFE50914) : Colors.white70);
-
+    // 3. Center Icon
     if (allDownloaded) {
-      final p1 = Offset(center.dx - 3, center.dy);
-      final p2 = Offset(center.dx - 1, center.dy + 3);
-      final p3 = Offset(center.dx + 4, center.dy - 3);
+      // Completed Checkmark
+      final p1 = Offset(center.dx - 3.5, center.dy);
+      final p2 = Offset(center.dx - 1.0, center.dy + 3.2);
+      final p3 = Offset(center.dx + 4.2, center.dy - 3.2);
       final checkPaint = Paint()
         ..color = const Color(0xFF46D369)
         ..style = PaintingStyle.stroke
         ..strokeCap = StrokeCap.round
-        ..strokeWidth = 1.5;
+        ..strokeWidth = 1.8;
       canvas.drawLine(p1, p2, checkPaint);
       canvas.drawLine(p2, p3, checkPaint);
     } else {
-      final path = Path();
-      path.moveTo(center.dx - 2.5, center.dy - 1.5);
-      path.lineTo(center.dx + 2.5, center.dy - 1.5);
-      path.lineTo(center.dx, center.dy + 2);
-      path.close();
-      canvas.drawPath(path, iconPaint);
+      // Crisp Download Arrow & Tray
+      final arrowColor = anyDownloading ? const Color(0xFFE50914) : Colors.white70;
+      final arrowPaint = Paint()
+        ..color = arrowColor
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
+        ..strokeWidth = 1.6;
+
+      // Vertical stem
+      canvas.drawLine(
+        Offset(center.dx, center.dy - 3.6),
+        Offset(center.dx, center.dy + 1.2),
+        arrowPaint,
+      );
+
+      // Arrow head V
+      final headPath = Path();
+      headPath.moveTo(center.dx - 2.6, center.dy - 0.4);
+      headPath.lineTo(center.dx, center.dy + 2.0);
+      headPath.lineTo(center.dx + 2.6, center.dy - 0.4);
+      canvas.drawPath(headPath, arrowPaint);
+
+      // Bottom tray line
+      canvas.drawLine(
+        Offset(center.dx - 3.6, center.dy + 4.4),
+        Offset(center.dx + 3.6, center.dy + 4.4),
+        arrowPaint,
+      );
     }
   }
 
