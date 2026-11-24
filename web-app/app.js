@@ -50,6 +50,9 @@ let isSortAscending = false;
 const SEARCH_HISTORY_KEY = "dtv_search_history";
 const DEFAULT_HOT_TAGS = ['憲哥', 'KID', '澎湖', '飢餓遊戲', '金鐘', '日本', '週年', '黃隊'];
 
+// Audio-Only Radio Mode State (Feature 11)
+let isAudioOnlyMode = false;
+
 const episodesGrid = isBrowser ? document.getElementById("episodes-grid") : null;
 const episodeCountBadge = isBrowser ? document.getElementById("episode-count-badge") : null;
 
@@ -520,6 +523,9 @@ function playPart(episode, partIndex = 0, autoPlay = true, fromExplicitPartClick
 
   // Update Active Card in Grid
   highlightActiveCard(episode.id);
+
+  // Update Audio-Only Radio Mode View (Feature 11)
+  updateRadioView();
 
   // Load Source into Native Player with Speed Preservation and Media Fragment instant seeking
   if (player) {
@@ -2343,6 +2349,105 @@ function setupAutoPlay() {
   }
 }
 
+// Audio-Only Radio Mode Controller (Feature 11)
+function updateRadioView() {
+  if (!isBrowser) return;
+  const overlay = document.getElementById("radio-mode-overlay");
+  const coverImg = document.getElementById("radio-cover-img");
+  const titleEl = document.getElementById("radio-ep-title");
+  const subEl = document.getElementById("radio-ep-sub");
+  const vinyl = document.getElementById("radio-vinyl-disc");
+  const wave = document.getElementById("radio-waveform-bars");
+  const playBtn = document.getElementById("radio-play-btn");
+  const labelEl = document.getElementById("radio-mode-label");
+  const iconEl = document.getElementById("radio-mode-icon");
+  const radioBtn = document.getElementById("radio-mode-btn");
+
+  if (overlay) {
+    overlay.style.display = isAudioOnlyMode ? "flex" : "none";
+  }
+
+  if (labelEl) {
+    labelEl.textContent = isAudioOnlyMode ? "聽劇中" : "聽劇模式";
+  }
+  if (iconEl) {
+    iconEl.textContent = "🎧";
+  }
+  if (radioBtn) {
+    radioBtn.style.color = isAudioOnlyMode ? "#e50914" : "";
+    radioBtn.classList.toggle("active", isAudioOnlyMode);
+  }
+
+  if (activeEpisode) {
+    if (titleEl) titleEl.textContent = activeEpisode.title || "綜藝玩很大";
+    const part = activeEpisode.parts?.[activePartIndex];
+    const partLabel = part?.label || `Part ${activePartIndex + 1}`;
+    if (subEl) subEl.textContent = `${activeEpisode.date || "最新"} · ${partLabel} · 綜藝玩很大`;
+    if (coverImg) {
+      coverImg.src = resolveEpisodeThumb(activeEpisode);
+    }
+  }
+
+  const isPlaying = player && !player.paused;
+  if (vinyl) vinyl.classList.toggle("playing", isPlaying && isAudioOnlyMode);
+  if (wave) wave.classList.toggle("playing", isPlaying && isAudioOnlyMode);
+  if (playBtn) playBtn.textContent = isPlaying ? "⏸" : "▶";
+}
+
+function toggleAudioOnlyMode() {
+  isAudioOnlyMode = !isAudioOnlyMode;
+  updateRadioView();
+  showSleepToast(isAudioOnlyMode ? "🎧 已開啟純音頻聽劇模式 (70%+ 極致省電)" : "📺 已返回視訊播放模式");
+}
+
+function setupRadioMode() {
+  const radioBtn = document.getElementById("radio-mode-btn");
+  if (radioBtn) {
+    radioBtn.addEventListener("click", () => toggleAudioOnlyMode());
+  }
+
+  const returnBtn = document.getElementById("radio-return-btn");
+  if (returnBtn) {
+    returnBtn.addEventListener("click", () => toggleAudioOnlyMode());
+  }
+
+  const back15 = document.getElementById("radio-back-15");
+  if (back15) {
+    back15.addEventListener("click", () => {
+      if (player) {
+        player.currentTime = Math.max(0, player.currentTime - 15);
+      }
+    });
+  }
+
+  const fwd15 = document.getElementById("radio-fwd-15");
+  if (fwd15) {
+    fwd15.addEventListener("click", () => {
+      if (player) {
+        player.currentTime = Math.min(player.duration || 0, player.currentTime + 15);
+      }
+    });
+  }
+
+  const playBtn = document.getElementById("radio-play-btn");
+  if (playBtn) {
+    playBtn.addEventListener("click", () => {
+      if (!player) return;
+      if (player.paused) {
+        player.play().catch(() => {});
+      } else {
+        player.pause();
+      }
+      updateRadioView();
+    });
+  }
+
+  if (player) {
+    player.addEventListener("play", () => updateRadioView());
+    player.addEventListener("pause", () => updateRadioView());
+  }
+}
+
 // Initialization on DOMContentLoaded
 if (typeof window !== "undefined") {
   window.addEventListener("DOMContentLoaded", () => {
@@ -2362,6 +2467,7 @@ if (typeof window !== "undefined") {
     setupAutoPlay();
     setupSleepTimerModal();
     setupSearchAndFilters();
+    setupRadioMode();
     loadCatalog();
   });
 }
@@ -2427,6 +2533,9 @@ if (typeof window !== "undefined") {
   window.saveResume = saveResume;
   window.getEpisodeResume = getEpisodeResume;
   window.clearEpisodeResume = clearEpisodeResume;
+  window.toggleAudioOnlyMode = toggleAudioOnlyMode;
+  window.setupRadioMode = setupRadioMode;
+  window.updateRadioView = updateRadioView;
   window.formatTime = formatTime;
   window.loadNextPage = loadNextPage;
   window.applyPlaybackSpeed = applyPlaybackSpeed;
@@ -2497,6 +2606,9 @@ if (typeof module !== "undefined" && module.exports) {
     saveResume,
     getEpisodeResume,
     clearEpisodeResume,
+    toggleAudioOnlyMode,
+    setupRadioMode,
+    updateRadioView,
     formatTime,
     applyPlaybackSpeed,
     cycleSpeed,

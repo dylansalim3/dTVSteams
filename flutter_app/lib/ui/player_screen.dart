@@ -41,7 +41,8 @@ class NativePlayerScreen extends StatefulWidget {
   State<NativePlayerScreen> createState() => _NativePlayerScreenState();
 }
 
-class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBindingObserver {
+class _NativePlayerScreenState extends State<NativePlayerScreen>
+    with WidgetsBindingObserver, TickerProviderStateMixin {
   late CatalogEpisode _currentEpisode;
   late int _currentPartIndex;
   VideoPlayerController? _controller;
@@ -104,9 +105,22 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
   bool _showUnlockHint = false;
   Timer? _unlockHintTimer;
 
+  // Audio-only radio mode state (Feature 11)
+  bool _isAudioOnlyMode = false;
+  late AnimationController _vinylAnimationController;
+  late AnimationController _waveformAnimationController;
+
   @override
   void initState() {
     super.initState();
+    _vinylAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 12),
+    );
+    _waveformAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 650),
+    );
     _currentEpisode = widget.episode;
     WidgetsBinding.instance.addObserver(this);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
@@ -667,6 +681,21 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
         }
       }
     }
+
+    if (_isAudioOnlyMode) {
+      if (controller.value.isPlaying) {
+        if (!_vinylAnimationController.isAnimating) {
+          _vinylAnimationController.repeat();
+          _waveformAnimationController.repeat(reverse: true);
+        }
+      } else {
+        if (_vinylAnimationController.isAnimating) {
+          _vinylAnimationController.stop();
+          _waveformAnimationController.stop();
+        }
+      }
+    }
+
     setState(() {});
   }
 
@@ -771,6 +800,268 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
     }
   }
 
+  void _toggleAudioOnlyMode() {
+    setState(() {
+      _isAudioOnlyMode = !_isAudioOnlyMode;
+    });
+    if (_isAudioOnlyMode) {
+      if (_controller?.value.isPlaying == true) {
+        _vinylAnimationController.repeat();
+        _waveformAnimationController.repeat(reverse: true);
+      }
+    } else {
+      _vinylAnimationController.stop();
+      _waveformAnimationController.stop();
+    }
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          _isAudioOnlyMode
+              ? '🎧 已開啟純音頻聽劇模式 (節省 70%+ 電量與流量)'
+              : '📺 已返回視訊播放模式',
+        ),
+        duration: const Duration(milliseconds: 1400),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  Widget _buildRadioPlayerView(VideoPlayerController? controller) {
+    final isPlaying = controller?.value.isPlaying ?? false;
+    final part = _currentEpisode.parts.isNotEmpty && _currentPartIndex < _currentEpisode.parts.length
+        ? _currentEpisode.parts[_currentPartIndex]
+        : null;
+    final partLabel = part?.label ?? 'Part ${_currentPartIndex + 1}';
+
+    return Container(
+      width: double.infinity,
+      height: double.infinity,
+      decoration: const BoxDecoration(
+        gradient: RadialGradient(
+          center: Alignment.center,
+          radius: 0.95,
+          colors: [
+            Color(0xFF23161A),
+            Color(0xFF0F0F10),
+            Colors.black,
+          ],
+        ),
+      ),
+      child: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Audio mode pill badge
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE50914).withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: const Color(0xFFE50914).withValues(alpha: 0.5)),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.headphones, color: Color(0xFFE50914), size: 14),
+                        SizedBox(width: 6),
+                        Text(
+                          '純音頻聽劇模式 · 70%+ 極致省電',
+                          style: TextStyle(
+                            color: Color(0xFFFF8B8F),
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+
+                  // Vinyl Disc Artwork with album cover
+                  RotationTransition(
+                    turns: _vinylAnimationController,
+                    child: Container(
+                      width: 170,
+                      height: 170,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: const Color(0xFF141414),
+                        border: Border.all(color: Colors.white24, width: 2),
+                        boxShadow: [
+                          BoxShadow(
+                            color: isPlaying ? const Color(0xFFE50914).withValues(alpha: 0.25) : Colors.black54,
+                            blurRadius: 28,
+                            spreadRadius: 4,
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: Container(
+                          width: 120,
+                          height: 120,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white12, width: 3),
+                            image: _currentEpisode.poster.isNotEmpty
+                                ? DecorationImage(
+                                    image: NetworkImage(_currentEpisode.poster),
+                                    fit: BoxFit.cover,
+                                    onError: (err, stack) {},
+                                  )
+                                : null,
+                          ),
+                          child: _currentEpisode.poster.isEmpty
+                              ? const Icon(Icons.music_note, color: Colors.white38, size: 48)
+                              : null,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Animated Waveform Bars
+                  AnimatedBuilder(
+                    animation: _waveformAnimationController,
+                    builder: (context, _) {
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(11, (index) {
+                          final animVal = _waveformAnimationController.value;
+                          final offset = (index * 0.18) % 1.0;
+                          final factor = isPlaying ? ((animVal + offset) % 1.0) : 0.15;
+                          final barHeight = 8.0 + (factor * 26.0);
+                          return Container(
+                            width: 4,
+                            height: barHeight,
+                            margin: const EdgeInsets.symmetric(horizontal: 2.5),
+                            decoration: BoxDecoration(
+                              color: isPlaying
+                                  ? (index == 5 ? const Color(0xFFE50914) : const Color(0xFFFF5252))
+                                  : Colors.white24,
+                              borderRadius: BorderRadius.circular(2),
+                            ),
+                          );
+                        }),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 14),
+
+                  // Episode Title
+                  Text(
+                    _currentEpisode.title,
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+
+                  // Part & Date Subtitle
+                  Text(
+                    '${_currentEpisode.date} · $partLabel · 綜藝玩很大',
+                    style: const TextStyle(
+                      color: Colors.white60,
+                      fontSize: 12,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Radio Quick Action Controls: -15s, Play/Pause, +15s
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // -15s
+                      IconButton(
+                        tooltip: '快退 15 秒',
+                        iconSize: 32,
+                        icon: const Icon(Icons.fast_rewind, color: Colors.white),
+                        onPressed: () {
+                          if (controller == null) return;
+                          final cur = controller.value.position;
+                          final target = cur - const Duration(seconds: 15);
+                          controller.seekTo(target > Duration.zero ? target : Duration.zero);
+                        },
+                      ),
+                      const SizedBox(width: 16),
+
+                      // Play/Pause Big Button
+                      Container(
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Color(0xFFE50914),
+                        ),
+                        child: IconButton(
+                          iconSize: 38,
+                          color: Colors.white,
+                          icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow),
+                          onPressed: () {
+                            if (controller == null) return;
+                            if (isPlaying) {
+                              controller.pause();
+                              _vinylAnimationController.stop();
+                              _waveformAnimationController.stop();
+                            } else {
+                              controller.play();
+                              _vinylAnimationController.repeat();
+                              _waveformAnimationController.repeat(reverse: true);
+                            }
+                            setState(() {});
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+
+                      // +15s
+                      IconButton(
+                        tooltip: '快進 15 秒',
+                        iconSize: 32,
+                        icon: const Icon(Icons.fast_forward, color: Colors.white),
+                        onPressed: () {
+                          if (controller == null) return;
+                          final cur = controller.value.position;
+                          final dur = controller.value.duration;
+                          final target = cur + const Duration(seconds: 15);
+                          controller.seekTo(target < dur ? target : dur);
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Return to video button
+                  OutlinedButton.icon(
+                    onPressed: _toggleAudioOnlyMode,
+                    icon: const Icon(Icons.videocam, color: Colors.white70, size: 16),
+                    label: const Text(
+                      '返回視訊模式 (Return to Video)',
+                      style: TextStyle(color: Colors.white70, fontSize: 12),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Colors.white24),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Future<void> _handleExitPlayer() async {
     if (_isExiting) return;
     _isExiting = true;
@@ -816,6 +1107,8 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
     _longPressTimer?.cancel();
     _unlockHintTimer?.cancel();
     _autoPlayCountdownTimer?.cancel();
+    _vinylAnimationController.dispose();
+    _waveformAnimationController.dispose();
     WidgetsBinding.instance.removeObserver(this);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     _persistCurrentPosition(force: true);
@@ -1587,22 +1880,24 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
                 children: [
                   // Video Surface View (Backed by native Android Media3 ExoPlayer)
                   Center(
-                    child: isInitialized
-                        ? _buildScaledVideoPlayer(controller)
-                        : (_isLoading
-                          ? const Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                CircularProgressIndicator(color: Color(0xFFE50914)),
-                                SizedBox(height: 16),
-                                Text(
-                                  '正在連線即時串流... (Connecting live stream)',
-                                  style: TextStyle(color: Colors.white70, fontSize: 13),
-                                ),
-                              ],
-                            )
-                          : Container(color: Colors.black)),
-                ),
+                    child: _isAudioOnlyMode
+                        ? _buildRadioPlayerView(controller)
+                        : (isInitialized
+                            ? _buildScaledVideoPlayer(controller)
+                            : (_isLoading
+                                ? const Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      CircularProgressIndicator(color: Color(0xFFE50914)),
+                                      SizedBox(height: 16),
+                                      Text(
+                                        '正在連線即時串流... (Connecting live stream)',
+                                        style: TextStyle(color: Colors.white70, fontSize: 13),
+                                      ),
+                                    ],
+                                  )
+                                : Container(color: Colors.black))),
+                  ),
 
                 // Error Overlay with Self-Healing Action
                 if (_errorMessage != null)
@@ -1929,6 +2224,19 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
                                   ),
 
                                   const SizedBox(width: 4),
+
+                                  // Audio-Only Radio Mode Button in OSD (Feature 11)
+                                  IconButton(
+                                    tooltip: _isAudioOnlyMode
+                                        ? '切換回視訊播放模式 (Video)'
+                                        : '切換純音頻聽劇模式 (Audio-Only)',
+                                    icon: Icon(
+                                      _isAudioOnlyMode ? Icons.headphones : Icons.headphones_outlined,
+                                      color: _isAudioOnlyMode ? const Color(0xFFE50914) : Colors.white,
+                                      size: 22,
+                                    ),
+                                    onPressed: _toggleAudioOnlyMode,
+                                  ),
 
                                   // Playback Settings Button in OSD
                                   IconButton(

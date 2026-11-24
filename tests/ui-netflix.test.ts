@@ -592,5 +592,44 @@ describe("YouTube Web App UI & Video.js Compliance", () => {
 
     win.clearSearchHistory();
     expect(win.getSearchHistory().length).toBe(0);
+
+    // Verify Audio-Only Radio Mode (Feature 11)
+    const radioBtn = win.document.getElementById("radio-mode-btn");
+    const radioLabel = win.document.getElementById("radio-mode-label");
+    const radioOverlay = win.document.getElementById("radio-mode-overlay");
+    const vinylDisc = win.document.getElementById("radio-vinyl-disc");
+    const waveformBars = win.document.getElementById("radio-waveform-bars");
+    const radioReturnBtn = win.document.getElementById("radio-return-btn");
+    const radioBack15 = win.document.getElementById("radio-back-15");
+    const radioFwd15 = win.document.getElementById("radio-fwd-15");
+    const radioPlayBtn = win.document.getElementById("radio-play-btn");
+
+    expect(radioBtn).not.toBeNull();
+    expect(radioLabel).not.toBeNull();
+    expect(radioOverlay).not.toBeNull();
+    expect(vinylDisc).not.toBeNull();
+    expect(waveformBars).not.toBeNull();
+    expect(radioReturnBtn).not.toBeNull();
+    expect(radioBack15).not.toBeNull();
+    expect(radioFwd15).not.toBeNull();
+    expect(radioPlayBtn).not.toBeNull();
+
+    expect(typeof win.toggleAudioOnlyMode).toBe("function");
+    expect(typeof win.setupRadioMode).toBe("function");
+    expect(typeof win.updateRadioView).toBe("function");
+
+    // Initially in video mode
+    expect(radioOverlay.style.display).toBe("none");
+    expect(radioLabel.textContent).toBe("聽劇模式");
+
+    // Toggle Audio-Only Radio Mode ON
+    win.toggleAudioOnlyMode();
+    expect(radioOverlay.style.display).toBe("flex");
+    expect(radioLabel.textContent).toBe("聽劇中");
+
+    // Toggle Audio-Only Radio Mode OFF
+    win.toggleAudioOnlyMode();
+    expect(radioOverlay.style.display).toBe("none");
+    expect(radioLabel.textContent).toBe("聽劇模式");
   });
 });

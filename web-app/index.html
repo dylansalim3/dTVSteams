@@ -142,6 +142,43 @@
             <button id="ap-cancel-btn" class="ap-btn cancel" title="取消">取消 ✕</button>
           </div>
         </div>
+
+        <!-- Audio-Only Radio Mode Overlay (Feature 11) -->
+        <div id="radio-mode-overlay" class="yt-radio-overlay" style="display:none;" role="region" aria-label="純音頻聽劇模式">
+          <div class="yt-radio-content">
+            <div class="yt-radio-badge">
+              <span>🎧 純音頻聽劇模式 · 70%+ 極致省電</span>
+            </div>
+            <div class="yt-vinyl-disc" id="radio-vinyl-disc">
+              <div class="yt-vinyl-inner">
+                <img id="radio-cover-img" src="./media/thumb-default.svg" alt="節目封面" class="yt-vinyl-cover">
+              </div>
+            </div>
+            <div class="yt-waveform-bars" id="radio-waveform-bars" aria-hidden="true">
+              <span class="yt-bar"></span>
+              <span class="yt-bar"></span>
+              <span class="yt-bar"></span>
+              <span class="yt-bar"></span>
+              <span class="yt-bar"></span>
+              <span class="yt-bar"></span>
+              <span class="yt-bar"></span>
+              <span class="yt-bar"></span>
+              <span class="yt-bar"></span>
+            </div>
+            <div class="yt-radio-info">
+              <h2 id="radio-ep-title" class="yt-radio-title">綜藝玩很大</h2>
+              <p id="radio-ep-sub" class="yt-radio-sub">2026 · Part 1</p>
+            </div>
+            <div class="yt-radio-controls">
+              <button class="yt-radio-ctrl-btn" id="radio-back-15" aria-label="快退 15 秒">⏪ 15s</button>
+              <button class="yt-radio-play-btn" id="radio-play-btn" aria-label="播放或暫停">▶</button>
+              <button class="yt-radio-ctrl-btn" id="radio-fwd-15" aria-label="快進 15 秒">⏩ 15s</button>
+            </div>
+            <button class="yt-btn yt-btn-secondary" id="radio-return-btn" style="border-radius: 20px; font-size: 0.82rem; margin-top: 10px;">
+              <span>📺 返回視訊模式</span>
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- Video Details & Part Selector Under Player -->
@@ -199,6 +236,10 @@
             <button class="yt-btn yt-btn-secondary" id="screen-lock-btn" aria-label="螢幕鎖定防誤觸" title="螢幕鎖定防誤觸 (Screen Lock)">
               <span id="screen-lock-icon" style="font-size: 14px;">🔒</span>
               <span id="screen-lock-label">鎖定</span>
+            </button>
+            <button class="yt-btn yt-btn-secondary" id="radio-mode-btn" aria-label="切換純音頻聽劇模式" title="純音頻聽劇模式 (Audio-Only Radio Mode)">
+              <span id="radio-mode-icon" style="font-size: 14px;">🎧</span>
+              <span id="radio-mode-label">聽劇模式</span>
             </button>
             <button class="yt-btn yt-btn-secondary" id="autoplay-toggle-btn" aria-label="自動連續播放切換" title="自動連續播放切換 (Auto-play Next)">
               <span id="autoplay-toggle-icon" style="font-size: 14px;">⚡</span>

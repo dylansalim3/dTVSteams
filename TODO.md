@@ -16,7 +16,7 @@ This roadmap documents the implementation plan for the 4 core enhancements reque
 - [x] **Feature 8: 播放器「螢幕鎖定防誤觸（Screen Lock OSD）」功能** *(Completed)*
 - [x] **Feature 9: 無縫連續追劇與片尾自動播放倒數浮層 (Auto-Play Next Part/Episode & Countdown HUD)** *(Completed)*
 - [x] **Feature 10: 年份速查膠囊、正倒序切換與搜尋歷史 (Year Chips, Order Switcher & Search History)** *(Completed)*
-- [ ] **Feature 11: 🎧 純音頻聽劇 / 廣播模式（Audio-Only Radio Mode）** *(Queued)*
+- [x] **Feature 11: 🎧 純音頻聽劇 / 廣播模式（Audio-Only Radio Mode）** *(Completed)*
 - [ ] **Feature 12: ⏩ 一鍵跳過片頭 (30s) 與智慧卡頓換線（Skip Intro & Smart CDN Fallback）** *(Queued)*
 
 ---
@@ -249,15 +249,15 @@ This roadmap documents the implementation plan for the 4 core enhancements reque
 * 介面替換為黑膠唱片旋轉封面 / 節目視覺海報，搭配精緻波形動效與極簡音頻控制項（-15s、+15s、定時睡眠快捷入口）。
 
 ### Implementation Checklist:
-- [ ] **11.1 Audio-Only Toggle & Surface Detach (`player_screen.dart` & `web-app/app.js`)**:
+- [x] **11.1 Audio-Only Toggle & Surface Detach (`player_screen.dart` & `web-app/app.js`)**:
   - 頂部 OSD 加入 `🎧 聽劇模式` 切換按鈕。
   - 切換時停用視訊畫面渲染，保留音訊解碼串流。
-- [ ] **11.2 Radio Player UI View**:
+- [x] **11.2 Radio Player UI View**:
   - 旋轉黑膠 / 封面卡片、動態音頻波形 HUD、大字體集數資訊。
-- [ ] **11.3 Media Notification & Background Audio Polish**:
+- [x] **11.3 Media Notification & Background Audio Polish**:
   - 完善鎖定畫面快進/快退與播放暫停控制。
-- [ ] **11.4 Automated Verification**:
-  - 驗證音頻模式切換、控制項響應與視訊恢復。
+- [x] **11.4 Automated Verification**:
+  - 驗證音頻模式切換、控制項響應與視訊恢復（`audio_only_radio_mode_test.dart` & `ui-netflix.test.ts`）。
 
 ---
 
