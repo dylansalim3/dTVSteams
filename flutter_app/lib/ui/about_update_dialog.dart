@@ -13,6 +13,7 @@ class AboutUpdateDialog {
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
+      useSafeArea: true,
       builder: (ctx) => _AboutUpdateSheet(updateManager: updateManager),
     );
   }
@@ -113,27 +114,42 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
     final mgr = widget.updateManager;
     final update = mgr.latestUpdate;
 
-    final bottomInset = MediaQuery.of(context).padding.bottom;
-    return SafeArea(
-      top: false,
-      bottom: true,
-      child: Container(
-        decoration: const BoxDecoration(
-          color: Color(0xFF1E1E1E),
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        padding: EdgeInsets.fromLTRB(
-          20,
-          16,
-          20,
-          MediaQuery.of(context).viewInsets.bottom + (bottomInset + 24) / 2,
-        ),
-        child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header with Close
+    final mediaQuery = MediaQuery.of(context);
+    final bottomInset = mediaQuery.padding.bottom;
+    return Container(
+      decoration: const BoxDecoration(
+        color: Color(0xFF1E1E1E),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      child: SafeArea(
+        top: true,
+        bottom: true,
+        minimum: const EdgeInsets.only(top: 8),
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(
+            20,
+            8,
+            20,
+            mediaQuery.viewInsets.bottom + (bottomInset + 24) / 2,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Top drag handle indicator
+                Center(
+                  child: Container(
+                    width: 38,
+                    height: 4,
+                    margin: const EdgeInsets.only(bottom: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.white24,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                // Header with Close
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -397,7 +413,8 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
         ),
       ),
     ),
-  );
+  ),
+);
 }
 
   Widget _buildStorageLocationCard(BuildContext context) {
@@ -672,6 +689,28 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                   ),
                 ],
               ],
+            ),
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.05),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.white12),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: const [
+                  Icon(Icons.info_outline, color: Colors.amberAccent, size: 16),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      '提示：若系統提示「安裝套件無效」，通常是因目前手機安裝的是 Debug 開發版，與 GitHub 正式發布版簽名不相容。請先手動解除安裝舊版後再安裝即可。',
+                      style: TextStyle(color: Colors.white70, fontSize: 11, height: 1.4),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ],

@@ -128,6 +128,13 @@ void main() {
       await tester.tap(find.byType(Switch).first);
       await tester.pumpAndSettle();
       expect(settingsManager.backgroundPlay, isFalse);
+
+      // Verify SafeArea has top: true for status bar and notch clearance
+      final safeAreas = tester.widgetList<SafeArea>(find.byType(SafeArea)).toList();
+      final sheetSafeArea = safeAreas.firstWhere((sa) => sa.top == true && sa.bottom == true);
+      expect(sheetSafeArea.top, isTrue);
+      expect(sheetSafeArea.bottom, isTrue);
+      expect(sheetSafeArea.minimum.top, greaterThanOrEqualTo(8.0));
     });
 
     testWidgets('PlayerScreen top OSD header includes settings tune button', (WidgetTester tester) async {

@@ -21,6 +21,7 @@ class StorageLocationHelper {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
+      useSafeArea: true,
       builder: (ctx) => Material(
         color: const Color(0xFF222222),
         shape: const RoundedRectangleBorder(
@@ -28,14 +29,26 @@ class StorageLocationHelper {
         ),
         clipBehavior: Clip.antiAlias,
         child: SafeArea(
-          top: false,
+          top: true,
           bottom: true,
+          minimum: const EdgeInsets.only(top: 8),
           child: Container(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 36),
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 36),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Center(
+                  child: Container(
+                    width: 38,
+                    height: 4,
+                    margin: const EdgeInsets.only(bottom: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.white24,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [

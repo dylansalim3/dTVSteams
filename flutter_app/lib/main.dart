@@ -263,22 +263,36 @@ class _HomeScreenState extends State<HomeScreen> {
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
+      useSafeArea: true,
       builder: (ctx) {
         final bottomInset = MediaQuery.of(ctx).padding.bottom;
-        return SafeArea(
-          top: false,
-          bottom: true,
-          child: Container(
-            decoration: const BoxDecoration(
-              color: Color(0xFF1E1E1E),
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-            ),
-            padding: EdgeInsets.fromLTRB(20, 16, 20, (bottomInset + 24) / 2),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-              // Header
+        return Container(
+          decoration: const BoxDecoration(
+            color: Color(0xFF1E1E1E),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: SafeArea(
+            top: true,
+            bottom: true,
+            minimum: const EdgeInsets.only(top: 8),
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(20, 8, 20, (bottomInset + 24) / 2),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 38,
+                      height: 4,
+                      margin: const EdgeInsets.only(bottom: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.white24,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  // Header
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -395,9 +409,10 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
         ),
-      );
-    },
+      ),
     );
+  },
+);
   }
 
   Future<void> goToPage(int page) async {

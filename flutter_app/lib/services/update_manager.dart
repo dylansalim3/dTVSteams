@@ -449,8 +449,17 @@ class UpdateManager extends ChangeNotifier {
   }
 
   Future<File> _getUpdateApkFile() async {
-    final dir = await getTemporaryDirectory();
-    return File('${dir.path}/dTVSteams-update.apk');
+    Directory? targetDir;
+    if (!kIsWeb && Platform.isAndroid) {
+      try {
+        final extDirs = await getExternalCacheDirectories();
+        if (extDirs != null && extDirs.isNotEmpty) {
+          targetDir = extDirs.first;
+        }
+      } catch (_) {}
+    }
+    targetDir ??= await getTemporaryDirectory();
+    return File('${targetDir.path}/dTVSteams-update.apk');
   }
 
   Future<void> _persistState() async {

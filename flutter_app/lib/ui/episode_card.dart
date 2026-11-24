@@ -236,6 +236,7 @@ void showDownloadSelectionSheet(
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
+    useSafeArea: true,
     backgroundColor: const Color(0xFF1E1E1E),
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
@@ -260,15 +261,27 @@ void showDownloadSelectionSheet(
           final bottomInset = MediaQuery.of(sheetContext).padding.bottom;
 
           return SafeArea(
-            top: false,
+            top: true,
             bottom: true,
+            minimum: const EdgeInsets.only(top: 8),
             child: Padding(
-              padding: EdgeInsets.fromLTRB(16.0, 12.0, 16.0, (bottomInset + 16.0) / 2),
+              padding: EdgeInsets.fromLTRB(16.0, 8.0, 16.0, (bottomInset + 16.0) / 2),
               child: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Center(
+                      child: Container(
+                        width: 38,
+                        height: 4,
+                        margin: const EdgeInsets.only(bottom: 12),
+                        decoration: BoxDecoration(
+                          color: Colors.white24,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    ),
                     Row(
                       children: [
                         Container(

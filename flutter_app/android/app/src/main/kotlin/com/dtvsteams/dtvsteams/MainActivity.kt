@@ -137,6 +137,10 @@ class MainActivity : FlutterActivity() {
                             result.error("FILE_NOT_FOUND", "File does not exist: $filePath", null)
                             return@setMethodCallHandler
                         }
+
+                        // Ensure world-readable permissions for external installer processes
+                        file.setReadable(true, false)
+
                         val contentUri = FileProvider.getUriForFile(
                             this@MainActivity,
                             "$packageName.fileprovider",
@@ -145,8 +149,18 @@ class MainActivity : FlutterActivity() {
                         val installIntent = Intent(Intent.ACTION_VIEW).apply {
                             setDataAndType(contentUri, "application/vnd.android.package-archive")
                             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                            addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
                             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, true)
                         }
+
+                        // Explicitly grant URI read permissions to all matching installer components
+                        val resolveInfos = packageManager.queryIntentActivities(installIntent, PackageManager.MATCH_DEFAULT_ONLY)
+                        for (resolveInfo in resolveInfos) {
+                            val targetPkg = resolveInfo.activityInfo.packageName
+                            grantUriPermission(targetPkg, contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        }
+
                         startActivity(installIntent)
                         result.success(true)
                     } catch (e: Exception) {
