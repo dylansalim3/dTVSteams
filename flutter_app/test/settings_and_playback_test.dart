@@ -115,12 +115,14 @@ void main() {
       expect(find.text('播放偏好設定 (Settings)'), findsOneWidget);
       expect(find.text('背景播放 (鎖定螢幕繼續播放音訊)'), findsOneWidget);
       expect(find.text('播放時保持螢幕常亮 (防止休眠)'), findsOneWidget);
+      expect(find.text('自動連續播放下一段 / 下一集'), findsOneWidget);
 
-      // Verify switches are toggled on by default
-      expect(find.byType(Switch), findsNWidgets(2));
+      // Verify switches are toggled on by default (background play, keep awake, auto play next)
+      expect(find.byType(Switch), findsNWidgets(3));
       final switches = tester.widgetList<Switch>(find.byType(Switch)).toList();
       expect(switches[0].value, isTrue);
       expect(switches[1].value, isTrue);
+      expect(switches[2].value, isTrue);
 
       // Tap to toggle background play off
       await tester.tap(find.byType(Switch).first);

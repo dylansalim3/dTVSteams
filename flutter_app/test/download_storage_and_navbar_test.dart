@@ -194,7 +194,9 @@ void main() {
       expect(find.text('預設內部儲存空間'), findsOneWidget);
       expect(find.text('變更位置'), findsOneWidget);
 
-      // Tap '變更位置' button to open picker sheet
+      // Scroll to and tap '變更位置' button to open picker sheet
+      await tester.ensureVisible(find.text('變更位置'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('變更位置'));
       await tester.pumpAndSettle();
 

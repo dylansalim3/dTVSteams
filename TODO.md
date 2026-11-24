@@ -14,6 +14,10 @@ This roadmap documents the implementation plan for the 4 core enhancements reque
 - [x] **Feature 6: 「我的收藏」與「稍後觀看」清單（Favorites / Watchlist & Bookmarks）** *(Completed)*
 - [x] **Feature 7: 「觀看歷史紀錄」專屬管理頁面（Watch History Dedicated Management Screen）** *(Completed)*
 - [x] **Feature 8: 播放器「螢幕鎖定防誤觸（Screen Lock OSD）」功能** *(Completed)*
+- [x] **Feature 9: 無縫連續追劇與片尾自動播放倒數浮層 (Auto-Play Next Part/Episode & Countdown HUD)** *(Completed)*
+- [ ] **Feature 10: 年份速查膠囊、正倒序切換與搜尋歷史 (Year Chips, Order Switcher & Search History)** *(In Progress)*
+- [ ] **Feature 11: 🎧 純音頻聽劇 / 廣播模式（Audio-Only Radio Mode）** *(Queued)*
+- [ ] **Feature 12: ⏩ 一鍵跳過片頭 (30s) 與智慧卡頓換線（Skip Intro & Smart CDN Fallback）** *(Queued)*
 
 ---
 
@@ -188,3 +192,86 @@ This roadmap documents the implementation plan for the 4 core enhancements reque
   - Web 端同步鎖定控制列與快捷手勢。
 - [x] **8.4 Automated Tests**:
   - 驗證鎖定與解鎖狀態切換。
+
+---
+
+## 📌 Feature 9: 無縫連續追劇與片尾自動播放倒數浮層 (Auto-Play Next Part/Episode & Countdown HUD)
+
+### Goals:
+* 台灣綜藝節目單集長達 1.5 ~ 2 小時，在串流上被切為 Part 1、Part 2、Part 3 等分段。
+* 當當前分段播放結束前 5 秒或播放完畢時，浮現半透明圓形進度環與倒數膠囊：
+  `⚡ 5 秒後自動播放下一段：Part 2 [立即播放 ▶] [取消 ✕]`
+* 若倒數結束未取消，自動無縫切換載入 Part 2 起播，使用者無需手動點擊螢幕。
+* 若當前集數所有分段皆已播畢（例如 Part 3 完結），智慧提示自動續播下一集：
+  `🎬 5 秒後播放下一集：2026-03-22 集數 [立即播放 ▶] [重播本集]`
+* 在播放器設定選單與全域設定中提供「自動連續播放」開關（預設開啟）。
+* 雙端（Mobile Flutter App 與 Web App）同步實作。
+
+### Implementation Checklist:
+- [x] **9.1 Auto-Play State Machine (`player_screen.dart` & `web-app/app.js`)**:
+  - 監聽視訊剩餘時間（duration - position <= 5 秒且正在播放），或播放完成事件（status == completed）。
+  - 判斷下一分段是否存在；若無下一分段則查詢目錄下一集。
+- [x] **9.2 Floating Next Part Countdown HUD**:
+  - 現代圓形倒數計時器（5s）、下一段標題、[立即播放] 快速按鈕、[取消] 關閉倒數按鈕。
+  - 取消後該次不再反覆彈出干擾使用者。
+- [x] **9.3 Settings Toggle & Persistence**:
+  - `SettingsManager` 加入 `autoPlayNext` 開關，持久化儲存偏好。
+- [x] **9.4 Automated Verification**:
+  - Flutter 測試（`autoplay_test.dart`）與 Vitest 測試（`ui-netflix.test.ts`）驗證倒數計時、自動切換分段、取消倒數與集數末尾流轉。
+
+---
+
+## 📌 Feature 10: 年份速查膠囊、正倒序切換與搜尋歷史 (Year Chips, Order Switcher & Search History)
+
+### Goals:
+* 綜藝節目歷史長達數年（2018 ~ 2026，數百集），解決海量集數翻頁不易與關鍵字搜尋無記憶的痛點。
+* 首頁頂部過濾列提供快捷年份標籤（`全部 | 2026 | 2025 | 2024 | 2023 | 2022 | 經典`）。
+* 支援正序 / 倒序切換：`📅 最新優先 (倒序) ⇄ 經典回顧 (正序)`。
+* 搜尋框升級：最近搜尋歷史（可單項清除或全部清空）+ 熱門關鍵字標籤推薦（`憲哥`、`KID`、`澎湖`、`金鐘`等）。
+
+### Implementation Checklist:
+- [ ] **10.1 Year Filter Chips (`main.dart` & `web-app/app.js`)**:
+  - 自動從集數日期解析年份，提供水平滑動年份標籤列，點選即時過濾顯示。
+- [ ] **10.2 Chronological Sort Switcher**:
+  - 支援倒序（預設最新發布）與正序（經典早期優先）排序切換。
+- [ ] **10.3 Search History & Recommended Tags**:
+  - 本地儲存最近 10 筆搜尋紀錄，展示熱門探索推薦標籤。
+- [ ] **10.4 Automated Verification**:
+  - 驗證年份過濾準確性、排序狀態翻轉與搜尋歷史新增/刪除。
+
+---
+
+## 📌 Feature 11: 🎧 純音頻聽劇 / 廣播模式（Audio-Only Radio Mode）
+
+### Goals:
+* 針對《小明星大跟班》、《11點熱吵店》等談話類型節目，滿足通勤、家事、睡前「只聽不看」的極致省電需求。
+* 一鍵切換純音頻模式：停止視訊解碼渲染，節省 70%+ 電量與大量數據流量。
+* 介面替換為黑膠唱片旋轉封面 / 節目視覺海報，搭配精緻波形動效與極簡音頻控制項（-15s、+15s、定時睡眠快捷入口）。
+
+### Implementation Checklist:
+- [ ] **11.1 Audio-Only Toggle & Surface Detach (`player_screen.dart` & `web-app/app.js`)**:
+  - 頂部 OSD 加入 `🎧 聽劇模式` 切換按鈕。
+  - 切換時停用視訊畫面渲染，保留音訊解碼串流。
+- [ ] **11.2 Radio Player UI View**:
+  - 旋轉黑膠 / 封面卡片、動態音頻波形 HUD、大字體集數資訊。
+- [ ] **11.3 Media Notification & Background Audio Polish**:
+  - 完善鎖定畫面快進/快退與播放暫停控制。
+- [ ] **11.4 Automated Verification**:
+  - 驗證音頻模式切換、控制項響應與視訊恢復。
+
+---
+
+## 📌 Feature 12: ⏩ 一鍵跳過片頭 (30s) 與智慧卡頓換線（Skip Intro & Smart CDN Fallback）
+
+### Goals:
+* 綜藝節目固定有 20~30 秒開場片頭或贊助商，提供前 60 秒內一鍵快速跳過片頭按鈕。
+* 當串流遭遇網路波動或 CDN 卡頓超過 5 秒時，主動提示使用者「點擊切換備用線路 / 流暢模式」，提升播放成功率。
+
+### Implementation Checklist:
+- [ ] **12.1 Skip Intro Floating Pill (`player_screen.dart` & `web-app/app.js`)**:
+  - 影片開播前 60 秒右下角浮現 `[⏩ 跳過片頭 +30s]`，點擊平滑推進 30 秒並自動淡出。
+- [ ] **12.2 Buffering Stall Watchdog & Fallback Trigger**:
+  - 偵測卡頓超過門檻值時，於畫面中央展示溫和提示，支援一鍵切換備用播放源或重試。
+- [ ] **12.3 Automated Verification**:
+  - 驗證跳過片頭手勢、定時隱藏機制與卡頓偵測流程。
+

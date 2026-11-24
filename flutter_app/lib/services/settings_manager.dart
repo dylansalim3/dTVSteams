@@ -11,10 +11,12 @@ class SettingsManager extends ChangeNotifier {
 
   bool _backgroundPlay = true; // Default ON: Background play & lock screen audio
   bool _keepScreenAwake = true; // Default ON: Prevent sleep during playback
+  bool _autoPlayNext = true; // Default ON: Auto-play next part/episode countdown
   String? _customDownloadPath; // Null means default app storage
 
   bool get backgroundPlay => _backgroundPlay;
   bool get keepScreenAwake => _keepScreenAwake;
+  bool get autoPlayNext => _autoPlayNext;
   String? get customDownloadPath => _customDownloadPath;
 
   File? _settingsFile;
@@ -34,6 +36,9 @@ class SettingsManager extends ChangeNotifier {
         }
         if (json.containsKey('keepScreenAwake')) {
           _keepScreenAwake = json['keepScreenAwake'] as bool? ?? true;
+        }
+        if (json.containsKey('autoPlayNext')) {
+          _autoPlayNext = json['autoPlayNext'] as bool? ?? true;
         }
         if (json.containsKey('customDownloadPath')) {
           _customDownloadPath = json['customDownloadPath'] as String?;
@@ -60,6 +65,13 @@ class SettingsManager extends ChangeNotifier {
     await _persist();
   }
 
+  Future<void> setAutoPlayNext(bool value) async {
+    if (_autoPlayNext == value) return;
+    _autoPlayNext = value;
+    notifyListeners();
+    await _persist();
+  }
+
   Future<void> setCustomDownloadPath(String? path) async {
     if (_customDownloadPath == path) return;
     _customDownloadPath = path;
@@ -76,6 +88,7 @@ class SettingsManager extends ChangeNotifier {
       final data = {
         'backgroundPlay': _backgroundPlay,
         'keepScreenAwake': _keepScreenAwake,
+        'autoPlayNext': _autoPlayNext,
         'customDownloadPath': _customDownloadPath,
       };
       await _settingsFile!.writeAsString(jsonEncode(data));
@@ -88,10 +101,12 @@ class SettingsManager extends ChangeNotifier {
   void resetForTesting({
     bool backgroundPlay = true,
     bool keepScreenAwake = true,
+    bool autoPlayNext = true,
     String? customDownloadPath,
   }) {
     _backgroundPlay = backgroundPlay;
     _keepScreenAwake = keepScreenAwake;
+    _autoPlayNext = autoPlayNext;
     _customDownloadPath = customDownloadPath;
     _initialized = true;
   }

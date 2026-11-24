@@ -27,12 +27,14 @@ class NativePlayerScreen extends StatefulWidget {
   final CatalogEpisode episode;
   final int initialPartIndex;
   final File? localFile;
+  final List<CatalogEpisode>? playlist;
 
   const NativePlayerScreen({
     super.key,
     required this.episode,
     this.initialPartIndex = 0,
     this.localFile,
+    this.playlist,
   });
 
   @override
@@ -40,6 +42,7 @@ class NativePlayerScreen extends StatefulWidget {
 }
 
 class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBindingObserver {
+  late CatalogEpisode _currentEpisode;
   late int _currentPartIndex;
   VideoPlayerController? _controller;
   bool _isLoading = true;
@@ -49,6 +52,13 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
   double _playbackSpeed = 1.0;
   final List<double> _availableSpeeds = [1.0, 1.25, 1.5, 2.0];
   bool _isAutoAdvancing = false;
+
+  // Auto-play next part/episode countdown state
+  bool _showAutoPlayHud = false;
+  int _autoPlayCountdown = 5;
+  Timer? _autoPlayCountdownTimer;
+  bool _autoPlayDismissedForThisPart = false;
+
   final DownloadManager _downloadManager = DownloadManager();
   final PlaybackHistoryManager _historyManager = PlaybackHistoryManager();
   final FavoritesManager _favoritesManager = FavoritesManager();
@@ -97,6 +107,7 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
   @override
   void initState() {
     super.initState();
+    _currentEpisode = widget.episode;
     WidgetsBinding.instance.addObserver(this);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     _currentPartIndex = widget.initialPartIndex;
@@ -112,6 +123,138 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
       if (mounted) setState(() => _currentBrightness = b);
     });
     _initPlayerForPart(_currentPartIndex);
+  }
+
+  CatalogEpisode? get _nextEpisode {
+    final list = widget.playlist;
+    if (list == null || list.isEmpty) return null;
+    final curIdx = list.indexWhere((e) => e.id == _currentEpisode.id);
+    if (curIdx >= 0 && curIdx + 1 < list.length) {
+      return list[curIdx + 1];
+    }
+    return null;
+  }
+
+  bool get _hasNextPartOrEpisode {
+    if (_currentPartIndex + 1 < _currentEpisode.parts.length) return true;
+    return _nextEpisode != null;
+  }
+
+  String get _nextPlayTargetLabel {
+    if (_currentPartIndex + 1 < _currentEpisode.parts.length) {
+      return '下一段：${_currentEpisode.parts[_currentPartIndex + 1].label}';
+    }
+    final nextEp = _nextEpisode;
+    if (nextEp != null) {
+      return '下一集：${nextEp.title}';
+    }
+    return '';
+  }
+
+  void _startAutoPlayCountdown() {
+    if (_showAutoPlayHud || !_settingsManager.autoPlayNext || _isScreenLocked || _autoPlayDismissedForThisPart) {
+      return;
+    }
+    if (!_hasNextPartOrEpisode) return;
+
+    _autoPlayCountdownTimer?.cancel();
+    setState(() {
+      _showAutoPlayHud = true;
+      _autoPlayCountdown = 5;
+    });
+
+    _autoPlayCountdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      if (_autoPlayCountdown <= 1) {
+        timer.cancel();
+        _proceedAutoPlayNext();
+      } else {
+        setState(() {
+          _autoPlayCountdown--;
+        });
+      }
+    });
+  }
+
+  void _cancelAutoPlayCountdown({bool permanentForThisPart = true}) {
+    _autoPlayCountdownTimer?.cancel();
+    _autoPlayCountdownTimer = null;
+    if (mounted) {
+      setState(() {
+        _showAutoPlayHud = false;
+        if (permanentForThisPart) {
+          _autoPlayDismissedForThisPart = true;
+        }
+      });
+    }
+  }
+
+  void _proceedAutoPlayNext() {
+    _autoPlayCountdownTimer?.cancel();
+    _autoPlayCountdownTimer = null;
+    if (mounted) {
+      setState(() {
+        _showAutoPlayHud = false;
+      });
+    }
+
+    if (_currentPartIndex + 1 < _currentEpisode.parts.length) {
+      final nextPartIndex = _currentPartIndex + 1;
+      _isAutoAdvancing = true;
+      if (mounted) {
+        ScaffoldMessenger.of(context).removeCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.playlist_play, color: Colors.white, size: 20),
+                const SizedBox(width: 8),
+                Text('自動為您播放：${_currentEpisode.parts[nextPartIndex].label}'),
+              ],
+            ),
+            duration: const Duration(seconds: 2),
+            backgroundColor: const Color(0xFFE50914),
+          ),
+        );
+      }
+      _switchPart(nextPartIndex);
+    } else if (_nextEpisode != null) {
+      final nextEp = _nextEpisode!;
+      if (mounted) {
+        ScaffoldMessenger.of(context).removeCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.skip_next, color: Colors.white, size: 20),
+                const SizedBox(width: 8),
+                Expanded(child: Text('自動為您播放下一集：${nextEp.title}')),
+              ],
+            ),
+            duration: const Duration(seconds: 3),
+            backgroundColor: const Color(0xFFE50914),
+          ),
+        );
+      }
+      _switchToEpisode(nextEp, 0);
+    } else {
+      if (mounted) setState(() {});
+    }
+  }
+
+  void _switchToEpisode(CatalogEpisode nextEpisode, int partIndex) {
+    _persistCurrentPosition(force: true);
+    _cancelAutoPlayCountdown(permanentForThisPart: false);
+    setState(() {
+      _currentEpisode = nextEpisode;
+      _currentPartIndex = partIndex;
+      _autoPlayDismissedForThisPart = false;
+      _isAutoAdvancing = false;
+    });
+    _initPlayerForPart(partIndex, forceLiveResolve: true);
   }
 
   void _onSleepTimerUpdate() {
@@ -474,18 +617,22 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
       _persistCurrentPosition(force: false);
     }
 
-    // Autoplay next part when finished
+    // Autoplay next part/episode countdown when near end or finished
     if (!_isAutoAdvancing && controller.value.duration > const Duration(seconds: 2)) {
       final isFinished = controller.value.isCompleted ||
           (controller.value.position >= controller.value.duration - const Duration(milliseconds: 700));
 
+      final remaining = controller.value.duration - controller.value.position;
+      final isNearEnd = isFinished ||
+          (controller.value.duration > const Duration(seconds: 8) && remaining <= const Duration(seconds: 5) && controller.value.isPlaying);
+
       if (isFinished) {
         // Offer quick cleanup for offline downloaded file once watched to completion
-        final parts = widget.episode.parts;
+        final parts = _currentEpisode.parts;
         final finishedPart = parts.isNotEmpty && _currentPartIndex < parts.length ? parts[_currentPartIndex] : null;
         if (finishedPart != null &&
-            _downloadManager.isDownloaded(widget.episode.id, finishedPart.label,
-                showId: widget.episode.showId, title: widget.episode.title)) {
+            _downloadManager.isDownloaded(_currentEpisode.id, finishedPart.label,
+                showId: _currentEpisode.showId, title: _currentEpisode.title)) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('已看完「${finishedPart.label}」，可清理離線檔以節省空間'),
@@ -494,37 +641,28 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
               action: SnackBarAction(
                 label: '刪除檔案',
                 textColor: const Color(0xFFE50914),
-                onPressed: () => _downloadManager.deleteDownload(widget.episode.id, finishedPart.label),
+                onPressed: () => _downloadManager.deleteDownload(_currentEpisode.id, finishedPart.label),
               ),
             ),
           );
         }
 
-        final isLastPart = _currentPartIndex >= widget.episode.parts.length - 1;
+        final isLastPart = _currentPartIndex >= _currentEpisode.parts.length - 1;
         if (_sleepTimerManager.isActive &&
             (_sleepTimerManager.mode == SleepTimerMode.endOfPart ||
              (_sleepTimerManager.mode == SleepTimerMode.endOfEpisode && isLastPart))) {
           _sleepTimerManager.onPartFinished(isLastPart: isLastPart);
           return;
         }
+      }
 
-        final nextPart = _currentPartIndex + 1;
-        if (nextPart < widget.episode.parts.length) {
-          _isAutoAdvancing = true;
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Row(
-                children: [
-                  const Icon(Icons.playlist_play, color: Colors.white, size: 20),
-                  const SizedBox(width: 8),
-                  Text('分段播放完畢，自動為您播放：${widget.episode.parts[nextPart].label}'),
-                ],
-              ),
-              duration: const Duration(seconds: 2),
-              backgroundColor: const Color(0xFFE50914),
-            ),
-          );
-          _switchPart(nextPart);
+      if (_showAutoPlayHud && controller.value.position < controller.value.duration - const Duration(seconds: 6)) {
+        _cancelAutoPlayCountdown(permanentForThisPart: false);
+      }
+
+      if (isNearEnd && _settingsManager.autoPlayNext && !_isScreenLocked && !_autoPlayDismissedForThisPart && !_showAutoPlayHud) {
+        if (_hasNextPartOrEpisode) {
+          _startAutoPlayCountdown();
           return;
         }
       }
@@ -535,8 +673,10 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
   void _switchPart(int newIndex) {
     if (newIndex == _currentPartIndex && _controller != null) return;
     _persistCurrentPosition(force: true);
+    _cancelAutoPlayCountdown(permanentForThisPart: false);
     setState(() {
       _currentPartIndex = newIndex;
+      _autoPlayDismissedForThisPart = false;
       _isAutoAdvancing = false;
     });
     _initPlayerForPart(newIndex, forceLiveResolve: true);
@@ -675,6 +815,7 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
     _singleTapDebounce?.cancel();
     _longPressTimer?.cancel();
     _unlockHintTimer?.cancel();
+    _autoPlayCountdownTimer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     _persistCurrentPosition(force: true);
@@ -778,6 +919,16 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
                             style: TextStyle(color: Colors.white60, fontSize: 12)),
                         value: _settingsManager.keepScreenAwake,
                         onChanged: (val) => _settingsManager.setKeepScreenAwake(val),
+                      ),
+                      const Divider(color: Colors.white12, height: 1),
+                      SwitchListTile(
+                        activeColor: const Color(0xFFE50914),
+                        title: const Text('自動連續播放下一段 / 下一集',
+                            style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
+                        subtitle: const Text('分段或整集播畢前浮現 5 秒倒數並自動續播',
+                            style: TextStyle(color: Colors.white60, fontSize: 12)),
+                        value: _settingsManager.autoPlayNext,
+                        onChanged: (val) => _settingsManager.setAutoPlayNext(val),
                       ),
                       const Divider(color: Colors.white12, height: 1),
                       ListTile(
@@ -1164,6 +1315,123 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
     );
   }
 
+  Widget _buildAutoPlayHud() {
+    final nextTarget = _nextPlayTargetLabel;
+    final progress = (5 - _autoPlayCountdown) / 5.0;
+
+    return Container(
+      constraints: const BoxConstraints(maxWidth: 360),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: const Color(0xFF141414).withValues(alpha: 0.95),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white24, width: 1.2),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.7),
+            blurRadius: 18,
+            spreadRadius: 2,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Circular Countdown Timer
+          SizedBox(
+            width: 36,
+            height: 36,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                CircularProgressIndicator(
+                  value: progress.clamp(0.0, 1.0),
+                  strokeWidth: 3.2,
+                  backgroundColor: Colors.white24,
+                  valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFE50914)),
+                ),
+                Text(
+                  '$_autoPlayCountdown',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          // Target info
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: const [
+                    Icon(Icons.bolt, color: Color(0xFFE50914), size: 14),
+                    SizedBox(width: 4),
+                    Text(
+                      '即將自動播放',
+                      style: TextStyle(
+                        color: Color(0xFFE50914),
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  nextTarget,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 10),
+          // Action Buttons
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFE50914),
+              foregroundColor: Colors.white,
+              elevation: 0,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            onPressed: _proceedAutoPlayNext,
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.play_arrow, size: 16),
+                SizedBox(width: 2),
+                Text('播放', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+              ],
+            ),
+          ),
+          const SizedBox(width: 4),
+          IconButton(
+            tooltip: '取消自動播放',
+            icon: const Icon(Icons.close, color: Colors.white70, size: 20),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+            onPressed: () => _cancelAutoPlayCountdown(permanentForThisPart: true),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _triggerDownloadCurrentPart() {
     final parts = widget.episode.parts;
     if (parts.isEmpty || _currentPartIndex >= parts.length) return;
@@ -1232,7 +1500,7 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
 
   @override
   Widget build(BuildContext context) {
-    final parts = widget.episode.parts;
+    final parts = _currentEpisode.parts;
     final currentPart = parts.isNotEmpty && _currentPartIndex < parts.length
         ? parts[_currentPartIndex]
         : null;
@@ -1247,14 +1515,14 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
         : 0.0;
 
     final isCurPartDownloaded = currentPart != null &&
-        _downloadManager.isDownloaded(widget.episode.id, currentPart.label,
-            showId: widget.episode.showId, title: widget.episode.title);
+        _downloadManager.isDownloaded(_currentEpisode.id, currentPart.label,
+            showId: _currentEpisode.showId, title: _currentEpisode.title);
     final isCurPartDownloading = currentPart != null &&
-        _downloadManager.isDownloading(widget.episode.id, currentPart.label,
-            showId: widget.episode.showId, title: widget.episode.title);
+        _downloadManager.isDownloading(_currentEpisode.id, currentPart.label,
+            showId: _currentEpisode.showId, title: _currentEpisode.title);
     final downloadItem = currentPart != null
-        ? _downloadManager.getItem(widget.episode.id, currentPart.label,
-            showId: widget.episode.showId, title: widget.episode.title)
+        ? _downloadManager.getItem(_currentEpisode.id, currentPart.label,
+            showId: _currentEpisode.showId, title: _currentEpisode.title)
         : null;
 
     if (_pipManager.isInPipMode.value) {
@@ -1538,7 +1806,7 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          widget.episode.title,
+                                          _currentEpisode.title,
                                           style: const TextStyle(
                                             color: Colors.white,
                                             fontSize: 16,
@@ -1676,7 +1944,7 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
                                     onPressed: () {
                                       showShareDialog(
                                         context,
-                                        widget.episode,
+                                        _currentEpisode,
                                         partIndex: _currentPartIndex,
                                         localFilePath: widget.localFile?.path,
                                       );
@@ -1687,7 +1955,7 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
                                   ListenableBuilder(
                                     listenable: _favoritesManager,
                                     builder: (context, _) {
-                                      final isFav = _favoritesManager.isFavorite(widget.episode.id);
+                                      final isFav = _favoritesManager.isFavorite(_currentEpisode.id);
                                       return IconButton(
                                         tooltip: isFav ? '已收藏 (點擊取消)' : '加入收藏',
                                         icon: Icon(
@@ -1696,7 +1964,7 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
                                           size: 22,
                                         ),
                                         onPressed: () async {
-                                          final added = await _favoritesManager.toggleFavorite(widget.episode);
+                                          final added = await _favoritesManager.toggleFavorite(_currentEpisode);
                                           HapticFeedback.lightImpact();
                                           if (context.mounted) {
                                             ScaffoldMessenger.of(context).removeCurrentSnackBar();
@@ -1869,6 +2137,18 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
                     ),
                   ),
                 ),
+
+                // Floating Auto-Play Next Part/Episode Countdown HUD
+                if (_showAutoPlayHud && !_isScreenLocked)
+                  Positioned(
+                    bottom: _showOsd ? 110 : 36,
+                    left: 20,
+                    right: 20,
+                    child: Align(
+                      alignment: Alignment.bottomRight,
+                      child: _buildAutoPlayHud(),
+                    ),
+                  ),
 
                 // Screen Locked Unlock Hint Overlay
                 if (_isScreenLocked)

@@ -38,6 +38,12 @@ const playerStreamStatus = isBrowser ? document.getElementById("player-stream-st
 const playerPartsNav = isBrowser ? document.getElementById("player-parts-nav") : null;
 const playerResumeToast = isBrowser ? document.getElementById("player-resume-toast") : null;
 
+// Auto-Play Next Part/Episode State
+let autoPlayNextEnabled = typeof localStorage !== "undefined" ? localStorage.getItem("dtv_autoplay_next") !== "false" : true;
+let autoPlayTimer = null;
+let autoPlayCountdown = 5;
+let autoPlayDismissed = false;
+
 const episodesGrid = isBrowser ? document.getElementById("episodes-grid") : null;
 const episodeCountBadge = isBrowser ? document.getElementById("episode-count-badge") : null;
 
@@ -361,13 +367,23 @@ function initPlayer() {
       }
     });
 
-    // Save resume position periodically (every 2 seconds)
+    // Save resume position periodically (every 2 seconds) & trigger auto-play countdown
     player.addEventListener("timeupdate", () => {
       const now = Date.now();
       if (now - lastSaveTime > 2000) {
         lastSaveTime = now;
         if (activeEpisode && player && !player.paused) {
           saveResume(activeEpisode.id, activePartIndex, player.currentTime, player.duration);
+        }
+      }
+
+      // Auto-play next part countdown 5.5s before end
+      if (player && player.duration > 8 && !player.paused) {
+        const remaining = player.duration - player.currentTime;
+        if (remaining <= 5.5 && !autoPlayDismissed && !autoPlayTimer && autoPlayNextEnabled && !isScreenLocked) {
+          startAutoPlayCountdown();
+        } else if (remaining > 6.5 && autoPlayTimer) {
+          cancelAutoPlay(false);
         }
       }
     });
@@ -396,11 +412,8 @@ function initPlayer() {
         return;
       }
 
-      if (activeEpisode && activeEpisode.parts && activePartIndex < activeEpisode.parts.length - 1) {
-        if (playerStreamStatus) playerStreamStatus.textContent = `播放完成，即將自動播放 Part ${activePartIndex + 2}...`;
-        setTimeout(() => {
-          playPart(activeEpisode, activePartIndex + 1, true, true);
-        }, 1200);
+      if (autoPlayNextEnabled && !isScreenLocked) {
+        proceedAutoPlayNext();
       } else {
         if (playerStreamStatus) playerStreamStatus.textContent = "全集播放完畢";
       }
@@ -454,6 +467,8 @@ function playPart(episode, partIndex = 0, autoPlay = true, fromExplicitPartClick
   if (!episode || !episode.parts || !episode.parts.length) return;
   activeEpisode = episode;
   hideResumeToast();
+  cancelAutoPlay(false);
+  autoPlayDismissed = false;
 
   // If clicked episode card without specifying a part, check localStorage resume point
   if (!fromExplicitPartClick) {
@@ -1985,6 +2000,132 @@ function setupScreenLock() {
   }
 }
 
+// Auto-Play Next Part/Episode State Machine & HUD
+function getNextPlayTarget() {
+  if (!activeEpisode) return null;
+  if (activeEpisode.parts && activePartIndex < activeEpisode.parts.length - 1) {
+    const nextPart = activeEpisode.parts[activePartIndex + 1];
+    return {
+      type: "part",
+      title: `下一段：${nextPart.label || `Part ${activePartIndex + 2}`}`,
+      episode: activeEpisode,
+      partIndex: activePartIndex + 1,
+    };
+  }
+  // Check next episode in catalog
+  const eps = catalog?.episodes || [];
+  const curIdx = eps.findIndex(e => e.id === activeEpisode.id);
+  if (curIdx >= 0 && curIdx + 1 < eps.length) {
+    const nextEp = eps[curIdx + 1];
+    return {
+      type: "episode",
+      title: `下一集：${nextEp.title}`,
+      episode: nextEp,
+      partIndex: 0,
+    };
+  }
+  return null;
+}
+
+function startAutoPlayCountdown() {
+  if (!autoPlayNextEnabled || isScreenLocked || autoPlayDismissed || autoPlayTimer) return;
+  const target = getNextPlayTarget();
+  if (!target) return;
+
+  const card = document.getElementById("autoplay-next-card");
+  const numEl = document.getElementById("ap-countdown-num");
+  const titleEl = document.getElementById("ap-next-title");
+  const circleEl = document.getElementById("ap-circle-progress");
+  if (!card) return;
+
+  if (titleEl) titleEl.textContent = target.title;
+  autoPlayCountdown = 5;
+  if (numEl) numEl.textContent = "5";
+  if (circleEl) circleEl.setAttribute("stroke-dasharray", "100, 100");
+  card.style.display = "flex";
+
+  if (autoPlayTimer) clearInterval(autoPlayTimer);
+  autoPlayTimer = setInterval(() => {
+    autoPlayCountdown--;
+    if (numEl) numEl.textContent = String(Math.max(0, autoPlayCountdown));
+    if (circleEl) {
+      const pct = Math.max(0, (autoPlayCountdown / 5) * 100);
+      circleEl.setAttribute("stroke-dasharray", `${pct}, 100`);
+    }
+
+    if (autoPlayCountdown <= 0) {
+      clearInterval(autoPlayTimer);
+      autoPlayTimer = null;
+      proceedAutoPlayNext();
+    }
+  }, 1000);
+}
+
+function cancelAutoPlay(permanent = true) {
+  if (autoPlayTimer) {
+    clearInterval(autoPlayTimer);
+    autoPlayTimer = null;
+  }
+  const card = document.getElementById("autoplay-next-card");
+  if (card) card.style.display = "none";
+  if (permanent) {
+    autoPlayDismissed = true;
+  }
+}
+
+function proceedAutoPlayNext() {
+  const target = getNextPlayTarget();
+  cancelAutoPlay(false);
+  if (target) {
+    if (playerStreamStatus) playerStreamStatus.textContent = `自動為您播放：${target.title}...`;
+    playPart(target.episode, target.partIndex, true, true);
+  } else {
+    if (playerStreamStatus) playerStreamStatus.textContent = "全集播放完畢";
+  }
+}
+
+function toggleAutoPlay() {
+  autoPlayNextEnabled = !autoPlayNextEnabled;
+  try {
+    localStorage.setItem("dtv_autoplay_next", autoPlayNextEnabled ? "true" : "false");
+  } catch (_) {}
+  updateAutoPlayBtn();
+  if (!autoPlayNextEnabled) {
+    cancelAutoPlay(true);
+  }
+}
+
+function updateAutoPlayBtn() {
+  const labelEl = document.getElementById("autoplay-toggle-label");
+  const iconEl = document.getElementById("autoplay-toggle-icon");
+  const btn = document.getElementById("autoplay-toggle-btn");
+  if (labelEl) {
+    labelEl.textContent = autoPlayNextEnabled ? "連播: 開" : "連播: 關";
+  }
+  if (iconEl) {
+    iconEl.textContent = autoPlayNextEnabled ? "⚡" : "⏸";
+  }
+  if (btn) {
+    btn.style.color = autoPlayNextEnabled ? "#e50914" : "#ffffff";
+  }
+}
+
+function setupAutoPlay() {
+  updateAutoPlayBtn();
+  const toggleBtn = document.getElementById("autoplay-toggle-btn");
+  if (toggleBtn) {
+    toggleBtn.addEventListener("click", () => toggleAutoPlay());
+  }
+  const playBtn = document.getElementById("ap-play-btn");
+  if (playBtn) {
+    playBtn.addEventListener("click", () => proceedAutoPlayNext());
+  }
+  const cancelBtn = document.getElementById("ap-cancel-btn");
+  if (cancelBtn) {
+    cancelBtn.addEventListener("click", () => cancelAutoPlay(true));
+  }
+}
+
 // Initialization on DOMContentLoaded
 if (typeof window !== "undefined") {
   window.addEventListener("DOMContentLoaded", () => {
@@ -2001,6 +2142,7 @@ if (typeof window !== "undefined") {
     setupFavorites();
     setupHistory();
     setupScreenLock();
+    setupAutoPlay();
     setupSleepTimerModal();
     loadCatalog();
   });
@@ -2044,6 +2186,12 @@ if (typeof window !== "undefined") {
   window.lockScreen = lockScreen;
   window.unlockScreen = unlockScreen;
   window.setupScreenLock = setupScreenLock;
+  window.getNextPlayTarget = getNextPlayTarget;
+  window.startAutoPlayCountdown = startAutoPlayCountdown;
+  window.cancelAutoPlay = cancelAutoPlay;
+  window.proceedAutoPlayNext = proceedAutoPlayNext;
+  window.toggleAutoPlay = toggleAutoPlay;
+  window.setupAutoPlay = setupAutoPlay;
   window.setSleepTimer = setSleepTimer;
   window.setupSleepTimerModal = setupSleepTimerModal;
   window.saveResume = saveResume;
@@ -2096,6 +2244,12 @@ if (typeof module !== "undefined" && module.exports) {
     lockScreen,
     unlockScreen,
     setupScreenLock,
+    getNextPlayTarget,
+    startAutoPlayCountdown,
+    cancelAutoPlay,
+    proceedAutoPlayNext,
+    toggleAutoPlay,
+    setupAutoPlay,
     setSleepTimer,
     setupSleepTimerModal,
     saveResume,

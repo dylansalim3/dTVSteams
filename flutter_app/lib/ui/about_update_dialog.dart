@@ -293,6 +293,16 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                     onChanged: (val) => _settingsManager.setKeepScreenAwake(val),
                   ),
                   const Divider(color: Colors.white12, height: 1),
+                  SwitchListTile(
+                    activeColor: const Color(0xFFE50914),
+                    title: const Text('自動連續播放下一段 / 下一集',
+                        style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
+                    subtitle: const Text('分段或整集播畢前浮現 5 秒倒數並自動續播',
+                        style: TextStyle(color: Colors.white60, fontSize: 12)),
+                    value: _settingsManager.autoPlayNext,
+                    onChanged: (val) => _settingsManager.setAutoPlayNext(val),
+                  ),
+                  const Divider(color: Colors.white12, height: 1),
                   ListTile(
                     leading: Icon(
                       _sleepTimerManager.isActive ? Icons.alarm_on : Icons.timer_outlined,

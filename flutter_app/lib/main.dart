@@ -493,7 +493,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => NativePlayerScreen(episode: ep, initialPartIndex: targetPartIndex),
+        builder: (_) => NativePlayerScreen(
+          episode: ep,
+          initialPartIndex: targetPartIndex,
+          playlist: displayEpisodes,
+        ),
       ),
     );
   }

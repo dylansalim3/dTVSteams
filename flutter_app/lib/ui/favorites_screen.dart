@@ -39,6 +39,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         builder: (_) => NativePlayerScreen(
           episode: ep,
           initialPartIndex: partIndex,
+          playlist: _favoritesManager.favoriteEpisodes,
         ),
       ),
     );

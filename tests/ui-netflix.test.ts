@@ -465,5 +465,51 @@ describe("YouTube Web App UI & Video.js Compliance", () => {
     expect(playerContainer.classList.contains("player-screen-locked")).toBe(true);
     win.toggleScreenLock();
     expect(playerContainer.classList.contains("player-screen-locked")).toBe(false);
+
+    // Verify Auto-Play Next Part/Episode Countdown HUD & Toggle (Feature 9)
+    const autoPlayBtn = win.document.getElementById("autoplay-toggle-btn");
+    const autoPlayLabel = win.document.getElementById("autoplay-toggle-label");
+    const autoPlayCard = win.document.getElementById("autoplay-next-card");
+    const apPlayBtn = win.document.getElementById("ap-play-btn");
+    const apCancelBtn = win.document.getElementById("ap-cancel-btn");
+    const apNextTitle = win.document.getElementById("ap-next-title");
+    const apCountdownNum = win.document.getElementById("ap-countdown-num");
+
+    expect(autoPlayBtn).not.toBeNull();
+    expect(autoPlayLabel).not.toBeNull();
+    expect(autoPlayCard).not.toBeNull();
+    expect(apPlayBtn).not.toBeNull();
+    expect(apCancelBtn).not.toBeNull();
+    expect(apNextTitle).not.toBeNull();
+    expect(apCountdownNum).not.toBeNull();
+
+    expect(typeof win.startAutoPlayCountdown).toBe("function");
+    expect(typeof win.cancelAutoPlay).toBe("function");
+    expect(typeof win.proceedAutoPlayNext).toBe("function");
+    expect(typeof win.toggleAutoPlay).toBe("function");
+
+    // Toggle auto-play
+    expect(autoPlayLabel.textContent).toBe("連播: 開");
+    win.toggleAutoPlay();
+    expect(autoPlayLabel.textContent).toBe("連播: 關");
+    win.toggleAutoPlay();
+    expect(autoPlayLabel.textContent).toBe("連播: 開");
+
+    // Start auto-play countdown with multi-part episode
+    const multiPartEp = {
+      id: "ep-auto-test",
+      title: "【綜藝玩很大】宜蘭 溫泉大作戰",
+      date: "2026-11-23",
+      parts: [{ label: "Part 1" }, { label: "Part 2" }]
+    };
+    win.playPart(multiPartEp, 0, false, true);
+    win.startAutoPlayCountdown();
+    expect(autoPlayCard.style.display).toBe("flex");
+    expect(apNextTitle.textContent).toContain("Part 2");
+    expect(apCountdownNum.textContent).toBe("5");
+
+    // Cancel auto-play
+    win.cancelAutoPlay(true);
+    expect(autoPlayCard.style.display).toBe("none");
   });
 });

@@ -108,6 +108,24 @@
             <span>點擊解鎖螢幕</span>
           </button>
         </div>
+        <!-- Auto-Play Next Part/Episode Countdown Card Overlay -->
+        <div id="autoplay-next-card" class="yt-autoplay-card" style="display:none;" role="dialog" aria-label="即將自動播放下一段">
+          <div class="ap-countdown-circle">
+            <svg viewBox="0 0 36 36" class="ap-circular-chart">
+              <path class="ap-circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+              <path id="ap-circle-progress" class="ap-circle" stroke-dasharray="100, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+            </svg>
+            <span id="ap-countdown-num" class="ap-countdown-num">5</span>
+          </div>
+          <div class="ap-info">
+            <span class="ap-badge-label">⚡ 即將自動播放</span>
+            <span id="ap-next-title" class="ap-title">下一段：Part 2</span>
+          </div>
+          <div class="ap-actions">
+            <button id="ap-play-btn" class="ap-btn primary" title="立即播放">立即播放 ▶</button>
+            <button id="ap-cancel-btn" class="ap-btn cancel" title="取消">取消 ✕</button>
+          </div>
+        </div>
       </div>
 
       <!-- Video Details & Part Selector Under Player -->
@@ -165,6 +183,10 @@
             <button class="yt-btn yt-btn-secondary" id="screen-lock-btn" aria-label="螢幕鎖定防誤觸" title="螢幕鎖定防誤觸 (Screen Lock)">
               <span id="screen-lock-icon" style="font-size: 14px;">🔒</span>
               <span id="screen-lock-label">鎖定</span>
+            </button>
+            <button class="yt-btn yt-btn-secondary" id="autoplay-toggle-btn" aria-label="自動連續播放切換" title="自動連續播放切換 (Auto-play Next)">
+              <span id="autoplay-toggle-icon" style="font-size: 14px;">⚡</span>
+              <span id="autoplay-toggle-label">連播: 開</span>
             </button>
           </div>
         </div>
