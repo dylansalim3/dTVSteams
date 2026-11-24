@@ -26,8 +26,24 @@
 
     <div class="yt-header-center">
       <div class="yt-search-box">
-        <input type="search" id="q" placeholder="搜尋集數、日期、地名 (例如: 嘉義, 11-08)..." aria-label="搜尋集數">
+        <input type="search" id="q" placeholder="搜尋集數、日期、地名 (例如: 嘉義, 11-08)..." aria-label="搜尋集數" autocomplete="off">
         <button id="search-clear-btn" class="yt-search-clear" aria-label="清除搜尋" style="display:none;">✕</button>
+        <!-- Search Suggestions & History Dropdown -->
+        <div id="search-dropdown" class="yt-search-dropdown" style="display:none;" role="region" aria-label="搜尋建議與歷史">
+          <div class="yt-dropdown-section" id="search-history-section">
+            <div class="yt-dropdown-header">
+              <span>🕒 最近搜尋</span>
+              <button type="button" id="clear-all-history-btn" class="yt-clear-link">全部清除</button>
+            </div>
+            <div class="yt-chips-wrap" id="search-history-chips"></div>
+          </div>
+          <div class="yt-dropdown-section" id="hot-tags-section">
+            <div class="yt-dropdown-header">
+              <span>🔥 熱門推薦標籤</span>
+            </div>
+            <div class="yt-chips-wrap" id="hot-tags-chips"></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -230,8 +246,29 @@
     <!-- Simple Episode List Section (YouTube Grid) -->
     <section class="yt-list-section" id="episodes-section" aria-label="集數列表">
       <div class="yt-section-header">
-        <h2 class="yt-section-title">全部集數列表</h2>
-        <span class="yt-item-count" id="episode-count-badge">共 10 集</span>
+        <div class="yt-title-group">
+          <h2 class="yt-section-title">全部集數列表</h2>
+          <span class="yt-item-count" id="episode-count-badge">共 10 集</span>
+        </div>
+        <div class="yt-filter-controls">
+          <button class="yt-sort-btn" id="sort-order-btn" aria-label="切換集數排序" title="切換新到舊或舊到新">
+            <span id="sort-icon">⬇</span>
+            <span id="sort-label">新到舊</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Year Filter Chips Bar -->
+      <div class="yt-year-bar" id="year-bar" role="toolbar" aria-label="年份速查">
+        <div class="yt-year-chips" id="year-chips-bar" role="group" aria-label="依年份速查">
+          <button class="yt-year-chip active" data-year="all">全部</button>
+          <button class="yt-year-chip" data-year="2026">2026</button>
+          <button class="yt-year-chip" data-year="2025">2025</button>
+          <button class="yt-year-chip" data-year="2024">2024</button>
+          <button class="yt-year-chip" data-year="2023">2023</button>
+          <button class="yt-year-chip" data-year="2022">2022</button>
+          <button class="yt-year-chip" data-year="classic">經典懷舊</button>
+        </div>
       </div>
 
       <div class="yt-episodes-grid" id="episodes-grid">

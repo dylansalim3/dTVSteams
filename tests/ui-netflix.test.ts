@@ -511,5 +511,86 @@ describe("YouTube Web App UI & Video.js Compliance", () => {
     // Cancel auto-play
     win.cancelAutoPlay(true);
     expect(autoPlayCard.style.display).toBe("none");
+
+    // Verify Year Filter Chips, Chronological Sort & Search History (Feature 10)
+    const yearChipsBar = win.document.getElementById("year-chips-bar");
+    const sortOrderBtn = win.document.getElementById("sort-order-btn");
+    const sortIcon = win.document.getElementById("sort-icon");
+    const sortLabel = win.document.getElementById("sort-label");
+    const searchDropdown = win.document.getElementById("search-dropdown");
+    const searchHistorySection = win.document.getElementById("search-history-section");
+    const searchHistoryChips = win.document.getElementById("search-history-chips");
+    const hotTagsChips = win.document.getElementById("hot-tags-chips");
+
+    expect(yearChipsBar).not.toBeNull();
+    expect(sortOrderBtn).not.toBeNull();
+    expect(sortIcon).not.toBeNull();
+    expect(sortLabel).not.toBeNull();
+    expect(searchDropdown).not.toBeNull();
+    expect(searchHistorySection).not.toBeNull();
+    expect(searchHistoryChips).not.toBeNull();
+    expect(hotTagsChips).not.toBeNull();
+
+    // Verify exported functions
+    expect(typeof win.matchesYear).toBe("function");
+    expect(typeof win.setYearFilter).toBe("function");
+    expect(typeof win.toggleSortOrder).toBe("function");
+    expect(typeof win.addSearchHistory).toBe("function");
+    expect(typeof win.removeSearchHistory).toBe("function");
+    expect(typeof win.clearSearchHistory).toBe("function");
+    expect(typeof win.getSearchHistory).toBe("function");
+
+    // Test matchesYear
+    const ep2026 = { title: "2026-11-20 台北", date: "2026-11-20" };
+    const ep2025 = { title: "2025-05-10 高雄", date: "2025-05-10" };
+    const epClassic = { title: "2019-08-01 經典回顧", date: "2019-08-01" };
+
+    expect(win.matchesYear(ep2026, "all")).toBe(true);
+    expect(win.matchesYear(ep2026, "2026")).toBe(true);
+    expect(win.matchesYear(ep2026, "2025")).toBe(false);
+    expect(win.matchesYear(epClassic, "classic")).toBe(true);
+    expect(win.matchesYear(ep2026, "classic")).toBe(false);
+
+    // Test Year Filtering on Grid
+    win.setYearFilter("2025");
+    const chip2025 = win.document.querySelector('.yt-year-chip[data-year="2025"]');
+    expect(chip2025.classList.contains("active")).toBe(true);
+
+    win.setYearFilter("all");
+    const chipAll = win.document.querySelector('.yt-year-chip[data-year="all"]');
+    expect(chipAll.classList.contains("active")).toBe(true);
+
+    // Test Chronological Sort Toggle
+    expect(sortLabel.textContent).toBe("新到舊");
+    win.toggleSortOrder();
+    expect(sortLabel.textContent).toBe("舊到新");
+    expect(sortIcon.textContent).toBe("⬆");
+    win.toggleSortOrder();
+    expect(sortLabel.textContent).toBe("新到舊");
+    expect(sortIcon.textContent).toBe("⬇");
+
+    // Test Search History and Hot Tags
+    win.clearSearchHistory();
+    expect(win.getSearchHistory().length).toBe(0);
+
+    win.addSearchHistory("澎湖");
+    win.addSearchHistory("KID");
+    win.addSearchHistory("憲哥");
+    let hist = win.getSearchHistory();
+    expect(hist.length).toBe(3);
+    expect(hist[0]).toBe("憲哥");
+
+    // Test deduplication
+    win.addSearchHistory("澎湖");
+    hist = win.getSearchHistory();
+    expect(hist[0]).toBe("澎湖");
+    expect(hist.length).toBe(3);
+
+    // Test remove and clear
+    win.removeSearchHistory("KID");
+    expect(win.getSearchHistory()).not.toContain("KID");
+
+    win.clearSearchHistory();
+    expect(win.getSearchHistory().length).toBe(0);
   });
 });

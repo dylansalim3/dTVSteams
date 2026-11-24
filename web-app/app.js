@@ -44,6 +44,12 @@ let autoPlayTimer = null;
 let autoPlayCountdown = 5;
 let autoPlayDismissed = false;
 
+// Year Filter & Chronological Sort & Search History State (Feature 10)
+let selectedYear = "all";
+let isSortAscending = false;
+const SEARCH_HISTORY_KEY = "dtv_search_history";
+const DEFAULT_HOT_TAGS = ['憲哥', 'KID', '澎湖', '飢餓遊戲', '金鐘', '日本', '週年', '黃隊'];
+
 const episodesGrid = isBrowser ? document.getElementById("episodes-grid") : null;
 const episodeCountBadge = isBrowser ? document.getElementById("episode-count-badge") : null;
 
@@ -928,17 +934,81 @@ function renderGrid(list) {
   }
 }
 
-// Live Search Filter
-function handleSearch() {
+// Year Filter & Search History & Chronological Sorting (Feature 10)
+function getSearchHistory() {
+  try {
+    const raw = localStorage.getItem(SEARCH_HISTORY_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch (_) {
+    return [];
+  }
+}
+
+function addSearchHistory(query) {
+  const trimmed = (query || "").trim();
+  if (!trimmed) return;
+  let list = getSearchHistory();
+  list = list.filter(item => item.toLowerCase() !== trimmed.toLowerCase());
+  list.unshift(trimmed);
+  if (list.length > 10) list = list.slice(0, 10);
+  try {
+    localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(list));
+  } catch (_) {}
+  renderSearchDropdown();
+}
+
+function removeSearchHistory(query) {
+  let list = getSearchHistory();
+  list = list.filter(item => item !== query);
+  try {
+    localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(list));
+  } catch (_) {}
+  renderSearchDropdown();
+}
+
+function clearSearchHistory() {
+  try {
+    localStorage.removeItem(SEARCH_HISTORY_KEY);
+  } catch (_) {}
+  renderSearchDropdown();
+}
+
+function matchesYear(ep, year) {
+  if (!year || year === "all") return true;
+  const date = (ep.date || "").trim();
+  const title = (ep.title || "").trim();
+  if (year === "classic") {
+    const yearMatch = date.match(/(20\d\d)/) || title.match(/(20\d\d)/);
+    if (yearMatch) {
+      const y = parseInt(yearMatch[1], 10);
+      return y <= 2021;
+    }
+    return false;
+  }
+  return date.startsWith(year) || title.includes(year);
+}
+
+function compareEpisodes(a, b) {
+  const dateA = a.date || "";
+  const dateB = b.date || "";
+  if (isSortAscending) {
+    return dateA.localeCompare(dateB);
+  } else {
+    return dateB.localeCompare(dateA);
+  }
+}
+
+function applyFilters() {
   const query = (searchInput?.value || "").trim().toLowerCase();
   if (searchClearBtn) {
     searchClearBtn.style.display = query.length > 0 ? "block" : "none";
   }
 
-  if (!query) {
-    filteredEpisodes = [...catalog.episodes];
-  } else {
-    filteredEpisodes = catalog.episodes.filter((ep) => {
+  const baseEpisodes = isFavoritesOnlyFilter ? getFavorites() : (catalog?.episodes || []);
+  let list = [...baseEpisodes];
+
+  if (query) {
+    list = list.filter((ep) => {
       const title = (ep.title || "").toLowerCase();
       const date = (ep.date || "").toLowerCase();
       const overview = (ep.overview || "").toLowerCase();
@@ -947,7 +1017,154 @@ function handleSearch() {
     });
   }
 
+  if (selectedYear !== "all") {
+    list = list.filter(ep => matchesYear(ep, selectedYear));
+  }
+
+  list.sort(compareEpisodes);
+  filteredEpisodes = list;
   renderGrid(filteredEpisodes);
+}
+
+function setYearFilter(year) {
+  selectedYear = year;
+  if (isBrowser) {
+    document.querySelectorAll(".yt-year-chip").forEach((btn) => {
+      btn.classList.toggle("active", btn.getAttribute("data-year") === year);
+    });
+  }
+  applyFilters();
+}
+
+function toggleSortOrder() {
+  isSortAscending = !isSortAscending;
+  if (isBrowser) {
+    const sortIcon = document.getElementById("sort-icon");
+    const sortLabel = document.getElementById("sort-label");
+    if (sortIcon) sortIcon.textContent = isSortAscending ? "⬆" : "⬇";
+    if (sortLabel) sortLabel.textContent = isSortAscending ? "舊到新" : "新到舊";
+  }
+  applyFilters();
+}
+
+function renderSearchDropdown() {
+  if (!isBrowser) return;
+  const historyChips = document.getElementById("search-history-chips");
+  const historySection = document.getElementById("search-history-section");
+  const hotTagsChips = document.getElementById("hot-tags-chips");
+
+  if (historyChips && historySection) {
+    const history = getSearchHistory();
+    historyChips.innerHTML = "";
+    if (history.length === 0) {
+      historySection.style.display = "none";
+    } else {
+      historySection.style.display = "block";
+      history.forEach((q) => {
+        const chip = document.createElement("span");
+        chip.className = "yt-search-chip";
+        chip.innerHTML = `
+          <span class="yt-chip-text">${q}</span>
+          <button type="button" class="yt-chip-del" aria-label="刪除搜尋紀錄 ${q}">✕</button>
+        `;
+        chip.querySelector(".yt-chip-text").onclick = (e) => {
+          e.stopPropagation();
+          if (searchInput) searchInput.value = q;
+          addSearchHistory(q);
+          applyFilters();
+          closeSearchDropdown();
+        };
+        chip.querySelector(".yt-chip-del").onclick = (e) => {
+          e.stopPropagation();
+          removeSearchHistory(q);
+        };
+        historyChips.appendChild(chip);
+      });
+    }
+  }
+
+  if (hotTagsChips) {
+    hotTagsChips.innerHTML = "";
+    DEFAULT_HOT_TAGS.forEach((tag) => {
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "yt-hot-chip";
+      chip.textContent = tag;
+      chip.onclick = (e) => {
+        e.stopPropagation();
+        if (searchInput) searchInput.value = tag;
+        addSearchHistory(tag);
+        applyFilters();
+        closeSearchDropdown();
+      };
+      hotTagsChips.appendChild(chip);
+    });
+  }
+}
+
+function openSearchDropdown() {
+  const searchDropdown = document.getElementById("search-dropdown");
+  if (searchDropdown) {
+    renderSearchDropdown();
+    searchDropdown.style.display = "flex";
+  }
+}
+
+function closeSearchDropdown() {
+  const searchDropdown = document.getElementById("search-dropdown");
+  if (searchDropdown) {
+    searchDropdown.style.display = "none";
+  }
+}
+
+function setupSearchAndFilters() {
+  if (!isBrowser) return;
+
+  if (searchInput) {
+    searchInput.addEventListener("focus", openSearchDropdown);
+    searchInput.addEventListener("click", openSearchDropdown);
+    searchInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        const q = searchInput.value.trim();
+        if (q) addSearchHistory(q);
+        applyFilters();
+        closeSearchDropdown();
+      }
+    });
+  }
+
+  const clearAllHistBtn = document.getElementById("clear-all-history-btn");
+  if (clearAllHistBtn) {
+    clearAllHistBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      clearSearchHistory();
+    });
+  }
+
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".yt-search-box")) {
+      closeSearchDropdown();
+    }
+  });
+
+  const sortBtn = document.getElementById("sort-order-btn");
+  if (sortBtn) {
+    sortBtn.addEventListener("click", toggleSortOrder);
+  }
+
+  document.querySelectorAll(".yt-year-chip").forEach((chip) => {
+    chip.addEventListener("click", () => {
+      const year = chip.getAttribute("data-year") || "all";
+      setYearFilter(year);
+    });
+  });
+
+  renderSearchDropdown();
+}
+
+// Live Search Filter
+function handleSearch() {
+  applyFilters();
 }
 
 // Load Catalog Data
@@ -986,7 +1203,7 @@ async function loadCatalog() {
   filteredEpisodes = [...catalog.episodes];
   if (catalogStatus) catalogStatus.textContent = `已同步 (${catalog.episodes.length} 集)`;
 
-  renderGrid(filteredEpisodes);
+  applyFilters();
 
   // Stage episode (with deep-link query parameter support: ?ep=...&part=...)
   let targetEpisode = catalog.episodes[0];
@@ -1042,7 +1259,7 @@ async function loadNextPage() {
     filteredEpisodes = [...catalog.episodes];
     currentCatalogPage = nextPage;
 
-    renderGrid(filteredEpisodes);
+    applyFilters();
 
     if (loadMoreText) {
       if (currentCatalogPage >= TOTAL_SOURCE_PAGES) {
@@ -1764,10 +1981,10 @@ function setupFavorites() {
       filterBtn.classList.toggle("active", isFavoritesOnlyFilter);
       if (isFavoritesOnlyFilter) {
         showSleepToast("篩選模式：我的收藏");
-        renderFavoritesGrid();
+        applyFilters();
       } else {
         showSleepToast("已切換回完整集數清單");
-        renderGrid(catalog.episodes);
+        applyFilters();
       }
     });
   }
@@ -2144,6 +2361,7 @@ if (typeof window !== "undefined") {
     setupScreenLock();
     setupAutoPlay();
     setupSleepTimerModal();
+    setupSearchAndFilters();
     loadCatalog();
   });
 }
@@ -2155,6 +2373,18 @@ if (typeof window !== "undefined") {
   window.playPart = playPart;
   window.renderGrid = renderGrid;
   window.handleSearch = handleSearch;
+  window.applyFilters = applyFilters;
+  window.matchesYear = matchesYear;
+  window.compareEpisodes = compareEpisodes;
+  window.setYearFilter = setYearFilter;
+  window.toggleSortOrder = toggleSortOrder;
+  window.getSearchHistory = getSearchHistory;
+  window.addSearchHistory = addSearchHistory;
+  window.removeSearchHistory = removeSearchHistory;
+  window.clearSearchHistory = clearSearchHistory;
+  window.setupSearchAndFilters = setupSearchAndFilters;
+  window.DEFAULT_HOT_TAGS = DEFAULT_HOT_TAGS;
+  window.SEARCH_HISTORY_KEY = SEARCH_HISTORY_KEY;
   window.resolveStreamUrl = resolveStreamUrl;
   window.resolveDirectStream = resolveDirectStream;
   window.getDownloadFilename = getDownloadFilename;
@@ -2213,6 +2443,18 @@ if (typeof module !== "undefined" && module.exports) {
     playPart,
     renderGrid,
     handleSearch,
+    applyFilters,
+    matchesYear,
+    compareEpisodes,
+    setYearFilter,
+    toggleSortOrder,
+    getSearchHistory,
+    addSearchHistory,
+    removeSearchHistory,
+    clearSearchHistory,
+    setupSearchAndFilters,
+    DEFAULT_HOT_TAGS,
+    SEARCH_HISTORY_KEY,
     resolveStreamUrl,
     resolveDirectStream,
     getDownloadFilename,

@@ -7,6 +7,7 @@ import 'catalog/show_channel.dart';
 import 'services/download_manager.dart';
 import 'services/favorites_manager.dart';
 import 'services/playback_history_manager.dart';
+import 'services/search_history_manager.dart';
 import 'services/update_manager.dart';
 import 'ui/about_update_dialog.dart';
 import 'ui/downloads_screen.dart';
@@ -68,14 +69,18 @@ class _HomeScreenState extends State<HomeScreen> {
   String? refreshStatus;
   CatalogEpisode? selectedEpisode;
 
-  // Search state (Category pills removed per user request)
+  // Search & Filter state
   String searchQuery = '';
+  String selectedYear = '全部';
+  bool isSortAscending = false;
+  static const List<String> yearOptions = ['全部', '2026', '2025', '2024', '2023', '2022', '經典懷舊'];
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final DownloadManager _downloadManager = DownloadManager();
   final PlaybackHistoryManager _historyManager = PlaybackHistoryManager();
   final UpdateManager _updateManager = UpdateManager();
   final FavoritesManager _favoritesManager = FavoritesManager();
+  final SearchHistoryManager _searchHistoryManager = SearchHistoryManager();
 
   @override
   void initState() {
@@ -88,6 +93,8 @@ class _HomeScreenState extends State<HomeScreen> {
     _updateManager.init();
     _favoritesManager.addListener(_onDownloadUpdate);
     _favoritesManager.init();
+    _searchHistoryManager.addListener(_onDownloadUpdate);
+    _searchHistoryManager.init();
     _loadCatalog();
     _checkRemoteUpdate();
   }
@@ -112,6 +119,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _historyManager.removeListener(_onDownloadUpdate);
     _updateManager.removeListener(_onDownloadUpdate);
     _favoritesManager.removeListener(_onDownloadUpdate);
+    _searchHistoryManager.removeListener(_onDownloadUpdate);
     _searchController.dispose();
     _scrollController.dispose();
     super.dispose();
@@ -526,20 +534,47 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  bool _matchesYear(CatalogEpisode ep, String year) {
+    if (year == '全部') return true;
+    if (year == '經典懷舊') {
+      final date = ep.date.trim();
+      if (date.length >= 4) {
+        final y = int.tryParse(date.substring(0, 4));
+        if (y != null && y <= 2021) return true;
+      }
+      final match = RegExp(r'(20\d\d)').firstMatch(ep.title);
+      if (match != null) {
+        final y = int.tryParse(match.group(1)!);
+        if (y != null && y <= 2021) return true;
+      }
+      return false;
+    }
+    return ep.date.startsWith(year) || ep.title.contains(year);
+  }
+
+  int _compareEpisodes(CatalogEpisode a, CatalogEpisode b) {
+    final res = CatalogParser.compareDateDescending(a, b);
+    return isSortAscending ? -res : res;
+  }
+
   List<CatalogEpisode> get filteredEpisodes {
-    if (searchQuery.isEmpty) return allEpisodes;
+    if (searchQuery.isEmpty && selectedYear == '全部') return allEpisodes;
     final q = searchQuery.toLowerCase();
     return allEpisodes.where((ep) {
-      final matchTitle = ep.title.toLowerCase().contains(q);
-      final matchDate = ep.date.toLowerCase().contains(q);
-      final matchOverview = ep.overview.toLowerCase().contains(q);
-      final matchTags = ep.tags.any((t) => t.toLowerCase().contains(q));
-      return matchTitle || matchDate || matchOverview || matchTags;
+      final matchSearch = searchQuery.isEmpty ||
+          ep.title.toLowerCase().contains(q) ||
+          ep.date.toLowerCase().contains(q) ||
+          ep.overview.toLowerCase().contains(q) ||
+          ep.tags.any((t) => t.toLowerCase().contains(q));
+      final matchYear = _matchesYear(ep, selectedYear);
+      return matchSearch && matchYear;
     }).toList();
   }
 
   List<CatalogEpisode> get displayEpisodes {
-    if (searchQuery.isNotEmpty) {
+    final isFiltering = searchQuery.isNotEmpty || selectedYear != '全部';
+
+    if (isFiltering) {
       final q = searchQuery.toLowerCase();
       final allKnown = <String, CatalogEpisode>{};
       for (final eps in _pageCache.values) {
@@ -551,14 +586,16 @@ class _HomeScreenState extends State<HomeScreen> {
         allKnown[ep.url] = ep;
       }
       final matched = allKnown.values.where((ep) {
-        final matchTitle = ep.title.toLowerCase().contains(q);
-        final matchDate = ep.date.toLowerCase().contains(q);
-        final matchOverview = ep.overview.toLowerCase().contains(q);
-        final matchTags = ep.tags.any((t) => t.toLowerCase().contains(q));
-        return matchTitle || matchDate || matchOverview || matchTags;
+        final matchSearch = searchQuery.isEmpty ||
+            ep.title.toLowerCase().contains(q) ||
+            ep.date.toLowerCase().contains(q) ||
+            ep.overview.toLowerCase().contains(q) ||
+            ep.tags.any((t) => t.toLowerCase().contains(q));
+        final matchYear = _matchesYear(ep, selectedYear);
+        return matchSearch && matchYear;
       }).toList();
 
-      matched.sort(CatalogParser.compareDateDescending);
+      matched.sort(_compareEpisodes);
 
       const pageSize = 10;
       final startIndex = (currentPage - 1) * pageSize;
@@ -569,12 +606,13 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     final paged = _pageCache[currentPage] ?? (currentPage == 1 ? allEpisodes : []);
-    final sorted = List<CatalogEpisode>.from(paged)..sort(CatalogParser.compareDateDescending);
+    final sorted = List<CatalogEpisode>.from(paged)..sort(_compareEpisodes);
     return sorted;
   }
 
   int get totalPages {
-    if (searchQuery.isNotEmpty) {
+    final isFiltering = searchQuery.isNotEmpty || selectedYear != '全部';
+    if (isFiltering) {
       final q = searchQuery.toLowerCase();
       final allKnown = <String, CatalogEpisode>{};
       for (final eps in _pageCache.values) {
@@ -586,11 +624,13 @@ class _HomeScreenState extends State<HomeScreen> {
         allKnown[ep.url] = ep;
       }
       final matchCount = allKnown.values.where((ep) {
-        final matchTitle = ep.title.toLowerCase().contains(q);
-        final matchDate = ep.date.toLowerCase().contains(q);
-        final matchOverview = ep.overview.toLowerCase().contains(q);
-        final matchTags = ep.tags.any((t) => t.toLowerCase().contains(q));
-        return matchTitle || matchDate || matchOverview || matchTags;
+        final matchSearch = searchQuery.isEmpty ||
+            ep.title.toLowerCase().contains(q) ||
+            ep.date.toLowerCase().contains(q) ||
+            ep.overview.toLowerCase().contains(q) ||
+            ep.tags.any((t) => t.toLowerCase().contains(q));
+        final matchYear = _matchesYear(ep, selectedYear);
+        return matchSearch && matchYear;
       }).length;
       return (matchCount / 10).ceil().clamp(1, 99);
     }
@@ -879,6 +919,12 @@ class _HomeScreenState extends State<HomeScreen> {
                             isDense: true,
                           ),
                           onChanged: (val) => setState(() { searchQuery = val.trim(); currentPage = 1; }),
+                          onSubmitted: (val) {
+                            final q = val.trim();
+                            if (q.isNotEmpty) {
+                              _searchHistoryManager.addQuery(q);
+                            }
+                          },
                         ),
                       ),
                       if (searchQuery.isNotEmpty)
@@ -891,6 +937,167 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                     ],
                   ),
+                ),
+              ),
+            ),
+
+            // Search History & Hot Suggestions Row
+            SliverToBoxAdapter(
+              child: ListenableBuilder(
+                listenable: _searchHistoryManager,
+                builder: (context, _) {
+                  final history = _searchHistoryManager.history;
+                  final hasHistory = history.isNotEmpty;
+
+                  return Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 2, 16, 2),
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          if (hasHistory) ...[
+                            const Text('🕒 最近: ', style: TextStyle(color: Colors.white38, fontSize: 11)),
+                            ...history.take(4).map((q) => Padding(
+                              padding: const EdgeInsets.only(right: 6.0),
+                              child: ActionChip(
+                                label: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(q, style: const TextStyle(color: Colors.white70, fontSize: 11)),
+                                    const SizedBox(width: 4),
+                                    GestureDetector(
+                                      onTap: () => _searchHistoryManager.removeQuery(q),
+                                      child: const Icon(Icons.close, size: 12, color: Colors.white38),
+                                    ),
+                                  ],
+                                ),
+                                backgroundColor: const Color(0xFF1E1E1E),
+                                side: const BorderSide(color: Colors.white12),
+                                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
+                                onPressed: () {
+                                  _searchController.text = q;
+                                  setState(() {
+                                    searchQuery = q;
+                                    currentPage = 1;
+                                  });
+                                  _searchHistoryManager.addQuery(q);
+                                },
+                              ),
+                            )),
+                            const SizedBox(width: 4),
+                          ],
+                          const Text('🔥 熱門: ', style: TextStyle(color: Color(0xFFE50914), fontSize: 11, fontWeight: FontWeight.bold)),
+                          ...SearchHistoryManager.defaultHotTags.map((tag) => Padding(
+                            padding: const EdgeInsets.only(right: 6.0),
+                            child: ActionChip(
+                              label: Text(tag, style: const TextStyle(color: Colors.white, fontSize: 11)),
+                              backgroundColor: const Color(0xFF2A2A2A),
+                              side: const BorderSide(color: Colors.white24),
+                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
+                              onPressed: () {
+                                _searchController.text = tag;
+                                setState(() {
+                                  searchQuery = tag;
+                                  currentPage = 1;
+                                });
+                                _searchHistoryManager.addQuery(tag);
+                              },
+                            ),
+                          )),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+
+            // Year Filter Chips & Sort Order Switcher
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 2, 16, 6),
+                child: Row(
+                  children: [
+                    // Year filter horizontal scrolling chips
+                    Expanded(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: yearOptions.map((year) {
+                            final isSelected = selectedYear == year;
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 6.0),
+                              child: FilterChip(
+                                label: Text(
+                                  year,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                    color: isSelected ? Colors.white : Colors.white70,
+                                  ),
+                                ),
+                                selected: isSelected,
+                                selectedColor: const Color(0xFFE50914),
+                                backgroundColor: const Color(0xFF222222),
+                                checkmarkColor: Colors.white,
+                                showCheckmark: false,
+                                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  side: BorderSide(
+                                    color: isSelected ? const Color(0xFFE50914) : Colors.white12,
+                                  ),
+                                ),
+                                onSelected: (val) {
+                                  setState(() {
+                                    selectedYear = year;
+                                    currentPage = 1;
+                                  });
+                                },
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    // Sort order toggle button
+                    InkWell(
+                      borderRadius: BorderRadius.circular(16),
+                      onTap: () {
+                        setState(() {
+                          isSortAscending = !isSortAscending;
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF222222),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: Colors.white12),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              isSortAscending ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded,
+                              size: 14,
+                              color: isSortAscending ? const Color(0xFFE50914) : Colors.white70,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              isSortAscending ? '舊到新' : '新到舊',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: isSortAscending ? FontWeight.bold : FontWeight.w500,
+                                color: isSortAscending ? const Color(0xFFE50914) : Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

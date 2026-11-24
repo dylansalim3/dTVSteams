@@ -15,7 +15,7 @@ This roadmap documents the implementation plan for the 4 core enhancements reque
 - [x] **Feature 7: 「觀看歷史紀錄」專屬管理頁面（Watch History Dedicated Management Screen）** *(Completed)*
 - [x] **Feature 8: 播放器「螢幕鎖定防誤觸（Screen Lock OSD）」功能** *(Completed)*
 - [x] **Feature 9: 無縫連續追劇與片尾自動播放倒數浮層 (Auto-Play Next Part/Episode & Countdown HUD)** *(Completed)*
-- [ ] **Feature 10: 年份速查膠囊、正倒序切換與搜尋歷史 (Year Chips, Order Switcher & Search History)** *(In Progress)*
+- [x] **Feature 10: 年份速查膠囊、正倒序切換與搜尋歷史 (Year Chips, Order Switcher & Search History)** *(Completed)*
 - [ ] **Feature 11: 🎧 純音頻聽劇 / 廣播模式（Audio-Only Radio Mode）** *(Queued)*
 - [ ] **Feature 12: ⏩ 一鍵跳過片頭 (30s) 與智慧卡頓換線（Skip Intro & Smart CDN Fallback）** *(Queued)*
 
@@ -230,14 +230,14 @@ This roadmap documents the implementation plan for the 4 core enhancements reque
 * 搜尋框升級：最近搜尋歷史（可單項清除或全部清空）+ 熱門關鍵字標籤推薦（`憲哥`、`KID`、`澎湖`、`金鐘`等）。
 
 ### Implementation Checklist:
-- [ ] **10.1 Year Filter Chips (`main.dart` & `web-app/app.js`)**:
+- [x] **10.1 Year Filter Chips (`main.dart` & `web-app/app.js`)**:
   - 自動從集數日期解析年份，提供水平滑動年份標籤列，點選即時過濾顯示。
-- [ ] **10.2 Chronological Sort Switcher**:
+- [x] **10.2 Chronological Sort Switcher**:
   - 支援倒序（預設最新發布）與正序（經典早期優先）排序切換。
-- [ ] **10.3 Search History & Recommended Tags**:
+- [x] **10.3 Search History & Recommended Tags**:
   - 本地儲存最近 10 筆搜尋紀錄，展示熱門探索推薦標籤。
-- [ ] **10.4 Automated Verification**:
-  - 驗證年份過濾準確性、排序狀態翻轉與搜尋歷史新增/刪除。
+- [x] **10.4 Automated Verification**:
+  - 驗證年份過濾準確性、排序狀態翻轉與搜尋歷史新增/刪除（`year_filter_and_search_test.dart` & `ui-netflix.test.ts`）。
 
 ---
 

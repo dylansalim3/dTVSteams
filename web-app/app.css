@@ -1492,6 +1492,196 @@ html, body {
   }
 }
 
+/* Search Suggestions & History Dropdown (Feature 10) */
+.yt-search-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: #1e1e1e;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 14px;
+  padding: 12px 14px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+  z-index: 1000;
+  backdrop-filter: blur(16px);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.yt-dropdown-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.yt-dropdown-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--yt-text-secondary);
+}
+
+.yt-clear-link {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 0 4px;
+  transition: color 0.15s ease;
+}
+
+.yt-clear-link:hover {
+  color: var(--yt-red);
+}
+
+.yt-chips-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.yt-search-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.yt-search-chip:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.yt-chip-text {
+  cursor: pointer;
+}
+
+.yt-chip-del {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 0 2px;
+  line-height: 1;
+}
+
+.yt-chip-del:hover {
+  color: #ff4d4f;
+}
+
+.yt-hot-chip {
+  background: rgba(229, 9, 20, 0.15);
+  border: 1px solid rgba(229, 9, 20, 0.35);
+  color: #ff7875;
+  border-radius: 14px;
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.yt-hot-chip:hover {
+  background: rgba(229, 9, 20, 0.3);
+  color: #fff;
+  border-color: #ff4d4f;
+}
+
+/* Year Filter & Sort Bar (Feature 10) */
+.yt-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.yt-filter-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.yt-sort-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 16px;
+  padding: 6px 14px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--yt-text-primary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.yt-sort-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.yt-year-bar {
+  display: flex;
+  align-items: center;
+  margin-top: 4px;
+  margin-bottom: 8px;
+}
+
+.yt-year-chips {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.yt-year-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.yt-year-chip {
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--yt-text-secondary);
+  border-radius: 16px;
+  padding: 6px 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.yt-year-chip:hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+}
+
+.yt-year-chip.active {
+  background: #ffffff;
+  color: #000000;
+  border-color: #ffffff;
+  font-weight: 700;
+}
+
 /* Responsive Breakpoints */
 @media (max-width: 768px) {
   .yt-header {
