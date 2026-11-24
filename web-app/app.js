@@ -350,6 +350,12 @@ function initPlayer() {
         saveResume(activeEpisode.id, activePartIndex, player.duration, player.duration);
       }
 
+      if (sleepTimerMode === "end") {
+        setSleepTimer("0");
+        showSleepToast("睡眠定時已到達（分段播放完畢），播放已暫停");
+        return;
+      }
+
       if (activeEpisode && activeEpisode.parts && activePartIndex < activeEpisode.parts.length - 1) {
         if (playerStreamStatus) playerStreamStatus.textContent = `播放完成，即將自動播放 Part ${activePartIndex + 2}...`;
         setTimeout(() => {
@@ -1167,6 +1173,382 @@ if (refreshBtn) {
   });
 }
 
+// Double-Tap / Double-Click Seek with Accumulation
+let seekAccumulated = 0;
+let seekFeedbackTimer = null;
+
+function triggerDoubleTapSeek(isForward) {
+  if (!player && typeof document !== "undefined") {
+    player = document.getElementById("main-player");
+  }
+  if (!player) return;
+  const delta = isForward ? 10 : -10;
+  if (seekAccumulated !== 0 && (isForward ? seekAccumulated > 0 : seekAccumulated < 0)) {
+    seekAccumulated += delta;
+  } else {
+    seekAccumulated = delta;
+  }
+
+  seekRelative(delta);
+
+  const leftOverlay = document.getElementById("seek-overlay-left");
+  const rightOverlay = document.getElementById("seek-overlay-right");
+  const textLeft = document.getElementById("seek-text-left");
+  const textRight = document.getElementById("seek-text-right");
+
+  if (isForward && rightOverlay && textRight) {
+    textRight.textContent = `+${Math.abs(seekAccumulated)}秒`;
+    rightOverlay.style.display = "flex";
+    if (leftOverlay) leftOverlay.style.display = "none";
+  } else if (!isForward && leftOverlay && textLeft) {
+    textLeft.textContent = `-${Math.abs(seekAccumulated)}秒`;
+    leftOverlay.style.display = "flex";
+    if (rightOverlay) rightOverlay.style.display = "none";
+  }
+
+  clearTimeout(seekFeedbackTimer);
+  seekFeedbackTimer = setTimeout(() => {
+    if (leftOverlay) leftOverlay.style.display = "none";
+    if (rightOverlay) rightOverlay.style.display = "none";
+    seekAccumulated = 0;
+  }, 700);
+}
+
+function setupDoubleTapSeek() {
+  const container = document.getElementById("player-container");
+  if (!container) return;
+
+  let lastTapTime = 0;
+  let lastTapX = 0;
+
+  container.addEventListener("dblclick", (e) => {
+    const rect = container.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    if (x < rect.width * 0.45) {
+      triggerDoubleTapSeek(false);
+    } else if (x > rect.width * 0.55) {
+      triggerDoubleTapSeek(true);
+    }
+  });
+
+  // Touch support for mobile browsers
+  container.addEventListener("touchend", (e) => {
+    const now = Date.now();
+    const touch = e.changedTouches?.[0];
+    if (!touch) return;
+    const rect = container.getBoundingClientRect();
+    const x = touch.clientX - rect.left;
+
+    if (now - lastTapTime < 350 && Math.abs(x - lastTapX) < 100) {
+      if (x < rect.width * 0.45) {
+        triggerDoubleTapSeek(false);
+      } else if (x > rect.width * 0.55) {
+        triggerDoubleTapSeek(true);
+      }
+      lastTapTime = 0;
+    } else {
+      lastTapTime = now;
+      lastTapX = x;
+    }
+  });
+}
+
+// Vertical Swipe HUD & Controls (Brightness & Volume)
+let currentBrightness = 1.0;
+let hudFadeTimer = null;
+
+function updateBrightness(deltaOrValue, isAbsolute = false) {
+  if (isAbsolute) {
+    currentBrightness = Math.min(1.0, Math.max(0.1, deltaOrValue));
+  } else {
+    currentBrightness = Math.min(1.0, Math.max(0.1, currentBrightness + deltaOrValue));
+  }
+
+  const player = document.getElementById("main-player");
+  if (player) {
+    player.style.filter = `brightness(${0.2 + currentBrightness * 0.8})`;
+  }
+
+  const hud = document.getElementById("hud-brightness");
+  const fill = document.getElementById("hud-brightness-fill");
+  const text = document.getElementById("hud-brightness-text");
+  const icon = document.getElementById("hud-brightness-icon");
+
+  if (hud && fill && text && icon) {
+    const pct = Math.round(currentBrightness * 100);
+    text.textContent = `${pct}%`;
+    fill.style.height = `${pct}%`;
+    icon.textContent = currentBrightness > 0.6 ? "🔆" : (currentBrightness > 0.25 ? "🔅" : "🌑");
+    hud.style.opacity = "1";
+
+    clearTimeout(hudFadeTimer);
+    hudFadeTimer = setTimeout(() => {
+      hud.style.opacity = "0";
+      const hudVol = document.getElementById("hud-volume");
+      if (hudVol) hudVol.style.opacity = "0";
+    }, 800);
+  }
+}
+
+function updateVolume(deltaOrValue, isAbsolute = false) {
+  const player = document.getElementById("main-player");
+  let curVol = player ? player.volume : 1.0;
+  let newVol = isAbsolute ? deltaOrValue : curVol + deltaOrValue;
+  newVol = Math.min(1.0, Math.max(0.0, newVol));
+
+  if (player) {
+    player.volume = newVol;
+    player.muted = (newVol === 0);
+  }
+
+  const hud = document.getElementById("hud-volume");
+  const fill = document.getElementById("hud-volume-fill");
+  const text = document.getElementById("hud-volume-text");
+  const icon = document.getElementById("hud-volume-icon");
+
+  if (hud && fill && text && icon) {
+    const pct = Math.round(newVol * 100);
+    text.textContent = `${pct}%`;
+    fill.style.height = `${pct}%`;
+    icon.textContent = newVol === 0 ? "🔇" : (newVol > 0.5 ? "🔊" : "🔉");
+    hud.style.opacity = "1";
+
+    clearTimeout(hudFadeTimer);
+    hudFadeTimer = setTimeout(() => {
+      hud.style.opacity = "0";
+      const hudBri = document.getElementById("hud-brightness");
+      if (hudBri) hudBri.style.opacity = "0";
+    }, 800);
+  }
+}
+
+function setupVerticalSwipe() {
+  const container = document.getElementById("player-container");
+  if (!container) return;
+
+  let isSwiping = false;
+  let swipeSide = null; // "left" | "right"
+  let startX = 0;
+  let startY = 0;
+  let startVal = 1.0;
+
+  function handleStart(x, y) {
+    const rect = container.getBoundingClientRect();
+    const relX = x - rect.left;
+    if (relX < rect.width * 0.45) {
+      swipeSide = "left";
+      startVal = currentBrightness;
+    } else if (relX > rect.width * 0.55) {
+      swipeSide = "right";
+      const player = document.getElementById("main-player");
+      startVal = player ? player.volume : 1.0;
+    } else {
+      swipeSide = null;
+      return;
+    }
+    startX = x;
+    startY = y;
+    isSwiping = false;
+  }
+
+  function handleMove(x, y, cancelEvent) {
+    if (!swipeSide) return;
+    const deltaY = startY - y; // Dragging UP increases value
+    const deltaX = Math.abs(x - startX);
+
+    if (!isSwiping && Math.abs(deltaY) > 10 && Math.abs(deltaY) > deltaX) {
+      isSwiping = true;
+    }
+
+    if (isSwiping) {
+      if (cancelEvent && cancelEvent.cancelable) {
+        cancelEvent.preventDefault();
+      }
+      const rect = container.getBoundingClientRect();
+      const sensitivity = rect.height > 0 ? rect.height * 0.65 : 200;
+      const deltaVal = deltaY / sensitivity;
+      const targetVal = Math.min(1.0, Math.max(0.0, startVal + deltaVal));
+
+      if (swipeSide === "left") {
+        updateBrightness(targetVal, true);
+      } else if (swipeSide === "right") {
+        updateVolume(targetVal, true);
+      }
+    }
+  }
+
+  function handleEnd() {
+    isSwiping = false;
+    swipeSide = null;
+  }
+
+  // Pointer / Touch / Mouse bindings
+  container.addEventListener("pointerdown", (e) => {
+    if (e.button !== 0) return;
+    handleStart(e.clientX, e.clientY);
+  });
+
+  if (typeof window !== "undefined") {
+    window.addEventListener("pointermove", (e) => {
+      if (swipeSide) {
+        handleMove(e.clientX, e.clientY, e);
+      }
+    });
+
+    window.addEventListener("pointerup", handleEnd);
+    window.addEventListener("pointercancel", handleEnd);
+  }
+
+  // Touch fallback
+  container.addEventListener("touchstart", (e) => {
+    const t = e.touches[0];
+    if (t) handleStart(t.clientX, t.clientY);
+  }, { passive: true });
+
+  container.addEventListener("touchmove", (e) => {
+    const t = e.touches[0];
+    if (t) handleMove(t.clientX, t.clientY, e);
+  }, { passive: false });
+
+  container.addEventListener("touchend", handleEnd);
+  container.addEventListener("touchcancel", handleEnd);
+}
+
+// Sleep Timer Controller
+let sleepTimerMode = "0"; // "0", "15", "30", "45", "60", "end"
+let sleepTimerRemaining = 0;
+let sleepTimerInterval = null;
+
+function setSleepTimer(mode) {
+  clearInterval(sleepTimerInterval);
+  sleepTimerMode = String(mode);
+
+  const badge = document.getElementById("sleep-timer-badge");
+  const options = document.querySelectorAll(".yt-timer-opt");
+  options.forEach((opt) => {
+    opt.classList.toggle("active", opt.dataset.minutes === sleepTimerMode);
+  });
+
+  if (sleepTimerMode === "0") {
+    sleepTimerRemaining = 0;
+    if (badge) badge.style.display = "none";
+    return;
+  }
+
+  if (sleepTimerMode === "end") {
+    sleepTimerRemaining = 0;
+    if (badge) {
+      badge.textContent = "分段";
+      badge.style.display = "inline-block";
+    }
+    return;
+  }
+
+  const mins = parseInt(sleepTimerMode, 10);
+  if (isNaN(mins) || mins <= 0) return;
+
+  sleepTimerRemaining = mins * 60;
+  updateSleepTimerBadge();
+
+  sleepTimerInterval = setInterval(() => {
+    if (sleepTimerRemaining > 1) {
+      sleepTimerRemaining--;
+      updateSleepTimerBadge();
+    } else {
+      sleepTimerRemaining = 0;
+      triggerSleepTimerExpired();
+    }
+  }, 1000);
+}
+
+function updateSleepTimerBadge() {
+  const badge = document.getElementById("sleep-timer-badge");
+  if (!badge) return;
+  if (sleepTimerRemaining <= 0) {
+    badge.style.display = "none";
+    return;
+  }
+  const mins = Math.ceil(sleepTimerRemaining / 60);
+  badge.textContent = `${mins}m`;
+  badge.style.display = "inline-block";
+}
+
+function triggerSleepTimerExpired() {
+  clearInterval(sleepTimerInterval);
+  sleepTimerMode = "0";
+  sleepTimerRemaining = 0;
+  const badge = document.getElementById("sleep-timer-badge");
+  if (badge) badge.style.display = "none";
+
+  if (player && typeof player.pause === "function") {
+    player.pause();
+  }
+
+  showSleepToast("睡眠定時已到達，播放已暫停");
+}
+
+function showSleepToast(msg) {
+  let toast = document.getElementById("yt-sleep-toast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "yt-sleep-toast";
+    toast.className = "yt-resume-toast";
+    const container = document.querySelector(".yt-player-container") || document.body;
+    container.appendChild(toast);
+  }
+  toast.innerHTML = `
+    <span>${msg}</span>
+    <button id="sleep-extend-btn" class="yt-btn yt-btn-secondary" style="padding: 4px 10px; font-size: 0.75rem; margin-left: 10px; background:#e50914; color:#fff; border:none; border-radius:6px; cursor:pointer;">+15 分鐘</button>
+  `;
+  toast.classList.add("visible");
+  toast.style.display = "flex";
+
+  const extendBtn = document.getElementById("sleep-extend-btn");
+  if (extendBtn) {
+    extendBtn.addEventListener("click", () => {
+      setSleepTimer("15");
+      if (player && typeof player.play === "function") {
+        player.play().catch(() => {});
+      }
+      toast.classList.remove("visible");
+      toast.style.display = "none";
+    });
+  }
+
+  setTimeout(() => {
+    if (toast) {
+      toast.classList.remove("visible");
+      toast.style.display = "none";
+    }
+  }, 8000);
+}
+
+function setupSleepTimerModal() {
+  const btn = document.getElementById("sleep-timer-btn");
+  const modal = document.getElementById("sleep-timer-modal");
+  const backdrop = document.getElementById("sleep-timer-modal-backdrop");
+  const closeBtn = document.getElementById("sleep-timer-modal-close");
+  const options = document.querySelectorAll(".yt-timer-opt");
+
+  function openModal() {
+    if (modal) modal.style.display = "flex";
+  }
+  function closeModal() {
+    if (modal) modal.style.display = "none";
+  }
+
+  if (btn) btn.addEventListener("click", openModal);
+  if (backdrop) backdrop.addEventListener("click", closeModal);
+  if (closeBtn) closeBtn.addEventListener("click", closeModal);
+
+  options.forEach((opt) => {
+    opt.addEventListener("click", () => {
+      setSleepTimer(opt.dataset.minutes);
+      closeModal();
+    });
+  });
+}
+
 // Initialization on DOMContentLoaded
 if (typeof window !== "undefined") {
   window.addEventListener("DOMContentLoaded", () => {
@@ -1176,6 +1558,9 @@ if (typeof window !== "undefined") {
     setupShortcuts();
     setupDownloadActions();
     setupShareModal();
+    setupDoubleTapSeek();
+    setupVerticalSwipe();
+    setupSleepTimerModal();
     loadCatalog();
   });
 }
@@ -1196,6 +1581,13 @@ if (typeof window !== "undefined") {
   window.openShareModal = openShareModal;
   window.closeShareModal = closeShareModal;
   window.setupShareModal = setupShareModal;
+  window.triggerDoubleTapSeek = triggerDoubleTapSeek;
+  window.setupDoubleTapSeek = setupDoubleTapSeek;
+  window.updateBrightness = updateBrightness;
+  window.updateVolume = updateVolume;
+  window.setupVerticalSwipe = setupVerticalSwipe;
+  window.setSleepTimer = setSleepTimer;
+  window.setupSleepTimerModal = setupSleepTimerModal;
   window.saveResume = saveResume;
   window.getEpisodeResume = getEpisodeResume;
   window.clearEpisodeResume = clearEpisodeResume;
@@ -1224,6 +1616,13 @@ if (typeof module !== "undefined" && module.exports) {
     openShareModal,
     closeShareModal,
     setupShareModal,
+    triggerDoubleTapSeek,
+    setupDoubleTapSeek,
+    updateBrightness,
+    updateVolume,
+    setupVerticalSwipe,
+    setSleepTimer,
+    setupSleepTimerModal,
     saveResume,
     getEpisodeResume,
     clearEpisodeResume,

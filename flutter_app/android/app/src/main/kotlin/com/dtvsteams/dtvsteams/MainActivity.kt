@@ -89,8 +89,8 @@ class MainActivity : FlutterActivity() {
                         ))
                     } catch (e: Exception) {
                         result.success(mapOf(
-                            "versionName" to "1.0.8",
-                            "versionCode" to 9L
+                            "versionName" to "1.0.9",
+                            "versionCode" to 10L
                         ))
                     }
                 }
@@ -216,6 +216,19 @@ class MainActivity : FlutterActivity() {
                     } catch (e: Exception) {
                         result.error("SERVICE_ERROR", e.message, null)
                     }
+                }
+                "setScreenBrightness" -> {
+                    val brightness = call.argument<Double>("brightness") ?: -1.0
+                    runOnUiThread {
+                        val lp = window.attributes
+                        lp.screenBrightness = if (brightness < 0) -1.0f else brightness.toFloat().coerceIn(0.01f, 1.0f)
+                        window.attributes = lp
+                    }
+                    result.success(true)
+                }
+                "getScreenBrightness" -> {
+                    val b = window.attributes.screenBrightness.toDouble()
+                    result.success(if (b < 0) 0.5 else b)
                 }
                 else -> result.notImplemented()
             }

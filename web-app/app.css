@@ -947,6 +947,173 @@ html, body {
   justify-content: center;
 }
 
+/* Sleep Timer Modal & Badge */
+.yt-modal-sm {
+  max-width: 380px;
+}
+
+.yt-timer-badge {
+  background: var(--yt-red);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 1px 5px;
+  border-radius: 8px;
+  margin-left: 4px;
+}
+
+.yt-timer-options {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.yt-timer-opt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  color: var(--yt-text);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.yt-timer-opt:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.yt-timer-opt.active {
+  background: rgba(229, 9, 20, 0.15);
+  border-color: var(--yt-red);
+  color: #fff;
+  font-weight: 700;
+}
+
+/* Double-Tap/Click Seek Overlays */
+.yt-player-container {
+  position: relative;
+}
+
+.yt-seek-overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 40%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 15;
+  transition: opacity 0.25s ease;
+}
+
+.yt-seek-left {
+  left: 0;
+  background: radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.05) 50%, transparent 75%);
+  border-top-left-radius: var(--yt-radius);
+  border-bottom-left-radius: var(--yt-radius);
+}
+
+.yt-seek-right {
+  right: 0;
+  background: radial-gradient(circle at 80% 50%, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.05) 50%, transparent 75%);
+  border-top-right-radius: var(--yt-radius);
+  border-bottom-right-radius: var(--yt-radius);
+}
+
+.yt-seek-icon {
+  font-size: 2.2rem;
+  margin-bottom: 4px;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.8));
+}
+
+.yt-seek-text {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.75);
+  padding: 3px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.8));
+}
+
+/* Vertical Gesture Capsule HUDs (Brightness & Volume) */
+.yt-vertical-hud {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 52px;
+  padding: 16px 8px;
+  background: rgba(0, 0, 0, 0.75);
+  border: 1.2px solid rgba(255, 255, 255, 0.24);
+  border-radius: 26px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  pointer-events: none;
+  z-index: 20;
+  transition: opacity 0.25s ease;
+}
+
+.yt-hud-left {
+  left: 24px;
+}
+
+.yt-hud-right {
+  right: 24px;
+}
+
+.yt-hud-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.yt-hud-bar {
+  width: 6px;
+  height: 100px;
+  background: rgba(255, 255, 255, 0.24);
+  border-radius: 3px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.yt-hud-left .yt-hud-bar-fill {
+  width: 100%;
+  background: #ffcc00;
+  border-radius: 3px;
+  transition: height 0.05s ease;
+}
+
+.yt-hud-right .yt-hud-bar-fill {
+  width: 100%;
+  background: #e50914;
+  border-radius: 3px;
+  transition: height 0.05s ease;
+}
+
+.yt-hud-text {
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: monospace, sans-serif;
+  text-align: center;
+}
+
 /* Responsive Breakpoints */
 @media (max-width: 768px) {
   .yt-header {

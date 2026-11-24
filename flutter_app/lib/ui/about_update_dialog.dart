@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import '../services/download_manager.dart';
 import '../services/settings_manager.dart';
+import '../services/sleep_timer_manager.dart';
 import '../services/update_manager.dart';
+import 'sleep_timer_sheet.dart';
 import 'storage_location_sheet.dart';
 
 class AboutUpdateDialog {
@@ -80,6 +82,7 @@ class _AboutUpdateSheet extends StatefulWidget {
 class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
   final SettingsManager _settingsManager = SettingsManager();
   final DownloadManager _downloadManager = DownloadManager();
+  final SleepTimerManager _sleepTimerManager = SleepTimerManager();
 
   @override
   void initState() {
@@ -87,6 +90,7 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
     widget.updateManager.addListener(_onUpdateChange);
     _settingsManager.addListener(_onUpdateChange);
     _downloadManager.addListener(_onUpdateChange);
+    _sleepTimerManager.addListener(_onUpdateChange);
     _settingsManager.init();
     _downloadManager.init();
   }
@@ -96,6 +100,7 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
     widget.updateManager.removeListener(_onUpdateChange);
     _settingsManager.removeListener(_onUpdateChange);
     _downloadManager.removeListener(_onUpdateChange);
+    _sleepTimerManager.removeListener(_onUpdateChange);
     super.dispose();
   }
 
@@ -286,6 +291,29 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                         style: TextStyle(color: Colors.white60, fontSize: 12)),
                     value: _settingsManager.keepScreenAwake,
                     onChanged: (val) => _settingsManager.setKeepScreenAwake(val),
+                  ),
+                  const Divider(color: Colors.white12, height: 1),
+                  ListTile(
+                    leading: Icon(
+                      _sleepTimerManager.isActive ? Icons.alarm_on : Icons.timer_outlined,
+                      color: _sleepTimerManager.isActive ? const Color(0xFFE50914) : Colors.white70,
+                    ),
+                    title: const Text('睡眠定時器 (Sleep Timer)',
+                        style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
+                    subtitle: Text(
+                      _sleepTimerManager.isActive
+                          ? '倒數中：${_sleepTimerManager.formattedTime}'
+                          : '定時自動暫停並停止背景音訊服務',
+                      style: TextStyle(
+                        color: _sleepTimerManager.isActive ? const Color(0xFFE50914) : Colors.white60,
+                        fontSize: 12,
+                      ),
+                    ),
+                    trailing: const Icon(Icons.chevron_right, color: Colors.white38),
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      showSleepTimerSheet(context);
+                    },
                   ),
                 ],
               ),

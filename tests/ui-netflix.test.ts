@@ -118,6 +118,7 @@ describe("YouTube Web App UI & Video.js Compliance", () => {
 
     // Evaluate web-app script in JSDOM window context
     win.eval(js);
+    win.initPlayer();
 
     expect(typeof win.saveResume).toBe("function");
     expect(typeof win.getEpisodeResume).toBe("function");
@@ -152,6 +153,7 @@ describe("YouTube Web App UI & Video.js Compliance", () => {
     const win = dom.window as any;
 
     win.eval(js);
+    win.initPlayer();
 
     expect(typeof win.applyPlaybackSpeed).toBe("function");
     expect(typeof win.cycleSpeed).toBe("function");
@@ -181,6 +183,7 @@ describe("YouTube Web App UI & Video.js Compliance", () => {
 
     win.eval(js);
     win.initPlayer();
+    win.initPlayer();
 
     expect(typeof win.seekRelative).toBe("function");
 
@@ -203,6 +206,7 @@ describe("YouTube Web App UI & Video.js Compliance", () => {
     const dom = new JSDOM(html, { runScripts: "dangerously", url: "http://localhost/" });
     const win = dom.window as any;
     win.eval(js);
+    win.initPlayer();
 
     expect(typeof win.getDownloadFilename).toBe("function");
 
@@ -226,6 +230,7 @@ describe("YouTube Web App UI & Video.js Compliance", () => {
     const win = dom.window as any;
     win.eval(qrJs);
     win.eval(js);
+    win.initPlayer();
 
     expect(typeof win.getShareUrl).toBe("function");
     expect(typeof win.QRCode.generateSVG).toBe("function");
@@ -249,5 +254,79 @@ describe("YouTube Web App UI & Video.js Compliance", () => {
     expect(svg).toContain("<svg");
     expect(svg).toContain("</svg>");
     expect(svg).toContain("<rect");
+  });
+
+  it("implements sleep timer and double-tap seek controls in web-app app.js", () => {
+    const htmlPath = path.resolve(__dirname, "../web-app/index.html");
+    const jsPath = path.resolve(__dirname, "../web-app/app.js");
+
+    const html = fs.readFileSync(htmlPath, "utf-8");
+    const js = fs.readFileSync(jsPath, "utf-8");
+
+    const dom = new JSDOM(html, {
+      runScripts: "dangerously",
+      url: "https://dtvsteams.pages.dev/"
+    });
+    const win = dom.window as any;
+
+    win.eval(js);
+    win.initPlayer();
+
+    // Verify DOM structure for Sleep Timer and Seek Overlays
+    const sleepBtn = win.document.getElementById("sleep-timer-btn");
+    const sleepBadge = win.document.getElementById("sleep-timer-badge");
+    const sleepModal = win.document.getElementById("sleep-timer-modal");
+    const seekLeft = win.document.getElementById("seek-overlay-left");
+    const seekRight = win.document.getElementById("seek-overlay-right");
+
+    expect(sleepBtn).not.toBeNull();
+    expect(sleepBadge).not.toBeNull();
+    expect(sleepModal).not.toBeNull();
+    expect(seekLeft).not.toBeNull();
+    expect(seekRight).not.toBeNull();
+
+    // Verify setSleepTimer functionality
+    expect(typeof win.setSleepTimer).toBe("function");
+    win.setSleepTimer("30");
+    expect(sleepBadge.style.display).toBe("inline-block");
+    expect(sleepBadge.textContent).toBe("30m");
+
+    win.setSleepTimer("end");
+    expect(sleepBadge.textContent).toBe("分段");
+
+    win.setSleepTimer("0");
+    expect(sleepBadge.style.display).toBe("none");
+
+    // Verify triggerDoubleTapSeek
+    expect(typeof win.triggerDoubleTapSeek).toBe("function");
+    win.triggerDoubleTapSeek(true);
+    expect(seekRight.style.display).toBe("flex");
+    const textRight = win.document.getElementById("seek-text-right");
+    expect(textRight.textContent).toContain("+10秒");
+
+    // Verify vertical swipe HUDs for brightness and volume
+    const hudBri = win.document.getElementById("hud-brightness");
+    const hudVol = win.document.getElementById("hud-volume");
+    const textBri = win.document.getElementById("hud-brightness-text");
+    const textVol = win.document.getElementById("hud-volume-text");
+    const player = win.document.getElementById("main-player");
+
+    expect(hudBri).not.toBeNull();
+    expect(hudVol).not.toBeNull();
+    expect(typeof win.updateBrightness).toBe("function");
+    expect(typeof win.updateVolume).toBe("function");
+    expect(typeof win.setupVerticalSwipe).toBe("function");
+
+    // Adjust brightness
+    win.updateBrightness(0.6, true);
+    expect(hudBri.style.opacity).toBe("1");
+    expect(textBri.textContent).toBe("60%");
+    expect(player.style.filter).toContain("brightness(");
+
+    // Adjust volume
+    win.updateVolume(0.8, true);
+    expect(hudVol.style.opacity).toBe("1");
+    expect(textVol.textContent).toBe("80%");
+    expect(player.volume).toBeCloseTo(0.8);
   });
 });

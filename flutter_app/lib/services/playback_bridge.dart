@@ -13,6 +13,32 @@ class PlaybackBridge {
 
   bool get isScreenAwake => _isScreenAwake;
   bool get isBackgroundServiceRunning => _isBackgroundServiceRunning;
+  double _screenBrightness = -1.0;
+  double get screenBrightness => _screenBrightness;
+
+  /// Sets per-window screen brightness (0.01 to 1.0, or -1.0 to restore system auto).
+  Future<void> setScreenBrightness(double brightness) async {
+    _screenBrightness = brightness;
+    try {
+      await _channel.invokeMethod('setScreenBrightness', {'brightness': brightness});
+    } catch (e) {
+      debugPrint('[PlaybackBridge] setScreenBrightness error: $e');
+    }
+  }
+
+  /// Gets current window screen brightness.
+  Future<double> getScreenBrightness() async {
+    try {
+      final b = await _channel.invokeMethod<double>('getScreenBrightness');
+      if (b != null) {
+        _screenBrightness = b;
+        return b;
+      }
+    } catch (e) {
+      debugPrint('[PlaybackBridge] getScreenBrightness error: $e');
+    }
+    return 0.5;
+  }
 
   /// Prevents the device screen from dimming/sleeping while playback is active.
   Future<void> setKeepScreenOn(bool enabled) async {

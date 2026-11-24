@@ -10,8 +10,10 @@ import '../services/pip_manager.dart';
 import '../services/playback_bridge.dart';
 import '../services/playback_history_manager.dart';
 import '../services/settings_manager.dart';
+import '../services/sleep_timer_manager.dart';
 import 'downloads_screen.dart';
 import 'share_dialog.dart';
+import 'sleep_timer_sheet.dart';
 
 class NativePlayerScreen extends StatefulWidget {
   final CatalogEpisode episode;
@@ -44,7 +46,28 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
   final PipManager _pipManager = PipManager();
   final SettingsManager _settingsManager = SettingsManager();
   final PlaybackBridge _playbackBridge = PlaybackBridge();
+  final SleepTimerManager _sleepTimerManager = SleepTimerManager();
   bool _isExiting = false;
+
+  // Vertical swipe brightness & volume state
+  double _currentBrightness = 0.5;
+  double _currentVolume = 1.0;
+  bool _showBrightnessHud = false;
+  bool _showVolumeHud = false;
+  Timer? _hudFadeTimer;
+  bool _isVerticalDragging = false;
+  bool _isDragLeft = false;
+  double _dragStartY = 0;
+  double _dragStartValue = 0;
+
+  // Double-tap seek state
+  bool _showSeekFeedback = false;
+  bool _isSeekingForward = false;
+  int _accumulatedSeekSeconds = 0;
+  Timer? _seekFeedbackTimer;
+  Timer? _singleTapDebounce;
+  int _lastTapTime = 0;
+  Offset _lastTapPosition = Offset.zero;
 
   @override
   void initState() {
@@ -58,7 +81,39 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
     _historyManager.init();
     _settingsManager.init();
     _settingsManager.addListener(_onSettingsUpdate);
+    _sleepTimerManager.addListener(_onSleepTimerUpdate);
+    _sleepTimerManager.onExpired = _onSleepTimerExpired;
+    _playbackBridge.getScreenBrightness().then((b) {
+      if (mounted) setState(() => _currentBrightness = b);
+    });
     _initPlayerForPart(_currentPartIndex);
+  }
+
+  void _onSleepTimerUpdate() {
+    if (mounted) setState(() {});
+  }
+
+  void _onSleepTimerExpired() {
+    if (!mounted || _isExiting) return;
+    _controller?.pause();
+    _syncPlaybackState();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('睡眠定時已到達，播放已暫停'),
+        duration: const Duration(seconds: 8),
+        backgroundColor: const Color(0xFF262626),
+        action: SnackBarAction(
+          label: '+15 分鐘',
+          textColor: const Color(0xFFE50914),
+          onPressed: () {
+            _sleepTimerManager.extend15Minutes();
+            _controller?.play();
+            _syncPlaybackState();
+          },
+        ),
+      ),
+    );
+    setState(() {});
   }
 
   void _onSettingsUpdate() {
@@ -372,6 +427,14 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
           );
         }
 
+        final isLastPart = _currentPartIndex >= widget.episode.parts.length - 1;
+        if (_sleepTimerManager.isActive &&
+            (_sleepTimerManager.mode == SleepTimerMode.endOfPart ||
+             (_sleepTimerManager.mode == SleepTimerMode.endOfEpisode && isLastPart))) {
+          _sleepTimerManager.onPartFinished(isLastPart: isLastPart);
+          return;
+        }
+
         final nextPart = _currentPartIndex + 1;
         if (nextPart < widget.episode.parts.length) {
           _isAutoAdvancing = true;
@@ -428,6 +491,7 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
     try {
       await _playbackBridge.setKeepScreenOn(false);
       await _playbackBridge.stopBackgroundPlay();
+      await _playbackBridge.setScreenBrightness(-1.0);
     } catch (_) {}
 
     // 2. Disable Auto-PiP immediately so system back gesture doesn't trigger PiP
@@ -447,7 +511,15 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
     _isExiting = true;
     _playbackBridge.setKeepScreenOn(false);
     _playbackBridge.stopBackgroundPlay();
+    _playbackBridge.setScreenBrightness(-1.0);
+    _hudFadeTimer?.cancel();
     _settingsManager.removeListener(_onSettingsUpdate);
+    _sleepTimerManager.removeListener(_onSleepTimerUpdate);
+    if (_sleepTimerManager.onExpired == _onSleepTimerExpired) {
+      _sleepTimerManager.onExpired = null;
+    }
+    _seekFeedbackTimer?.cancel();
+    _singleTapDebounce?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     _persistCurrentPosition(force: true);
@@ -552,6 +624,29 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
                         value: _settingsManager.keepScreenAwake,
                         onChanged: (val) => _settingsManager.setKeepScreenAwake(val),
                       ),
+                      const Divider(color: Colors.white12, height: 1),
+                      ListTile(
+                        leading: Icon(
+                          _sleepTimerManager.isActive ? Icons.alarm_on : Icons.timer_outlined,
+                          color: _sleepTimerManager.isActive ? const Color(0xFFE50914) : Colors.white70,
+                        ),
+                        title: const Text('睡眠定時器 (Sleep Timer)',
+                            style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
+                        subtitle: Text(
+                          _sleepTimerManager.isActive
+                              ? '倒數中：${_sleepTimerManager.formattedTime}'
+                              : '定時自動暫停並停止背景音訊服務',
+                          style: TextStyle(
+                            color: _sleepTimerManager.isActive ? const Color(0xFFE50914) : Colors.white60,
+                            fontSize: 12,
+                          ),
+                        ),
+                        trailing: const Icon(Icons.chevron_right, color: Colors.white38),
+                        onTap: () {
+                          Navigator.of(ctx).pop();
+                          showSleepTimerSheet(context, onTimerChanged: () => setState(() {}));
+                        },
+                      ),
                     ],
                   ),
                 ),
@@ -574,6 +669,187 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
         : (target > c.value.duration ? c.value.duration : target);
     c.seekTo(clamped);
     _resetOsdTimer();
+  }
+
+  void _handleScreenTapDown(TapDownDetails details, double screenWidth) {
+    final now = DateTime.now().millisecondsSinceEpoch;
+    final pos = details.localPosition;
+    final isDoubleTap = (now - _lastTapTime < 380) && ((pos - _lastTapPosition).distance < 120);
+
+    if (isDoubleTap) {
+      _singleTapDebounce?.cancel();
+      _singleTapDebounce = null;
+      _lastTapTime = 0;
+
+      final isLeft = pos.dx < screenWidth * 0.45;
+      final isRight = pos.dx > screenWidth * 0.55;
+
+      if (isLeft) {
+        _triggerDoubleTapSeek(forward: false);
+      } else if (isRight) {
+        _triggerDoubleTapSeek(forward: true);
+      } else {
+        _toggleOsd();
+      }
+    } else {
+      _lastTapTime = now;
+      _lastTapPosition = pos;
+      _singleTapDebounce?.cancel();
+      _singleTapDebounce = Timer(const Duration(milliseconds: 260), () {
+        if (mounted) {
+          _toggleOsd();
+        }
+      });
+    }
+  }
+
+  void _triggerDoubleTapSeek({required bool forward}) {
+    if (_showSeekFeedback && _isSeekingForward == forward) {
+      _accumulatedSeekSeconds += 10;
+    } else {
+      _accumulatedSeekSeconds = 10;
+      _isSeekingForward = forward;
+    }
+
+    _seekRelative(forward ? 10 : -10);
+
+    setState(() {
+      _showSeekFeedback = true;
+    });
+
+    _seekFeedbackTimer?.cancel();
+    _seekFeedbackTimer = Timer(const Duration(milliseconds: 700), () {
+      if (mounted) {
+        setState(() {
+          _showSeekFeedback = false;
+          _accumulatedSeekSeconds = 0;
+        });
+      }
+    });
+  }
+
+  void _onVerticalDragStart(DragStartDetails details, double screenWidth) {
+    final pos = details.localPosition;
+    _dragStartY = pos.dy;
+    _isDragLeft = pos.dx < screenWidth * 0.45;
+    _isVerticalDragging = false;
+
+    if (_isDragLeft) {
+      _dragStartValue = _currentBrightness;
+    } else if (pos.dx > screenWidth * 0.55) {
+      _dragStartValue = _currentVolume;
+    }
+  }
+
+  void _onVerticalDragUpdate(DragUpdateDetails details, double screenHeight) {
+    final deltaY = _dragStartY - details.localPosition.dy;
+    if (!_isVerticalDragging && deltaY.abs() < 10) {
+      return;
+    }
+
+    _isVerticalDragging = true;
+    _singleTapDebounce?.cancel();
+    _singleTapDebounce = null;
+
+    final change = deltaY / (screenHeight * 0.65);
+    final newValue = (_dragStartValue + change).clamp(0.0, 1.0);
+
+    if (_isDragLeft) {
+      _currentBrightness = newValue;
+      _playbackBridge.setScreenBrightness(newValue);
+      _showBrightnessHud = true;
+      _showVolumeHud = false;
+    } else {
+      _currentVolume = newValue;
+      _controller?.setVolume(newValue);
+      _showVolumeHud = true;
+      _showBrightnessHud = false;
+    }
+
+    _resetHudFadeTimer();
+    setState(() {});
+  }
+
+  void _onVerticalDragEnd(DragEndDetails details) {
+    if (_isVerticalDragging) {
+      _resetHudFadeTimer();
+    }
+    _isVerticalDragging = false;
+  }
+
+  void _resetHudFadeTimer() {
+    _hudFadeTimer?.cancel();
+    _hudFadeTimer = Timer(const Duration(milliseconds: 800), () {
+      if (mounted) {
+        setState(() {
+          _showBrightnessHud = false;
+          _showVolumeHud = false;
+        });
+      }
+    });
+  }
+
+  Widget _buildVerticalHud({
+    required bool isLeft,
+    required double value,
+    required IconData icon,
+    required String label,
+  }) {
+    return IgnorePointer(
+      child: AnimatedOpacity(
+        duration: const Duration(milliseconds: 200),
+        opacity: (isLeft ? _showBrightnessHud : _showVolumeHud) ? 1.0 : 0.0,
+        child: Container(
+          width: 52,
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.75),
+            borderRadius: BorderRadius.circular(26),
+            border: Border.all(color: Colors.white24, width: 1.2),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.5),
+                blurRadius: 16,
+                spreadRadius: 2,
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, color: Colors.white, size: 24),
+              const SizedBox(height: 12),
+              Container(
+                width: 6,
+                height: 100,
+                decoration: BoxDecoration(
+                  color: Colors.white24,
+                  borderRadius: BorderRadius.circular(3),
+                ),
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  width: 6,
+                  height: 100 * value,
+                  decoration: BoxDecoration(
+                    color: isLeft ? const Color(0xFFFFCC00) : const Color(0xFFE50914),
+                    borderRadius: BorderRadius.circular(3),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                '${(value * 100).toInt()}%',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   void _triggerDownloadCurrentPart() {
@@ -717,7 +993,10 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
           autofocus: true,
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
-            onTap: _toggleOsd,
+            onTapDown: (details) => _handleScreenTapDown(details, MediaQuery.of(context).size.width),
+            onVerticalDragStart: (details) => _onVerticalDragStart(details, MediaQuery.of(context).size.width),
+            onVerticalDragUpdate: (details) => _onVerticalDragUpdate(details, MediaQuery.of(context).size.height),
+            onVerticalDragEnd: _onVerticalDragEnd,
             child: Stack(
               fit: StackFit.expand,
               children: [
@@ -788,6 +1067,92 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
                       ),
                     ),
                   ),
+
+                // Animated Double-Tap Seek Feedback Overlay
+                if (_showSeekFeedback)
+                  Positioned.fill(
+                    child: IgnorePointer(
+                      child: Align(
+                        alignment: _isSeekingForward ? Alignment.centerRight : Alignment.centerLeft,
+                        child: Container(
+                          width: MediaQuery.of(context).size.width * 0.42,
+                          height: double.infinity,
+                          decoration: BoxDecoration(
+                            gradient: RadialGradient(
+                              center: _isSeekingForward ? const Alignment(0.8, 0.0) : const Alignment(-0.8, 0.0),
+                              radius: 1.2,
+                              colors: [
+                                Colors.white.withValues(alpha: 0.22),
+                                Colors.white.withValues(alpha: 0.05),
+                                Colors.transparent,
+                              ],
+                            ),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                _isSeekingForward ? Icons.fast_forward : Icons.fast_rewind,
+                                color: Colors.white,
+                                size: 42,
+                              ),
+                              const SizedBox(height: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withValues(alpha: 0.65),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: Colors.white24, width: 0.8),
+                                ),
+                                child: Text(
+                                  '${_isSeekingForward ? "+" : "-"}$_accumulatedSeekSeconds 秒',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                // Vertical Brightness Capsule HUD (Left)
+                Positioned(
+                  left: 32,
+                  top: 0,
+                  bottom: 0,
+                  child: Center(
+                    child: _buildVerticalHud(
+                      isLeft: true,
+                      value: _currentBrightness,
+                      icon: _currentBrightness > 0.6
+                          ? Icons.brightness_high
+                          : (_currentBrightness > 0.25 ? Icons.brightness_medium : Icons.brightness_low),
+                      label: '亮度',
+                    ),
+                  ),
+                ),
+
+                // Vertical Volume Capsule HUD (Right)
+                Positioned(
+                  right: 32,
+                  top: 0,
+                  bottom: 0,
+                  child: Center(
+                    child: _buildVerticalHud(
+                      isLeft: false,
+                      value: _currentVolume,
+                      icon: _currentVolume == 0
+                          ? Icons.volume_off
+                          : (_currentVolume > 0.5 ? Icons.volume_up : Icons.volume_down),
+                      label: '音量',
+                    ),
+                  ),
+                ),
 
                 // Animated OSD Controls
                 AnimatedOpacity(
@@ -903,6 +1268,46 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
                                         ),
                                       ),
                                     ),
+                                  ),
+
+                                  const SizedBox(width: 4),
+
+                                  // Sleep Timer Button in OSD
+                                  Stack(
+                                    clipBehavior: Clip.none,
+                                    children: [
+                                      IconButton(
+                                        tooltip: _sleepTimerManager.isActive
+                                            ? '睡眠定時器 (剩餘 ${_sleepTimerManager.badgeText})'
+                                            : '睡眠定時器 (Sleep Timer)',
+                                        icon: Icon(
+                                          _sleepTimerManager.isActive ? Icons.alarm_on : Icons.timer_outlined,
+                                          color: _sleepTimerManager.isActive ? const Color(0xFFE50914) : Colors.white,
+                                          size: 22,
+                                        ),
+                                        onPressed: () => showSleepTimerSheet(context, onTimerChanged: () => setState(() {})),
+                                      ),
+                                      if (_sleepTimerManager.isActive)
+                                        Positioned(
+                                          right: 4,
+                                          top: 6,
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFFE50914),
+                                              borderRadius: BorderRadius.circular(8),
+                                            ),
+                                            child: Text(
+                                              _sleepTimerManager.badgeText,
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 9,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                    ],
                                   ),
 
                                   const SizedBox(width: 4),

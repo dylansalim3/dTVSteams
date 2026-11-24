@@ -47,7 +47,7 @@
   <main class="yt-main" role="main">
     <!-- Theater / Active Video Player Section -->
     <section class="yt-player-section" aria-label="目前播放影片">
-      <div class="yt-player-container">
+      <div class="yt-player-container" id="player-container">
         <video
           id="main-player"
           class="yt-native-player video-js vjs-theme-yt"
@@ -60,6 +60,30 @@
           <source src="./media/sample-part1.mp4" type="video/mp4">
           您的瀏覽器不支援 HTML5 影片播放。
         </video>
+        <!-- Double-Tap/Click Seek Ripples -->
+        <div id="seek-overlay-left" class="yt-seek-overlay yt-seek-left" style="display:none;" aria-hidden="true">
+          <div class="yt-seek-icon">⏪</div>
+          <div class="yt-seek-text" id="seek-text-left">-10秒</div>
+        </div>
+        <div id="seek-overlay-right" class="yt-seek-overlay yt-seek-right" style="display:none;" aria-hidden="true">
+          <div class="yt-seek-icon">⏩</div>
+          <div class="yt-seek-text" id="seek-text-right">+10秒</div>
+        </div>
+        <!-- Vertical Gesture Capsule HUDs (Brightness & Volume) -->
+        <div id="hud-brightness" class="yt-vertical-hud yt-hud-left" style="opacity:0;" aria-hidden="true">
+          <span class="yt-hud-icon" id="hud-brightness-icon">🔆</span>
+          <div class="yt-hud-bar">
+            <div class="yt-hud-bar-fill" id="hud-brightness-fill" style="height: 100%;"></div>
+          </div>
+          <span class="yt-hud-text" id="hud-brightness-text">100%</span>
+        </div>
+        <div id="hud-volume" class="yt-vertical-hud yt-hud-right" style="opacity:0;" aria-hidden="true">
+          <span class="yt-hud-icon" id="hud-volume-icon">🔊</span>
+          <div class="yt-hud-bar">
+            <div class="yt-hud-bar-fill" id="hud-volume-fill" style="height: 100%;"></div>
+          </div>
+          <span class="yt-hud-text" id="hud-volume-text">100%</span>
+        </div>
       </div>
 
       <!-- Video Details & Part Selector Under Player -->
@@ -86,6 +110,14 @@
               </button>
               <div id="download-menu" class="yt-download-menu" style="display: none;" role="menu" aria-label="選擇下載分段"></div>
             </div>
+            <button class="yt-btn yt-btn-secondary" id="sleep-timer-btn" aria-label="設定睡眠定時器" title="睡眠定時器 (Sleep Timer)">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+              <span>定時</span>
+              <span id="sleep-timer-badge" class="yt-timer-badge" style="display:none;"></span>
+            </button>
             <button class="yt-btn yt-btn-secondary" id="share-btn" aria-label="分享此集影片" title="分享此集影片">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="18" cy="5" r="3"/>
@@ -214,6 +246,39 @@
             </svg>
             <span>使用系統分享傳送</span>
           </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sleep Timer Modal Dialog -->
+  <div id="sleep-timer-modal" class="yt-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="sleep-timer-modal-title">
+    <div class="yt-modal-backdrop" id="sleep-timer-modal-backdrop"></div>
+    <div class="yt-modal-content yt-modal-sm">
+      <div class="yt-modal-header">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div class="yt-modal-icon">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+          </div>
+          <div>
+            <h2 class="yt-modal-title" id="sleep-timer-modal-title">睡眠定時器</h2>
+            <p class="yt-modal-subtitle" id="sleep-timer-modal-subtitle">時間到達自動暫停播放</p>
+          </div>
+        </div>
+        <button class="yt-modal-close" id="sleep-timer-modal-close" aria-label="關閉定時器視窗">✕</button>
+      </div>
+
+      <div class="yt-modal-body">
+        <div class="yt-timer-options" id="sleep-timer-options">
+          <button class="yt-timer-opt active" data-minutes="0">關閉定時器</button>
+          <button class="yt-timer-opt" data-minutes="15">15 分鐘</button>
+          <button class="yt-timer-opt" data-minutes="30">30 分鐘</button>
+          <button class="yt-timer-opt" data-minutes="45">45 分鐘</button>
+          <button class="yt-timer-opt" data-minutes="60">60 分鐘</button>
+          <button class="yt-timer-opt" data-minutes="end">播完當前分段後停止</button>
         </div>
       </div>
     </div>
