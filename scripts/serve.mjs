@@ -233,7 +233,9 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    const proxyMode = parsedUrl.searchParams.get("proxy") === "true";
+    const download = parsedUrl.searchParams.get("download") === "true";
+    const filename = parsedUrl.searchParams.get("filename") || "video.mp4";
+    const proxyMode = parsedUrl.searchParams.get("proxy") === "true" || download;
     if (!proxyMode) {
       res.writeHead(307, {
         "Location": targetUrl,
@@ -269,8 +271,11 @@ const server = http.createServer(async (req, res) => {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
         "Access-Control-Allow-Headers": "Range, Content-Type, Accept",
-        "Access-Control-Expose-Headers": "Content-Range, Content-Length, Accept-Ranges",
+        "Access-Control-Expose-Headers": "Content-Range, Content-Length, Accept-Ranges, Content-Disposition",
       };
+      if (download) {
+        outHeaders["Content-Disposition"] = `attachment; filename="${encodeURIComponent(filename)}"; filename*=UTF-8''${encodeURIComponent(filename)}`;
+      }
       if (upstream.headers.has("content-range")) {
         outHeaders["Content-Range"] = upstream.headers.get("content-range");
       }

@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../catalog/parser.dart';
 import '../services/download_manager.dart';
+import '../services/share_service.dart';
 import 'episode_card.dart';
 import 'player_screen.dart';
 import 'storage_location_sheet.dart';
@@ -82,6 +83,100 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
         ],
       ),
     );
+  }
+
+  void _shareEpisode(CatalogEpisode ep) {
+    final showId = ep.showId.isNotEmpty
+        ? ep.showId
+        : CatalogParser.detectShowId('${ep.title} ${ep.id}');
+    final downloadedFiles = <String>[];
+    for (final p in ep.parts) {
+      final f = _manager.getLocalFile(ep.id, p.label, showId: showId, title: ep.title);
+      if (f != null && f.existsSync()) {
+        downloadedFiles.add(f.path);
+      }
+    }
+
+    if (downloadedFiles.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('查無已下載的影片檔案')),
+      );
+      return;
+    }
+
+    if (downloadedFiles.length == 1) {
+      ShareService.shareVideoFile(downloadedFiles.first, title: ep.title);
+    } else {
+      showModalBottomSheet(
+        context: context,
+        backgroundColor: const Color(0xFF1E1E1E),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+        builder: (sheetCtx) {
+          final bottomInset = MediaQuery.of(sheetCtx).padding.bottom;
+          return SafeArea(
+            top: false,
+            bottom: true,
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, (bottomInset + 16.0) / 2),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.share, color: Color(0xFFE50914), size: 20),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          '分享「${ep.title}」',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close, color: Colors.white54, size: 20),
+                        onPressed: () => Navigator.of(sheetCtx).pop(),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  ListTile(
+                    leading: const Icon(Icons.folder_zip_outlined, color: Colors.white70),
+                    title: Text('分享全部已下載分段 (${downloadedFiles.length} 個分段)',
+                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                    subtitle: const Text('一次傳送所有分段影片檔', style: TextStyle(color: Colors.white54, fontSize: 12)),
+                    onTap: () {
+                      Navigator.of(sheetCtx).pop();
+                      ShareService.shareVideoFiles(downloadedFiles, title: ep.title);
+                    },
+                  ),
+                  const Divider(color: Colors.white12),
+                  for (int i = 0; i < ep.parts.length; i++) ...[
+                    Builder(builder: (_) {
+                      final p = ep.parts[i];
+                      final file = _manager.getLocalFile(ep.id, p.label, showId: showId, title: ep.title);
+                      if (file == null || !file.existsSync()) return const SizedBox.shrink();
+                      return ListTile(
+                        leading: const Icon(Icons.video_file_outlined, color: Color(0xFF46D369)),
+                        title: Text(p.label, style: const TextStyle(color: Colors.white)),
+                        trailing: const Icon(Icons.share, size: 18, color: Colors.white54),
+                        onTap: () {
+                          Navigator.of(sheetCtx).pop();
+                          ShareService.shareVideoFile(file.path, title: '${ep.title} - ${p.label}');
+                        },
+                      );
+                    }),
+                  ],
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    }
   }
 
   List<CatalogEpisode> get downloadedEpisodes {
@@ -379,6 +474,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                     onPlayTapped: () => _playEpisode(ep, 0),
                     onPartTapped: (partIdx) => _playEpisode(ep, partIdx),
                     onDeleteTapped: () => _confirmDeleteEpisode(ep),
+                    onShareTapped: () => _shareEpisode(ep),
                   );
                 },
                 childCount: episodes.length,

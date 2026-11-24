@@ -45,7 +45,9 @@ export async function onRequest(context) {
   let targetUrl = url.searchParams.get("url");
   const pageUrl = url.searchParams.get("pageUrl");
   const forceRefresh = url.searchParams.get("refresh") === "true";
-  const proxyMode = url.searchParams.get("proxy") === "true";
+  const download = url.searchParams.get("download") === "true";
+  const filename = url.searchParams.get("filename") || "video.mp4";
+  const proxyMode = url.searchParams.get("proxy") === "true" || download;
 
   // Always prioritize authentic live token resolved from pageUrl (cached for 30m)
   // to prevent stale 404 tokens from breaking seeking and playback
@@ -108,7 +110,11 @@ export async function onRequest(context) {
     outHeaders.set("Access-Control-Allow-Origin", "*");
     outHeaders.set("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS");
     outHeaders.set("Access-Control-Allow-Headers", "Range, Content-Type, Accept");
-    outHeaders.set("Access-Control-Expose-Headers", "Content-Range, Content-Length, Accept-Ranges");
+    outHeaders.set("Access-Control-Expose-Headers", "Content-Range, Content-Length, Accept-Ranges, Content-Disposition");
+
+    if (download) {
+      outHeaders.set("Content-Disposition", `attachment; filename="${encodeURIComponent(filename)}"; filename*=UTF-8''${encodeURIComponent(filename)}`);
+    }
 
     if (upstream.headers.has("content-range")) {
       outHeaders.set("Content-Range", upstream.headers.get("content-range"));

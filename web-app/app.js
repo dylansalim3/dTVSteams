@@ -19,6 +19,8 @@ const refreshBtn = isBrowser ? document.getElementById("refresh-btn") : null;
 
 const playerTitle = isBrowser ? document.getElementById("player-title") : null;
 const openSourceBtn = isBrowser ? document.getElementById("open-source-btn") : null;
+const downloadBtn = isBrowser ? document.getElementById("download-btn") : null;
+const downloadMenu = isBrowser ? document.getElementById("download-menu") : null;
 const playerPartBadge = isBrowser ? document.getElementById("player-part-badge") : null;
 const playerDateBadge = isBrowser ? document.getElementById("player-date-badge") : null;
 const playerStreamStatus = isBrowser ? document.getElementById("player-stream-status") : null;
@@ -475,6 +477,152 @@ function playPart(episode, partIndex = 0, autoPlay = true, fromExplicitPartClick
   }
 }
 
+// Download Helper Functions
+function getDownloadFilename(episode, partIndex = 0) {
+  if (!episode) return "dtvstream_video.mp4";
+  const showName = (episode.showName || "綜藝玩很大").replace(/[\/\\:*?"<>|]/g, "").trim();
+  const date = (episode.date || "").replace(/[\/\\:*?"<>|]/g, "").trim();
+  const rawTitle = (episode.title || "").replace(/[\/\\:*?"<>|]/g, "").trim();
+  const part = episode.parts?.[partIndex];
+  const partLabel = (part?.label || `Part ${partIndex + 1}`).replace(/[\/\\:*?"<>|]/g, "").trim();
+
+  if (date) {
+    return `${showName}_${date}_${partLabel}.mp4`;
+  }
+  return `${showName}_${rawTitle}_${partLabel}.mp4`;
+}
+
+async function downloadEpisodePart(episode, partIndex = 0) {
+  if (!episode || !episode.parts || !episode.parts[partIndex]) return;
+  const part = episode.parts[partIndex];
+  const filename = getDownloadFilename(episode, partIndex);
+
+  if (playerStreamStatus) {
+    playerStreamStatus.textContent = `⏳ 正在準備下載 ${part.label || 'Part ' + (partIndex + 1)}...`;
+  }
+
+  try {
+    let downloadHref = "";
+    const directStream = await resolveDirectStream(part.url);
+    if (directStream && !directStream.includes("sample-part")) {
+      downloadHref = `/api/stream?url=${encodeURIComponent(directStream)}&download=true&filename=${encodeURIComponent(filename)}`;
+    } else if (part.url) {
+      downloadHref = `/api/stream?pageUrl=${encodeURIComponent(part.url)}&download=true&filename=${encodeURIComponent(filename)}`;
+    } else if (part.fallbackStreamUrl) {
+      downloadHref = part.fallbackStreamUrl;
+    } else {
+      downloadHref = "./media/sample-part1.mp4";
+    }
+
+    const a = document.createElement("a");
+    a.href = downloadHref;
+    a.download = filename;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    if (playerStreamStatus) {
+      playerStreamStatus.textContent = `✅ 已送出下載：${filename}`;
+      setTimeout(() => {
+        if (playerStreamStatus && playerStreamStatus.textContent.includes("已送出下載")) {
+          playerStreamStatus.textContent = "串流狀態：準備中";
+        }
+      }, 4000);
+    }
+  } catch (err) {
+    console.error("下載失敗:", err);
+    if (playerStreamStatus) {
+      playerStreamStatus.textContent = `❌ 下載失敗：${err.message || '無法下載'}`;
+    }
+  }
+}
+
+function renderDownloadMenu() {
+  if (!downloadMenu || !activeEpisode) return;
+  const parts = activeEpisode.parts || [];
+  downloadMenu.innerHTML = "";
+
+  const activePartBtn = document.createElement("button");
+  activePartBtn.className = "yt-download-item";
+  activePartBtn.setAttribute("role", "menuitem");
+  activePartBtn.innerHTML = `
+    <span class="yt-download-item-title">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      <strong>下載目前分段 (${parts[activePartIndex]?.label || 'Part ' + (activePartIndex + 1)})</strong>
+    </span>
+  `;
+  activePartBtn.onclick = () => {
+    downloadMenu.style.display = "none";
+    downloadEpisodePart(activeEpisode, activePartIndex);
+  };
+  downloadMenu.appendChild(activePartBtn);
+
+  if (parts.length > 1) {
+    const divider = document.createElement("div");
+    divider.className = "yt-download-divider";
+    downloadMenu.appendChild(divider);
+
+    parts.forEach((p, idx) => {
+      const itemBtn = document.createElement("button");
+      itemBtn.className = "yt-download-item";
+      itemBtn.setAttribute("role", "menuitem");
+      itemBtn.innerHTML = `
+        <span class="yt-download-item-title">
+          <span>${idx === activePartIndex ? "▶" : "•"}</span>
+          <span>${p.label || 'Part ' + (idx + 1)}</span>
+        </span>
+        <span class="yt-download-item-size">1080p MP4</span>
+      `;
+      itemBtn.onclick = () => {
+        downloadMenu.style.display = "none";
+        downloadEpisodePart(activeEpisode, idx);
+      };
+      downloadMenu.appendChild(itemBtn);
+    });
+  }
+}
+
+function setupDownloadActions() {
+  if (!downloadBtn || !downloadMenu) return;
+
+  downloadBtn.onclick = (e) => {
+    e.stopPropagation();
+    if (!activeEpisode) {
+      if (playerStreamStatus) playerStreamStatus.textContent = "請先選擇欲下載的集數";
+      return;
+    }
+
+    const parts = activeEpisode.parts || [];
+    if (parts.length <= 1) {
+      downloadEpisodePart(activeEpisode, 0);
+      return;
+    }
+
+    const isVisible = downloadMenu.style.display !== "none";
+    if (isVisible) {
+      downloadMenu.style.display = "none";
+      return;
+    }
+
+    renderDownloadMenu();
+    downloadMenu.style.display = "flex";
+  };
+
+  document.addEventListener("click", (e) => {
+    if (downloadMenu && downloadMenu.style.display !== "none") {
+      if (!e.target.closest("#download-wrapper")) {
+        downloadMenu.style.display = "none";
+      }
+    }
+  });
+}
+
 // Render Part Selector Chips Under Player
 function renderPlayerParts(episode, activeIdx) {
   if (!playerPartsNav) return;
@@ -899,6 +1047,7 @@ if (typeof window !== "undefined") {
     initPlaybackSpeed();
     setupQuickSkipButtons();
     setupShortcuts();
+    setupDownloadActions();
     loadCatalog();
   });
 }
@@ -912,6 +1061,9 @@ if (typeof window !== "undefined") {
   window.handleSearch = handleSearch;
   window.resolveStreamUrl = resolveStreamUrl;
   window.resolveDirectStream = resolveDirectStream;
+  window.getDownloadFilename = getDownloadFilename;
+  window.downloadEpisodePart = downloadEpisodePart;
+  window.setupDownloadActions = setupDownloadActions;
   window.saveResume = saveResume;
   window.getEpisodeResume = getEpisodeResume;
   window.clearEpisodeResume = clearEpisodeResume;
@@ -933,6 +1085,9 @@ if (typeof module !== "undefined" && module.exports) {
     handleSearch,
     resolveStreamUrl,
     resolveDirectStream,
+    getDownloadFilename,
+    downloadEpisodePart,
+    setupDownloadActions,
     saveResume,
     getEpisodeResume,
     clearEpisodeResume,

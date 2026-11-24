@@ -5,6 +5,7 @@ import '../catalog/parser.dart';
 import '../catalog/show_channel.dart';
 import '../services/download_manager.dart';
 import '../services/playback_history_manager.dart';
+import '../services/share_service.dart';
 import 'downloads_screen.dart';
 import 'player_screen.dart';
 
@@ -476,8 +477,28 @@ void showDownloadSelectionSheet(
                                         ),
                                       ),
 
-                                    // Action for Already Downloaded: Play or Delete
+                                    // Action for Already Downloaded: Share, Play or Delete
                                     if (isDown) ...[
+                                      IconButton(
+                                        padding: EdgeInsets.zero,
+                                        constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                                        icon: const Icon(Icons.share_outlined, color: Colors.white70, size: 20),
+                                        tooltip: '分享此分段影片',
+                                        onPressed: () {
+                                          final localFile = downloadManager.getLocalFile(
+                                              episode.id, p.label,
+                                              showId: showId, title: episode.title);
+                                          if (localFile != null && localFile.existsSync()) {
+                                            final shareTitle = '${episode.title} - ${p.label}';
+                                            ShareService.shareVideoFile(localFile.path, title: shareTitle);
+                                          } else {
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              const SnackBar(content: Text('影片檔案不存在或已被移動')),
+                                            );
+                                          }
+                                        },
+                                      ),
+                                      const SizedBox(width: 4),
                                       IconButton(
                                         padding: EdgeInsets.zero,
                                         constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
@@ -654,6 +675,7 @@ class YouTubeEpisodeCard extends StatelessWidget {
   final VoidCallback onPlayTapped;
   final Function(int) onPartTapped;
   final VoidCallback? onDeleteTapped;
+  final VoidCallback? onShareTapped;
   final bool isDownloadView;
 
   const YouTubeEpisodeCard({
@@ -662,6 +684,7 @@ class YouTubeEpisodeCard extends StatelessWidget {
     required this.onPlayTapped,
     required this.onPartTapped,
     this.onDeleteTapped,
+    this.onShareTapped,
     this.isDownloadView = false,
   });
 
@@ -886,6 +909,18 @@ class YouTubeEpisodeCard extends StatelessWidget {
                     ),
                   ),
                 ),
+
+                // Share Button for Downloads View
+                if (isDownloadView && onShareTapped != null) ...[
+                  IconButton(
+                    icon: const Icon(Icons.share_outlined, color: Colors.white70, size: 20),
+                    tooltip: '分享離線影片',
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                    onPressed: onShareTapped,
+                  ),
+                  const SizedBox(width: 4),
+                ],
 
                 // Delete Button for Downloads View
                 if (isDownloadView && onDeleteTapped != null) ...[

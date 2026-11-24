@@ -24,12 +24,14 @@ class MainActivity : FlutterActivity() {
     private val UPDATE_CHANNEL = "com.dtvsteams.dtvsteams/update"
     private val PLAYBACK_CHANNEL = "com.dtvsteams.dtvsteams/playback"
     private val STORAGE_CHANNEL = "com.dtvsteams.dtvsteams/storage"
+    private val SHARE_CHANNEL = "com.dtvsteams.dtvsteams/share"
     private val REQUEST_CODE_PICK_DIR = 3001
 
     private var pipChannel: MethodChannel? = null
     private var updateChannel: MethodChannel? = null
     private var playbackChannel: MethodChannel? = null
     private var storageChannel: MethodChannel? = null
+    private var shareChannel: MethodChannel? = null
     private var pendingDirResult: MethodChannel.Result? = null
     private var autoPipEnabled: Boolean = false
 
@@ -87,8 +89,8 @@ class MainActivity : FlutterActivity() {
                         ))
                     } catch (e: Exception) {
                         result.success(mapOf(
-                            "versionName" to "1.0.6",
-                            "versionCode" to 7L
+                            "versionName" to "1.0.7",
+                            "versionCode" to 8L
                         ))
                     }
                 }
@@ -290,6 +292,87 @@ class MainActivity : FlutterActivity() {
                     } catch (e: Exception) {
                         pendingDirResult = null
                         result.error("PICK_ERROR", e.message, null)
+                    }
+                }
+                else -> result.notImplemented()
+            }
+        }
+
+        shareChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, SHARE_CHANNEL)
+        shareChannel?.setMethodCallHandler { call, result ->
+            when (call.method) {
+                "shareFile" -> {
+                    val filePath = call.argument<String>("filePath")
+                    val title = call.argument<String>("title") ?: "分享影片"
+                    val mimeType = call.argument<String>("mimeType") ?: "video/mp4"
+                    if (filePath.isNullOrEmpty()) {
+                        result.error("INVALID_PATH", "filePath is null or empty", null)
+                        return@setMethodCallHandler
+                    }
+                    try {
+                        val file = File(filePath)
+                        if (!file.exists()) {
+                            result.error("FILE_NOT_FOUND", "File does not exist: $filePath", null)
+                            return@setMethodCallHandler
+                        }
+                        val contentUri = FileProvider.getUriForFile(
+                            this@MainActivity,
+                            "$packageName.fileprovider",
+                            file
+                        )
+                        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                            type = mimeType
+                            putExtra(Intent.EXTRA_STREAM, contentUri)
+                            putExtra(Intent.EXTRA_SUBJECT, title)
+                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        }
+                        val chooser = Intent.createChooser(shareIntent, title).apply {
+                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        }
+                        startActivity(chooser)
+                        result.success(true)
+                    } catch (e: Exception) {
+                        result.error("SHARE_ERROR", e.message, null)
+                    }
+                }
+                "shareFiles" -> {
+                    val filePaths = call.argument<List<String>>("filePaths")
+                    val title = call.argument<String>("title") ?: "分享影片"
+                    val mimeType = call.argument<String>("mimeType") ?: "video/mp4"
+                    if (filePaths.isNullOrEmpty()) {
+                        result.error("INVALID_PATHS", "filePaths is empty", null)
+                        return@setMethodCallHandler
+                    }
+                    try {
+                        val uris = ArrayList<Uri>()
+                        for (path in filePaths) {
+                            val file = File(path)
+                            if (file.exists()) {
+                                val uri = FileProvider.getUriForFile(
+                                    this@MainActivity,
+                                    "$packageName.fileprovider",
+                                    file
+                                )
+                                uris.add(uri)
+                            }
+                        }
+                        if (uris.isEmpty()) {
+                            result.error("FILES_NOT_FOUND", "None of the files exist", null)
+                            return@setMethodCallHandler
+                        }
+                        val shareIntent = Intent(Intent.ACTION_SEND_MULTIPLE).apply {
+                            type = mimeType
+                            putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris)
+                            putExtra(Intent.EXTRA_SUBJECT, title)
+                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        }
+                        val chooser = Intent.createChooser(shareIntent, title).apply {
+                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        }
+                        startActivity(chooser)
+                        result.success(true)
+                    } catch (e: Exception) {
+                        result.error("SHARE_ERROR", e.message, null)
                     }
                 }
                 else -> result.notImplemented()

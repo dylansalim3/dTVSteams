@@ -58,6 +58,8 @@ describe("YouTube Web App UI & Video.js Compliance", () => {
     expect(doc.querySelector("#player-stream-status")).not.toBeNull();
     expect(doc.querySelector("#player-parts-nav")).not.toBeNull();
     expect(doc.querySelector("#open-source-btn")).not.toBeNull();
+    expect(doc.querySelector("#download-btn")).not.toBeNull();
+    expect(doc.querySelector("#download-menu")).not.toBeNull();
     expect(doc.querySelector("#player-resume-toast")).not.toBeNull();
   });
 
@@ -189,5 +191,26 @@ describe("YouTube Web App UI & Video.js Compliance", () => {
     const hud = win.document.getElementById("yt-seek-hud");
     expect(hud).not.toBeNull();
     expect(hud.textContent).toContain("+30s");
+  });
+
+  it("generates correct clean download filenames for parts and episodes", () => {
+    const html = fs.readFileSync(htmlPath, "utf-8");
+    const js = fs.readFileSync(jsPath, "utf-8");
+    const dom = new JSDOM(html, { runScripts: "dangerously", url: "http://localhost/" });
+    const win = dom.window as any;
+    win.eval(js);
+
+    expect(typeof win.getDownloadFilename).toBe("function");
+
+    const ep1 = {
+      title: "【綜藝玩很大】第450集 嘉義 經典大對決",
+      date: "2026-11-08",
+      parts: [
+        { label: "Part 1", url: "https://example.com/p1" },
+        { label: "Part 2", url: "https://example.com/p2" }
+      ]
+    };
+    expect(win.getDownloadFilename(ep1, 0)).toBe("綜藝玩很大_2026-11-08_Part 1.mp4");
+    expect(win.getDownloadFilename(ep1, 1)).toBe("綜藝玩很大_2026-11-08_Part 2.mp4");
   });
 });
