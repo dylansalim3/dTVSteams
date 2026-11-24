@@ -53,6 +53,11 @@ const DEFAULT_HOT_TAGS = ['憲哥', 'KID', '澎湖', '飢餓遊戲', '金鐘', '
 // Audio-Only Radio Mode State (Feature 11)
 let isAudioOnlyMode = false;
 
+// Skip Intro & Stall Fallback State (Feature 12)
+let skipIntroDismissed = false;
+let stallWatchdogTimer = null;
+let stallHudVisible = false;
+
 const episodesGrid = isBrowser ? document.getElementById("episodes-grid") : null;
 const episodeCountBadge = isBrowser ? document.getElementById("episode-count-badge") : null;
 
@@ -351,8 +356,15 @@ function initPlayer() {
 
   try {
     player.addEventListener("playing", () => {
+      clearTimeout(stallWatchdogTimer);
+      hideStallCard();
       if (playerStreamStatus) playerStreamStatus.textContent = "串流狀態：播放中 (1080p HD)";
       player.playbackRate = currentSpeed;
+    });
+
+    player.addEventListener("canplay", () => {
+      clearTimeout(stallWatchdogTimer);
+      hideStallCard();
     });
 
     player.addEventListener("seeking", () => {
@@ -386,6 +398,16 @@ function initPlayer() {
         }
       }
 
+      // Feature 12: Skip Intro pill display (0 - 60s)
+      const skipIntroBtn = document.getElementById("skip-intro-btn");
+      if (skipIntroBtn) {
+        if (player.currentTime >= 0 && player.currentTime <= 60 && !player.paused && !skipIntroDismissed && !isScreenLocked) {
+          skipIntroBtn.style.display = "inline-flex";
+        } else {
+          skipIntroBtn.style.display = "none";
+        }
+      }
+
       // Auto-play next part countdown 5.5s before end
       if (player && player.duration > 8 && !player.paused) {
         const remaining = player.duration - player.currentTime;
@@ -406,6 +428,12 @@ function initPlayer() {
 
     player.addEventListener("waiting", () => {
       if (playerStreamStatus) playerStreamStatus.textContent = "串流狀態：緩衝載入中...";
+      clearTimeout(stallWatchdogTimer);
+      stallWatchdogTimer = setTimeout(() => {
+        if (player && !player.paused) {
+          showStallCard();
+        }
+      }, 4500);
     });
 
     // Auto-advance to next part when current part finishes
@@ -478,6 +506,8 @@ function playPart(episode, partIndex = 0, autoPlay = true, fromExplicitPartClick
   hideResumeToast();
   cancelAutoPlay(false);
   autoPlayDismissed = false;
+  skipIntroDismissed = false;
+  hideStallCard();
 
   // If clicked episode card without specifying a part, check localStorage resume point
   if (!fromExplicitPartClick) {
@@ -2448,6 +2478,70 @@ function setupRadioMode() {
   }
 }
 
+// Skip Intro & Stall Fallback Controller (Feature 12)
+function showStallCard() {
+  if (!isBrowser) return;
+  const card = document.getElementById("stall-fallback-card");
+  if (card && !isScreenLocked) {
+    card.style.display = "flex";
+    stallHudVisible = true;
+  }
+}
+
+function hideStallCard() {
+  if (!isBrowser) return;
+  clearTimeout(stallWatchdogTimer);
+  const card = document.getElementById("stall-fallback-card");
+  if (card) {
+    card.style.display = "none";
+    stallHudVisible = false;
+  }
+}
+
+function skipIntro() {
+  if (!player) return;
+  const dur = player.duration || 999999;
+  player.currentTime = Math.min(dur, player.currentTime + 30);
+  skipIntroDismissed = true;
+  const skipIntroBtn = document.getElementById("skip-intro-btn");
+  if (skipIntroBtn) skipIntroBtn.style.display = "none";
+  showSleepToast("⏩ 已為您跳過片頭 30 秒");
+}
+
+function reloadStallFallback() {
+  hideStallCard();
+  const currentPart = activeEpisode?.parts?.[activePartIndex];
+  if (currentPart?.url && player && window.location.protocol.startsWith("http")) {
+    const freshStream = `/api/stream?pageUrl=${encodeURIComponent(currentPart.url)}&refresh=true`;
+    player.src = freshStream;
+    try { player.load(); } catch (_) {}
+    player.play().catch(() => {});
+    showSleepToast("⚡ 正在為您切換備用播放線路...");
+    return;
+  }
+  if (player && activeEpisode) {
+    playPart(activeEpisode, activePartIndex, true, true);
+    showSleepToast("⚡ 重新整理目前串流線路...");
+  }
+}
+
+function setupSkipIntroAndStall() {
+  const skipBtn = document.getElementById("skip-intro-btn");
+  if (skipBtn) {
+    skipBtn.addEventListener("click", () => skipIntro());
+  }
+
+  const reloadBtn = document.getElementById("stall-reload-btn");
+  if (reloadBtn) {
+    reloadBtn.addEventListener("click", () => reloadStallFallback());
+  }
+
+  const closeBtn = document.getElementById("stall-close-btn");
+  if (closeBtn) {
+    closeBtn.addEventListener("click", () => hideStallCard());
+  }
+}
+
 // Initialization on DOMContentLoaded
 if (typeof window !== "undefined") {
   window.addEventListener("DOMContentLoaded", () => {
@@ -2468,6 +2562,7 @@ if (typeof window !== "undefined") {
     setupSleepTimerModal();
     setupSearchAndFilters();
     setupRadioMode();
+    setupSkipIntroAndStall();
     loadCatalog();
   });
 }
@@ -2536,6 +2631,11 @@ if (typeof window !== "undefined") {
   window.toggleAudioOnlyMode = toggleAudioOnlyMode;
   window.setupRadioMode = setupRadioMode;
   window.updateRadioView = updateRadioView;
+  window.skipIntro = skipIntro;
+  window.showStallCard = showStallCard;
+  window.hideStallCard = hideStallCard;
+  window.reloadStallFallback = reloadStallFallback;
+  window.setupSkipIntroAndStall = setupSkipIntroAndStall;
   window.formatTime = formatTime;
   window.loadNextPage = loadNextPage;
   window.applyPlaybackSpeed = applyPlaybackSpeed;
@@ -2609,6 +2709,11 @@ if (typeof module !== "undefined" && module.exports) {
     toggleAudioOnlyMode,
     setupRadioMode,
     updateRadioView,
+    skipIntro,
+    showStallCard,
+    hideStallCard,
+    reloadStallFallback,
+    setupSkipIntroAndStall,
     formatTime,
     applyPlaybackSpeed,
     cycleSpeed,

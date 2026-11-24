@@ -1864,6 +1864,92 @@ html, body {
   transform: scale(1.08);
 }
 
+/* Skip Intro Pill (Feature 12) */
+.yt-skip-intro-btn {
+  position: absolute;
+  bottom: 60px;
+  right: 20px;
+  background: rgba(0, 0, 0, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  z-index: 35;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.yt-skip-intro-btn:hover {
+  background: rgba(30, 30, 30, 0.95);
+  border-color: #e50914;
+  transform: scale(1.05);
+}
+
+/* Smart Buffering Stall / CDN Fallback Card (Feature 12) */
+.yt-stall-fallback {
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(30, 30, 30, 0.95);
+  border: 1px solid rgba(255, 170, 0, 0.7);
+  border-radius: 24px;
+  padding: 6px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 50;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+}
+
+.yt-stall-icon {
+  font-size: 1rem;
+}
+
+.yt-stall-text {
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.yt-stall-btn {
+  background: #e50914;
+  border: none;
+  color: #ffffff;
+  border-radius: 14px;
+  padding: 4px 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.yt-stall-btn:hover {
+  background: #f40612;
+  transform: scale(1.04);
+}
+
+.yt-stall-close {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.yt-stall-close:hover {
+  color: #ffffff;
+}
+
 /* Responsive Breakpoints */
 @media (max-width: 768px) {
   .yt-header {

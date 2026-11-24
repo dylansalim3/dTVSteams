@@ -110,6 +110,39 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
   late AnimationController _vinylAnimationController;
   late AnimationController _waveformAnimationController;
 
+  // Skip intro & smart stall fallback state (Feature 12)
+  bool _skipIntroDismissedForThisPart = false;
+  bool _showStallFallbackHud = false;
+  DateTime? _bufferingStartTime;
+
+  bool get _canShowSkipIntro {
+    final c = _controller;
+    if (c == null || !c.value.isInitialized) return false;
+    if (_isScreenLocked || _skipIntroDismissedForThisPart || _isAudioOnlyMode) return false;
+    final pos = c.value.position;
+    return pos >= Duration.zero && pos <= const Duration(seconds: 60) && c.value.isPlaying;
+  }
+
+  void _skipIntro() {
+    final c = _controller;
+    if (c == null) return;
+    final cur = c.value.position;
+    final dur = c.value.duration;
+    final target = cur + const Duration(seconds: 30);
+    c.seekTo(target < dur ? target : dur);
+    setState(() {
+      _skipIntroDismissedForThisPart = true;
+    });
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('⏩ 已為您跳過片頭 30 秒'),
+        duration: Duration(milliseconds: 1400),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -696,6 +729,19 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
       }
     }
 
+    // Stall detection watchdog (Feature 12)
+    if (controller.value.isBuffering && controller.value.isPlaying) {
+      _bufferingStartTime ??= DateTime.now();
+      if (DateTime.now().difference(_bufferingStartTime!).inSeconds >= 4 && !_showStallFallbackHud) {
+        _showStallFallbackHud = true;
+      }
+    } else {
+      _bufferingStartTime = null;
+      if (_showStallFallbackHud && controller.value.isPlaying && !controller.value.isBuffering) {
+        _showStallFallbackHud = false;
+      }
+    }
+
     setState(() {});
   }
 
@@ -706,6 +752,9 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
     setState(() {
       _currentPartIndex = newIndex;
       _autoPlayDismissedForThisPart = false;
+      _skipIntroDismissedForThisPart = false;
+      _showStallFallbackHud = false;
+      _bufferingStartTime = null;
       _isAutoAdvancing = false;
     });
     _initPlayerForPart(newIndex, forceLiveResolve: true);
@@ -2455,6 +2504,101 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
                     child: Align(
                       alignment: Alignment.bottomRight,
                       child: _buildAutoPlayHud(),
+                    ),
+                  ),
+
+                // Floating Skip Intro Pill (Feature 12)
+                if (_canShowSkipIntro && !_showAutoPlayHud)
+                  Positioned(
+                    bottom: _showOsd ? 110 : 36,
+                    right: 20,
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(20),
+                        onTap: _skipIntro,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.82),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: Colors.white30, width: 1),
+                            boxShadow: const [
+                              BoxShadow(color: Colors.black54, blurRadius: 8, spreadRadius: 1),
+                            ],
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                '跳過片頭 (30s)',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(width: 4),
+                              Icon(Icons.fast_forward, color: Color(0xFFE50914), size: 16),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                // Smart Buffering Stall / CDN Fallback HUD (Feature 12)
+                if (_showStallFallbackHud && !_isScreenLocked)
+                  Positioned(
+                    top: 50,
+                    left: 24,
+                    right: 24,
+                    child: Center(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1E1E1E).withValues(alpha: 0.94),
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(color: Colors.orangeAccent.withValues(alpha: 0.7), width: 1),
+                          boxShadow: const [
+                            BoxShadow(color: Colors.black54, blurRadius: 12),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.wifi_tethering_error_rounded, color: Colors.orangeAccent, size: 18),
+                            const SizedBox(width: 8),
+                            const Text(
+                              '網路卡頓緩衝中...',
+                              style: TextStyle(color: Colors.white, fontSize: 12),
+                            ),
+                            const SizedBox(width: 10),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFFE50914),
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                minimumSize: Size.zero,
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              ),
+                              onPressed: () {
+                                setState(() => _showStallFallbackHud = false);
+                                _initPlayerForPart(_currentPartIndex, forceLiveResolve: true);
+                              },
+                              child: const Text('⚡ 換線重試', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                            ),
+                            const SizedBox(width: 4),
+                            IconButton(
+                              icon: const Icon(Icons.close, size: 16, color: Colors.white60),
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                              onPressed: () => setState(() => _showStallFallbackHud = false),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
 

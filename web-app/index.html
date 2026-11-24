@@ -179,6 +179,20 @@
             </button>
           </div>
         </div>
+
+        <!-- Skip Intro Pill (Feature 12) -->
+        <button id="skip-intro-btn" class="yt-skip-intro-btn" style="display:none;" aria-label="跳過片頭 30 秒">
+          <span>跳過片頭 (30s)</span>
+          <span style="color:#e50914;">⏩</span>
+        </button>
+
+        <!-- Smart Buffering Stall / CDN Fallback Card (Feature 12) -->
+        <div id="stall-fallback-card" class="yt-stall-fallback" style="display:none;" role="alert">
+          <span class="yt-stall-icon">⚠️</span>
+          <span class="yt-stall-text">網路卡頓緩衝中...</span>
+          <button id="stall-reload-btn" class="yt-stall-btn" title="切換備用線路">⚡ 換線重試</button>
+          <button id="stall-close-btn" class="yt-stall-close" aria-label="關閉提示">✕</button>
+        </div>
       </div>
 
       <!-- Video Details & Part Selector Under Player -->

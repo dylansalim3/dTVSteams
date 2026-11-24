@@ -631,5 +631,41 @@ describe("YouTube Web App UI & Video.js Compliance", () => {
     win.toggleAudioOnlyMode();
     expect(radioOverlay.style.display).toBe("none");
     expect(radioLabel.textContent).toBe("聽劇模式");
+
+    // Verify Skip Intro & Stall Fallback (Feature 12)
+    const skipIntroBtn = win.document.getElementById("skip-intro-btn");
+    const stallCard = win.document.getElementById("stall-fallback-card");
+    const stallReloadBtn = win.document.getElementById("stall-reload-btn");
+    const stallCloseBtn = win.document.getElementById("stall-close-btn");
+
+    expect(skipIntroBtn).not.toBeNull();
+    expect(stallCard).not.toBeNull();
+    expect(stallReloadBtn).not.toBeNull();
+    expect(stallCloseBtn).not.toBeNull();
+
+    expect(typeof win.skipIntro).toBe("function");
+    expect(typeof win.showStallCard).toBe("function");
+    expect(typeof win.hideStallCard).toBe("function");
+    expect(typeof win.reloadStallFallback).toBe("function");
+
+    // Skip intro action
+    player.currentTime = 10;
+    skipIntroBtn.style.display = "flex";
+    win.skipIntro();
+    expect(player.currentTime).toBe(40);
+    expect(skipIntroBtn.style.display).toBe("none");
+
+    // Stall card display and interactions
+    expect(stallCard.style.display).toBe("none");
+    win.showStallCard();
+    expect(stallCard.style.display).toBe("flex");
+
+    win.hideStallCard();
+    expect(stallCard.style.display).toBe("none");
+
+    win.showStallCard();
+    expect(stallCard.style.display).toBe("flex");
+    win.reloadStallFallback();
+    expect(stallCard.style.display).toBe("none");
   });
 });

@@ -17,7 +17,7 @@ This roadmap documents the implementation plan for the 4 core enhancements reque
 - [x] **Feature 9: 無縫連續追劇與片尾自動播放倒數浮層 (Auto-Play Next Part/Episode & Countdown HUD)** *(Completed)*
 - [x] **Feature 10: 年份速查膠囊、正倒序切換與搜尋歷史 (Year Chips, Order Switcher & Search History)** *(Completed)*
 - [x] **Feature 11: 🎧 純音頻聽劇 / 廣播模式（Audio-Only Radio Mode）** *(Completed)*
-- [ ] **Feature 12: ⏩ 一鍵跳過片頭 (30s) 與智慧卡頓換線（Skip Intro & Smart CDN Fallback）** *(Queued)*
+- [x] **Feature 12: ⏩ 一鍵跳過片頭 (30s) 與智慧卡頓換線（Skip Intro & Smart CDN Fallback）** *(Completed)*
 
 ---
 
@@ -268,10 +268,10 @@ This roadmap documents the implementation plan for the 4 core enhancements reque
 * 當串流遭遇網路波動或 CDN 卡頓超過 5 秒時，主動提示使用者「點擊切換備用線路 / 流暢模式」，提升播放成功率。
 
 ### Implementation Checklist:
-- [ ] **12.1 Skip Intro Floating Pill (`player_screen.dart` & `web-app/app.js`)**:
+- [x] **12.1 Skip Intro Floating Pill (`player_screen.dart` & `web-app/app.js`)**:
   - 影片開播前 60 秒右下角浮現 `[⏩ 跳過片頭 +30s]`，點擊平滑推進 30 秒並自動淡出。
-- [ ] **12.2 Buffering Stall Watchdog & Fallback Trigger**:
+- [x] **12.2 Buffering Stall Watchdog & Fallback Trigger**:
   - 偵測卡頓超過門檻值時，於畫面中央展示溫和提示，支援一鍵切換備用播放源或重試。
-- [ ] **12.3 Automated Verification**:
-  - 驗證跳過片頭手勢、定時隱藏機制與卡頓偵測流程。
+- [x] **12.3 Automated Verification**:
+  - 驗證跳過片頭手勢、定時隱藏機制與卡頓偵測流程（`skip_intro_and_stall_test.dart` & `ui-netflix.test.ts`）。
 
