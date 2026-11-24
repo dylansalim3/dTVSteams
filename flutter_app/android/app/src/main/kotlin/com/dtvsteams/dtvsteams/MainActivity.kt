@@ -87,8 +87,8 @@ class MainActivity : FlutterActivity() {
                         ))
                     } catch (e: Exception) {
                         result.success(mapOf(
-                            "versionName" to "1.0.5",
-                            "versionCode" to 6L
+                            "versionName" to "1.0.6",
+                            "versionCode" to 7L
                         ))
                     }
                 }

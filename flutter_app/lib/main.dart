@@ -598,78 +598,90 @@ class _HomeScreenState extends State<HomeScreen> {
                     final isCompact = screenWidth < 370;
 
                     return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // Brand Logo
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFE50914),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: const Text(
-                            'dTV',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w900,
-                              fontSize: 15,
-                              letterSpacing: 1.0,
-                            ),
-                          ),
-                        ),
-                        if (!isCompact) ...[
-                          const SizedBox(width: 5),
-                          const Text(
-                            'STEAMS',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                              letterSpacing: 1.5,
-                            ),
-                          ),
-                        ],
-                        SizedBox(width: isCompact ? 4 : 6),
-
-                        // Channel Switcher Selector Button
-                        TvFocusableButton(
-                          onPressed: _showChannelPicker,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFE50914).withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(
-                                color: const Color(0xFFE50914).withValues(alpha: 0.6),
-                                width: 1.2,
+                        // Left Section: Brand Logo + Channel Switcher
+                        Flexible(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // Brand Logo
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFE50914),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: const Text(
+                                  'dTV',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 15,
+                                    letterSpacing: 1.0,
+                                  ),
+                                ),
                               ),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(currentChannel.iconEmoji, style: const TextStyle(fontSize: 12)),
-                                const SizedBox(width: 3),
-                                ConstrainedBox(
-                                  constraints: BoxConstraints(maxWidth: isCompact ? 70 : 130),
-                                  child: Text(
-                                    currentChannel.name,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 11,
+                              if (!isCompact) ...[
+                                const SizedBox(width: 5),
+                                const Text(
+                                  'STEAMS',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                    letterSpacing: 1.5,
+                                  ),
+                                ),
+                              ],
+                              SizedBox(width: isCompact ? 4 : 6),
+
+                              // Channel Switcher Selector Button
+                              Flexible(
+                                child: ConstrainedBox(
+                                  constraints: BoxConstraints(maxWidth: isCompact ? 100 : 130),
+                                  child: TvFocusableButton(
+                                    onPressed: _showChannelPicker,
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFE50914).withValues(alpha: 0.15),
+                                        borderRadius: BorderRadius.circular(16),
+                                        border: Border.all(
+                                          color: const Color(0xFFE50914).withValues(alpha: 0.6),
+                                          width: 1.2,
+                                        ),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(currentChannel.iconEmoji, style: const TextStyle(fontSize: 12)),
+                                          const SizedBox(width: 3),
+                                          Flexible(
+                                            child: Text(
+                                              currentChannel.name,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 11,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 1),
+                                          const Icon(Icons.arrow_drop_down, color: Colors.white70, size: 15),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
-                                const SizedBox(width: 1),
-                                const Icon(Icons.arrow_drop_down, color: Colors.white70, size: 15),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
-                        const Spacer(),
 
-                        // Action Buttons: Downloads, Refresh, Settings
+                        // Action Buttons: Downloads, Refresh, Settings (Same standard touch size as Downloads screen)
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -677,67 +689,40 @@ class _HomeScreenState extends State<HomeScreen> {
                             TvFocusableButton(
                               onPressed: _openDownloads,
                               child: IconButton(
-                                style: IconButton.styleFrom(
-                                  minimumSize: const Size(28, 28),
-                                  padding: EdgeInsets.zero,
-                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                ),
-                                visualDensity: VisualDensity.compact,
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
                                 icon: Icon(
                                   Icons.folder_special,
                                   color: (activeCount > 0 || downloadedCount > 0)
                                       ? const Color(0xFFE50914)
                                       : Colors.white70,
-                                  size: 20,
                                 ),
                                 tooltip: '下載庫',
                                 onPressed: _openDownloads,
                               ),
                             ),
-                            const SizedBox(width: 4),
 
                             // Refresh Icon Button
                             TvFocusableButton(
                               onPressed: () => refreshCatalog(),
                               child: IconButton(
-                                style: IconButton.styleFrom(
-                                  minimumSize: const Size(28, 28),
-                                  padding: EdgeInsets.zero,
-                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                ),
-                                visualDensity: VisualDensity.compact,
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
                                 icon: isRefreshing
                                     ? const SizedBox(
-                                        width: 16,
-                                        height: 16,
+                                        width: 20,
+                                        height: 20,
                                         child: CircularProgressIndicator(
                                           strokeWidth: 2,
                                           color: Color(0xFFE50914),
                                         ),
                                       )
-                                    : const Icon(Icons.refresh, color: Colors.white70, size: 20),
+                                    : const Icon(Icons.refresh, color: Colors.white70),
                                 tooltip: '刷新',
                                 onPressed: () => refreshCatalog(),
                               ),
                             ),
-                            const SizedBox(width: 4),
 
                             // Settings & Updates Icon Button
                             TvFocusableButton(
                               onPressed: () => AboutUpdateDialog.show(context, _updateManager),
                               child: IconButton(
-                                style: IconButton.styleFrom(
-                                  minimumSize: const Size(28, 28),
-                                  padding: EdgeInsets.zero,
-                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                ),
-                                visualDensity: VisualDensity.compact,
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
                                 icon: Icon(
                                   _updateManager.updateAvailable
                                       ? Icons.system_update_alt
@@ -745,7 +730,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                   color: _updateManager.updateAvailable
                                       ? const Color(0xFFE50914)
                                       : Colors.white70,
-                                  size: 20,
                                 ),
                                 tooltip: '設定與關於',
                                 onPressed: () => AboutUpdateDialog.show(context, _updateManager),

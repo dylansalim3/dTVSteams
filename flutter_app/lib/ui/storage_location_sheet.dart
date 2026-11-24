@@ -27,95 +27,100 @@ class StorageLocationHelper {
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
         clipBehavior: Clip.antiAlias,
-        child: Container(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    '選擇下載儲存位置',
-                    style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+        child: SafeArea(
+          top: false,
+          bottom: true,
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 36),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      '選擇下載儲存位置',
+                      style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close, color: Colors.white70),
+                      onPressed: () => Navigator.of(ctx).pop(),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+
+                // Option 1: Default App Documents
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.folder, color: Colors.white70),
+                  title: const Text('預設應用內部儲存', style: TextStyle(color: Colors.white, fontSize: 14)),
+                  subtitle: Text(defaultPath, style: const TextStyle(color: Colors.white54, fontSize: 11)),
+                  trailing: (downloadManager.downloadDirectoryPath == defaultPath)
+                      ? const Icon(Icons.check, color: Color(0xFF46D369), size: 20)
+                      : null,
+                  onTap: () {
+                    Navigator.of(ctx).pop();
+                    handleSelectLocation(context, defaultPath, onStorageChanged: onStorageChanged);
+                  },
+                ),
+                const Divider(color: Colors.white12, height: 1),
+
+                // Option 2: Public Download folder
+                if (publicDownloads != null && publicDownloads.isNotEmpty) ...[
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: const Icon(Icons.file_download, color: Color(0xFFE50914)),
+                    title: const Text('系統公開下載資料夾 (Downloads/dTVSteams)',
+                        style: TextStyle(color: Colors.white, fontSize: 14)),
+                    subtitle: Text(publicDownloads, style: const TextStyle(color: Colors.white54, fontSize: 11)),
+                    trailing: (downloadManager.downloadDirectoryPath == publicDownloads)
+                        ? const Icon(Icons.check, color: Color(0xFF46D369), size: 20)
+                        : null,
+                    onTap: () {
+                      Navigator.of(ctx).pop();
+                      handleSelectLocation(context, publicDownloads, onStorageChanged: onStorageChanged);
+                    },
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white70),
-                    onPressed: () => Navigator.of(ctx).pop(),
-                  ),
+                  const Divider(color: Colors.white12, height: 1),
                 ],
-              ),
-              const SizedBox(height: 8),
 
-              // Option 1: Default App Documents
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: const Icon(Icons.folder, color: Colors.white70),
-                title: const Text('預設應用內部儲存', style: TextStyle(color: Colors.white, fontSize: 14)),
-                subtitle: Text(defaultPath, style: const TextStyle(color: Colors.white54, fontSize: 11)),
-                trailing: (downloadManager.downloadDirectoryPath == defaultPath)
-                    ? const Icon(Icons.check, color: Color(0xFF46D369), size: 20)
-                    : null,
-                onTap: () {
-                  Navigator.of(ctx).pop();
-                  handleSelectLocation(context, defaultPath, onStorageChanged: onStorageChanged);
-                },
-              ),
-              const Divider(color: Colors.white12, height: 1),
+                // Option 3: Public Movies folder
+                if (publicMovies != null && publicMovies.isNotEmpty) ...[
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: const Icon(Icons.movie, color: Colors.amber),
+                    title: const Text('系統公開影片資料夾 (Movies/dTVSteams)',
+                        style: TextStyle(color: Colors.white, fontSize: 14)),
+                    subtitle: Text(publicMovies, style: const TextStyle(color: Colors.white54, fontSize: 11)),
+                    trailing: (downloadManager.downloadDirectoryPath == publicMovies)
+                        ? const Icon(Icons.check, color: Color(0xFF46D369), size: 20)
+                        : null,
+                    onTap: () {
+                      Navigator.of(ctx).pop();
+                      handleSelectLocation(context, publicMovies, onStorageChanged: onStorageChanged);
+                    },
+                  ),
+                  const Divider(color: Colors.white12, height: 1),
+                ],
 
-              // Option 2: Public Download folder
-              if (publicDownloads != null && publicDownloads.isNotEmpty) ...[
+                // Option 4: Custom Directory Picker / Input
                 ListTile(
                   contentPadding: EdgeInsets.zero,
-                  leading: const Icon(Icons.file_download, color: Color(0xFFE50914)),
-                  title: const Text('系統公開下載資料夾 (Downloads/dTVSteams)',
+                  leading: const Icon(Icons.drive_folder_upload, color: Colors.lightBlueAccent),
+                  title: const Text('自訂資料夾 (系統資料夾選取器)...',
                       style: TextStyle(color: Colors.white, fontSize: 14)),
-                  subtitle: Text(publicDownloads, style: const TextStyle(color: Colors.white54, fontSize: 11)),
-                  trailing: (downloadManager.downloadDirectoryPath == publicDownloads)
-                      ? const Icon(Icons.check, color: Color(0xFF46D369), size: 20)
-                      : null,
-                  onTap: () {
+                  subtitle: const Text('自由選取手機或 SD 卡上的任意儲存資料夾',
+                      style: TextStyle(color: Colors.white54, fontSize: 11)),
+                  onTap: () async {
                     Navigator.of(ctx).pop();
-                    handleSelectLocation(context, publicDownloads, onStorageChanged: onStorageChanged);
+                    await pickCustomDirectory(context, onStorageChanged: onStorageChanged);
                   },
                 ),
-                const Divider(color: Colors.white12, height: 1),
+                const SizedBox(height: 8),
               ],
-
-              // Option 3: Public Movies folder
-              if (publicMovies != null && publicMovies.isNotEmpty) ...[
-                ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: const Icon(Icons.movie, color: Colors.amber),
-                  title: const Text('系統公開影片資料夾 (Movies/dTVSteams)',
-                      style: TextStyle(color: Colors.white, fontSize: 14)),
-                  subtitle: Text(publicMovies, style: const TextStyle(color: Colors.white54, fontSize: 11)),
-                  trailing: (downloadManager.downloadDirectoryPath == publicMovies)
-                      ? const Icon(Icons.check, color: Color(0xFF46D369), size: 20)
-                      : null,
-                  onTap: () {
-                    Navigator.of(ctx).pop();
-                    handleSelectLocation(context, publicMovies, onStorageChanged: onStorageChanged);
-                  },
-                ),
-                const Divider(color: Colors.white12, height: 1),
-              ],
-
-              // Option 4: Custom Directory Picker / Input
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: const Icon(Icons.drive_folder_upload, color: Colors.lightBlueAccent),
-                title: const Text('自訂資料夾 (系統資料夾選取器)...',
-                    style: TextStyle(color: Colors.white, fontSize: 14)),
-                subtitle: const Text('自由選取手機或 SD 卡上的任意儲存資料夾',
-                    style: TextStyle(color: Colors.white54, fontSize: 11)),
-                onTap: () async {
-                  Navigator.of(ctx).pop();
-                  await pickCustomDirectory(context, onStorageChanged: onStorageChanged);
-                },
-              ),
-            ],
+            ),
           ),
         ),
       ),
