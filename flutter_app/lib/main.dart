@@ -11,6 +11,7 @@ import 'ui/about_update_dialog.dart';
 import 'ui/downloads_screen.dart';
 import 'ui/episode_card.dart';
 import 'ui/player_screen.dart';
+import 'ui/share_dialog.dart';
 
 export 'ui/episode_card.dart';
 
@@ -885,6 +886,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       episode: ep,
                       onPlayTapped: () => _openPlayer(ep, 0),
                       onPartTapped: (partIdx) => _openPlayer(ep, partIdx),
+                      onShareTapped: () => showShareDialog(context, ep),
                     );
                   },
                   childCount: currentDisplayEpisodes.length + 1,

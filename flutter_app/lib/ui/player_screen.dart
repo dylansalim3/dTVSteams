@@ -11,6 +11,7 @@ import '../services/playback_bridge.dart';
 import '../services/playback_history_manager.dart';
 import '../services/settings_manager.dart';
 import 'downloads_screen.dart';
+import 'share_dialog.dart';
 
 class NativePlayerScreen extends StatefulWidget {
   final CatalogEpisode episode;
@@ -911,6 +912,20 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
                                     tooltip: '播放偏好設定 (背景播放 / 防止休眠)',
                                     icon: const Icon(Icons.tune, color: Colors.white, size: 22),
                                     onPressed: _showPlaybackSettingsSheet,
+                                  ),
+
+                                  // Share Button in OSD (QR Code & Link)
+                                  IconButton(
+                                    tooltip: '分享此集影片 (QR Code / 連結)',
+                                    icon: const Icon(Icons.share_outlined, color: Colors.white, size: 22),
+                                    onPressed: () {
+                                      showShareDialog(
+                                        context,
+                                        widget.episode,
+                                        partIndex: _currentPartIndex,
+                                        localFilePath: widget.localFile?.path,
+                                      );
+                                    },
                                   ),
                                 ],
                               ),

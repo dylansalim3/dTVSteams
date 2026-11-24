@@ -5,9 +5,9 @@ import '../catalog/parser.dart';
 import '../catalog/show_channel.dart';
 import '../services/download_manager.dart';
 import '../services/playback_history_manager.dart';
-import '../services/share_service.dart';
 import 'downloads_screen.dart';
 import 'player_screen.dart';
+import 'share_dialog.dart';
 
 /// Segmented Single-Border Circular Progress Download Icon (3-piece pie border)
 /// Slice 1 (Top-Right): Part 1
@@ -488,14 +488,12 @@ void showDownloadSelectionSheet(
                                           final localFile = downloadManager.getLocalFile(
                                               episode.id, p.label,
                                               showId: showId, title: episode.title);
-                                          if (localFile != null && localFile.existsSync()) {
-                                            final shareTitle = '${episode.title} - ${p.label}';
-                                            ShareService.shareVideoFile(localFile.path, title: shareTitle);
-                                          } else {
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              const SnackBar(content: Text('影片檔案不存在或已被移動')),
-                                            );
-                                          }
+                                          showShareDialog(
+                                            context,
+                                            episode,
+                                            partIndex: i,
+                                            localFilePath: localFile?.path,
+                                          );
                                         },
                                       ),
                                       const SizedBox(width: 4),
@@ -910,11 +908,11 @@ class YouTubeEpisodeCard extends StatelessWidget {
                   ),
                 ),
 
-                // Share Button for Downloads View
-                if (isDownloadView && onShareTapped != null) ...[
+                // Share Button (Available in both Home Feed and Downloads View)
+                if (onShareTapped != null) ...[
                   IconButton(
                     icon: const Icon(Icons.share_outlined, color: Colors.white70, size: 20),
-                    tooltip: '分享離線影片',
+                    tooltip: '分享此集影片',
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                     onPressed: onShareTapped,

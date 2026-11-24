@@ -7,6 +7,8 @@ dist/
 build/
 coverage/
 .gradle/
+*.apk
+checksums-sha256.txt
 
 # Agent / Tool cache
 .agents/

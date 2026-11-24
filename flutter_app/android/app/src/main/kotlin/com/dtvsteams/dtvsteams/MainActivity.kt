@@ -89,8 +89,8 @@ class MainActivity : FlutterActivity() {
                         ))
                     } catch (e: Exception) {
                         result.success(mapOf(
-                            "versionName" to "1.0.7",
-                            "versionCode" to 8L
+                            "versionName" to "1.0.8",
+                            "versionCode" to 9L
                         ))
                     }
                 }
@@ -301,6 +301,28 @@ class MainActivity : FlutterActivity() {
         shareChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, SHARE_CHANNEL)
         shareChannel?.setMethodCallHandler { call, result ->
             when (call.method) {
+                "shareText" -> {
+                    val text = call.argument<String>("text")
+                    val title = call.argument<String>("title") ?: "分享連結"
+                    if (text.isNullOrEmpty()) {
+                        result.error("INVALID_TEXT", "text is null or empty", null)
+                        return@setMethodCallHandler
+                    }
+                    try {
+                        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                            type = "text/plain"
+                            putExtra(Intent.EXTRA_TEXT, text)
+                            putExtra(Intent.EXTRA_SUBJECT, title)
+                        }
+                        val chooser = Intent.createChooser(shareIntent, title).apply {
+                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        }
+                        startActivity(chooser)
+                        result.success(true)
+                    } catch (e: Exception) {
+                        result.error("SHARE_ERROR", e.message, null)
+                    }
+                }
                 "shareFile" -> {
                     val filePath = call.argument<String>("filePath")
                     val title = call.argument<String>("title") ?: "分享影片"

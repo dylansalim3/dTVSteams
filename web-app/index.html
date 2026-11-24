@@ -86,6 +86,16 @@
               </button>
               <div id="download-menu" class="yt-download-menu" style="display: none;" role="menu" aria-label="選擇下載分段"></div>
             </div>
+            <button class="yt-btn yt-btn-secondary" id="share-btn" aria-label="分享此集影片" title="分享此集影片">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="18" cy="5" r="3"/>
+                <circle cx="6" cy="12" r="3"/>
+                <circle cx="18" cy="19" r="3"/>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+              </svg>
+              <span>分享</span>
+            </button>
           </div>
         </div>
 
@@ -152,7 +162,65 @@
     <p>dTVStream 個人播放平台 · 快捷鍵支援：<code>Space / Enter</code> (播放/暫停)、<code>← / →</code> (快退/快進 10s)、<code>1 / 2 / 3</code> (切換分段)、<code>&gt; / &lt;</code> (倍速調整)、<code>F</code> (全螢幕)</p>
   </footer>
 
+  <!-- Share Link & QR Code Modal Dialog -->
+  <div id="share-modal" class="yt-modal" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="share-modal-title">
+    <div class="yt-modal-backdrop" id="share-modal-backdrop"></div>
+    <div class="yt-modal-content">
+      <div class="yt-modal-header">
+        <div class="yt-modal-title-row">
+          <div class="yt-share-icon-badge">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="18" cy="5" r="3"/>
+              <circle cx="6" cy="12" r="3"/>
+              <circle cx="18" cy="19" r="3"/>
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+            </svg>
+          </div>
+          <div>
+            <h2 class="yt-modal-title" id="share-modal-title">分享節目影片</h2>
+            <p class="yt-modal-subtitle" id="share-modal-subtitle">掃描 QR Code 或複製網址即開即播</p>
+          </div>
+        </div>
+        <button class="yt-modal-close" id="share-modal-close" aria-label="關閉分享視窗">✕</button>
+      </div>
+
+      <div class="yt-modal-body">
+        <!-- QR Code Container -->
+        <div class="yt-qr-wrapper" id="share-qr-container"></div>
+        <p class="yt-qr-hint">使用手機相機或平板掃描，即可直接於瀏覽器開播</p>
+
+        <!-- Copy URL Input Bar -->
+        <div class="yt-copy-bar">
+          <input type="text" id="share-url-input" class="yt-copy-input" readonly aria-label="分享連結網址">
+          <button id="share-copy-btn" class="yt-btn yt-btn-primary" aria-label="複製分享連結">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+            <span id="share-copy-text">複製連結</span>
+          </button>
+        </div>
+
+        <!-- Web Share API Button -->
+        <div class="yt-modal-footer">
+          <button id="share-native-btn" class="yt-btn yt-btn-secondary yt-btn-block" style="display:none;" aria-label="呼叫系統分享">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="18" cy="5" r="3"/>
+              <circle cx="6" cy="12" r="3"/>
+              <circle cx="18" cy="19" r="3"/>
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+            </svg>
+            <span>使用系統分享傳送</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="./frame-thumbnails.js"></script>
+  <script src="./qrcode.js"></script>
   <script src="./app.js"></script>
 </body>
 </html>

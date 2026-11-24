@@ -6,6 +6,24 @@ import 'package:flutter/services.dart';
 class ShareService {
   static const MethodChannel _channel = MethodChannel('com.dtvsteams.dtvsteams/share');
 
+  /// Shares text/URL using Android native system share sheet
+  static Future<bool> shareText(String text, {String? title}) async {
+    try {
+      if (text.isEmpty) return false;
+      final bool? success = await _channel.invokeMethod<bool>('shareText', {
+        'text': text,
+        'title': title ?? '分享連結',
+      });
+      return success ?? false;
+    } on PlatformException catch (e) {
+      debugPrint('[ShareService] PlatformException sharing text: ${e.message}');
+      return false;
+    } catch (e) {
+      debugPrint('[ShareService] Error sharing text: $e');
+      return false;
+    }
+  }
+
   /// Shares a single video file using Android native system share sheet
   static Future<bool> shareVideoFile(
     String filePath, {

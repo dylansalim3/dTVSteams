@@ -21,6 +21,17 @@ const playerTitle = isBrowser ? document.getElementById("player-title") : null;
 const openSourceBtn = isBrowser ? document.getElementById("open-source-btn") : null;
 const downloadBtn = isBrowser ? document.getElementById("download-btn") : null;
 const downloadMenu = isBrowser ? document.getElementById("download-menu") : null;
+const shareBtn = isBrowser ? document.getElementById("share-btn") : null;
+const shareModal = isBrowser ? document.getElementById("share-modal") : null;
+const shareModalBackdrop = isBrowser ? document.getElementById("share-modal-backdrop") : null;
+const shareModalClose = isBrowser ? document.getElementById("share-modal-close") : null;
+const shareModalTitle = isBrowser ? document.getElementById("share-modal-title") : null;
+const shareModalSubtitle = isBrowser ? document.getElementById("share-modal-subtitle") : null;
+const shareQrContainer = isBrowser ? document.getElementById("share-qr-container") : null;
+const shareUrlInput = isBrowser ? document.getElementById("share-url-input") : null;
+const shareCopyBtn = isBrowser ? document.getElementById("share-copy-btn") : null;
+const shareCopyText = isBrowser ? document.getElementById("share-copy-text") : null;
+const shareNativeBtn = isBrowser ? document.getElementById("share-native-btn") : null;
 const playerPartBadge = isBrowser ? document.getElementById("player-part-badge") : null;
 const playerDateBadge = isBrowser ? document.getElementById("player-date-badge") : null;
 const playerStreamStatus = isBrowser ? document.getElementById("player-stream-status") : null;
@@ -623,6 +634,105 @@ function setupDownloadActions() {
   });
 }
 
+// Share Modal & URL Generation
+function getShareUrl(episode, partIndex = 0) {
+  if (!episode) return "https://dtvsteams.pages.dev";
+  const origin = (typeof window !== "undefined" && window.location?.origin && !window.location.origin.startsWith("null"))
+    ? window.location.origin
+    : "https://dtvsteams.pages.dev";
+  const params = new URLSearchParams();
+  if (episode.id) params.set("ep", episode.id);
+  if (partIndex > 0) params.set("part", String(partIndex + 1));
+  return `${origin}/?${params.toString()}`;
+}
+
+function openShareModal(episode, partIndex = 0) {
+  if (!shareModal || !episode) return;
+  const shareUrl = getShareUrl(episode, partIndex);
+  const part = episode.parts?.[partIndex];
+  const partLabel = part?.label || `Part ${partIndex + 1}`;
+
+  if (shareModalTitle) shareModalTitle.textContent = episode.title || "分享節目影片";
+  if (shareModalSubtitle) shareModalSubtitle.textContent = `${episode.date || "最新"} · ${partLabel} · 掃描或複製即播`;
+  if (shareUrlInput) shareUrlInput.value = shareUrl;
+  if (shareCopyText) shareCopyText.textContent = "複製連結";
+
+  if (shareQrContainer) {
+    const qrLib = (typeof window !== "undefined" && window.QRCode) || (typeof QRCode !== "undefined" ? QRCode : null);
+    if (qrLib && typeof qrLib.renderTo === "function") {
+      qrLib.renderTo(shareQrContainer, shareUrl);
+    } else {
+      shareQrContainer.innerHTML = `<div style="padding:40px; text-align:center; color:#fff; font-size:0.9rem;">QR Code 載入中</div>`;
+    }
+  }
+
+  if (shareNativeBtn) {
+    if (typeof navigator !== "undefined" && navigator.share) {
+      shareNativeBtn.style.display = "inline-flex";
+      shareNativeBtn.onclick = async () => {
+        try {
+          await navigator.share({
+            title: episode.title || "dTVStream 影片分享",
+            text: `快來觀看【${episode.title}】(${partLabel})：`,
+            url: shareUrl
+          });
+        } catch (_) {}
+      };
+    } else {
+      shareNativeBtn.style.display = "none";
+    }
+  }
+
+  shareModal.style.display = "flex";
+}
+
+function closeShareModal() {
+  if (shareModal) shareModal.style.display = "none";
+}
+
+function setupShareModal() {
+  if (shareBtn) {
+    shareBtn.onclick = () => {
+      if (activeEpisode) {
+        openShareModal(activeEpisode, activePartIndex);
+      } else {
+        if (playerStreamStatus) playerStreamStatus.textContent = "請先選擇欲分享的集數";
+      }
+    };
+  }
+
+  if (shareModalBackdrop) shareModalBackdrop.onclick = closeShareModal;
+  if (shareModalClose) shareModalClose.onclick = closeShareModal;
+
+  if (shareCopyBtn) {
+    shareCopyBtn.onclick = async () => {
+      if (!shareUrlInput || !shareUrlInput.value) return;
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(shareUrlInput.value);
+        } else {
+          shareUrlInput.select();
+          document.execCommand("copy");
+        }
+        if (shareCopyText) shareCopyText.textContent = "已複製！";
+        setTimeout(() => {
+          if (shareCopyText) shareCopyText.textContent = "複製連結";
+        }, 2500);
+      } catch (_) {
+        shareUrlInput.select();
+        document.execCommand("copy");
+        if (shareCopyText) shareCopyText.textContent = "已複製！";
+      }
+    };
+  }
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && shareModal && shareModal.style.display !== "none") {
+      closeShareModal();
+    }
+  });
+}
+
 // Render Part Selector Chips Under Player
 function renderPlayerParts(episode, activeIdx) {
   if (!playerPartsNav) return;
@@ -817,9 +927,26 @@ async function loadCatalog() {
 
   renderGrid(filteredEpisodes);
 
-  // Stage first episode (with resume check)
-  if (catalog.episodes.length > 0) {
-    playPart(catalog.episodes[0], 0, false, false);
+  // Stage episode (with deep-link query parameter support: ?ep=...&part=...)
+  let targetEpisode = catalog.episodes[0];
+  let targetPartIndex = 0;
+  if (typeof window !== "undefined" && window.location && window.location.search) {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const epParam = urlParams.get("ep");
+      const partParam = parseInt(urlParams.get("part") || "1", 10) - 1;
+      if (epParam) {
+        const found = catalog.episodes.find((e) => e.id === epParam || e.url === epParam || (e.id && e.id.includes(epParam)));
+        if (found) {
+          targetEpisode = found;
+          targetPartIndex = Math.max(0, partParam);
+        }
+      }
+    } catch (_) {}
+  }
+
+  if (targetEpisode) {
+    playPart(targetEpisode, targetPartIndex, false, false);
   }
 
   // Bind Load More button
@@ -1048,6 +1175,7 @@ if (typeof window !== "undefined") {
     setupQuickSkipButtons();
     setupShortcuts();
     setupDownloadActions();
+    setupShareModal();
     loadCatalog();
   });
 }
@@ -1064,6 +1192,10 @@ if (typeof window !== "undefined") {
   window.getDownloadFilename = getDownloadFilename;
   window.downloadEpisodePart = downloadEpisodePart;
   window.setupDownloadActions = setupDownloadActions;
+  window.getShareUrl = getShareUrl;
+  window.openShareModal = openShareModal;
+  window.closeShareModal = closeShareModal;
+  window.setupShareModal = setupShareModal;
   window.saveResume = saveResume;
   window.getEpisodeResume = getEpisodeResume;
   window.clearEpisodeResume = clearEpisodeResume;
@@ -1088,6 +1220,10 @@ if (typeof module !== "undefined" && module.exports) {
     getDownloadFilename,
     downloadEpisodePart,
     setupDownloadActions,
+    getShareUrl,
+    openShareModal,
+    closeShareModal,
+    setupShareModal,
     saveResume,
     getEpisodeResume,
     clearEpisodeResume,

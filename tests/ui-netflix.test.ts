@@ -60,6 +60,10 @@ describe("YouTube Web App UI & Video.js Compliance", () => {
     expect(doc.querySelector("#open-source-btn")).not.toBeNull();
     expect(doc.querySelector("#download-btn")).not.toBeNull();
     expect(doc.querySelector("#download-menu")).not.toBeNull();
+    expect(doc.querySelector("#share-btn")).not.toBeNull();
+    expect(doc.querySelector("#share-modal")).not.toBeNull();
+    expect(doc.querySelector("#share-qr-container")).not.toBeNull();
+    expect(doc.querySelector("#share-copy-btn")).not.toBeNull();
     expect(doc.querySelector("#player-resume-toast")).not.toBeNull();
   });
 
@@ -212,5 +216,38 @@ describe("YouTube Web App UI & Video.js Compliance", () => {
     };
     expect(win.getDownloadFilename(ep1, 0)).toBe("綜藝玩很大_2026-11-08_Part 1.mp4");
     expect(win.getDownloadFilename(ep1, 1)).toBe("綜藝玩很大_2026-11-08_Part 2.mp4");
+  });
+
+  it("generates correct share URLs and creates valid QR Code SVGs", () => {
+    const html = fs.readFileSync(htmlPath, "utf-8");
+    const js = fs.readFileSync(jsPath, "utf-8");
+    const qrJs = fs.readFileSync(path.resolve(__dirname, "../web-app/qrcode.js"), "utf-8");
+    const dom = new JSDOM(html, { runScripts: "dangerously", url: "http://localhost/" });
+    const win = dom.window as any;
+    win.eval(qrJs);
+    win.eval(js);
+
+    expect(typeof win.getShareUrl).toBe("function");
+    expect(typeof win.QRCode.generateSVG).toBe("function");
+
+    const ep = {
+      id: "https://srgoideas.com/ep-20261108/",
+      title: "【綜藝玩很大】嘉義 經典大對決",
+      date: "2026-11-08",
+      parts: [{ label: "Part 1" }, { label: "Part 2" }]
+    };
+
+    const urlP1 = win.getShareUrl(ep, 0);
+    expect(urlP1).toContain("?ep=" + encodeURIComponent(ep.id));
+    expect(urlP1).not.toContain("&part=");
+
+    const urlP2 = win.getShareUrl(ep, 1);
+    expect(urlP2).toContain("?ep=" + encodeURIComponent(ep.id));
+    expect(urlP2).toContain("&part=2");
+
+    const svg = win.QRCode.generateSVG(urlP2);
+    expect(svg).toContain("<svg");
+    expect(svg).toContain("</svg>");
+    expect(svg).toContain("<rect");
   });
 });
