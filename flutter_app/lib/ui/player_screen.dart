@@ -6,14 +6,22 @@ import 'package:http/http.dart' as http;
 import 'package:video_player/video_player.dart';
 import '../catalog/parser.dart';
 import '../services/download_manager.dart';
+import '../services/favorites_manager.dart';
 import '../services/pip_manager.dart';
 import '../services/playback_bridge.dart';
 import '../services/playback_history_manager.dart';
 import '../services/settings_manager.dart';
 import '../services/sleep_timer_manager.dart';
 import 'downloads_screen.dart';
+import 'history_screen.dart';
 import 'share_dialog.dart';
 import 'sleep_timer_sheet.dart';
+
+enum VideoScaleMode {
+  fit, // 適應 (Fit / Contain)
+  fill, // 填滿裁剪 (Fill / Cover)
+  stretch, // 拉伸 (Stretch / Fill)
+}
 
 class NativePlayerScreen extends StatefulWidget {
   final CatalogEpisode episode;
@@ -43,6 +51,7 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
   bool _isAutoAdvancing = false;
   final DownloadManager _downloadManager = DownloadManager();
   final PlaybackHistoryManager _historyManager = PlaybackHistoryManager();
+  final FavoritesManager _favoritesManager = FavoritesManager();
   final PipManager _pipManager = PipManager();
   final SettingsManager _settingsManager = SettingsManager();
   final PlaybackBridge _playbackBridge = PlaybackBridge();
@@ -68,6 +77,22 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
   Timer? _singleTapDebounce;
   int _lastTapTime = 0;
   Offset _lastTapPosition = Offset.zero;
+
+  // Press-and-hold 2x fast forward state
+  bool _isFastForwarding = false;
+  bool _showFastForwardHud = false;
+  double _preFastForwardSpeed = 1.0;
+  Timer? _longPressTimer;
+  bool _isPointerDown = false;
+  Offset _pointerDownPos = Offset.zero;
+
+  // Video aspect ratio scale mode
+  VideoScaleMode _scaleMode = VideoScaleMode.fit;
+
+  // Screen lock anti-touch state
+  bool _isScreenLocked = false;
+  bool _showUnlockHint = false;
+  Timer? _unlockHintTimer;
 
   @override
   void initState() {
@@ -209,6 +234,10 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
         partIndex: _currentPartIndex,
         positionMs: controller.value.position.inMilliseconds,
         durationMs: controller.value.duration.inMilliseconds,
+        episodeTitle: widget.episode.title,
+        thumbnailUrl: widget.episode.poster.isNotEmpty ? widget.episode.poster : widget.episode.backdrop,
+        showName: widget.episode.showName,
+        episode: widget.episode,
         forcePersist: force,
       );
     }
@@ -226,11 +255,55 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
   }
 
   void _toggleOsd() {
+    if (_isScreenLocked) {
+      _showUnlockPrompt();
+      return;
+    }
     setState(() {
       _showOsd = !_showOsd;
       if (_showOsd) {
         _resetOsdTimer();
       }
+    });
+  }
+
+  void _lockScreen() {
+    HapticFeedback.mediumImpact();
+    setState(() {
+      _isScreenLocked = true;
+      _showOsd = false;
+      _showFastForwardHud = false;
+      _showSeekFeedback = false;
+      _showBrightnessHud = false;
+      _showVolumeHud = false;
+    });
+    _osdTimer?.cancel();
+    _showUnlockPrompt();
+  }
+
+  void _unlockScreen() {
+    HapticFeedback.lightImpact();
+    _unlockHintTimer?.cancel();
+    setState(() {
+      _isScreenLocked = false;
+      _showUnlockHint = false;
+      _showOsd = true;
+    });
+    _resetOsdTimer();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('🔓 螢幕已解鎖 (Screen Unlocked)'),
+        duration: Duration(milliseconds: 1500),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  void _showUnlockPrompt() {
+    _unlockHintTimer?.cancel();
+    setState(() => _showUnlockHint = true);
+    _unlockHintTimer = Timer(const Duration(seconds: 3), () {
+      if (mounted) setState(() => _showUnlockHint = false);
     });
   }
 
@@ -478,6 +551,86 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
     _resetOsdTimer();
   }
 
+  void _cycleScaleMode() {
+    setState(() {
+      switch (_scaleMode) {
+        case VideoScaleMode.fit:
+          _scaleMode = VideoScaleMode.fill;
+          break;
+        case VideoScaleMode.fill:
+          _scaleMode = VideoScaleMode.stretch;
+          break;
+        case VideoScaleMode.stretch:
+          _scaleMode = VideoScaleMode.fit;
+          break;
+      }
+    });
+
+    final name = switch (_scaleMode) {
+      VideoScaleMode.fit => '畫面比例：原始適應 (Fit)',
+      VideoScaleMode.fill => '畫面比例：全螢幕填滿裁剪 (Fill)',
+      VideoScaleMode.stretch => '畫面比例：全螢幕拉伸 (Stretch)',
+    };
+
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(name),
+        duration: const Duration(milliseconds: 1200),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+    _resetOsdTimer();
+  }
+
+  IconData get _scaleModeIcon => switch (_scaleMode) {
+        VideoScaleMode.fit => Icons.fit_screen,
+        VideoScaleMode.fill => Icons.crop_free,
+        VideoScaleMode.stretch => Icons.aspect_ratio,
+      };
+
+  String get _scaleModeTooltip => switch (_scaleMode) {
+        VideoScaleMode.fit => '畫面比例：適應 (Fit)',
+        VideoScaleMode.fill => '畫面比例：填滿 (Fill)',
+        VideoScaleMode.stretch => '畫面比例：拉伸 (Stretch)',
+      };
+
+  Widget _buildScaledVideoPlayer(VideoPlayerController controller) {
+    final videoAspect = controller.value.aspectRatio > 0 ? controller.value.aspectRatio : (16 / 9);
+
+    switch (_scaleMode) {
+      case VideoScaleMode.fit:
+        return AspectRatio(
+          aspectRatio: videoAspect,
+          child: VideoPlayer(controller),
+        );
+      case VideoScaleMode.fill:
+        return SizedBox.expand(
+          child: FittedBox(
+            fit: BoxFit.cover,
+            clipBehavior: Clip.hardEdge,
+            child: SizedBox(
+              width: controller.value.size.width > 0 ? controller.value.size.width : 1920,
+              height: controller.value.size.height > 0 ? controller.value.size.height : 1080,
+              child: VideoPlayer(controller),
+            ),
+          ),
+        );
+      case VideoScaleMode.stretch:
+        return SizedBox.expand(
+          child: FittedBox(
+            fit: BoxFit.fill,
+            clipBehavior: Clip.hardEdge,
+            child: SizedBox(
+              width: controller.value.size.width > 0 ? controller.value.size.width : 1920,
+              height: controller.value.size.height > 0 ? controller.value.size.height : 1080,
+              child: VideoPlayer(controller),
+            ),
+          ),
+        );
+    }
+  }
+
   Future<void> _handleExitPlayer() async {
     if (_isExiting) return;
     _isExiting = true;
@@ -520,6 +673,8 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
     }
     _seekFeedbackTimer?.cancel();
     _singleTapDebounce?.cancel();
+    _longPressTimer?.cancel();
+    _unlockHintTimer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     _persistCurrentPosition(force: true);
@@ -647,6 +802,53 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
                           showSleepTimerSheet(context, onTimerChanged: () => setState(() {}));
                         },
                       ),
+                      const Divider(color: Colors.white12, height: 1),
+                      ListTile(
+                        leading: Icon(_scaleModeIcon, color: const Color(0xFFE50914)),
+                        title: const Text('畫面比例縮放 (Aspect Ratio)',
+                            style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
+                        subtitle: Text(
+                          _scaleModeTooltip,
+                          style: const TextStyle(color: Colors.white60, fontSize: 12),
+                        ),
+                        trailing: const Icon(Icons.chevron_right, color: Colors.white38),
+                        onTap: () {
+                          Navigator.of(ctx).pop();
+                          _cycleScaleMode();
+                        },
+                      ),
+                      const Divider(color: Colors.white12, height: 1),
+                      ListTile(
+                        leading: const Icon(Icons.history, color: Color(0xFFE50914)),
+                        title: const Text('觀看歷史紀錄 (Watch History)',
+                            style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
+                        subtitle: const Text(
+                          '查看歷史播放清單與中斷點進度',
+                          style: TextStyle(color: Colors.white60, fontSize: 12),
+                        ),
+                        trailing: const Icon(Icons.chevron_right, color: Colors.white38),
+                        onTap: () {
+                          Navigator.of(ctx).pop();
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (_) => const HistoryScreen()),
+                          );
+                        },
+                      ),
+                      const Divider(color: Colors.white12, height: 1),
+                      ListTile(
+                        leading: const Icon(Icons.lock_outline_rounded, color: Color(0xFFE50914)),
+                        title: const Text('螢幕鎖定防誤觸 (Screen Lock)',
+                            style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
+                        subtitle: const Text(
+                          '鎖定所有控制項與手勢，防止誤觸',
+                          style: TextStyle(color: Colors.white60, fontSize: 12),
+                        ),
+                        trailing: const Icon(Icons.chevron_right, color: Colors.white38),
+                        onTap: () {
+                          Navigator.of(ctx).pop();
+                          _lockScreen();
+                        },
+                      ),
                     ],
                   ),
                 ),
@@ -661,6 +863,7 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
   }
 
   void _seekRelative(int seconds) {
+    if (_isScreenLocked) return;
     final c = _controller;
     if (c == null || !c.value.isInitialized) return;
     final target = c.value.position + Duration(seconds: seconds);
@@ -671,7 +874,71 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
     _resetOsdTimer();
   }
 
+  void _onPointerDown(PointerDownEvent event) {
+    if (_isScreenLocked) {
+      _isPointerDown = false;
+      return;
+    }
+    _isPointerDown = true;
+    _pointerDownPos = event.localPosition;
+    _longPressTimer?.cancel();
+    _longPressTimer = Timer(const Duration(milliseconds: 350), () {
+      if (_isPointerDown && !_isVerticalDragging && !_isSeekingForward && !_showSeekFeedback) {
+        final c = _controller;
+        if (c != null && c.value.isInitialized && c.value.isPlaying) {
+          _preFastForwardSpeed = _playbackSpeed;
+          _isFastForwarding = true;
+          c.setPlaybackSpeed(2.0);
+          HapticFeedback.lightImpact();
+          _singleTapDebounce?.cancel();
+          _singleTapDebounce = null;
+          setState(() {
+            _showFastForwardHud = true;
+          });
+        }
+      }
+    });
+  }
+
+  void _onPointerMove(PointerMoveEvent event) {
+    if ((event.localPosition - _pointerDownPos).distance > 12) {
+      _longPressTimer?.cancel();
+      _longPressTimer = null;
+    }
+  }
+
+  void _onPointerUp(PointerUpEvent event) {
+    _isPointerDown = false;
+    _longPressTimer?.cancel();
+    _longPressTimer = null;
+    if (_isFastForwarding) {
+      _isFastForwarding = false;
+      _controller?.setPlaybackSpeed(_preFastForwardSpeed);
+      setState(() {
+        _showFastForwardHud = false;
+      });
+    }
+  }
+
+  void _onPointerCancel(PointerCancelEvent event) {
+    _isPointerDown = false;
+    _longPressTimer?.cancel();
+    _longPressTimer = null;
+    if (_isFastForwarding) {
+      _isFastForwarding = false;
+      _controller?.setPlaybackSpeed(_preFastForwardSpeed);
+      setState(() {
+        _showFastForwardHud = false;
+      });
+    }
+  }
+
   void _handleScreenTapDown(TapDownDetails details, double screenWidth) {
+    if (_isScreenLocked) {
+      _showUnlockPrompt();
+      return;
+    }
+    if (_isFastForwarding) return;
     final now = DateTime.now().millisecondsSinceEpoch;
     final pos = details.localPosition;
     final isDoubleTap = (now - _lastTapTime < 380) && ((pos - _lastTapPosition).distance < 120);
@@ -696,7 +963,7 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
       _lastTapPosition = pos;
       _singleTapDebounce?.cancel();
       _singleTapDebounce = Timer(const Duration(milliseconds: 260), () {
-        if (mounted) {
+        if (mounted && !_isPointerDown && !_isFastForwarding && !_isVerticalDragging) {
           _toggleOsd();
         }
       });
@@ -729,6 +996,9 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
   }
 
   void _onVerticalDragStart(DragStartDetails details, double screenWidth) {
+    if (_isScreenLocked) return;
+    _longPressTimer?.cancel();
+    _longPressTimer = null;
     final pos = details.localPosition;
     _dragStartY = pos.dy;
     _isDragLeft = pos.dx < screenWidth * 0.45;
@@ -845,6 +1115,48 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
                   fontWeight: FontWeight.bold,
                 ),
               ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFastForwardHud() {
+    return IgnorePointer(
+      child: AnimatedOpacity(
+        duration: const Duration(milliseconds: 150),
+        opacity: _showFastForwardHud ? 1.0 : 0.0,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.82),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Colors.white24, width: 1.0),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.5),
+                blurRadius: 14,
+                spreadRadius: 2,
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: const [
+              Icon(Icons.bolt, color: Color(0xFFFFCC00), size: 20),
+              SizedBox(width: 6),
+              Text(
+                '2X 快進中',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                  letterSpacing: 0.5,
+                ),
+              ),
+              SizedBox(width: 6),
+              Icon(Icons.fast_forward, color: Colors.white70, size: 16),
             ],
           ),
         ),
@@ -991,25 +1303,25 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
           },
         child: Focus(
           autofocus: true,
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTapDown: (details) => _handleScreenTapDown(details, MediaQuery.of(context).size.width),
-            onVerticalDragStart: (details) => _onVerticalDragStart(details, MediaQuery.of(context).size.width),
-            onVerticalDragUpdate: (details) => _onVerticalDragUpdate(details, MediaQuery.of(context).size.height),
-            onVerticalDragEnd: _onVerticalDragEnd,
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                // Video Surface View (Backed by native Android Media3 ExoPlayer)
-                Center(
-                  child: isInitialized
-                      ? AspectRatio(
-                          aspectRatio: controller.value.aspectRatio > 0
-                              ? controller.value.aspectRatio
-                              : 16 / 9,
-                          child: VideoPlayer(controller),
-                        )
-                      : (_isLoading
+          child: Listener(
+            onPointerDown: _onPointerDown,
+            onPointerMove: _onPointerMove,
+            onPointerUp: _onPointerUp,
+            onPointerCancel: _onPointerCancel,
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTapDown: (details) => _handleScreenTapDown(details, MediaQuery.of(context).size.width),
+              onVerticalDragStart: (details) => _onVerticalDragStart(details, MediaQuery.of(context).size.width),
+              onVerticalDragUpdate: (details) => _onVerticalDragUpdate(details, MediaQuery.of(context).size.height),
+              onVerticalDragEnd: _onVerticalDragEnd,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  // Video Surface View (Backed by native Android Media3 ExoPlayer)
+                  Center(
+                    child: isInitialized
+                        ? _buildScaledVideoPlayer(controller)
+                        : (_isLoading
                           ? const Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -1154,14 +1466,45 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
                   ),
                 ),
 
+                // Top Fast-Forward 2X Capsule HUD
+                if (_showFastForwardHud)
+                  Positioned(
+                    top: 28,
+                    left: 0,
+                    right: 0,
+                    child: Center(
+                      child: _buildFastForwardHud(),
+                    ),
+                  ),
+
                 // Animated OSD Controls
                 AnimatedOpacity(
-                  opacity: _showOsd ? 1.0 : 0.0,
+                  opacity: (_showOsd && !_isScreenLocked) ? 1.0 : 0.0,
                   duration: const Duration(milliseconds: 250),
                   child: IgnorePointer(
-                    ignoring: !_showOsd,
+                    ignoring: !_showOsd || _isScreenLocked,
                     child: Stack(
                       children: [
+                        // Left-side Floating Lock Button
+                        Positioned(
+                          left: 20,
+                          top: 0,
+                          bottom: 0,
+                          child: Center(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.black.withValues(alpha: 0.65),
+                                border: Border.all(color: Colors.white24, width: 1),
+                              ),
+                              child: IconButton(
+                                tooltip: '鎖定螢幕 (防誤觸)',
+                                icon: const Icon(Icons.lock_open_rounded, color: Colors.white, size: 22),
+                                onPressed: _lockScreen,
+                              ),
+                            ),
+                          ),
+                        ),
                         // Top Gradient Header
                         Positioned(
                           top: 0,
@@ -1245,6 +1588,13 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
                                     tooltip: '子母畫面 (Picture-in-Picture)',
                                     icon: const Icon(Icons.picture_in_picture_alt, color: Colors.white, size: 22),
                                     onPressed: () => _pipManager.enterPip(),
+                                  ),
+
+                                  // Aspect Ratio Scale Mode Button in OSD
+                                  IconButton(
+                                    tooltip: _scaleModeTooltip,
+                                    icon: Icon(_scaleModeIcon, color: Colors.white, size: 22),
+                                    onPressed: _cycleScaleMode,
                                   ),
 
                                   const SizedBox(width: 4),
@@ -1331,6 +1681,43 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
                                         localFilePath: widget.localFile?.path,
                                       );
                                     },
+                                  ),
+
+                                  // Favorite Button in OSD (Watch Later)
+                                  ListenableBuilder(
+                                    listenable: _favoritesManager,
+                                    builder: (context, _) {
+                                      final isFav = _favoritesManager.isFavorite(widget.episode.id);
+                                      return IconButton(
+                                        tooltip: isFav ? '已收藏 (點擊取消)' : '加入收藏',
+                                        icon: Icon(
+                                          isFav ? Icons.favorite : Icons.favorite_border,
+                                          color: isFav ? const Color(0xFFE50914) : Colors.white,
+                                          size: 22,
+                                        ),
+                                        onPressed: () async {
+                                          final added = await _favoritesManager.toggleFavorite(widget.episode);
+                                          HapticFeedback.lightImpact();
+                                          if (context.mounted) {
+                                            ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(
+                                                content: Text(added ? '❤️ 已加入收藏清單' : '已從收藏清單移除'),
+                                                duration: const Duration(milliseconds: 1200),
+                                                behavior: SnackBarBehavior.floating,
+                                              ),
+                                            );
+                                          }
+                                        },
+                                      );
+                                    },
+                                  ),
+
+                                  // Lock Screen Button in Top OSD
+                                  IconButton(
+                                    tooltip: '鎖定螢幕 (防誤觸)',
+                                    icon: const Icon(Icons.lock_open_rounded, color: Colors.white, size: 22),
+                                    onPressed: _lockScreen,
                                   ),
                                 ],
                               ),
@@ -1482,13 +1869,90 @@ class _NativePlayerScreenState extends State<NativePlayerScreen> with WidgetsBin
                     ),
                   ),
                 ),
+
+                // Screen Locked Unlock Hint Overlay
+                if (_isScreenLocked)
+                  AnimatedOpacity(
+                    opacity: _showUnlockHint ? 1.0 : 0.0,
+                    duration: const Duration(milliseconds: 200),
+                    child: IgnorePointer(
+                      ignoring: !_showUnlockHint,
+                      child: Stack(
+                        children: [
+                          // Center Floating Unlock Capsule
+                          Center(
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(30),
+                                onTap: _unlockScreen,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withValues(alpha: 0.85),
+                                    borderRadius: BorderRadius.circular(30),
+                                    border: Border.all(color: const Color(0xFFE50914), width: 1.5),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(alpha: 0.6),
+                                        blurRadius: 18,
+                                        spreadRadius: 2,
+                                      ),
+                                    ],
+                                  ),
+                                  child: const Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.lock_rounded, color: Color(0xFFE50914), size: 22),
+                                      SizedBox(width: 8),
+                                      Text(
+                                        '點擊解鎖螢幕',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: 0.5,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+
+                          // Left-side Floating Unlock Button
+                          Positioned(
+                            left: 20,
+                            top: 0,
+                            bottom: 0,
+                            child: Center(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.black.withValues(alpha: 0.8),
+                                  border: Border.all(color: const Color(0xFFE50914), width: 1.5),
+                                ),
+                                child: IconButton(
+                                  tooltip: '解除螢幕鎖定',
+                                  icon: const Icon(Icons.lock_rounded, color: Color(0xFFE50914), size: 24),
+                                  onPressed: _unlockScreen,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),
         ),
       ),
     ),
-  );
+  ),
+);
 }
 
   String _formatDuration(Duration d) {

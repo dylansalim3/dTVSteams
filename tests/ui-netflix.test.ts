@@ -328,5 +328,142 @@ describe("YouTube Web App UI & Video.js Compliance", () => {
     expect(hudVol.style.opacity).toBe("1");
     expect(textVol.textContent).toBe("80%");
     expect(player.volume).toBeCloseTo(0.8);
+
+    // Verify 2X Fast-forward HUD & Scale Mode
+    const hud2x = win.document.getElementById("hud-speed-2x");
+    const scaleBtn = win.document.getElementById("scale-mode-btn");
+    const scaleLabel = win.document.getElementById("scale-mode-label");
+
+    expect(hud2x).not.toBeNull();
+    expect(scaleBtn).not.toBeNull();
+    expect(scaleLabel).not.toBeNull();
+    expect(typeof win.setupPressAndHold2x).toBe("function");
+    expect(typeof win.cycleScaleMode).toBe("function");
+
+    // Cycle scale modes: contain -> cover -> fill -> contain
+    expect(scaleLabel.textContent).toContain("適應");
+    win.cycleScaleMode();
+    expect(player.style.objectFit).toBe("cover");
+    expect(scaleLabel.textContent).toContain("填滿");
+
+    win.cycleScaleMode();
+    expect(player.style.objectFit).toBe("fill");
+    expect(scaleLabel.textContent).toContain("拉伸");
+
+    win.cycleScaleMode();
+    expect(player.style.objectFit).toBe("contain");
+    expect(scaleLabel.textContent).toContain("適應");
+
+    // Verify Favorites System (Feature 6)
+    const favFilterBtn = win.document.getElementById("fav-filter-btn");
+    const favBadge = win.document.getElementById("fav-badge");
+    const favBtn = win.document.getElementById("fav-btn");
+
+    expect(favFilterBtn).not.toBeNull();
+    expect(favBadge).not.toBeNull();
+    expect(favBtn).not.toBeNull();
+    expect(typeof win.getFavorites).toBe("function");
+    expect(typeof win.isFavorite).toBe("function");
+    expect(typeof win.toggleFavorite).toBe("function");
+
+    const sampleEp = {
+      id: "ep-fav-test",
+      title: "【綜藝玩很大】宜蘭 溫泉大作戰",
+      date: "2026-11-23",
+      parts: [{ label: "Part 1" }]
+    };
+
+    expect(win.isFavorite(sampleEp.id)).toBe(false);
+    win.toggleFavorite(sampleEp);
+    expect(win.isFavorite(sampleEp.id)).toBe(true);
+    expect(favBadge.textContent).toBe("1");
+    expect(favBadge.style.display).toBe("inline-block");
+
+    // Toggle off
+    win.toggleFavorite(sampleEp);
+    expect(win.isFavorite(sampleEp.id)).toBe(false);
+    expect(favBadge.style.display).toBe("none");
+
+    // Verify Dedicated Watch History Screen / Modal (Feature 7)
+    const historyBtn = win.document.getElementById("history-btn");
+    const historyBadge = win.document.getElementById("history-badge");
+    const historyModal = win.document.getElementById("history-modal");
+    const historyContainer = win.document.getElementById("history-list-container");
+    const historyClearAllBtn = win.document.getElementById("history-clear-all-btn");
+
+    expect(historyBtn).not.toBeNull();
+    expect(historyBadge).not.toBeNull();
+    expect(historyModal).not.toBeNull();
+    expect(historyContainer).not.toBeNull();
+    expect(historyClearAllBtn).not.toBeNull();
+    expect(typeof win.getHistoryRecords).toBe("function");
+    expect(typeof win.openHistoryModal).toBe("function");
+    expect(typeof win.closeHistoryModal).toBe("function");
+    expect(typeof win.clearAllHistory).toBe("function");
+
+    // Clear history to start clean
+    win.clearAllHistory();
+    expect(win.getHistoryRecords().length).toBe(0);
+    expect(historyBadge.style.display).toBe("none");
+
+    // Save a playback record
+    win.saveResume("ep-history-test-1", 0, 120, 300);
+    const records = win.getHistoryRecords();
+    expect(records.length).toBe(1);
+    expect(records[0].episodeId).toBe("ep-history-test-1");
+    expect(records[0].currentTime).toBe(120);
+    expect(records[0].duration).toBe(300);
+    expect(historyBadge.textContent).toBe("1");
+    expect(historyBadge.style.display).toBe("flex");
+
+    // Open history modal and verify rendering
+    win.openHistoryModal();
+    expect(historyModal.style.display).toBe("flex");
+    expect(historyModal.getAttribute("aria-hidden")).toBe("false");
+    expect(historyContainer.innerHTML).toContain("ep-history-test-1");
+    expect(historyContainer.innerHTML).toContain("40%");
+
+    // Close history modal
+    win.closeHistoryModal();
+    expect(historyModal.style.display).toBe("none");
+    expect(historyModal.getAttribute("aria-hidden")).toBe("true");
+
+    // Clear all history
+    win.clearAllHistory();
+    expect(win.getHistoryRecords().length).toBe(0);
+    expect(historyBadge.style.display).toBe("none");
+
+    // Verify Screen Lock OSD (Feature 8)
+    const lockBtn = win.document.getElementById("screen-lock-btn");
+    const lockLabel = win.document.getElementById("screen-lock-label");
+    const unlockOverlay = win.document.getElementById("screen-unlock-overlay");
+    const unlockBtn = win.document.getElementById("screen-unlock-btn");
+    const playerContainer = win.document.getElementById("player-container");
+
+    expect(lockBtn).not.toBeNull();
+    expect(lockLabel).not.toBeNull();
+    expect(unlockOverlay).not.toBeNull();
+    expect(unlockBtn).not.toBeNull();
+    expect(typeof win.lockScreen).toBe("function");
+    expect(typeof win.unlockScreen).toBe("function");
+    expect(typeof win.toggleScreenLock).toBe("function");
+
+    // Lock screen
+    win.lockScreen();
+    expect(playerContainer.classList.contains("player-screen-locked")).toBe(true);
+    expect(lockLabel.textContent).toBe("已鎖定");
+    expect(unlockOverlay.style.display).toBe("flex");
+
+    // Unlock screen
+    win.unlockScreen();
+    expect(playerContainer.classList.contains("player-screen-locked")).toBe(false);
+    expect(lockLabel.textContent).toBe("鎖定");
+    expect(unlockOverlay.style.display).toBe("none");
+
+    // Toggle screen lock
+    win.toggleScreenLock();
+    expect(playerContainer.classList.contains("player-screen-locked")).toBe(true);
+    win.toggleScreenLock();
+    expect(playerContainer.classList.contains("player-screen-locked")).toBe(false);
   });
 });

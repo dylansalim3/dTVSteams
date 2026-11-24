@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../catalog/parser.dart';
 import '../catalog/show_channel.dart';
 import '../services/download_manager.dart';
+import '../services/favorites_manager.dart';
 import '../services/playback_history_manager.dart';
 import 'downloads_screen.dart';
 import 'player_screen.dart';
@@ -907,6 +908,40 @@ class YouTubeEpisodeCard extends StatelessWidget {
                     ),
                   ),
                 ),
+
+                // Favorite Button (Save to Favorites / Watch Later)
+                ListenableBuilder(
+                  listenable: FavoritesManager(),
+                  builder: (context, _) {
+                    final favManager = FavoritesManager();
+                    final isFav = favManager.isFavorite(episode.id);
+                    return IconButton(
+                      icon: Icon(
+                        isFav ? Icons.favorite : Icons.favorite_border,
+                        color: isFav ? const Color(0xFFE50914) : Colors.white70,
+                        size: 20,
+                      ),
+                      tooltip: isFav ? '已收藏 (點擊取消)' : '加入收藏',
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                      onPressed: () async {
+                        final added = await favManager.toggleFavorite(episode);
+                        HapticFeedback.lightImpact();
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(added ? '❤️ 已加入收藏清單' : '已從收藏清單移除'),
+                              duration: const Duration(milliseconds: 1200),
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        }
+                      },
+                    );
+                  },
+                ),
+                const SizedBox(width: 4),
 
                 // Share Button (Available in both Home Feed and Downloads View)
                 if (onShareTapped != null) ...[

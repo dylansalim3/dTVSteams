@@ -1114,6 +1114,247 @@ html, body {
   text-align: center;
 }
 
+/* Fast-Forward 2X Capsule HUD */
+.yt-speed-2x-hud {
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.82);
+  border: 1.2px solid rgba(255, 255, 255, 0.24);
+  padding: 8px 18px;
+  border-radius: 20px;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+  z-index: 30;
+  letter-spacing: 0.5px;
+  animation: yt-pulse-glow 1.5s infinite alternate ease-in-out;
+}
+
+.yt-speed-icon {
+  font-size: 14px;
+}
+
+.yt-speed-text {
+  font-size: 13px;
+}
+
+@keyframes yt-pulse-glow {
+  0% { box-shadow: 0 0 8px rgba(255, 204, 0, 0.3); }
+  100% { box-shadow: 0 0 16px rgba(255, 204, 0, 0.7); }
+}
+
+/* Favorites Button & Active States */
+.yt-thumb-fav-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+  z-index: 5;
+}
+
+.yt-thumb-fav-btn:hover {
+  transform: scale(1.15);
+  background: rgba(0, 0, 0, 0.85);
+}
+
+#fav-filter-btn.active {
+  background: rgba(229, 9, 20, 0.2);
+  border-color: rgba(229, 9, 20, 0.5);
+}
+
+#fav-btn.active {
+  color: #e50914;
+  border-color: rgba(229, 9, 20, 0.4);
+}
+
+/* History Modal Styling */
+.yt-history-modal-content {
+  max-width: 600px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.yt-history-body {
+  overflow-y: auto;
+  max-height: calc(85vh - 120px);
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.yt-history-empty {
+  text-align: center;
+  padding: 40px 16px;
+  color: var(--yt-spec-text-secondary, #aaa);
+}
+
+.yt-history-empty svg {
+  margin-bottom: 12px;
+  color: #555;
+}
+
+.yt-history-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  transition: background 0.15s, border-color 0.15s;
+  cursor: pointer;
+}
+
+.yt-history-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(229, 9, 20, 0.3);
+}
+
+.yt-history-thumb-wrapper {
+  position: relative;
+  width: 100px;
+  height: 58px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #111;
+}
+
+.yt-history-thumb-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.yt-history-progress-fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: #e50914;
+}
+
+.yt-history-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.yt-history-show-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #e50914;
+  margin-bottom: 2px;
+}
+
+.yt-history-title {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 4px;
+}
+
+.yt-history-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  color: #888;
+}
+
+.yt-history-part-pill {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  color: #ccc;
+}
+
+.yt-history-delete-btn {
+  background: transparent;
+  border: none;
+  color: #777;
+  padding: 6px 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 14px;
+  transition: color 0.15s, background 0.15s;
+}
+
+.yt-history-delete-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Screen Lock Overlay & Anti-touch Styling */
+.yt-unlock-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+  pointer-events: auto;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.yt-unlock-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 24px;
+  background: rgba(20, 20, 20, 0.92);
+  border: 1.5px solid #e50914;
+  border-radius: 30px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.yt-unlock-btn:hover {
+  transform: scale(1.05);
+  background: #1e1e1e;
+}
+
+.yt-unlock-icon {
+  font-size: 18px;
+}
+
+.player-screen-locked .yt-video-actions,
+.player-screen-locked .yt-parts-picker,
+.player-screen-locked .yt-quick-actions,
+.player-screen-locked .vjs-control-bar {
+  opacity: 0.25;
+  pointer-events: none !important;
+  user-select: none;
+}
+
 /* Responsive Breakpoints */
 @media (max-width: 768px) {
   .yt-header {

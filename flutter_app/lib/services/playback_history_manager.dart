@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
+import '../catalog/parser.dart';
 
 class PlaybackRecord {
   final String episodeId;
@@ -10,6 +11,10 @@ class PlaybackRecord {
   final int positionMs;
   final int durationMs;
   final DateTime updatedAt;
+  final String episodeTitle;
+  final String thumbnailUrl;
+  final String showName;
+  final CatalogEpisode? episode;
 
   PlaybackRecord({
     required this.episodeId,
@@ -18,7 +23,32 @@ class PlaybackRecord {
     required this.positionMs,
     required this.durationMs,
     required this.updatedAt,
+    this.episodeTitle = '',
+    this.thumbnailUrl = '',
+    this.showName = '',
+    this.episode,
   });
+
+  String get effectiveTitle {
+    if (episodeTitle.isNotEmpty) return episodeTitle;
+    if (episode != null && episode!.title.isNotEmpty) return episode!.title;
+    return episodeId;
+  }
+
+  String get effectiveThumbnail {
+    if (thumbnailUrl.isNotEmpty) return thumbnailUrl;
+    if (episode != null) {
+      if (episode!.poster.isNotEmpty) return episode!.poster;
+      if (episode!.backdrop.isNotEmpty) return episode!.backdrop;
+    }
+    return '';
+  }
+
+  String get effectiveShowName {
+    if (showName.isNotEmpty) return showName;
+    if (episode != null && episode!.showName.isNotEmpty) return episode!.showName;
+    return '精彩節目';
+  }
 
   double get progress => durationMs > 0 ? (positionMs / durationMs).clamp(0.0, 1.0) : 0.0;
   bool get isCompleted => progress >= 0.90; // Watched >90% marks as completed
@@ -46,6 +76,10 @@ class PlaybackRecord {
         'positionMs': positionMs,
         'durationMs': durationMs,
         'updatedAt': updatedAt.toIso8601String(),
+        'episodeTitle': episodeTitle,
+        'thumbnailUrl': thumbnailUrl,
+        'showName': showName,
+        if (episode != null) 'episode': episode!.toJson(),
       };
 
   factory PlaybackRecord.fromJson(Map<String, dynamic> json) => PlaybackRecord(
@@ -57,6 +91,12 @@ class PlaybackRecord {
         updatedAt: json['updatedAt'] != null
             ? DateTime.tryParse(json['updatedAt'] as String) ?? DateTime.now()
             : DateTime.now(),
+        episodeTitle: json['episodeTitle'] as String? ?? '',
+        thumbnailUrl: json['thumbnailUrl'] as String? ?? '',
+        showName: json['showName'] as String? ?? '',
+        episode: json['episode'] != null
+            ? CatalogEpisode.fromJson(json['episode'] as Map<String, dynamic>)
+            : null,
       );
 }
 
@@ -72,6 +112,22 @@ class PlaybackHistoryManager extends ChangeNotifier {
 
   Map<String, PlaybackRecord> get records => Map.unmodifiable(_records);
   bool get isInitialized => _isInitialized;
+
+  List<PlaybackRecord> get allRecordsSorted {
+    final list = _records.values.toList();
+    list.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+    return list;
+  }
+
+  List<PlaybackRecord> get recentEpisodeRecords {
+    final map = <String, PlaybackRecord>{};
+    for (final rec in allRecordsSorted) {
+      if (!map.containsKey(rec.episodeId)) {
+        map[rec.episodeId] = rec;
+      }
+    }
+    return map.values.toList();
+  }
 
   String _buildKey(String episodeId, String partLabel) {
     final normPart = partLabel.toLowerCase().replaceAll(' ', '');
@@ -150,6 +206,10 @@ class PlaybackHistoryManager extends ChangeNotifier {
     required int partIndex,
     required int positionMs,
     required int durationMs,
+    String episodeTitle = '',
+    String thumbnailUrl = '',
+    String showName = '',
+    CatalogEpisode? episode,
     bool forcePersist = false,
   }) async {
     if (episodeId.isEmpty || durationMs <= 0) return;
@@ -161,6 +221,10 @@ class PlaybackHistoryManager extends ChangeNotifier {
       positionMs: positionMs,
       durationMs: durationMs,
       updatedAt: DateTime.now(),
+      episodeTitle: episodeTitle,
+      thumbnailUrl: thumbnailUrl,
+      showName: showName,
+      episode: episode,
     );
 
     final key = _buildKey(episodeId, partLabel);
@@ -178,14 +242,20 @@ class PlaybackHistoryManager extends ChangeNotifier {
   Future<void> clearRecord(String episodeId, String partLabel) async {
     final key = _buildKey(episodeId, partLabel);
     _records.remove(key);
-    await _persistToDisk();
     notifyListeners();
+    await _persistToDisk();
+  }
+
+  Future<void> removeEpisodeRecords(String episodeId) async {
+    _records.removeWhere((k, v) => v.episodeId == episodeId);
+    notifyListeners();
+    await _persistToDisk();
   }
 
   Future<void> clearAllHistory() async {
     _records.clear();
-    await _persistToDisk();
     notifyListeners();
+    await _persistToDisk();
   }
 
   Future<void> _persistToDisk() async {

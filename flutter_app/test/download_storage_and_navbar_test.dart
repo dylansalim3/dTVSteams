@@ -73,6 +73,7 @@ void main() {
       // Channel dropdown & top buttons are present
       expect(find.byIcon(Icons.arrow_drop_down), findsWidgets);
       expect(find.byIcon(Icons.folder_special), findsOneWidget);
+      expect(find.byIcon(Icons.history), findsOneWidget);
       expect(find.byIcon(Icons.refresh), findsOneWidget);
 
       // 2. Normal phone screen (390px width): Displays full 'dTV STEAMS' brand logo

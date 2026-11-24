@@ -34,6 +34,17 @@
     <div class="yt-header-right">
       <a href="./react/" class="yt-btn yt-btn-secondary" style="font-size:0.85rem; padding: 6px 14px; text-decoration: none; border-radius: 20px;" title="切換至 Video.js 10 React 官方組件版">React v10 版</a>
       <span class="yt-status-badge" id="catalog-status">載入中...</span>
+      <button class="yt-icon-btn" id="fav-filter-btn" aria-label="我的收藏清單" title="我的收藏 (Favorites)">
+        <span class="yt-fav-icon">❤️</span>
+        <span id="fav-badge" class="yt-timer-badge" style="display:none;">0</span>
+      </button>
+      <button class="yt-icon-btn" id="history-btn" aria-label="觀看歷史紀錄" title="觀看歷史 (History)">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+        <span id="history-badge" class="yt-timer-badge" style="display:none;">0</span>
+      </button>
       <button class="yt-icon-btn" id="refresh-btn" aria-label="重新整理集數清單" title="重新整理">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M23 4v6h-6M1 20v-6h6"/>
@@ -84,6 +95,19 @@
           </div>
           <span class="yt-hud-text" id="hud-volume-text">100%</span>
         </div>
+        <!-- Fast-Forward 2x Capsule HUD -->
+        <div id="hud-speed-2x" class="yt-speed-2x-hud" style="display:none;" aria-hidden="true">
+          <span class="yt-speed-icon">⚡</span>
+          <span class="yt-speed-text">2X 快進中</span>
+          <span class="yt-speed-icon">▶▶</span>
+        </div>
+        <!-- Screen Lock Unlock HUD Overlay -->
+        <div id="screen-unlock-overlay" class="yt-unlock-overlay" style="display:none;" aria-hidden="true">
+          <button id="screen-unlock-btn" class="yt-unlock-btn" aria-label="解除螢幕鎖定">
+            <span class="yt-unlock-icon">🔓</span>
+            <span>點擊解鎖螢幕</span>
+          </button>
+        </div>
       </div>
 
       <!-- Video Details & Part Selector Under Player -->
@@ -118,6 +142,12 @@
               <span>定時</span>
               <span id="sleep-timer-badge" class="yt-timer-badge" style="display:none;"></span>
             </button>
+            <button class="yt-btn yt-btn-secondary" id="scale-mode-btn" aria-label="切換畫面比例" title="切換畫面比例 (適應 Fit / 填滿 Fill / 拉伸 Stretch)">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+              </svg>
+              <span id="scale-mode-label">適應 (Fit)</span>
+            </button>
             <button class="yt-btn yt-btn-secondary" id="share-btn" aria-label="分享此集影片" title="分享此集影片">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="18" cy="5" r="3"/>
@@ -127,6 +157,14 @@
                 <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
               </svg>
               <span>分享</span>
+            </button>
+            <button class="yt-btn yt-btn-secondary" id="fav-btn" aria-label="收藏此集影片" title="加入收藏 (Favorites)">
+              <span id="fav-btn-icon" style="font-size: 14px;">🤍</span>
+              <span id="fav-btn-text">收藏</span>
+            </button>
+            <button class="yt-btn yt-btn-secondary" id="screen-lock-btn" aria-label="螢幕鎖定防誤觸" title="螢幕鎖定防誤觸 (Screen Lock)">
+              <span id="screen-lock-icon" style="font-size: 14px;">🔒</span>
+              <span id="screen-lock-label">鎖定</span>
             </button>
           </div>
         </div>
@@ -247,6 +285,35 @@
             <span>使用系統分享傳送</span>
           </button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- History Modal Dialog -->
+  <div id="history-modal" class="yt-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="history-modal-title">
+    <div class="yt-modal-backdrop" id="history-modal-backdrop"></div>
+    <div class="yt-modal-content yt-history-modal-content">
+      <div class="yt-modal-header">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div class="yt-modal-icon">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+          </div>
+          <div>
+            <h2 class="yt-modal-title" id="history-modal-title">觀看歷史紀錄</h2>
+            <p class="yt-modal-subtitle" id="history-modal-subtitle">已觀看的節目與續播中斷點</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button id="history-clear-all-btn" class="yt-btn yt-btn-secondary" style="font-size:0.8rem; padding:4px 10px; border-radius:14px;" title="清空所有歷史紀錄">清空歷史</button>
+          <button class="yt-modal-close" id="history-modal-close" aria-label="關閉歷史視窗">✕</button>
+        </div>
+      </div>
+
+      <div class="yt-modal-body yt-history-body" id="history-list-container">
+        <!-- Rendered by app.js -->
       </div>
     </div>
   </div>

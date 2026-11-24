@@ -69,14 +69,22 @@ function saveResume(episodeId, partIndex, currentTime, duration) {
   if (!episodeId || !duration || isNaN(currentTime) || currentTime < 3) return;
   const history = getResumeHistory();
   const completed = currentTime >= duration - 15;
+  const ep = (activeEpisode && activeEpisode.id === episodeId)
+    ? activeEpisode
+    : (catalog?.episodes ? catalog.episodes.find(e => e.id === episodeId) : null);
+  const partIdx = partIndex || 0;
   const record = {
     episodeId,
-    partIndex,
+    partIndex: partIdx,
     currentTime: Math.round(currentTime),
     duration: Math.round(duration),
     percentage: Math.min(100, Math.round((currentTime / duration) * 100)),
     completed,
-    updatedAt: Date.now()
+    updatedAt: Date.now(),
+    title: ep ? ep.title : (history[episodeId]?.title || episodeId),
+    thumbnail: ep ? (ep.thumbnail || ep.backdrop || ep.poster || "") : (history[episodeId]?.thumbnail || ""),
+    showName: ep ? (ep.showName || "綜藝玩很大") : (history[episodeId]?.showName || "綜藝玩很大"),
+    partLabel: (ep && ep.parts && ep.parts[partIdx]) ? ep.parts[partIdx].label : `Part ${partIdx + 1}`
   };
   history[episodeId] = record;
 
@@ -87,6 +95,7 @@ function saveResume(episodeId, partIndex, currentTime, duration) {
   }
 
   updateCardResume(episodeId, record);
+  updateHistoryBadge();
 }
 
 function getEpisodeResume(episodeId) {
@@ -102,6 +111,37 @@ function clearEpisodeResume(episodeId) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
   } catch (err) {}
   updateCardResume(episodeId, null);
+  updateHistoryBadge();
+}
+
+function clearAllHistory() {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch (err) {}
+  if (catalog && Array.isArray(catalog.episodes)) {
+    catalog.episodes.forEach(ep => updateCardResume(ep.id, null));
+  }
+  updateHistoryBadge();
+}
+
+function getHistoryRecords() {
+  const history = getResumeHistory();
+  const list = Object.values(history);
+  list.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+  return list;
+}
+
+function updateHistoryBadge() {
+  if (typeof document === "undefined") return;
+  const badge = document.getElementById("history-badge");
+  if (!badge) return;
+  const count = getHistoryRecords().length;
+  if (count > 0) {
+    badge.textContent = count > 99 ? "99+" : count;
+    badge.style.display = "flex";
+  } else {
+    badge.style.display = "none";
+  }
 }
 
 // Show Resume Toast
@@ -1065,6 +1105,14 @@ function setupQuickSkipButtons() {
 // Global Keyboard Shortcuts (Remote / Desktop friendly)
 function setupShortcuts() {
   window.addEventListener("keydown", (e) => {
+    // When screen is locked, ignore all shortcuts except Escape which unlocks
+    if (isScreenLocked) {
+      if (e.key === "Escape") {
+        unlockScreen();
+      }
+      return;
+    }
+
     // Ignore when typing inside search input
     if (document.activeElement === searchInput) {
       if (e.key === "Escape") {
@@ -1549,6 +1597,394 @@ function setupSleepTimerModal() {
   });
 }
 
+// Aspect Ratio Scale Mode (Feature 5)
+let currentScaleMode = "contain"; // "contain", "cover", "fill"
+const SCALE_MODES = ["contain", "cover", "fill"];
+const SCALE_LABELS = {
+  contain: "適應 (Fit)",
+  cover: "填滿 (Fill)",
+  fill: "拉伸 16:9 (Stretch)"
+};
+
+function cycleScaleMode() {
+  const nextIdx = (SCALE_MODES.indexOf(currentScaleMode) + 1) % SCALE_MODES.length;
+  currentScaleMode = SCALE_MODES[nextIdx];
+  const video = document.getElementById("player_html5_api") || document.querySelector("#player-container video");
+  if (video) {
+    video.style.objectFit = currentScaleMode;
+  }
+  const label = document.getElementById("scale-mode-label");
+  if (label) {
+    label.textContent = SCALE_LABELS[currentScaleMode];
+  }
+  showSleepToast(`畫面比例：${SCALE_LABELS[currentScaleMode]}`);
+}
+
+function setupScaleMode() {
+  const btn = document.getElementById("scale-mode-btn");
+  if (btn) {
+    btn.addEventListener("click", cycleScaleMode);
+  }
+}
+
+// Press-and-Hold 2X Speed (Feature 5)
+let isHolding2x = false;
+let hold2xTimer = null;
+let preHoldSpeed = 1.0;
+
+function setupPressAndHold2x() {
+  const container = document.getElementById("player-container");
+  const hud = document.getElementById("hud-speed-2x");
+  if (!container) return;
+
+  function startHold(e) {
+    if (isScreenLocked) return;
+    if (e.target.closest(".vjs-control-bar") || e.target.closest(".yt-seek-overlay")) return;
+    clearTimeout(hold2xTimer);
+    hold2xTimer = setTimeout(() => {
+      if (!player) return;
+      isHolding2x = true;
+      preHoldSpeed = typeof player.playbackRate === "function" ? player.playbackRate() : 1.0;
+      if (typeof player.playbackRate === "function") {
+        player.playbackRate(2.0);
+      }
+      if (hud) hud.style.display = "flex";
+    }, 350);
+  }
+
+  function endHold() {
+    clearTimeout(hold2xTimer);
+    if (isHolding2x) {
+      isHolding2x = false;
+      if (player && typeof player.playbackRate === "function") {
+        player.playbackRate(preHoldSpeed);
+      }
+      if (hud) hud.style.display = "none";
+    }
+  }
+
+  container.addEventListener("mousedown", startHold);
+  window.addEventListener("mouseup", endHold);
+  container.addEventListener("touchstart", (e) => startHold(e), { passive: true });
+  window.addEventListener("touchend", endHold);
+}
+
+// Favorites (Watch Later & Bookmarks - Feature 6)
+const FAVORITES_STORAGE_KEY = "dtv_favorites";
+let isFavoritesOnlyFilter = false;
+
+function getFavorites() {
+  try {
+    const raw = localStorage.getItem(FAVORITES_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch (err) {
+    return [];
+  }
+}
+
+function isFavorite(episodeId) {
+  if (!episodeId) return false;
+  return getFavorites().some(ep => ep.id === episodeId);
+}
+
+function toggleFavorite(episode) {
+  if (!episode || !episode.id) return false;
+  const favs = getFavorites();
+  const idx = favs.findIndex(ep => ep.id === episode.id);
+  let added = false;
+  if (idx >= 0) {
+    favs.splice(idx, 1);
+    added = false;
+  } else {
+    favs.unshift(episode);
+    added = true;
+  }
+  try {
+    localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(favs));
+  } catch (err) {}
+
+  updateFavoritesUI();
+  showSleepToast(added ? "❤️ 已加入收藏清單" : "已從收藏清單移除");
+  return added;
+}
+
+function updateFavoritesUI() {
+  if (typeof document === "undefined") return;
+  const favs = getFavorites();
+  const badge = document.getElementById("fav-badge");
+  if (badge) {
+    if (favs.length > 0) {
+      badge.textContent = favs.length > 99 ? "99+" : favs.length;
+      badge.style.display = "inline-block";
+    } else {
+      badge.style.display = "none";
+    }
+  }
+
+  const favBtn = document.getElementById("fav-btn");
+  const favBtnIcon = document.getElementById("fav-btn-icon");
+  const favBtnText = document.getElementById("fav-btn-text");
+  if (favBtn && activeEpisode) {
+    const isFav = isFavorite(activeEpisode.id);
+    if (favBtnIcon) favBtnIcon.textContent = isFav ? "❤️" : "🤍";
+    if (favBtnText) favBtnText.textContent = isFav ? "已收藏" : "收藏";
+    favBtn.classList.toggle("active", isFav);
+  }
+
+  if (isFavoritesOnlyFilter) {
+    renderFavoritesGrid();
+  }
+}
+
+function renderFavoritesGrid() {
+  const favs = getFavorites();
+  renderGrid(favs);
+}
+
+function setupFavorites() {
+  const filterBtn = document.getElementById("fav-filter-btn");
+  if (filterBtn) {
+    filterBtn.addEventListener("click", () => {
+      isFavoritesOnlyFilter = !isFavoritesOnlyFilter;
+      filterBtn.classList.toggle("active", isFavoritesOnlyFilter);
+      if (isFavoritesOnlyFilter) {
+        showSleepToast("篩選模式：我的收藏");
+        renderFavoritesGrid();
+      } else {
+        showSleepToast("已切換回完整集數清單");
+        renderGrid(catalog.episodes);
+      }
+    });
+  }
+
+  const favBtn = document.getElementById("fav-btn");
+  if (favBtn) {
+    favBtn.addEventListener("click", () => {
+      if (activeEpisode) {
+        toggleFavorite(activeEpisode);
+      }
+    });
+  }
+
+  updateFavoritesUI();
+}
+
+// Watch History Modal Controller (Feature 7)
+function openHistoryModal() {
+  if (typeof document === "undefined") return;
+  const modal = document.getElementById("history-modal");
+  if (!modal) return;
+  renderHistoryModal();
+  modal.style.display = "flex";
+  modal.setAttribute("aria-hidden", "false");
+}
+
+function closeHistoryModal() {
+  if (typeof document === "undefined") return;
+  const modal = document.getElementById("history-modal");
+  if (!modal) return;
+  modal.style.display = "none";
+  modal.setAttribute("aria-hidden", "true");
+}
+
+function renderHistoryModal() {
+  if (typeof document === "undefined") return;
+  const container = document.getElementById("history-list-container");
+  if (!container) return;
+  const records = getHistoryRecords();
+  const countBadge = document.getElementById("history-count-badge");
+  if (countBadge) {
+    countBadge.textContent = `${records.length} 部`;
+  }
+
+  if (records.length === 0) {
+    container.innerHTML = `
+      <div class="yt-history-empty">
+        <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+        <p style="font-size:1rem; font-weight:600; color:#fff; margin-bottom:4px;">尚無觀看歷史紀錄</p>
+        <p style="font-size:0.85rem; color:#888;">播放任何精彩節目，將在此紀錄中斷點與進度。</p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = records.map(rec => {
+    const title = rec.title || rec.episodeId;
+    const thumb = rec.thumbnail || "./placeholder.jpg";
+    const partLabel = rec.partLabel || `Part ${(rec.partIndex || 0) + 1}`;
+    const progress = rec.percentage || 0;
+    const timeText = `${formatTime(rec.currentTime)} / ${formatTime(rec.duration)} (${progress}%)`;
+    const dateStr = rec.updatedAt ? new Date(rec.updatedAt).toLocaleDateString("zh-TW", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }) : "";
+    const showName = rec.showName || "綜藝玩很大";
+
+    return `
+      <div class="yt-history-item" data-episode-id="${rec.episodeId}" data-part-index="${rec.partIndex || 0}">
+        <div class="yt-history-thumb-wrapper">
+          <img src="${thumb}" alt="${title}" onerror="this.src='./placeholder.jpg'">
+          <div class="yt-history-progress-fill" style="width: ${progress}%;"></div>
+        </div>
+        <div class="yt-history-info">
+          <div class="yt-history-show-badge">${showName}</div>
+          <div class="yt-history-title" title="${title}">${title}</div>
+          <div class="yt-history-meta">
+            <span class="yt-history-part-pill">${partLabel}</span>
+            <span>${timeText}</span>
+            <span style="margin-left:auto; font-size:0.7rem; color:#666;">${dateStr}</span>
+          </div>
+        </div>
+        <button class="yt-history-delete-btn" data-del-id="${rec.episodeId}" aria-label="刪除歷史紀錄" title="刪除紀錄">✕</button>
+      </div>
+    `;
+  }).join("");
+
+  // Attach click listeners to resume episode
+  container.querySelectorAll(".yt-history-item").forEach(item => {
+    item.addEventListener("click", (e) => {
+      if (e.target.closest(".yt-history-delete-btn")) return;
+      const epId = item.getAttribute("data-episode-id");
+      const partIdx = parseInt(item.getAttribute("data-part-index") || "0", 10);
+      closeHistoryModal();
+      const targetEp = (catalog && Array.isArray(catalog.episodes))
+        ? catalog.episodes.find(ep => ep.id === epId)
+        : null;
+      if (targetEp) {
+        selectEpisode(targetEp, partIdx);
+      }
+    });
+  });
+
+  // Attach delete buttons
+  container.querySelectorAll(".yt-history-delete-btn").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const epId = btn.getAttribute("data-del-id");
+      clearEpisodeResume(epId);
+      renderHistoryModal();
+    });
+  });
+}
+
+function setupHistory() {
+  if (typeof document === "undefined") return;
+  const historyBtn = document.getElementById("history-btn");
+  if (historyBtn) {
+    historyBtn.addEventListener("click", openHistoryModal);
+  }
+
+  const closeBtn = document.getElementById("history-modal-close");
+  if (closeBtn) {
+    closeBtn.addEventListener("click", closeHistoryModal);
+  }
+
+  const backdrop = document.getElementById("history-modal-backdrop");
+  if (backdrop) {
+    backdrop.addEventListener("click", closeHistoryModal);
+  }
+
+  const clearAllBtn = document.getElementById("history-clear-all-btn");
+  if (clearAllBtn) {
+    clearAllBtn.addEventListener("click", () => {
+      if (confirm("確定要清空所有觀看歷史紀錄嗎？此操作將清除所有集數的播放進度。")) {
+        clearAllHistory();
+        renderHistoryModal();
+      }
+    });
+  }
+
+  updateHistoryBadge();
+}
+
+// Screen Lock & Anti-Touch Controller (Feature 8)
+let isScreenLocked = false;
+let unlockOverlayTimer = null;
+
+function toggleScreenLock() {
+  if (isScreenLocked) {
+    unlockScreen();
+  } else {
+    lockScreen();
+  }
+}
+
+function lockScreen() {
+  isScreenLocked = true;
+  const playerContainer = document.getElementById("player-container");
+  if (playerContainer) {
+    playerContainer.classList.add("player-screen-locked");
+  }
+  const label = document.getElementById("screen-lock-label");
+  if (label) label.textContent = "已鎖定";
+  const icon = document.getElementById("screen-lock-icon");
+  if (icon) icon.textContent = "🔒";
+  const lockBtn = document.getElementById("screen-lock-btn");
+  if (lockBtn) lockBtn.classList.add("active");
+
+  showUnlockOverlay();
+  showSleepToast("🔒 螢幕已鎖定防誤觸");
+}
+
+function unlockScreen() {
+  isScreenLocked = false;
+  clearTimeout(unlockOverlayTimer);
+  const playerContainer = document.getElementById("player-container");
+  if (playerContainer) {
+    playerContainer.classList.remove("player-screen-locked");
+  }
+  const overlay = document.getElementById("screen-unlock-overlay");
+  if (overlay) overlay.style.display = "none";
+  const label = document.getElementById("screen-lock-label");
+  if (label) label.textContent = "鎖定";
+  const icon = document.getElementById("screen-lock-icon");
+  if (icon) icon.textContent = "🔒";
+  const lockBtn = document.getElementById("screen-lock-btn");
+  if (lockBtn) lockBtn.classList.remove("active");
+
+  showSleepToast("🔓 螢幕已解鎖");
+}
+
+function showUnlockOverlay() {
+  if (typeof document === "undefined") return;
+  const overlay = document.getElementById("screen-unlock-overlay");
+  if (!overlay) return;
+  clearTimeout(unlockOverlayTimer);
+  overlay.style.display = "flex";
+  unlockOverlayTimer = setTimeout(() => {
+    if (isScreenLocked && overlay) {
+      overlay.style.display = "none";
+    }
+  }, 3000);
+}
+
+function setupScreenLock() {
+  if (typeof document === "undefined") return;
+  const lockBtn = document.getElementById("screen-lock-btn");
+  if (lockBtn) {
+    lockBtn.addEventListener("click", () => {
+      toggleScreenLock();
+    });
+  }
+
+  const unlockBtn = document.getElementById("screen-unlock-btn");
+  if (unlockBtn) {
+    unlockBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      unlockScreen();
+    });
+  }
+
+  const playerContainer = document.getElementById("player-container");
+  if (playerContainer) {
+    playerContainer.addEventListener("click", (e) => {
+      if (isScreenLocked && !e.target.closest("#screen-unlock-btn")) {
+        showUnlockOverlay();
+      }
+    });
+  }
+}
+
 // Initialization on DOMContentLoaded
 if (typeof window !== "undefined") {
   window.addEventListener("DOMContentLoaded", () => {
@@ -1560,6 +1996,11 @@ if (typeof window !== "undefined") {
     setupShareModal();
     setupDoubleTapSeek();
     setupVerticalSwipe();
+    setupScaleMode();
+    setupPressAndHold2x();
+    setupFavorites();
+    setupHistory();
+    setupScreenLock();
     setupSleepTimerModal();
     loadCatalog();
   });
@@ -1586,6 +2027,23 @@ if (typeof window !== "undefined") {
   window.updateBrightness = updateBrightness;
   window.updateVolume = updateVolume;
   window.setupVerticalSwipe = setupVerticalSwipe;
+  window.cycleScaleMode = cycleScaleMode;
+  window.setupScaleMode = setupScaleMode;
+  window.setupPressAndHold2x = setupPressAndHold2x;
+  window.getFavorites = getFavorites;
+  window.isFavorite = isFavorite;
+  window.toggleFavorite = toggleFavorite;
+  window.setupFavorites = setupFavorites;
+  window.getHistoryRecords = getHistoryRecords;
+  window.openHistoryModal = openHistoryModal;
+  window.closeHistoryModal = closeHistoryModal;
+  window.renderHistoryModal = renderHistoryModal;
+  window.clearAllHistory = clearAllHistory;
+  window.setupHistory = setupHistory;
+  window.toggleScreenLock = toggleScreenLock;
+  window.lockScreen = lockScreen;
+  window.unlockScreen = unlockScreen;
+  window.setupScreenLock = setupScreenLock;
   window.setSleepTimer = setSleepTimer;
   window.setupSleepTimerModal = setupSleepTimerModal;
   window.saveResume = saveResume;
@@ -1621,6 +2079,23 @@ if (typeof module !== "undefined" && module.exports) {
     updateBrightness,
     updateVolume,
     setupVerticalSwipe,
+    cycleScaleMode,
+    setupScaleMode,
+    setupPressAndHold2x,
+    getFavorites,
+    isFavorite,
+    toggleFavorite,
+    setupFavorites,
+    getHistoryRecords,
+    openHistoryModal,
+    closeHistoryModal,
+    renderHistoryModal,
+    clearAllHistory,
+    setupHistory,
+    toggleScreenLock,
+    lockScreen,
+    unlockScreen,
+    setupScreenLock,
     setSleepTimer,
     setupSleepTimerModal,
     saveResume,

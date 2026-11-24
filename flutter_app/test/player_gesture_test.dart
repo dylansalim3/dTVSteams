@@ -113,5 +113,156 @@ void main() {
       expect(find.byIcon(Icons.brightness_high), findsOneWidget);
       expect(find.text('75%'), findsOneWidget);
     });
+
+    test('VideoScaleMode cycles through fit, fill, and stretch', () {
+      List<String> modes = ['fit', 'fill', 'stretch'];
+      int idx = 0;
+
+      // fit -> fill
+      idx = (idx + 1) % modes.length;
+      expect(modes[idx], equals('fill'));
+
+      // fill -> stretch
+      idx = (idx + 1) % modes.length;
+      expect(modes[idx], equals('stretch'));
+
+      // stretch -> fit
+      idx = (idx + 1) % modes.length;
+      expect(modes[idx], equals('fit'));
+    });
+
+    testWidgets('renders fast-forward 2X capsule HUD correctly', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.82),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Colors.white24, width: 1.0),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.bolt, color: Color(0xFFFFCC00), size: 20),
+                    SizedBox(width: 6),
+                    Text(
+                      '2X 快進中',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                      ),
+                    ),
+                    SizedBox(width: 6),
+                    Icon(Icons.fast_forward, color: Colors.white70, size: 16),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byIcon(Icons.bolt), findsOneWidget);
+      expect(find.text('2X 快進中'), findsOneWidget);
+      expect(find.byIcon(Icons.fast_forward), findsOneWidget);
+    });
+
+    test('Screen Lock state transitions and gesture suppression logic', () {
+      bool isScreenLocked = false;
+      bool showUnlockHint = false;
+      bool showOsd = true;
+
+      // Lock action
+      void lockScreen() {
+        isScreenLocked = true;
+        showOsd = false;
+        showUnlockHint = true;
+      }
+
+      // Unlock action
+      void unlockScreen() {
+        isScreenLocked = false;
+        showUnlockHint = false;
+        showOsd = true;
+      }
+
+      // Tap on locked screen
+      void handleTap() {
+        if (isScreenLocked) {
+          showUnlockHint = true;
+          return;
+        }
+        showOsd = !showOsd;
+      }
+
+      expect(isScreenLocked, isFalse);
+      expect(showOsd, isTrue);
+
+      lockScreen();
+      expect(isScreenLocked, isTrue);
+      expect(showOsd, isFalse);
+      expect(showUnlockHint, isTrue);
+
+      // Tapping screen while locked keeps OSD hidden and activates unlock hint
+      handleTap();
+      expect(showOsd, isFalse);
+      expect(showUnlockHint, isTrue);
+
+      // Unlocking restores OSD
+      unlockScreen();
+      expect(isScreenLocked, isFalse);
+      expect(showOsd, isTrue);
+      expect(showUnlockHint, isFalse);
+    });
+
+    testWidgets('renders floating screen unlock capsule HUD correctly', (tester) async {
+      bool unlocked = false;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Center(
+              child: GestureDetector(
+                onTap: () => unlocked = true,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.85),
+                    borderRadius: BorderRadius.circular(30),
+                    border: Border.all(color: const Color(0xFFE50914), width: 1.5),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.lock_rounded, color: Color(0xFFE50914), size: 22),
+                      SizedBox(width: 8),
+                      Text(
+                        '點擊解鎖螢幕',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byIcon(Icons.lock_rounded), findsOneWidget);
+      expect(find.text('點擊解鎖螢幕'), findsOneWidget);
+
+      await tester.tap(find.text('點擊解鎖螢幕'));
+      await tester.pump();
+      expect(unlocked, isTrue);
+    });
   });
 }

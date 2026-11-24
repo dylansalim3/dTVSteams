@@ -5,11 +5,14 @@ import 'package:http/http.dart' as http;
 import 'catalog/parser.dart';
 import 'catalog/show_channel.dart';
 import 'services/download_manager.dart';
+import 'services/favorites_manager.dart';
 import 'services/playback_history_manager.dart';
 import 'services/update_manager.dart';
 import 'ui/about_update_dialog.dart';
 import 'ui/downloads_screen.dart';
 import 'ui/episode_card.dart';
+import 'ui/favorites_screen.dart';
+import 'ui/history_screen.dart';
 import 'ui/player_screen.dart';
 import 'ui/share_dialog.dart';
 
@@ -72,6 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final DownloadManager _downloadManager = DownloadManager();
   final PlaybackHistoryManager _historyManager = PlaybackHistoryManager();
   final UpdateManager _updateManager = UpdateManager();
+  final FavoritesManager _favoritesManager = FavoritesManager();
 
   @override
   void initState() {
@@ -82,6 +86,8 @@ class _HomeScreenState extends State<HomeScreen> {
     _historyManager.init();
     _updateManager.addListener(_onDownloadUpdate);
     _updateManager.init();
+    _favoritesManager.addListener(_onDownloadUpdate);
+    _favoritesManager.init();
     _loadCatalog();
     _checkRemoteUpdate();
   }
@@ -105,6 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _downloadManager.removeListener(_onDownloadUpdate);
     _historyManager.removeListener(_onDownloadUpdate);
     _updateManager.removeListener(_onDownloadUpdate);
+    _favoritesManager.removeListener(_onDownloadUpdate);
     _searchController.dispose();
     _scrollController.dispose();
     super.dispose();
@@ -499,6 +506,22 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  void _openFavorites() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => const FavoritesScreen(),
+      ),
+    );
+  }
+
+  void _openHistory() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => const HistoryScreen(),
+      ),
+    );
+  }
+
   List<CatalogEpisode> get filteredEpisodes {
     if (searchQuery.isEmpty) return allEpisodes;
     final q = searchQuery.toLowerCase();
@@ -591,14 +614,22 @@ class _HomeScreenState extends State<HomeScreen> {
           slivers: [
             // Top App Bar with Logo, Download Folder Button, and Refresh
             SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
-                child: Builder(
-                  builder: (context) {
-                    final screenWidth = MediaQuery.of(context).size.width;
-                    final isCompact = screenWidth < 370;
+              child: Builder(
+                builder: (context) {
+                  final screenWidth = MediaQuery.of(context).size.width;
+                  final isCompact = screenWidth < 370;
+                  final isMedium = screenWidth < 430;
+                  final btnPadding = isCompact
+                      ? const EdgeInsets.all(2)
+                      : (isMedium ? const EdgeInsets.all(3) : const EdgeInsets.all(6));
+                  final btnConstraints = BoxConstraints(
+                    minWidth: isCompact ? 28 : (isMedium ? 32 : 38),
+                    minHeight: isCompact ? 28 : (isMedium ? 32 : 38),
+                  );
 
-                    return Row(
+                  return Padding(
+                    padding: EdgeInsets.symmetric(horizontal: isCompact ? 3.0 : (isMedium ? 6.0 : 10.0), vertical: 10.0),
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         // Left Section: Brand Logo + Channel Switcher
@@ -635,12 +666,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                 ),
                               ],
-                              SizedBox(width: isCompact ? 4 : 6),
+                              SizedBox(width: isCompact ? 3 : (isMedium ? 4 : 6)),
 
                               // Channel Switcher Selector Button
                               Flexible(
                                 child: ConstrainedBox(
-                                  constraints: BoxConstraints(maxWidth: isCompact ? 100 : 130),
+                                  constraints: BoxConstraints(maxWidth: isCompact ? 56 : (isMedium ? 75 : 130)),
                                   child: TvFocusableButton(
                                     onPressed: _showChannelPicker,
                                     child: Container(
@@ -682,7 +713,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
 
-                        // Action Buttons: Downloads, Refresh, Settings (Same standard touch size as Downloads screen)
+                        // Action Buttons: Downloads, Favorites, History, Refresh, Settings
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -690,6 +721,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             TvFocusableButton(
                               onPressed: _openDownloads,
                               child: IconButton(
+                                visualDensity: VisualDensity.compact,
+                                padding: btnPadding,
+                                constraints: btnConstraints,
                                 icon: Icon(
                                   Icons.folder_special,
                                   color: (activeCount > 0 || downloadedCount > 0)
@@ -701,14 +735,80 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             ),
 
+                            // Favorites Folder Icon Button
+                            ListenableBuilder(
+                              listenable: _favoritesManager,
+                              builder: (context, _) {
+                                final count = _favoritesManager.count;
+                                return TvFocusableButton(
+                                  onPressed: _openFavorites,
+                                  child: Stack(
+                                    clipBehavior: Clip.none,
+                                    children: [
+                                      IconButton(
+                                        visualDensity: VisualDensity.compact,
+                                        padding: btnPadding,
+                                        constraints: btnConstraints,
+                                        icon: Icon(
+                                          count > 0 ? Icons.favorite : Icons.favorite_border,
+                                          color: count > 0 ? const Color(0xFFE50914) : Colors.white70,
+                                        ),
+                                        tooltip: '我的收藏',
+                                        onPressed: _openFavorites,
+                                      ),
+                                      if (count > 0)
+                                        Positioned(
+                                          right: isCompact ? 1 : 4,
+                                          top: isCompact ? 1 : 4,
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFFE50914),
+                                              borderRadius: BorderRadius.circular(8),
+                                            ),
+                                            child: Text(
+                                              '$count',
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 9,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+
+                            // History Icon Button
+                            TvFocusableButton(
+                              onPressed: _openHistory,
+                              child: IconButton(
+                                visualDensity: VisualDensity.compact,
+                                padding: btnPadding,
+                                constraints: btnConstraints,
+                                icon: const Icon(
+                                  Icons.history,
+                                  color: Colors.white70,
+                                ),
+                                tooltip: '觀看紀錄',
+                                onPressed: _openHistory,
+                              ),
+                            ),
+
                             // Refresh Icon Button
                             TvFocusableButton(
                               onPressed: () => refreshCatalog(),
                               child: IconButton(
+                                visualDensity: VisualDensity.compact,
+                                padding: btnPadding,
+                                constraints: btnConstraints,
                                 icon: isRefreshing
                                     ? const SizedBox(
-                                        width: 20,
-                                        height: 20,
+                                        width: 18,
+                                        height: 18,
                                         child: CircularProgressIndicator(
                                           strokeWidth: 2,
                                           color: Color(0xFFE50914),
@@ -724,6 +824,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             TvFocusableButton(
                               onPressed: () => AboutUpdateDialog.show(context, _updateManager),
                               child: IconButton(
+                                visualDensity: VisualDensity.compact,
+                                padding: btnPadding,
+                                constraints: btnConstraints,
                                 icon: Icon(
                                   _updateManager.updateAvailable
                                       ? Icons.system_update_alt
@@ -739,9 +842,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           ],
                         ),
                       ],
-                    );
-                  },
-                ),
+                    ),
+                  );
+                },
               ),
             ),
 
