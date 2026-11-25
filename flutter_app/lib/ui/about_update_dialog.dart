@@ -781,7 +781,7 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                   SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: Text(
-                      '提示：若系統提示「安裝套件無效」，通常是因目前手機安裝的是 Debug 開發版，與 GitHub 正式發布版簽名不相容。請先手動解除安裝舊版後再安裝即可。',
+                      '提示：若系統提示「安裝套件無效」或「套件與現有套件衝突」，代表手機現有版本與本次正式版簽名不相容。請先手動解除安裝舊版後再安裝，之後的版本即可直接覆蓋更新。',
                       style: TextStyle(color: AppColors.textSecondary, fontSize: 11, height: 1.4),
                     ),
                   ),

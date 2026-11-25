@@ -10,18 +10,34 @@ plugins {
 val keystoreProperties = Properties()
 val keystorePropertiesFile = rootProject.file("key.properties")
 if (keystorePropertiesFile.exists()) {
-    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+    keystorePropertiesFile.bufferedReader(Charsets.UTF_8).use { reader ->
+        val content = reader.readText().removePrefix("\uFEFF")
+        keystoreProperties.load(content.reader())
+    }
 }
 
 val releaseStoreFile = keystoreProperties.getProperty("storeFile") ?: System.getenv("ANDROID_KEYSTORE_PATH")
 val releaseStorePassword = keystoreProperties.getProperty("storePassword") ?: System.getenv("ANDROID_STORE_PASSWORD")
 val releaseKeyAlias = keystoreProperties.getProperty("keyAlias") ?: System.getenv("ANDROID_KEY_ALIAS")
 val releaseKeyPassword = keystoreProperties.getProperty("keyPassword") ?: System.getenv("ANDROID_KEY_PASSWORD")
-val hasReleaseSigning = !releaseStoreFile.isNullOrBlank() &&
+val resolvedReleaseStoreFile = releaseStoreFile
+    ?.takeIf { it.isNotBlank() }
+    ?.let { path ->
+        val f = file(path)
+        if (f.isAbsolute) f else rootProject.file(path)
+    }
+val hasReleaseSigning = resolvedReleaseStoreFile != null &&
     !releaseStorePassword.isNullOrBlank() &&
     !releaseKeyAlias.isNullOrBlank() &&
     !releaseKeyPassword.isNullOrBlank() &&
-    rootProject.file(releaseStoreFile).exists()
+    resolvedReleaseStoreFile.exists()
+
+if (System.getenv("CI") == "true" && !hasReleaseSigning) {
+    throw GradleException(
+        "Missing release signing configuration in CI. Configure ANDROID_KEYSTORE_BASE64, " +
+            "ANDROID_KEY_ALIAS, ANDROID_STORE_PASSWORD, and ANDROID_KEY_PASSWORD secrets."
+    )
+}
 
 android {
     namespace = "com.dtvsteams.dtvsteams"
@@ -56,7 +72,7 @@ android {
     signingConfigs {
         if (hasReleaseSigning) {
             create("release") {
-                storeFile = rootProject.file(releaseStoreFile!!)
+                storeFile = resolvedReleaseStoreFile
                 storePassword = releaseStorePassword
                 keyAlias = releaseKeyAlias
                 keyPassword = releaseKeyPassword

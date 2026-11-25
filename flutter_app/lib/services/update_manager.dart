@@ -151,8 +151,8 @@ class UpdateManager extends ChangeNotifier {
         }
       }
 
-      // Check if previously downloaded APK still exists; clean up if no update is actually available
-      final apkFile = await _getUpdateApkFile();
+      // Check if previously downloaded APK for this exact release still exists
+      final apkFile = await _getUpdateApkFile(version: _latestUpdate?.latestVersion);
       if (await apkFile.exists()) {
         if (_updateAvailable && (await apkFile.length()) > 1024 * 1024) {
           _downloadedApkPath = apkFile.path;
@@ -162,6 +162,8 @@ class UpdateManager extends ChangeNotifier {
           } catch (_) {}
           _downloadedApkPath = null;
         }
+      } else {
+        _downloadedApkPath = null;
       }
     } catch (e) {
       debugPrint('[UpdateManager] init error: $e');
@@ -267,11 +269,22 @@ class UpdateManager extends ChangeNotifier {
       if (!hasUpdate) {
         _downloadedApkPath = null;
         try {
-          final staleApk = await _getUpdateApkFile();
+          final staleApk = await _getUpdateApkFile(version: cleanTag);
           if (await staleApk.exists()) {
             await staleApk.delete();
           }
         } catch (_) {}
+      } else {
+        try {
+          final versionApk = await _getUpdateApkFile(version: cleanTag);
+          if (await versionApk.exists() && (await versionApk.length()) > 1024 * 1024) {
+            _downloadedApkPath = versionApk.path;
+          } else {
+            _downloadedApkPath = null;
+          }
+        } catch (_) {
+          _downloadedApkPath = null;
+        }
       }
 
       await _persistState();
@@ -300,7 +313,9 @@ class UpdateManager extends ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
 
-    final targetFile = targetPath != null ? File(targetPath) : await _getUpdateApkFile();
+    final targetFile = targetPath != null
+        ? File(targetPath)
+        : await _getUpdateApkFile(version: _latestUpdate!.latestVersion);
     final tempFile = File('${targetFile.path}.tmp');
 
     final httpClient = client ?? http.Client();
@@ -492,7 +507,7 @@ class UpdateManager extends ChangeNotifier {
     return File('${dir.path}/update_cache.json');
   }
 
-  Future<File> _getUpdateApkFile() async {
+  Future<File> _getUpdateApkFile({String? version}) async {
     Directory? targetDir;
     if (!kIsWeb && Platform.isAndroid) {
       try {
@@ -503,7 +518,9 @@ class UpdateManager extends ChangeNotifier {
       } catch (_) {}
     }
     targetDir ??= await getTemporaryDirectory();
-    return File('${targetDir.path}/dTVSteams-update.apk');
+    final safeVer = (version ?? '').trim().replaceAll(RegExp(r'[^a-zA-Z0-9._-]'), '');
+    final fileName = safeVer.isNotEmpty ? 'dTVSteams-update-$safeVer.apk' : 'dTVSteams-update.apk';
+    return File('${targetDir.path}/$fileName');
   }
 
   Future<void> _persistState() async {

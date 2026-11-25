@@ -70,15 +70,20 @@ jobs:
           cd flutter_app
           flutter test
 
-      - name: Decode Release Keystore (if configured)
+      - name: Decode Release Keystore
         id: keystore
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
         run: |
-          if [ -n "$ANDROID_KEYSTORE_BASE64" ]; then
-            echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > flutter_app/android/release-keystore.jks
-            echo "ANDROID_KEYSTORE_PATH=release-keystore.jks" >> $GITHUB_ENV
+          if [ -z "$ANDROID_KEYSTORE_BASE64" ] || [ -z "$ANDROID_KEY_ALIAS" ] || [ -z "$ANDROID_KEY_PASSWORD" ] || [ -z "$ANDROID_STORE_PASSWORD" ]; then
+            echo "::error::Android release signing secrets are missing. Configure ANDROID_KEYSTORE_BASE64, ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD, and ANDROID_STORE_PASSWORD so release APKs share a consistent signature."
+            exit 1
           fi
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > flutter_app/android/release-keystore.jks
+          echo "ANDROID_KEYSTORE_PATH=release-keystore.jks" >> $GITHUB_ENV
 
       - name: Build Android Release APK
         env:
@@ -88,6 +93,18 @@ jobs:
         run: |
           cd flutter_app
           flutter build apk --release
+
+      - name: Verify Release APK Signature
+        run: |
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -name apksigner | sort -V | tail -n 1)
+          if [ -n "$APKSIGNER" ]; then
+            CERT_INFO=$("$APKSIGNER" verify --print-certs flutter_app/build/app/outputs/flutter-apk/app-release.apk)
+            echo "$CERT_INFO"
+            if echo "$CERT_INFO" | grep -q "CN=Android Debug"; then
+              echo "::error::Release APK is unexpectedly signed with an ephemeral Android Debug key!"
+              exit 1
+            fi
+          fi
 
       - name: Prepare Release Artifacts & Checksums
         id: prep

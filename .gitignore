@@ -20,6 +20,11 @@ skills-lock.json
 .env
 .env.local
 
+# Android Signing / Keystores (never commit)
+*.jks
+*.keystore
+key.properties
+
 # OS files
 .DS_Store
 Thumbs.db
