@@ -82,7 +82,7 @@ jobs:
             echo "::error::Android release signing secrets are missing. Configure ANDROID_KEYSTORE_BASE64, ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD, and ANDROID_STORE_PASSWORD so release APKs share a consistent signature."
             exit 1
           fi
-          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > flutter_app/android/release-keystore.jks
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | tr -d '[:space:]' | base64 -d > flutter_app/android/release-keystore.jks
           echo "ANDROID_KEYSTORE_PATH=release-keystore.jks" >> $GITHUB_ENV
 
       - name: Build Android Release APK
@@ -109,12 +109,18 @@ jobs:
       - name: Prepare Release Artifacts & Checksums
         id: prep
         run: |
-          VERSION="${{ needs.release-please.outputs.version || '1.0.0' }}"
           TAG="${{ needs.release-please.outputs.tag_name || '' }}"
-          
           if [ -z "$TAG" ]; then
-            TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v$VERSION")
+            TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
           fi
+          VERSION="${{ needs.release-please.outputs.version || '' }}"
+          if [ -z "$VERSION" ]; then
+            VERSION="${TAG#v}"
+          fi
+          if [ -z "$VERSION" ]; then
+            VERSION=$(grep -E '^version:' flutter_app/pubspec.yaml | head -n1 | sed -E 's/version:[[:space:]]*([^+[:space:]]+).*/\1/')
+          fi
+          [ -z "$TAG" ] && TAG="v$VERSION"
           echo "tag=$TAG" >> $GITHUB_OUTPUT
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
