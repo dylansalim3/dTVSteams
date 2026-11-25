@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.6](https://github.com/dylansalim3/dTVSteams/compare/v1.2.5...v1.2.6) (2026-11-25)
+
+
+### Bug Fixes
+
+* **player:** sync native system bars with OSD play/pause visibility ([0462812](https://github.com/dylansalim3/dTVSteams/commit/04628124161a11586bf03c7807a92dbeaf3d4902))
+
 ## [1.2.5](https://github.com/dylansalim3/dTVSteams/compare/v1.2.4...v1.2.5) (2026-11-25)
 
 
