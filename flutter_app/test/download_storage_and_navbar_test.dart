@@ -70,10 +70,12 @@ void main() {
       expect(find.text('dTV'), findsWidgets);
       expect(find.text('STEAMS'), findsNothing);
 
-      // Channel dropdown & top buttons are present
+      // Channel dropdown & top buttons are present (favorites & history moved into Downloads bottom bar)
       expect(find.byIcon(Icons.arrow_drop_down), findsWidgets);
       expect(find.byIcon(Icons.folder_special), findsOneWidget);
-      expect(find.byIcon(Icons.history), findsOneWidget);
+      expect(find.byIcon(Icons.history), findsNothing);
+      expect(find.byTooltip('我的收藏'), findsNothing);
+      expect(find.byTooltip('觀看紀錄'), findsNothing);
       expect(find.byIcon(Icons.refresh), findsOneWidget);
 
       // 2. Normal phone screen (390px width): Displays full 'dTV STEAMS' brand logo

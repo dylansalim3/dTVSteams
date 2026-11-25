@@ -7,13 +7,10 @@ import 'catalog/show_channel.dart';
 import 'services/download_manager.dart';
 import 'services/favorites_manager.dart';
 import 'services/playback_history_manager.dart';
-import 'services/search_history_manager.dart';
 import 'services/update_manager.dart';
 import 'ui/about_update_dialog.dart';
 import 'ui/downloads_screen.dart';
 import 'ui/episode_card.dart';
-import 'ui/favorites_screen.dart';
-import 'ui/history_screen.dart';
 import 'ui/player_screen.dart';
 import 'ui/share_dialog.dart';
 
@@ -80,7 +77,6 @@ class _HomeScreenState extends State<HomeScreen> {
   final PlaybackHistoryManager _historyManager = PlaybackHistoryManager();
   final UpdateManager _updateManager = UpdateManager();
   final FavoritesManager _favoritesManager = FavoritesManager();
-  final SearchHistoryManager _searchHistoryManager = SearchHistoryManager();
 
   @override
   void initState() {
@@ -93,8 +89,6 @@ class _HomeScreenState extends State<HomeScreen> {
     _updateManager.init();
     _favoritesManager.addListener(_onDownloadUpdate);
     _favoritesManager.init();
-    _searchHistoryManager.addListener(_onDownloadUpdate);
-    _searchHistoryManager.init();
     _loadCatalog();
     _checkRemoteUpdate();
   }
@@ -121,7 +115,6 @@ class _HomeScreenState extends State<HomeScreen> {
     _historyManager.removeListener(_onDownloadUpdate);
     _updateManager.removeListener(_onDownloadUpdate);
     _favoritesManager.removeListener(_onDownloadUpdate);
-    _searchHistoryManager.removeListener(_onDownloadUpdate);
     _searchController.dispose();
     _scrollController.dispose();
     super.dispose();
@@ -535,22 +528,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _openFavorites() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => const FavoritesScreen(),
-      ),
-    );
-  }
-
-  void _openHistory() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => const HistoryScreen(),
-      ),
-    );
-  }
-
   bool _matchesYear(CatalogEpisode ep, String year) {
     if (year == '全部') return true;
     if (year == '經典懷舊') {
@@ -732,7 +709,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               // Channel Switcher Selector Button
                               Flexible(
                                 child: ConstrainedBox(
-                                  constraints: BoxConstraints(maxWidth: isCompact ? 56 : (isMedium ? 75 : 130)),
+                                  constraints: BoxConstraints(maxWidth: isCompact ? 80 : (isMedium ? 120 : 155)),
                                   child: TvFocusableButton(
                                     onPressed: _showChannelPicker,
                                     child: Container(
@@ -774,11 +751,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
 
-                        // Action Buttons: Downloads, Favorites, History, Refresh, Settings
+                        // Action Buttons: Downloads (Library), Refresh, Settings
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            // Downloads Folder Icon Button
+                            // Downloads / Library Icon Button (contains Downloads, Favorites, History)
                             TvFocusableButton(
                               onPressed: _openDownloads,
                               child: IconButton(
@@ -793,69 +770,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                                 tooltip: '下載庫',
                                 onPressed: _openDownloads,
-                              ),
-                            ),
-
-                            // Favorites Folder Icon Button
-                            ListenableBuilder(
-                              listenable: _favoritesManager,
-                              builder: (context, _) {
-                                final count = _favoritesManager.count;
-                                return TvFocusableButton(
-                                  onPressed: _openFavorites,
-                                  child: Stack(
-                                    clipBehavior: Clip.none,
-                                    children: [
-                                      IconButton(
-                                        visualDensity: VisualDensity.compact,
-                                        padding: btnPadding,
-                                        constraints: btnConstraints,
-                                        icon: Icon(
-                                          count > 0 ? Icons.favorite : Icons.favorite_border,
-                                          color: count > 0 ? const Color(0xFFE50914) : Colors.white70,
-                                        ),
-                                        tooltip: '我的收藏',
-                                        onPressed: _openFavorites,
-                                      ),
-                                      if (count > 0)
-                                        Positioned(
-                                          right: isCompact ? 1 : 4,
-                                          top: isCompact ? 1 : 4,
-                                          child: Container(
-                                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                                            decoration: BoxDecoration(
-                                              color: const Color(0xFFE50914),
-                                              borderRadius: BorderRadius.circular(8),
-                                            ),
-                                            child: Text(
-                                              '$count',
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 9,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            ),
-
-                            // History Icon Button
-                            TvFocusableButton(
-                              onPressed: _openHistory,
-                              child: IconButton(
-                                visualDensity: VisualDensity.compact,
-                                padding: btnPadding,
-                                constraints: btnConstraints,
-                                icon: const Icon(
-                                  Icons.history,
-                                  color: Colors.white70,
-                                ),
-                                tooltip: '觀看紀錄',
-                                onPressed: _openHistory,
                               ),
                             ),
 
@@ -936,12 +850,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             isDense: true,
                           ),
                           onChanged: (val) => setState(() { searchQuery = val.trim(); currentPage = 1; }),
-                          onSubmitted: (val) {
-                            final q = val.trim();
-                            if (q.isNotEmpty) {
-                              _searchHistoryManager.addQuery(q);
-                            }
-                          },
                         ),
                       ),
                       if (searchQuery.isNotEmpty)
@@ -955,77 +863,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
-              ),
-            ),
-
-            // Search History & Hot Suggestions Row
-            SliverToBoxAdapter(
-              child: ListenableBuilder(
-                listenable: _searchHistoryManager,
-                builder: (context, _) {
-                  final history = _searchHistoryManager.history;
-                  final hasHistory = history.isNotEmpty;
-
-                  return Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 2, 16, 2),
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: [
-                          if (hasHistory) ...[
-                            const Text('🕒 最近: ', style: TextStyle(color: Colors.white38, fontSize: 11)),
-                            ...history.take(4).map((q) => Padding(
-                              padding: const EdgeInsets.only(right: 6.0),
-                              child: ActionChip(
-                                label: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(q, style: const TextStyle(color: Colors.white70, fontSize: 11)),
-                                    const SizedBox(width: 4),
-                                    GestureDetector(
-                                      onTap: () => _searchHistoryManager.removeQuery(q),
-                                      child: const Icon(Icons.close, size: 12, color: Colors.white38),
-                                    ),
-                                  ],
-                                ),
-                                backgroundColor: const Color(0xFF1E1E1E),
-                                side: const BorderSide(color: Colors.white12),
-                                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
-                                onPressed: () {
-                                  _searchController.text = q;
-                                  setState(() {
-                                    searchQuery = q;
-                                    currentPage = 1;
-                                  });
-                                  _searchHistoryManager.addQuery(q);
-                                },
-                              ),
-                            )),
-                            const SizedBox(width: 4),
-                          ],
-                          const Text('🔥 熱門: ', style: TextStyle(color: Color(0xFFE50914), fontSize: 11, fontWeight: FontWeight.bold)),
-                          ...SearchHistoryManager.defaultHotTags.map((tag) => Padding(
-                            padding: const EdgeInsets.only(right: 6.0),
-                            child: ActionChip(
-                              label: Text(tag, style: const TextStyle(color: Colors.white, fontSize: 11)),
-                              backgroundColor: const Color(0xFF2A2A2A),
-                              side: const BorderSide(color: Colors.white24),
-                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
-                              onPressed: () {
-                                _searchController.text = tag;
-                                setState(() {
-                                  searchQuery = tag;
-                                  currentPage = 1;
-                                });
-                                _searchHistoryManager.addQuery(tag);
-                              },
-                            ),
-                          )),
-                        ],
-                      ),
-                    ),
-                  );
-                },
               ),
             ),
 

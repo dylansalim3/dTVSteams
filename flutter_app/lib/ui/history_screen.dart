@@ -31,6 +31,133 @@ class _HistoryScreenState extends State<HistoryScreen> {
     if (mounted) setState(() {});
   }
 
+  @override
+  Widget build(BuildContext context) {
+    final records = _historyManager.allRecordsSorted;
+
+    return Scaffold(
+      backgroundColor: const Color(0xFF141414),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF1E1E1E),
+        elevation: 0,
+        title: Row(
+          children: [
+            const Icon(Icons.history, color: Color(0xFFE50914), size: 22),
+            const SizedBox(width: 8),
+            const Text(
+              '觀看紀錄',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+            ),
+            if (records.isNotEmpty) ...[
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF2A2A2A),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  '${records.length}',
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+        actions: [
+          if (records.isNotEmpty)
+            IconButton(
+              icon: const Icon(Icons.delete_sweep_outlined, color: Colors.white70),
+              tooltip: '清空歷史紀錄',
+              onPressed: () => HistoryBody.confirmClearAll(context, _historyManager),
+            ),
+        ],
+      ),
+      body: const HistoryBody(),
+    );
+  }
+}
+
+/// Reusable watch-history list body embedded in [HistoryScreen] and [DownloadsScreen].
+class HistoryBody extends StatefulWidget {
+  const HistoryBody({super.key});
+
+  static void confirmClearAll(BuildContext context, PlaybackHistoryManager manager) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF1E1E1E),
+        title: const Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: Color(0xFFE50914), size: 24),
+            SizedBox(width: 8),
+            Text('清空所有歷史紀錄？', style: TextStyle(color: Colors.white, fontSize: 18)),
+          ],
+        ),
+        content: const Text(
+          '確定要清空所有的觀看紀錄嗎？此操作將清除所有集數的播放進度與暫存時間戳。',
+          style: TextStyle(color: Colors.white70, fontSize: 14),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('取消', style: TextStyle(color: Colors.white70)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFE50914),
+            ),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              manager.clearAllHistory();
+              HapticFeedback.lightImpact();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('已清空所有觀看歷史紀錄'),
+                  duration: Duration(milliseconds: 1500),
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            },
+            child: const Text('確認清空', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  State<HistoryBody> createState() => _HistoryBodyState();
+}
+
+class _HistoryBodyState extends State<HistoryBody> {
+  final PlaybackHistoryManager _historyManager = PlaybackHistoryManager();
+
+  @override
+  void initState() {
+    super.initState();
+    _historyManager.addListener(_onHistoryUpdate);
+    _historyManager.init();
+  }
+
+  @override
+  void dispose() {
+    _historyManager.removeListener(_onHistoryUpdate);
+    super.dispose();
+  }
+
+  void _onHistoryUpdate() {
+    if (mounted) setState(() {});
+  }
+
   void _playHistoryRecord(PlaybackRecord record) {
     CatalogEpisode episode;
     if (record.episode != null) {
@@ -60,50 +187,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
           episode: episode,
           initialPartIndex: record.partIndex,
         ),
-      ),
-    );
-  }
-
-  void _confirmClearAll() {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF1E1E1E),
-        title: const Row(
-          children: [
-            Icon(Icons.warning_amber_rounded, color: Color(0xFFE50914), size: 24),
-            SizedBox(width: 8),
-            Text('清空所有歷史紀錄？', style: TextStyle(color: Colors.white, fontSize: 18)),
-          ],
-        ),
-        content: const Text(
-          '確定要清空所有的觀看紀錄嗎？此操作將清除所有集數的播放進度與暫存時間戳。',
-          style: TextStyle(color: Colors.white70, fontSize: 14),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('取消', style: TextStyle(color: Colors.white70)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFE50914),
-            ),
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              _historyManager.clearAllHistory();
-              HapticFeedback.lightImpact();
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('已清空所有觀看歷史紀錄'),
-                  duration: Duration(milliseconds: 1500),
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
-            },
-            child: const Text('確認清空', style: TextStyle(color: Colors.white)),
-          ),
-        ],
       ),
     );
   }
@@ -156,55 +239,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   @override
   Widget build(BuildContext context) {
     final records = _historyManager.allRecordsSorted;
-
-    return Scaffold(
-      backgroundColor: const Color(0xFF141414),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF1E1E1E),
-        elevation: 0,
-        title: Row(
-          children: [
-            const Icon(Icons.history, color: Color(0xFFE50914), size: 22),
-            const SizedBox(width: 8),
-            const Text(
-              '觀看紀錄',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
-            ),
-            if (records.isNotEmpty) ...[
-              const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF2A2A2A),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Text(
-                  '${records.length}',
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ],
-        ),
-        actions: [
-          if (records.isNotEmpty)
-            IconButton(
-              icon: const Icon(Icons.delete_sweep_outlined, color: Colors.white70),
-              tooltip: '清空歷史紀錄',
-              onPressed: _confirmClearAll,
-            ),
-        ],
-      ),
-      body: records.isEmpty ? _buildEmptyState() : _buildHistoryList(records),
-    );
+    return records.isEmpty ? _buildEmptyState() : _buildHistoryList(records);
   }
 
   Widget _buildEmptyState() {

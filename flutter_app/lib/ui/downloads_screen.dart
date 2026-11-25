@@ -3,13 +3,18 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../catalog/parser.dart';
 import '../services/download_manager.dart';
+import '../services/favorites_manager.dart';
+import '../services/playback_history_manager.dart';
 import 'episode_card.dart';
+import 'favorites_screen.dart';
+import 'history_screen.dart';
 import 'player_screen.dart';
 import 'share_dialog.dart';
 import 'storage_location_sheet.dart';
 
 class DownloadsScreen extends StatefulWidget {
-  const DownloadsScreen({super.key});
+  final int initialTabIndex;
+  const DownloadsScreen({super.key, this.initialTabIndex = 0});
 
   @override
   State<DownloadsScreen> createState() => _DownloadsScreenState();
@@ -17,17 +22,27 @@ class DownloadsScreen extends StatefulWidget {
 
 class _DownloadsScreenState extends State<DownloadsScreen> {
   final DownloadManager _manager = DownloadManager();
+  final FavoritesManager _favoritesManager = FavoritesManager();
+  final PlaybackHistoryManager _historyManager = PlaybackHistoryManager();
+  late int _currentTabIndex;
 
   @override
   void initState() {
     super.initState();
+    _currentTabIndex = widget.initialTabIndex.clamp(0, 2);
     _manager.addListener(_onManagerUpdate);
     _manager.init();
+    _favoritesManager.addListener(_onManagerUpdate);
+    _favoritesManager.init();
+    _historyManager.addListener(_onManagerUpdate);
+    _historyManager.init();
   }
 
   @override
   void dispose() {
     _manager.removeListener(_onManagerUpdate);
+    _favoritesManager.removeListener(_onManagerUpdate);
+    _historyManager.removeListener(_onManagerUpdate);
     super.dispose();
   }
 
@@ -165,67 +180,136 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
     final totalSize = _manager.formatBytes(_manager.totalDownloadedBytes);
     final folderPath = _manager.downloadDirectoryPath;
     final episodes = downloadedEpisodes;
+    final favoritesCount = _favoritesManager.count;
+    final historyRecords = _historyManager.allRecordsSorted;
+
+    final String appBarTitle = switch (_currentTabIndex) {
+      1 => '我的收藏 (Favorites)',
+      2 => '觀看紀錄',
+      _ => '下載資料夾 (Downloads)',
+    };
 
     return Scaffold(
       backgroundColor: const Color(0xFF0F0F0F),
       appBar: AppBar(
         backgroundColor: const Color(0xFF141414),
         elevation: 0,
-        title: const Text(
-          '下載資料夾 (Downloads)',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+        title: Row(
+          children: [
+            Flexible(
+              child: Text(
+                appBarTitle,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              ),
+            ),
+            if (_currentTabIndex == 1 && favoritesCount > 0) ...[
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE50914).withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: const Color(0xFFE50914).withValues(alpha: 0.5)),
+                ),
+                child: Text(
+                  '$favoritesCount',
+                  style: const TextStyle(
+                    color: Color(0xFFE50914),
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ] else if (_currentTabIndex == 2 && historyRecords.isNotEmpty) ...[
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF2A2A2A),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  '${historyRecords.length}',
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ],
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.drive_file_move_outlined, color: Colors.white70),
-            tooltip: '變更下載儲存位置',
-            onPressed: () => StorageLocationHelper.showStoragePickerSheet(
-              context,
-              onStorageChanged: () {
-                if (mounted) setState(() {});
-              },
-            ),
-          ),
-          if (completedList.isNotEmpty || activeList.isNotEmpty)
+          if (_currentTabIndex == 0) ...[
             IconButton(
-              icon: const Icon(Icons.delete_sweep, color: Colors.white70),
-              tooltip: '清空所有下載檔案',
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (ctx) => AlertDialog(
-                    backgroundColor: const Color(0xFF1E1E1E),
-                    title: const Text('清空所有下載檔案', style: TextStyle(color: Colors.white)),
-                    content: Text(
-                      '確定要刪除所有 ${completedList.length} 個已下載分段檔案嗎？\n將釋出 $totalSize 儲存空間。',
-                      style: const TextStyle(color: Colors.white70),
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.of(ctx).pop(),
-                        child: const Text('取消', style: TextStyle(color: Colors.white54)),
-                      ),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFE50914)),
-                        onPressed: () async {
-                          Navigator.of(ctx).pop();
-                          await _manager.deleteAllDownloads();
-                          if (!context.mounted) return;
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('已清空所有下載檔案，釋出 $totalSize 儲存空間')),
-                          );
-                        },
-                        child: const Text('全部清空', style: TextStyle(color: Colors.white)),
-                      ),
-                    ],
-                  ),
-                );
-              },
+              icon: const Icon(Icons.drive_file_move_outlined, color: Colors.white70),
+              tooltip: '變更下載儲存位置',
+              onPressed: () => StorageLocationHelper.showStoragePickerSheet(
+                context,
+                onStorageChanged: () {
+                  if (mounted) setState(() {});
+                },
+              ),
             ),
+            if (completedList.isNotEmpty || activeList.isNotEmpty)
+              IconButton(
+                icon: const Icon(Icons.delete_sweep, color: Colors.white70),
+                tooltip: '清空所有下載檔案',
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                      backgroundColor: const Color(0xFF1E1E1E),
+                      title: const Text('清空所有下載檔案', style: TextStyle(color: Colors.white)),
+                      content: Text(
+                        '確定要刪除所有 ${completedList.length} 個已下載分段檔案嗎？\n將釋出 $totalSize 儲存空間。',
+                        style: const TextStyle(color: Colors.white70),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(ctx).pop(),
+                          child: const Text('取消', style: TextStyle(color: Colors.white54)),
+                        ),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFE50914)),
+                          onPressed: () async {
+                            Navigator.of(ctx).pop();
+                            await _manager.deleteAllDownloads();
+                            if (!context.mounted) return;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('已清空所有下載檔案，釋出 $totalSize 儲存空間')),
+                            );
+                          },
+                          child: const Text('全部清空', style: TextStyle(color: Colors.white)),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+          ] else if (_currentTabIndex == 1 && favoritesCount > 0) ...[
+            IconButton(
+              icon: const Icon(Icons.delete_sweep_outlined, color: Colors.white70),
+              tooltip: '清空所有收藏',
+              onPressed: () => FavoritesBody.confirmClearAll(context, _favoritesManager),
+            ),
+          ] else if (_currentTabIndex == 2 && historyRecords.isNotEmpty) ...[
+            IconButton(
+              icon: const Icon(Icons.delete_sweep_outlined, color: Colors.white70),
+              tooltip: '清空歷史紀錄',
+              onPressed: () => HistoryBody.confirmClearAll(context, _historyManager),
+            ),
+          ],
         ],
       ),
-      body: CustomScrollView(
-        slivers: [
+      body: IndexedStack(
+        index: _currentTabIndex,
+        children: [
+          CustomScrollView(
+            slivers: [
           // Storage Summary Card
           SliverToBoxAdapter(
             child: Container(
@@ -409,6 +493,37 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
             ),
 
           const SliverToBoxAdapter(child: SizedBox(height: 24)),
+        ],
+      ),
+          const FavoritesBody(),
+          const HistoryBody(),
+        ],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentTabIndex,
+        onTap: (idx) => setState(() => _currentTabIndex = idx),
+        backgroundColor: const Color(0xFF141414),
+        selectedItemColor: const Color(0xFFE50914),
+        unselectedItemColor: Colors.white54,
+        selectedFontSize: 12,
+        unselectedFontSize: 11,
+        type: BottomNavigationBarType.fixed,
+        items: [
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.folder_special_outlined),
+            activeIcon: Icon(Icons.folder_special),
+            label: '下載',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(favoritesCount > 0 ? Icons.favorite_border : Icons.favorite_border),
+            activeIcon: const Icon(Icons.favorite),
+            label: favoritesCount > 0 ? '收藏 ($favoritesCount)' : '收藏',
+          ),
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.history),
+            activeIcon: Icon(Icons.history),
+            label: '觀看紀錄',
+          ),
         ],
       ),
     );

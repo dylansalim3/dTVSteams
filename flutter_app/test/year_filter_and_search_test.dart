@@ -79,7 +79,7 @@ void main() {
       SearchHistoryManager().clearForTesting();
     });
 
-    testWidgets('renders year chips, sort button, and hot recommendation tags', (WidgetTester tester) async {
+    testWidgets('renders year chips and sort button without recent or hot suggestion row', (WidgetTester tester) async {
       await tester.pumpWidget(MaterialApp(
         home: HomeScreen(initialEpisodes: sampleEpisodes),
       ));
@@ -93,10 +93,9 @@ void main() {
       // Verify sort button
       expect(find.text('新到舊'), findsOneWidget);
 
-      // Verify hot tags
-      expect(find.text('🔥 熱門: '), findsOneWidget);
-      expect(find.text('憲哥'), findsOneWidget);
-      expect(find.text('澎湖'), findsOneWidget);
+      // Verify recent and hot tags row is removed
+      expect(find.text('🕒 最近: '), findsNothing);
+      expect(find.text('🔥 熱門: '), findsNothing);
     });
 
     testWidgets('filtering by year 2025 narrows displayed episodes', (WidgetTester tester) async {
@@ -138,14 +137,14 @@ void main() {
       expect(find.text('舊到新'), findsOneWidget);
     });
 
-    testWidgets('tapping hot tag chip applies search query and filters list', (WidgetTester tester) async {
+    testWidgets('entering search query filters episode list', (WidgetTester tester) async {
       await tester.pumpWidget(MaterialApp(
         home: HomeScreen(initialEpisodes: sampleEpisodes),
       ));
       await tester.pumpAndSettle();
 
-      // Tap hot tag '澎湖'
-      await tester.tap(find.text('澎湖'));
+      // Enter search query '澎湖'
+      await tester.enterText(find.byType(TextField), '澎湖');
       await tester.pumpAndSettle();
 
       // Only the 澎湖 episode should match

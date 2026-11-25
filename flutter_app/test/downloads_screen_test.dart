@@ -167,5 +167,34 @@ void main() {
       // Show badge with emoji should be visible
       expect(find.textContaining('🔥 綜藝玩很大'), findsWidgets);
     });
+
+    testWidgets('DownloadsScreen bottom navigation switches between Downloads, Favorites, and History',
+        (WidgetTester tester) async {
+      final manager = DownloadManager();
+      manager.clearForTesting();
+
+      await tester.pumpWidget(const MaterialApp(
+        home: DownloadsScreen(),
+      ));
+      await tester.pumpAndSettle();
+
+      // Default tab: Downloads
+      expect(find.text('下載資料夾 (Downloads)'), findsOneWidget);
+      expect(find.byType(BottomNavigationBar), findsOneWidget);
+      expect(find.text('下載'), findsOneWidget);
+      expect(find.text('收藏'), findsOneWidget);
+      expect(find.text('觀看紀錄'), findsOneWidget);
+
+      // Switch to Favorites tab
+      await tester.tap(find.text('收藏'));
+      await tester.pumpAndSettle();
+      expect(find.text('我的收藏 (Favorites)'), findsOneWidget);
+      expect(find.text('尚未加入任何收藏'), findsOneWidget);
+
+      // Switch to History tab
+      await tester.tap(find.text('觀看紀錄').last);
+      await tester.pumpAndSettle();
+      expect(find.text('尚無觀看歷史紀錄'), findsOneWidget);
+    });
   });
 }
