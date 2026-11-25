@@ -1,4 +1,5 @@
 import java.util.Properties
+import java.io.File
 import java.io.FileInputStream
 
 plugins {
@@ -23,8 +24,8 @@ val releaseKeyPassword = keystoreProperties.getProperty("keyPassword") ?: System
 val resolvedReleaseStoreFile = releaseStoreFile
     ?.takeIf { it.isNotBlank() }
     ?.let { path ->
-        val f = file(path)
-        if (f.isAbsolute) f else rootProject.file(path)
+        val raw = File(path)
+        if (raw.isAbsolute) raw else rootProject.file(path)
     }
 val hasReleaseSigning = resolvedReleaseStoreFile != null &&
     !releaseStorePassword.isNullOrBlank() &&
