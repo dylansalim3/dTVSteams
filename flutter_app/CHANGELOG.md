@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.5](https://github.com/dylansalim3/dTVSteams/compare/v1.2.4...v1.2.5) (2026-11-25)
+
+
+### Bug Fixes
+
+* **downloads,player,ui:** handle download failures and retries, confirm and clean all deleted parts, and restore native system bars on player exit ([4778918](https://github.com/dylansalim3/dTVSteams/commit/4778918ff5753f51250e59ab78c2b9e3dee507a8))
+
 ## [1.2.4](https://github.com/dylansalim3/dTVSteams/compare/v1.2.3...v1.2.4) (2026-11-25)
 
 
