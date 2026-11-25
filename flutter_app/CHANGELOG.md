@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/dylansalim3/dTVSteams/compare/v1.2.0...v1.2.1) (2026-11-25)
+
+
+### Bug Fixes
+
+* **ui:** align card action buttons, tokenize UI colors/spacing, and harden settings sheets ([4dc020f](https://github.com/dylansalim3/dTVSteams/commit/4dc020fef4514a04095cabd74f3852666edd19d5))
+
 ## [1.2.0](https://github.com/dylansalim3/dTVSteams/compare/v1.1.0...v1.2.0) (2026-11-25)
 
 
