@@ -65,9 +65,9 @@ class AppUpdateInfo {
 
 /// Service managing remote update discovery, background downloads, and native Android APK installation.
 class UpdateManager extends ChangeNotifier {
-  static const String fallbackAppVersion = '1.0.6';
+  static const String fallbackAppVersion = '1.0.11';
   static String _nativeVersion = fallbackAppVersion;
-  static int _nativeVersionCode = 7;
+  static int _nativeVersionCode = 12;
 
   static String get currentAppVersion => _nativeVersion;
   static int get currentAppVersionCode => _nativeVersionCode;
@@ -93,7 +93,7 @@ class UpdateManager extends ChangeNotifier {
   String? _errorMessage;
   DateTime? _lastCheckedAt;
   String? _dismissedVersion;
-  bool _initialized = false;
+  Future<void>? _initFuture;
 
   bool get isChecking => _isChecking;
   bool get isDownloading => _isDownloading;
@@ -108,10 +108,10 @@ class UpdateManager extends ChangeNotifier {
   String? get dismissedVersion => _dismissedVersion;
   bool get isDownloaded => _downloadedApkPath != null && File(_downloadedApkPath!).existsSync();
 
-  /// Initialize local update state & cache
-  Future<void> init() async {
-    if (_initialized) return;
-    _initialized = true;
+  /// Initialize local update state & cache (idempotent, concurrent callers share the same Future).
+  Future<void> init() => _initFuture ??= _doInit();
+
+  Future<void> _doInit() async {
     try {
       if (!kIsWeb) {
         final versionData = await _channel.invokeMethod<Map<dynamic, dynamic>>('getAppVersion');
@@ -133,15 +133,35 @@ class UpdateManager extends ChangeNotifier {
         }
         _dismissedVersion = json['dismissedVersion'] as String?;
         if (json['latestUpdate'] != null) {
-          _latestUpdate = AppUpdateInfo.fromJson(json['latestUpdate'] as Map<String, dynamic>);
-          _updateAvailable = _latestUpdate?.hasUpdate ?? false;
+          final cached = AppUpdateInfo.fromJson(json['latestUpdate'] as Map<String, dynamic>);
+          // Re-evaluate against the real installed version so stale cache entries never trigger false prompts
+          final actuallyNewer = isNewerVersion(cached.latestVersion, currentAppVersion);
+          _latestUpdate = AppUpdateInfo(
+            latestVersion: cached.latestVersion,
+            currentVersion: currentAppVersion,
+            releaseTitle: cached.releaseTitle,
+            releaseNotes: cached.releaseNotes,
+            apkDownloadUrl: cached.apkDownloadUrl,
+            apkSizeBytes: cached.apkSizeBytes,
+            releaseHtmlUrl: cached.releaseHtmlUrl,
+            publishedAt: cached.publishedAt,
+            hasUpdate: actuallyNewer,
+          );
+          _updateAvailable = actuallyNewer;
         }
       }
 
-      // Check if previously downloaded APK still exists
+      // Check if previously downloaded APK still exists; clean up if no update is actually available
       final apkFile = await _getUpdateApkFile();
-      if (await apkFile.exists() && (await apkFile.length()) > 1024 * 1024) {
-        _downloadedApkPath = apkFile.path;
+      if (await apkFile.exists()) {
+        if (_updateAvailable && (await apkFile.length()) > 1024 * 1024) {
+          _downloadedApkPath = apkFile.path;
+        } else if (!_updateAvailable) {
+          try {
+            await apkFile.delete();
+          } catch (_) {}
+          _downloadedApkPath = null;
+        }
       }
     } catch (e) {
       debugPrint('[UpdateManager] init error: $e');
@@ -156,6 +176,10 @@ class UpdateManager extends ChangeNotifier {
     http.Client? client,
     String? currentVersionOverride,
   }) async {
+    // Ensure native version and cached state are loaded before comparing versions
+    if (_initFuture != null) {
+      await _initFuture;
+    }
     final currentVer = currentVersionOverride ?? currentAppVersion;
 
     if (!manual && _lastCheckedAt != null) {
@@ -239,6 +263,16 @@ class UpdateManager extends ChangeNotifier {
 
       _updateAvailable = hasUpdate;
       _lastCheckedAt = DateTime.now();
+
+      if (!hasUpdate) {
+        _downloadedApkPath = null;
+        try {
+          final staleApk = await _getUpdateApkFile();
+          if (await staleApk.exists()) {
+            await staleApk.delete();
+          }
+        } catch (_) {}
+      }
 
       await _persistState();
       return _latestUpdate;
@@ -373,6 +407,16 @@ class UpdateManager extends ChangeNotifier {
           'filePath': _downloadedApkPath,
         });
         return result ?? false;
+      } on PlatformException catch (e) {
+        _errorMessage = '啟動安裝程式失敗: ${e.message ?? e.code}';
+        if (e.code == 'INVALID_APK' || e.code == 'DOWNGRADE_BLOCKED') {
+          _downloadedApkPath = null;
+          try {
+            if (file.existsSync()) file.deleteSync();
+          } catch (_) {}
+        }
+        notifyListeners();
+        return false;
       } catch (e) {
         _errorMessage = '啟動安裝程式失敗: $e';
         notifyListeners();

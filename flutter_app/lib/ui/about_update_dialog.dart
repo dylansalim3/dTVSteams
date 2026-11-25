@@ -116,306 +116,344 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
 
     final mediaQuery = MediaQuery.of(context);
     final bottomInset = mediaQuery.padding.bottom;
-    return Container(
-      decoration: const BoxDecoration(
-        color: Color(0xFF1E1E1E),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      child: SafeArea(
-        top: true,
-        bottom: true,
-        minimum: const EdgeInsets.only(top: 8),
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(
-            20,
-            8,
-            20,
-            mediaQuery.viewInsets.bottom + (bottomInset + 24) / 2,
-          ),
-          child: SingleChildScrollView(
+    final maxSheetHeight = mediaQuery.size.height * 0.75;
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxHeight: maxSheetHeight),
+      child: Container(
+        decoration: const BoxDecoration(
+          color: Color(0xFF1E1E1E),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: SafeArea(
+          top: true,
+          bottom: true,
+          minimum: const EdgeInsets.only(top: 8),
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(
+              18,
+              6,
+              18,
+              mediaQuery.viewInsets.bottom + (bottomInset + 16) / 2,
+            ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Top drag handle indicator
+                // Top drag handle indicator (pinned)
                 Center(
                   child: Container(
                     width: 38,
                     height: 4,
-                    margin: const EdgeInsets.only(bottom: 12),
+                    margin: const EdgeInsets.only(bottom: 8),
                     decoration: BoxDecoration(
                       color: Colors.white24,
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
                 ),
-                // Header with Close
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
+                // Header with Close (pinned)
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFE50914),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: const Text(
-                        'dTV',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w900,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 5),
-                    const Text(
-                      '關於與版本更新',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close, color: Colors.white70),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-
-            // Current Version Card
-            Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: const Color(0xFF2A2A2A),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.white12),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.info_outline, color: Colors.white70, size: 28),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    Row(
                       children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFE50914),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: const Text(
+                            'dTV',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w900,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 6),
                         const Text(
-                          'dTVSteams 綜藝影音串流平台',
+                          '關於與版本更新',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 15,
+                            fontSize: 17,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 3),
-                        Text(
-                          '目前安裝版本: v${UpdateManager.currentAppVersion}',
-                          style: const TextStyle(color: Colors.white60, fontSize: 13),
+                      ],
+                    ),
+                    IconButton(
+                      visualDensity: VisualDensity.compact,
+                      icon: const Icon(Icons.close, color: Colors.white70),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Flexible(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Current Version Card
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF2A2A2A),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.white12),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.info_outline, color: Colors.white70, size: 22),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'dTVSteams 綜藝影音串流平台',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      '目前安裝版本: v${UpdateManager.currentAppVersion}',
+                                      style: const TextStyle(color: Colors.white60, fontSize: 12),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              ElevatedButton.icon(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFFE50914),
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                  minimumSize: const Size(0, 34),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                                ),
+                                onPressed: mgr.isChecking
+                                    ? null
+                                    : () => mgr.checkForUpdate(manual: true),
+                                icon: mgr.isChecking
+                                    ? const SizedBox(
+                                        width: 14,
+                                        height: 14,
+                                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                                      )
+                                    : const Icon(Icons.sync, size: 15),
+                                label: Text(mgr.isChecking ? '檢查中...' : '檢查更新', style: const TextStyle(fontSize: 12)),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        if (mgr.errorMessage != null) ...[
+                          const SizedBox(height: 8),
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.red.withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.red.withValues(alpha: 0.4)),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.error_outline, color: Colors.redAccent, size: 16),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    mgr.errorMessage!,
+                                    style: const TextStyle(color: Colors.redAccent, fontSize: 12),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+
+                        const SizedBox(height: 12),
+
+                        // Playback Preferences Settings Section
+                        const Text(
+                          '播放偏好設定 (Settings)',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Material(
+                          color: const Color(0xFF2A2A2A),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            side: const BorderSide(color: Colors.white12),
+                          ),
+                          clipBehavior: Clip.antiAlias,
+                          child: Column(
+                            children: [
+                              SwitchListTile(
+                                dense: true,
+                                visualDensity: VisualDensity.compact,
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                                activeColor: const Color(0xFFE50914),
+                                title: const Text('背景播放 (鎖定螢幕繼續播放音訊)',
+                                    style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+                                subtitle: const Text('螢幕關閉鎖定或切換應用時，背景繼續播放節目聲音',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(color: Colors.white60, fontSize: 11)),
+                                value: _settingsManager.backgroundPlay,
+                                onChanged: (val) => _settingsManager.setBackgroundPlay(val),
+                              ),
+                              const Divider(color: Colors.white12, height: 1),
+                              SwitchListTile(
+                                dense: true,
+                                visualDensity: VisualDensity.compact,
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                                activeColor: const Color(0xFFE50914),
+                                title: const Text('播放時保持螢幕常亮 (防止休眠)',
+                                    style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+                                subtitle: const Text('影片播放中螢幕不會因逾時自動變暗或關閉',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(color: Colors.white60, fontSize: 11)),
+                                value: _settingsManager.keepScreenAwake,
+                                onChanged: (val) => _settingsManager.setKeepScreenAwake(val),
+                              ),
+                              const Divider(color: Colors.white12, height: 1),
+                              SwitchListTile(
+                                dense: true,
+                                visualDensity: VisualDensity.compact,
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                                activeColor: const Color(0xFFE50914),
+                                title: const Text('自動連續播放下一段 / 下一集',
+                                    style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+                                subtitle: const Text('分段或整集播畢前浮現 5 秒倒數並自動續播',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(color: Colors.white60, fontSize: 11)),
+                                value: _settingsManager.autoPlayNext,
+                                onChanged: (val) => _settingsManager.setAutoPlayNext(val),
+                              ),
+                              const Divider(color: Colors.white12, height: 1),
+                              ListTile(
+                                dense: true,
+                                visualDensity: VisualDensity.compact,
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                                leading: Icon(
+                                  _sleepTimerManager.isActive ? Icons.alarm_on : Icons.timer_outlined,
+                                  size: 20,
+                                  color: _sleepTimerManager.isActive ? const Color(0xFFE50914) : Colors.white70,
+                                ),
+                                title: const Text('睡眠定時器 (Sleep Timer)',
+                                    style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+                                subtitle: Text(
+                                  _sleepTimerManager.isActive
+                                      ? '倒數中：${_sleepTimerManager.formattedTime}'
+                                      : '定時自動暫停並停止背景音訊服務',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: _sleepTimerManager.isActive ? const Color(0xFFE50914) : Colors.white60,
+                                    fontSize: 11,
+                                  ),
+                                ),
+                                trailing: const Icon(Icons.chevron_right, color: Colors.white38, size: 18),
+                                onTap: () {
+                                  Navigator.of(context).pop();
+                                  showSleepTimerSheet(context);
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        // Download Storage Location Section
+                        const Text(
+                          '下載儲存位置 (Download Storage)',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        _buildStorageLocationCard(context),
+
+                        const SizedBox(height: 12),
+
+                        // If Update Available
+                        if (mgr.updateAvailable && update != null) ...[
+                          _buildUpdateAvailableCard(context, mgr, update),
+                        ] else if (!mgr.isChecking && mgr.lastCheckedAt != null && !mgr.updateAvailable) ...[
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF242424),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: const [
+                                Icon(Icons.check_circle, color: Color(0xFF46D369), size: 18),
+                                SizedBox(width: 8),
+                                Text(
+                                  '目前已是最新版本，無需更新',
+                                  style: TextStyle(color: Colors.white70, fontSize: 13),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+
+                        const SizedBox(height: 10),
+                        const Divider(color: Colors.white12, height: 1),
+                        const SizedBox(height: 4),
+
+                        // Safety Fallback Row
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Flexible(
+                              child: Text(
+                                '遇到下載問題？可直接使用瀏覽器',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(color: Colors.white38, fontSize: 11),
+                              ),
+                            ),
+                            TextButton.icon(
+                              style: TextButton.styleFrom(
+                                visualDensity: VisualDensity.compact,
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              ),
+                              onPressed: () => mgr.openBrowserFallback(),
+                              icon: const Icon(Icons.open_in_browser, size: 15, color: Colors.white70),
+                              label: const Text('開啟 GitHub 發布頁', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                            ),
+                          ],
                         ),
                       ],
                     ),
                   ),
-                  ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFE50914),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                    ),
-                    onPressed: mgr.isChecking
-                        ? null
-                        : () => mgr.checkForUpdate(manual: true),
-                    icon: mgr.isChecking
-                        ? const SizedBox(
-                            width: 14,
-                            height: 14,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                          )
-                        : const Icon(Icons.sync, size: 16),
-                    label: Text(mgr.isChecking ? '檢查中...' : '檢查更新'),
-                  ),
-                ],
-              ),
-            ),
-
-            if (mgr.errorMessage != null) ...[
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: Colors.red.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.red.withValues(alpha: 0.4)),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.error_outline, color: Colors.redAccent, size: 18),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        mgr.errorMessage!,
-                        style: const TextStyle(color: Colors.redAccent, fontSize: 12),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-
-            const SizedBox(height: 16),
-
-            // Playback Preferences Settings Section
-            const Text(
-              '播放偏好設定 (Settings)',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Material(
-              color: const Color(0xFF2A2A2A),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-                side: const BorderSide(color: Colors.white12),
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: Column(
-                children: [
-                  SwitchListTile(
-                    activeColor: const Color(0xFFE50914),
-                    title: const Text('背景播放 (鎖定螢幕繼續播放音訊)',
-                        style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
-                    subtitle: const Text('螢幕關閉鎖定或切換應用時，背景繼續播放節目聲音',
-                        style: TextStyle(color: Colors.white60, fontSize: 12)),
-                    value: _settingsManager.backgroundPlay,
-                    onChanged: (val) => _settingsManager.setBackgroundPlay(val),
-                  ),
-                  const Divider(color: Colors.white12, height: 1),
-                  SwitchListTile(
-                    activeColor: const Color(0xFFE50914),
-                    title: const Text('播放時保持螢幕常亮 (防止休眠)',
-                        style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
-                    subtitle: const Text('影片播放中螢幕不會因逾時自動變暗或關閉',
-                        style: TextStyle(color: Colors.white60, fontSize: 12)),
-                    value: _settingsManager.keepScreenAwake,
-                    onChanged: (val) => _settingsManager.setKeepScreenAwake(val),
-                  ),
-                  const Divider(color: Colors.white12, height: 1),
-                  SwitchListTile(
-                    activeColor: const Color(0xFFE50914),
-                    title: const Text('自動連續播放下一段 / 下一集',
-                        style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
-                    subtitle: const Text('分段或整集播畢前浮現 5 秒倒數並自動續播',
-                        style: TextStyle(color: Colors.white60, fontSize: 12)),
-                    value: _settingsManager.autoPlayNext,
-                    onChanged: (val) => _settingsManager.setAutoPlayNext(val),
-                  ),
-                  const Divider(color: Colors.white12, height: 1),
-                  ListTile(
-                    leading: Icon(
-                      _sleepTimerManager.isActive ? Icons.alarm_on : Icons.timer_outlined,
-                      color: _sleepTimerManager.isActive ? const Color(0xFFE50914) : Colors.white70,
-                    ),
-                    title: const Text('睡眠定時器 (Sleep Timer)',
-                        style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
-                    subtitle: Text(
-                      _sleepTimerManager.isActive
-                          ? '倒數中：${_sleepTimerManager.formattedTime}'
-                          : '定時自動暫停並停止背景音訊服務',
-                      style: TextStyle(
-                        color: _sleepTimerManager.isActive ? const Color(0xFFE50914) : Colors.white60,
-                        fontSize: 12,
-                      ),
-                    ),
-                    trailing: const Icon(Icons.chevron_right, color: Colors.white38),
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      showSleepTimerSheet(context);
-                    },
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // Download Storage Location Section
-            const Text(
-              '下載儲存位置 (Download Storage)',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            _buildStorageLocationCard(context),
-
-            const SizedBox(height: 16),
-
-            // If Update Available
-            if (mgr.updateAvailable && update != null) ...[
-              _buildUpdateAvailableCard(context, mgr, update),
-            ] else if (!mgr.isChecking && mgr.lastCheckedAt != null && !mgr.updateAvailable) ...[
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF242424),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Icon(Icons.check_circle, color: Color(0xFF46D369), size: 20),
-                    SizedBox(width: 8),
-                    Text(
-                      '目前已是最新版本，無需更新',
-                      style: TextStyle(color: Colors.white70, fontSize: 14),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-
-            const SizedBox(height: 16),
-            const Divider(color: Colors.white12),
-            const SizedBox(height: 8),
-
-            // Safety Fallback Row
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Flexible(
-                  child: Text(
-                    '遇到下載問題？可直接使用瀏覽器',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(color: Colors.white38, fontSize: 12),
-                  ),
-                ),
-                TextButton.icon(
-                  onPressed: () => mgr.openBrowserFallback(),
-                  icon: const Icon(Icons.open_in_browser, size: 16, color: Colors.white70),
-                  label: const Text('開啟 GitHub 發布頁', style: TextStyle(color: Colors.white70, fontSize: 12)),
                 ),
               ],
             ),
-          ],
+          ),
         ),
       ),
-    ),
-  ),
-);
-}
+    );
+  }
 
   Widget _buildStorageLocationCard(BuildContext context) {
     final isCustom = _downloadManager.isUsingCustomDirectory;

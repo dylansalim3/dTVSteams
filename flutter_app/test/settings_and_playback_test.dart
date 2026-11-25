@@ -164,5 +164,47 @@ void main() {
       expect(find.text('背景播放 (鎖定螢幕繼續播放音訊)'), findsOneWidget);
       expect(find.text('播放中防止裝置休眠 (保持螢幕常亮)'), findsOneWidget);
     });
+
+    testWidgets('Portrait PlayerScreen omits green/red engine text, avoids overflow, and handles double-tap fast forward safely',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final testEp = CatalogEpisode(
+        id: 'https://srgoideas.com/portrait_test/',
+        title: '綜藝玩很大 2026-11-21 超長標題測試在窄螢幕下不會溢出或換行顯示異常',
+        date: '2026-11-21',
+        url: 'https://srgoideas.com/portrait_test/',
+        parts: [
+          CatalogPart(label: 'Part 1', url: 'https://srgoideas.com/portrait_test/1'),
+        ],
+      );
+
+      await tester.pumpWidget(MaterialApp(
+        home: NativePlayerScreen(episode: testEp, initialPartIndex: 0),
+      ));
+      await tester.pump(const Duration(milliseconds: 100));
+
+      expect(tester.takeException(), isNull);
+      expect(find.textContaining('ExoPlayer 1080p Engine'), findsNothing);
+      expect(find.textContaining('本機離線播放'), findsNothing);
+
+      // Simulate double-tap on the right side (fast forward)
+      const rightTapPos = Offset(330, 420);
+      await tester.tapAt(rightTapPos);
+      await tester.pump(const Duration(milliseconds: 80));
+      await tester.tapAt(rightTapPos);
+      await tester.pump();
+
+      expect(tester.takeException(), isNull);
+      expect(find.text('+10 秒'), findsOneWidget);
+
+      // Wait for seek feedback timer (700ms) to expire cleanly
+      await tester.pump(const Duration(milliseconds: 800));
+      expect(find.text('+10 秒'), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
   });
 }

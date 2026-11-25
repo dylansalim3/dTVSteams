@@ -135,6 +135,43 @@ void main() {
       expect(UpdateManager.currentAppVersion, '1.0.4');
       expect(UpdateManager.currentAppVersionCode, 5);
     });
+
+    test('checkForUpdate awaits delayed init() so native version prevents false update prompt', () async {
+      const channel = MethodChannel('com.dtvsteams.dtvsteams/update');
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(channel, (MethodCall call) async {
+        if (call.method == 'getAppVersion') {
+          await Future<void>.delayed(const Duration(milliseconds: 30));
+          return {'versionName': '1.0.11', 'versionCode': 12};
+        }
+        return null;
+      });
+
+      final mockReleaseJson = jsonEncode({
+        'tag_name': 'v1.0.9',
+        'name': 'v1.0.9',
+        'body': 'Older release',
+        'html_url': 'https://github.com/dylansalim3/dTVSteams/releases/tag/v1.0.9',
+        'assets': [],
+      });
+
+      final mockClient = MockClient((request) async {
+        return http.Response(mockReleaseJson, 200);
+      });
+
+      final manager = UpdateManager();
+      // Start init() without awaiting, immediately call checkForUpdate() just like HomeScreen.initState
+      manager.init();
+      final info = await manager.checkForUpdate(manual: true, client: mockClient);
+
+      expect(info, isNotNull);
+      expect(info!.currentVersion, equals('1.0.11'));
+      expect(info.hasUpdate, isFalse);
+      expect(manager.updateAvailable, isFalse);
+
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(channel, null);
+    });
   });
 
   group('AboutUpdateDialog Widget Tests', () {
@@ -160,6 +197,9 @@ void main() {
       expect(find.textContaining('目前安裝版本'), findsOneWidget);
       expect(find.text('檢查更新'), findsOneWidget);
       expect(find.text('開啟 GitHub 發布頁'), findsOneWidget);
+
+      final sheetBox = tester.getRect(find.text('關於與版本更新'));
+      expect(sheetBox.top, greaterThanOrEqualTo(100.0));
     });
   });
 }

@@ -113,7 +113,28 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
   // Skip intro & smart stall fallback state (Feature 12)
   bool _skipIntroDismissedForThisPart = false;
   bool _showStallFallbackHud = false;
+  bool _completionCleanupShownForThisPart = false;
   DateTime? _bufferingStartTime;
+
+  Future<void> _safeSeekTo(VideoPlayerController? controller, Duration target) async {
+    if (controller == null || _isExiting || !mounted) return;
+    try {
+      if (!controller.value.isInitialized || controller.value.hasError) return;
+      await controller.seekTo(target);
+    } catch (e) {
+      debugPrint('[Player] seekTo ignored error: $e');
+    }
+  }
+
+  Future<void> _safeSetPlaybackSpeed(VideoPlayerController? controller, double speed) async {
+    if (controller == null || _isExiting || !mounted) return;
+    try {
+      if (!controller.value.isInitialized || controller.value.hasError) return;
+      await controller.setPlaybackSpeed(speed);
+    } catch (e) {
+      debugPrint('[Player] setPlaybackSpeed ignored error: $e');
+    }
+  }
 
   bool get _canShowSkipIntro {
     final c = _controller;
@@ -129,7 +150,7 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
     final cur = c.value.position;
     final dur = c.value.duration;
     final target = cur + const Duration(seconds: 30);
-    c.seekTo(target < dur ? target : dur);
+    _safeSeekTo(c, dur > Duration.zero && target > dur ? dur : target);
     setState(() {
       _skipIntroDismissedForThisPart = true;
     });
@@ -299,6 +320,8 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
       _currentEpisode = nextEpisode;
       _currentPartIndex = partIndex;
       _autoPlayDismissedForThisPart = false;
+      _skipIntroDismissedForThisPart = false;
+      _completionCleanupShownForThisPart = false;
       _isAutoAdvancing = false;
     });
     _initPlayerForPart(partIndex, forceLiveResolve: true);
@@ -459,11 +482,19 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
 
   void _lockScreen() {
     HapticFeedback.mediumImpact();
+    _longPressTimer?.cancel();
+    _longPressTimer = null;
+    _singleTapDebounce?.cancel();
+    _singleTapDebounce = null;
+    _seekFeedbackTimer?.cancel();
+    _seekFeedbackTimer = null;
     setState(() {
       _isScreenLocked = true;
       _showOsd = false;
       _showFastForwardHud = false;
       _showSeekFeedback = false;
+      _isSeekingForward = false;
+      _accumulatedSeekSeconds = 0;
       _showBrightnessHud = false;
       _showVolumeHud = false;
     });
@@ -675,23 +706,26 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
 
       if (isFinished) {
         // Offer quick cleanup for offline downloaded file once watched to completion
-        final parts = _currentEpisode.parts;
-        final finishedPart = parts.isNotEmpty && _currentPartIndex < parts.length ? parts[_currentPartIndex] : null;
-        if (finishedPart != null &&
-            _downloadManager.isDownloaded(_currentEpisode.id, finishedPart.label,
-                showId: _currentEpisode.showId, title: _currentEpisode.title)) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('已看完「${finishedPart.label}」，可清理離線檔以節省空間'),
-              duration: const Duration(seconds: 4),
-              backgroundColor: const Color(0xFF1E1E1E),
-              action: SnackBarAction(
-                label: '刪除檔案',
-                textColor: const Color(0xFFE50914),
-                onPressed: () => _downloadManager.deleteDownload(_currentEpisode.id, finishedPart.label),
+        if (!_completionCleanupShownForThisPart) {
+          final parts = _currentEpisode.parts;
+          final finishedPart = parts.isNotEmpty && _currentPartIndex < parts.length ? parts[_currentPartIndex] : null;
+          if (finishedPart != null &&
+              _downloadManager.isDownloaded(_currentEpisode.id, finishedPart.label,
+                  showId: _currentEpisode.showId, title: _currentEpisode.title)) {
+            _completionCleanupShownForThisPart = true;
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('已看完「${finishedPart.label}」，可清理離線檔以節省空間'),
+                duration: const Duration(seconds: 4),
+                backgroundColor: const Color(0xFF1E1E1E),
+                action: SnackBarAction(
+                  label: '刪除檔案',
+                  textColor: const Color(0xFFE50914),
+                  onPressed: () => _downloadManager.deleteDownload(_currentEpisode.id, finishedPart.label),
+                ),
               ),
-            ),
-          );
+            );
+          }
         }
 
         final isLastPart = _currentPartIndex >= _currentEpisode.parts.length - 1;
@@ -753,6 +787,7 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
       _currentPartIndex = newIndex;
       _autoPlayDismissedForThisPart = false;
       _skipIntroDismissedForThisPart = false;
+      _completionCleanupShownForThisPart = false;
       _showStallFallbackHud = false;
       _bufferingStartTime = null;
       _isAutoAdvancing = false;
@@ -1190,197 +1225,245 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
 
   void _showPlaybackSettingsSheet() {
     _osdTimer?.cancel();
-    final bottomInset = MediaQuery.of(context).padding.bottom;
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       useSafeArea: true,
-      builder: (ctx) => ListenableBuilder(
-        listenable: _settingsManager,
-        builder: (ctx, _) => Container(
-          decoration: const BoxDecoration(
-            color: Color(0xFF1E1E1E),
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-          ),
-          child: SafeArea(
-            top: true,
-            bottom: true,
-            minimum: const EdgeInsets.only(top: 8),
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(20, 8, 20, (bottomInset + 24) / 2),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Center(
-                      child: Container(
-                        width: 38,
-                        height: 4,
-                        margin: const EdgeInsets.only(bottom: 12),
-                        decoration: BoxDecoration(
-                          color: Colors.white24,
-                          borderRadius: BorderRadius.circular(2),
-                        ),
-                      ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: const [
-                            Icon(Icons.tune, color: Color(0xFFE50914), size: 22),
-                            SizedBox(width: 8),
-                            Text(
-                              '播放偏好設定 (Settings)',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 17,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.close, color: Colors.white70),
-                      onPressed: () => Navigator.of(ctx).pop(),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Material(
-                  color: const Color(0xFF2A2A2A),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: const BorderSide(color: Colors.white12),
-                  ),
-                  clipBehavior: Clip.antiAlias,
+      builder: (ctx) {
+        final mediaQuery = MediaQuery.of(ctx);
+        final bottomInset = mediaQuery.padding.bottom;
+        final maxSheetHeight = mediaQuery.size.height * 0.75;
+        return ListenableBuilder(
+          listenable: _settingsManager,
+          builder: (ctx, _) => ConstrainedBox(
+            constraints: BoxConstraints(maxHeight: maxSheetHeight),
+            child: Container(
+              decoration: const BoxDecoration(
+                color: Color(0xFF1E1E1E),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              child: SafeArea(
+                top: true,
+                bottom: true,
+                minimum: const EdgeInsets.only(top: 8),
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(18, 6, 18, (bottomInset + 16) / 2),
                   child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SwitchListTile(
-                        activeColor: const Color(0xFFE50914),
-                        title: const Text('背景播放 (鎖定螢幕繼續播放音訊)',
-                            style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
-                        subtitle: const Text('螢幕關閉鎖定或切換應用時，背景繼續播放聲音',
-                            style: TextStyle(color: Colors.white60, fontSize: 12)),
-                        value: _settingsManager.backgroundPlay,
-                        onChanged: (val) => _settingsManager.setBackgroundPlay(val),
-                      ),
-                      const Divider(color: Colors.white12, height: 1),
-                      SwitchListTile(
-                        activeColor: const Color(0xFFE50914),
-                        title: const Text('播放中防止裝置休眠 (保持螢幕常亮)',
-                            style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
-                        subtitle: const Text('影片播放中螢幕不會因逾時自動變暗或關閉',
-                            style: TextStyle(color: Colors.white60, fontSize: 12)),
-                        value: _settingsManager.keepScreenAwake,
-                        onChanged: (val) => _settingsManager.setKeepScreenAwake(val),
-                      ),
-                      const Divider(color: Colors.white12, height: 1),
-                      SwitchListTile(
-                        activeColor: const Color(0xFFE50914),
-                        title: const Text('自動連續播放下一段 / 下一集',
-                            style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
-                        subtitle: const Text('分段或整集播畢前浮現 5 秒倒數並自動續播',
-                            style: TextStyle(color: Colors.white60, fontSize: 12)),
-                        value: _settingsManager.autoPlayNext,
-                        onChanged: (val) => _settingsManager.setAutoPlayNext(val),
-                      ),
-                      const Divider(color: Colors.white12, height: 1),
-                      ListTile(
-                        leading: Icon(
-                          _sleepTimerManager.isActive ? Icons.alarm_on : Icons.timer_outlined,
-                          color: _sleepTimerManager.isActive ? const Color(0xFFE50914) : Colors.white70,
-                        ),
-                        title: const Text('睡眠定時器 (Sleep Timer)',
-                            style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
-                        subtitle: Text(
-                          _sleepTimerManager.isActive
-                              ? '倒數中：${_sleepTimerManager.formattedTime}'
-                              : '定時自動暫停並停止背景音訊服務',
-                          style: TextStyle(
-                            color: _sleepTimerManager.isActive ? const Color(0xFFE50914) : Colors.white60,
-                            fontSize: 12,
+                      Center(
+                        child: Container(
+                          width: 38,
+                          height: 4,
+                          margin: const EdgeInsets.only(bottom: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.white24,
+                            borderRadius: BorderRadius.circular(2),
                           ),
                         ),
-                        trailing: const Icon(Icons.chevron_right, color: Colors.white38),
-                        onTap: () {
-                          Navigator.of(ctx).pop();
-                          showSleepTimerSheet(context, onTimerChanged: () => setState(() {}));
-                        },
                       ),
-                      const Divider(color: Colors.white12, height: 1),
-                      ListTile(
-                        leading: Icon(_scaleModeIcon, color: const Color(0xFFE50914)),
-                        title: const Text('畫面比例縮放 (Aspect Ratio)',
-                            style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
-                        subtitle: Text(
-                          _scaleModeTooltip,
-                          style: const TextStyle(color: Colors.white60, fontSize: 12),
-                        ),
-                        trailing: const Icon(Icons.chevron_right, color: Colors.white38),
-                        onTap: () {
-                          Navigator.of(ctx).pop();
-                          _cycleScaleMode();
-                        },
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: const [
+                              Icon(Icons.tune, color: Color(0xFFE50914), size: 20),
+                              SizedBox(width: 8),
+                              Text(
+                                '播放偏好設定 (Settings)',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                          IconButton(
+                            visualDensity: VisualDensity.compact,
+                            icon: const Icon(Icons.close, color: Colors.white70),
+                            onPressed: () => Navigator.of(ctx).pop(),
+                          ),
+                        ],
                       ),
-                      const Divider(color: Colors.white12, height: 1),
-                      ListTile(
-                        leading: const Icon(Icons.history, color: Color(0xFFE50914)),
-                        title: const Text('觀看歷史紀錄 (Watch History)',
-                            style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
-                        subtitle: const Text(
-                          '查看歷史播放清單與中斷點進度',
-                          style: TextStyle(color: Colors.white60, fontSize: 12),
+                      const SizedBox(height: 8),
+                      Flexible(
+                        child: SingleChildScrollView(
+                          child: Material(
+                            color: const Color(0xFF2A2A2A),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              side: const BorderSide(color: Colors.white12),
+                            ),
+                            clipBehavior: Clip.antiAlias,
+                            child: Column(
+                              children: [
+                                SwitchListTile(
+                                  dense: true,
+                                  visualDensity: VisualDensity.compact,
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                                  activeColor: const Color(0xFFE50914),
+                                  title: const Text('背景播放 (鎖定螢幕繼續播放音訊)',
+                                      style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+                                  subtitle: const Text('螢幕關閉鎖定或切換應用時，背景繼續播放聲音',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(color: Colors.white60, fontSize: 11)),
+                                  value: _settingsManager.backgroundPlay,
+                                  onChanged: (val) => _settingsManager.setBackgroundPlay(val),
+                                ),
+                                const Divider(color: Colors.white12, height: 1),
+                                SwitchListTile(
+                                  dense: true,
+                                  visualDensity: VisualDensity.compact,
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                                  activeColor: const Color(0xFFE50914),
+                                  title: const Text('播放中防止裝置休眠 (保持螢幕常亮)',
+                                      style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+                                  subtitle: const Text('影片播放中螢幕不會因逾時自動變暗或關閉',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(color: Colors.white60, fontSize: 11)),
+                                  value: _settingsManager.keepScreenAwake,
+                                  onChanged: (val) => _settingsManager.setKeepScreenAwake(val),
+                                ),
+                                const Divider(color: Colors.white12, height: 1),
+                                SwitchListTile(
+                                  dense: true,
+                                  visualDensity: VisualDensity.compact,
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                                  activeColor: const Color(0xFFE50914),
+                                  title: const Text('自動連續播放下一段 / 下一集',
+                                      style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+                                  subtitle: const Text('分段或整集播畢前浮現 5 秒倒數並自動續播',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(color: Colors.white60, fontSize: 11)),
+                                  value: _settingsManager.autoPlayNext,
+                                  onChanged: (val) => _settingsManager.setAutoPlayNext(val),
+                                ),
+                                const Divider(color: Colors.white12, height: 1),
+                                ListTile(
+                                  dense: true,
+                                  visualDensity: VisualDensity.compact,
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                                  leading: Icon(
+                                    _sleepTimerManager.isActive ? Icons.alarm_on : Icons.timer_outlined,
+                                    size: 20,
+                                    color: _sleepTimerManager.isActive ? const Color(0xFFE50914) : Colors.white70,
+                                  ),
+                                  title: const Text('睡眠定時器 (Sleep Timer)',
+                                      style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+                                  subtitle: Text(
+                                    _sleepTimerManager.isActive
+                                        ? '倒數中：${_sleepTimerManager.formattedTime}'
+                                        : '定時自動暫停並停止背景音訊服務',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: _sleepTimerManager.isActive ? const Color(0xFFE50914) : Colors.white60,
+                                      fontSize: 11,
+                                    ),
+                                  ),
+                                  trailing: const Icon(Icons.chevron_right, color: Colors.white38, size: 18),
+                                  onTap: () {
+                                    Navigator.of(ctx).pop();
+                                    showSleepTimerSheet(context, onTimerChanged: () => setState(() {}));
+                                  },
+                                ),
+                                const Divider(color: Colors.white12, height: 1),
+                                ListTile(
+                                  dense: true,
+                                  visualDensity: VisualDensity.compact,
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                                  leading: Icon(_scaleModeIcon, color: const Color(0xFFE50914), size: 20),
+                                  title: const Text('畫面比例縮放 (Aspect Ratio)',
+                                      style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+                                  subtitle: Text(
+                                    _scaleModeTooltip,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(color: Colors.white60, fontSize: 11),
+                                  ),
+                                  trailing: const Icon(Icons.chevron_right, color: Colors.white38, size: 18),
+                                  onTap: () {
+                                    Navigator.of(ctx).pop();
+                                    _cycleScaleMode();
+                                  },
+                                ),
+                                const Divider(color: Colors.white12, height: 1),
+                                ListTile(
+                                  dense: true,
+                                  visualDensity: VisualDensity.compact,
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                                  leading: const Icon(Icons.history, color: Color(0xFFE50914), size: 20),
+                                  title: const Text('觀看歷史紀錄 (Watch History)',
+                                      style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+                                  subtitle: const Text(
+                                    '查看歷史播放清單與中斷點進度',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(color: Colors.white60, fontSize: 11),
+                                  ),
+                                  trailing: const Icon(Icons.chevron_right, color: Colors.white38, size: 18),
+                                  onTap: () {
+                                    Navigator.of(ctx).pop();
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(builder: (_) => const HistoryScreen()),
+                                    );
+                                  },
+                                ),
+                                const Divider(color: Colors.white12, height: 1),
+                                ListTile(
+                                  dense: true,
+                                  visualDensity: VisualDensity.compact,
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                                  leading: const Icon(Icons.lock_outline_rounded, color: Color(0xFFE50914), size: 20),
+                                  title: const Text('螢幕鎖定防誤觸 (Screen Lock)',
+                                      style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+                                  subtitle: const Text(
+                                    '鎖定所有控制項與手勢，防止誤觸',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(color: Colors.white60, fontSize: 11),
+                                  ),
+                                  trailing: const Icon(Icons.chevron_right, color: Colors.white38, size: 18),
+                                  onTap: () {
+                                    Navigator.of(ctx).pop();
+                                    _lockScreen();
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
-                        trailing: const Icon(Icons.chevron_right, color: Colors.white38),
-                        onTap: () {
-                          Navigator.of(ctx).pop();
-                          Navigator.of(context).push(
-                            MaterialPageRoute(builder: (_) => const HistoryScreen()),
-                          );
-                        },
-                      ),
-                      const Divider(color: Colors.white12, height: 1),
-                      ListTile(
-                        leading: const Icon(Icons.lock_outline_rounded, color: Color(0xFFE50914)),
-                        title: const Text('螢幕鎖定防誤觸 (Screen Lock)',
-                            style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
-                        subtitle: const Text(
-                          '鎖定所有控制項與手勢，防止誤觸',
-                          style: TextStyle(color: Colors.white60, fontSize: 12),
-                        ),
-                        trailing: const Icon(Icons.chevron_right, color: Colors.white38),
-                        onTap: () {
-                          Navigator.of(ctx).pop();
-                          _lockScreen();
-                        },
                       ),
                     ],
                   ),
                 ),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
-    ),
-  ),
-).then((_) {
+        );
+      },
+    ).then((_) {
       if (mounted) _resetOsdTimer();
     });
   }
 
   void _seekRelative(int seconds) {
-    if (_isScreenLocked) return;
+    if (_isScreenLocked || _isExiting || !mounted) return;
     final c = _controller;
-    if (c == null || !c.value.isInitialized) return;
+    if (c == null || !c.value.isInitialized || c.value.hasError) return;
+    final dur = c.value.duration;
+    if (dur <= Duration.zero) return;
     final target = c.value.position + Duration(seconds: seconds);
     final clamped = target < Duration.zero
         ? Duration.zero
-        : (target > c.value.duration ? c.value.duration : target);
-    c.seekTo(clamped);
+        : (target > dur ? dur : target);
+    _safeSeekTo(c, clamped);
     _resetOsdTimer();
   }
 
@@ -1393,12 +1476,12 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
     _pointerDownPos = event.localPosition;
     _longPressTimer?.cancel();
     _longPressTimer = Timer(const Duration(milliseconds: 350), () {
-      if (_isPointerDown && !_isVerticalDragging && !_isSeekingForward && !_showSeekFeedback) {
+      if (mounted && _isPointerDown && !_isVerticalDragging && !_showSeekFeedback) {
         final c = _controller;
         if (c != null && c.value.isInitialized && c.value.isPlaying) {
           _preFastForwardSpeed = _playbackSpeed;
           _isFastForwarding = true;
-          c.setPlaybackSpeed(2.0);
+          _safeSetPlaybackSpeed(c, 2.0);
           HapticFeedback.lightImpact();
           _singleTapDebounce?.cancel();
           _singleTapDebounce = null;
@@ -1423,10 +1506,12 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
     _longPressTimer = null;
     if (_isFastForwarding) {
       _isFastForwarding = false;
-      _controller?.setPlaybackSpeed(_preFastForwardSpeed);
-      setState(() {
-        _showFastForwardHud = false;
-      });
+      _safeSetPlaybackSpeed(_controller, _preFastForwardSpeed);
+      if (mounted) {
+        setState(() {
+          _showFastForwardHud = false;
+        });
+      }
     }
   }
 
@@ -1436,10 +1521,12 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
     _longPressTimer = null;
     if (_isFastForwarding) {
       _isFastForwarding = false;
-      _controller?.setPlaybackSpeed(_preFastForwardSpeed);
-      setState(() {
-        _showFastForwardHud = false;
-      });
+      _safeSetPlaybackSpeed(_controller, _preFastForwardSpeed);
+      if (mounted) {
+        setState(() {
+          _showFastForwardHud = false;
+        });
+      }
     }
   }
 
@@ -1448,7 +1535,7 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
       _showUnlockPrompt();
       return;
     }
-    if (_isFastForwarding) return;
+    if (_isFastForwarding || screenWidth <= 0) return;
     final now = DateTime.now().millisecondsSinceEpoch;
     final pos = details.localPosition;
     final isDoubleTap = (now - _lastTapTime < 380) && ((pos - _lastTapPosition).distance < 120);
@@ -1456,6 +1543,8 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
     if (isDoubleTap) {
       _singleTapDebounce?.cancel();
       _singleTapDebounce = null;
+      _longPressTimer?.cancel();
+      _longPressTimer = null;
       _lastTapTime = 0;
 
       final isLeft = pos.dx < screenWidth * 0.45;
@@ -1481,6 +1570,10 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
   }
 
   void _triggerDoubleTapSeek({required bool forward}) {
+    if (!mounted || _isExiting || _isScreenLocked) return;
+    _longPressTimer?.cancel();
+    _longPressTimer = null;
+
     if (_showSeekFeedback && _isSeekingForward == forward) {
       _accumulatedSeekSeconds += 10;
     } else {
@@ -1499,6 +1592,7 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
       if (mounted) {
         setState(() {
           _showSeekFeedback = false;
+          _isSeekingForward = false;
           _accumulatedSeekSeconds = 0;
         });
       }
@@ -1998,11 +2092,16 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFFE50914),
                               foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                             ),
                             onPressed: () => _initPlayerForPart(_currentPartIndex, forceLiveResolve: true),
                             icon: const Icon(Icons.refresh, size: 18),
-                            label: const Text('重新解析並重試 (Self-Healing Retry)', style: TextStyle(fontWeight: FontWeight.bold)),
+                            label: const Text(
+                              '重新解析並重試 (Retry)',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
                           ),
                         ],
                       ),
@@ -2011,51 +2110,52 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
 
                 // Animated Double-Tap Seek Feedback Overlay
                 if (_showSeekFeedback)
-                  Positioned.fill(
+                  Positioned(
+                    key: const ValueKey('seek_feedback_overlay'),
+                    top: 0,
+                    bottom: 0,
+                    left: _isSeekingForward ? null : 0,
+                    right: _isSeekingForward ? 0 : null,
+                    width: MediaQuery.of(context).size.width * 0.42,
                     child: IgnorePointer(
-                      child: Align(
-                        alignment: _isSeekingForward ? Alignment.centerRight : Alignment.centerLeft,
-                        child: Container(
-                          width: MediaQuery.of(context).size.width * 0.42,
-                          height: double.infinity,
-                          decoration: BoxDecoration(
-                            gradient: RadialGradient(
-                              center: _isSeekingForward ? const Alignment(0.8, 0.0) : const Alignment(-0.8, 0.0),
-                              radius: 1.2,
-                              colors: [
-                                Colors.white.withValues(alpha: 0.22),
-                                Colors.white.withValues(alpha: 0.05),
-                                Colors.transparent,
-                              ],
-                            ),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                _isSeekingForward ? Icons.fast_forward : Icons.fast_rewind,
-                                color: Colors.white,
-                                size: 42,
-                              ),
-                              const SizedBox(height: 6),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: Colors.black.withValues(alpha: 0.65),
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: Colors.white24, width: 0.8),
-                                ),
-                                child: Text(
-                                  '${_isSeekingForward ? "+" : "-"}$_accumulatedSeekSeconds 秒',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: RadialGradient(
+                            center: _isSeekingForward ? const Alignment(0.8, 0.0) : const Alignment(-0.8, 0.0),
+                            radius: 1.2,
+                            colors: [
+                              Colors.white.withValues(alpha: 0.22),
+                              Colors.white.withValues(alpha: 0.05),
+                              Colors.transparent,
                             ],
                           ),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              _isSeekingForward ? Icons.fast_forward : Icons.fast_rewind,
+                              color: Colors.white,
+                              size: 42,
+                            ),
+                            const SizedBox(height: 6),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withValues(alpha: 0.65),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: Colors.white24, width: 0.8),
+                              ),
+                              child: Text(
+                                '${_isSeekingForward ? "+" : "-"}$_accumulatedSeekSeconds 秒',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -2108,6 +2208,7 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
 
                 // Animated OSD Controls
                 AnimatedOpacity(
+                  key: const ValueKey('osd_controls_overlay'),
                   opacity: (_showOsd && !_isScreenLocked) ? 1.0 : 0.0,
                   duration: const Duration(milliseconds: 250),
                   child: IgnorePointer(
@@ -2140,7 +2241,7 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
                           left: 0,
                           right: 0,
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 colors: [Colors.black.withValues(alpha: 0.85), Colors.transparent],
@@ -2150,9 +2251,10 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
                             ),
                             child: SafeArea(
                               bottom: false,
-                              child: Row(
-                                children: [
-                                  IconButton(
+                              child: LayoutBuilder(
+                                builder: (context, constraints) {
+                                  final isPortraitOrNarrow = constraints.maxWidth < 600;
+                                  final backBtn = IconButton(
                                     icon: const Icon(Icons.arrow_back, color: Colors.white, size: 24),
                                     onPressed: () {
                                       _handleExitPlayer();
@@ -2160,208 +2262,221 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
                                         Navigator.of(context).maybePop();
                                       }
                                     },
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          _currentEpisode.title,
+                                  );
+                                  final titleWidget = Text(
+                                    _currentEpisode.title,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  );
+
+                                  final secondaryActions = <Widget>[
+                                    // Download Button in OSD
+                                    IconButton(
+                                      tooltip: isCurPartDownloaded
+                                          ? '已下載'
+                                          : (isCurPartDownloading ? '下載中' : '下載此分段'),
+                                      icon: isCurPartDownloading
+                                          ? SizedBox(
+                                              width: 22,
+                                              height: 22,
+                                              child: CircularProgressIndicator(
+                                                value: downloadItem?.progress,
+                                                strokeWidth: 2.5,
+                                                color: const Color(0xFFE50914),
+                                              ),
+                                            )
+                                          : Icon(
+                                              isCurPartDownloaded ? Icons.download_done : Icons.download,
+                                              color: isCurPartDownloaded ? const Color(0xFF46D369) : Colors.white,
+                                              size: 22,
+                                            ),
+                                      onPressed: _triggerDownloadCurrentPart,
+                                    ),
+
+                                    // PiP (Picture-in-Picture) Button in OSD
+                                    IconButton(
+                                      tooltip: '子母畫面 (Picture-in-Picture)',
+                                      icon: const Icon(Icons.picture_in_picture_alt, color: Colors.white, size: 22),
+                                      onPressed: () => _pipManager.enterPip(),
+                                    ),
+
+                                    // Aspect Ratio Scale Mode Button in OSD
+                                    IconButton(
+                                      tooltip: _scaleModeTooltip,
+                                      icon: Icon(_scaleModeIcon, color: Colors.white, size: 22),
+                                      onPressed: _cycleScaleMode,
+                                    ),
+
+                                    const SizedBox(width: 4),
+
+                                    // Speed Toggle Chip
+                                    GestureDetector(
+                                      onTap: _cyclePlaybackSpeed,
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withValues(alpha: 0.15),
+                                          borderRadius: BorderRadius.circular(14),
+                                          border: Border.all(color: Colors.white24),
+                                        ),
+                                        child: Text(
+                                          '${_playbackSpeed}x',
                                           style: const TextStyle(
                                             color: Colors.white,
-                                            fontSize: 16,
                                             fontWeight: FontWeight.bold,
+                                            fontSize: 12,
                                           ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
                                         ),
-                                        if (currentPart != null)
-                                          Text(
-                                            '${currentPart.label} • ${isCurPartDownloaded ? '本機離線播放' : 'ExoPlayer 1080p Engine'}',
-                                            style: TextStyle(
-                                              color: isCurPartDownloaded ? const Color(0xFF46D369) : const Color(0xFFE50914),
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+
+                                    const SizedBox(width: 4),
+
+                                    // Sleep Timer Button in OSD
+                                    Stack(
+                                      clipBehavior: Clip.none,
+                                      children: [
+                                        IconButton(
+                                          tooltip: _sleepTimerManager.isActive
+                                              ? '睡眠定時器 (剩餘 ${_sleepTimerManager.badgeText})'
+                                              : '睡眠定時器 (Sleep Timer)',
+                                          icon: Icon(
+                                            _sleepTimerManager.isActive ? Icons.alarm_on : Icons.timer_outlined,
+                                            color: _sleepTimerManager.isActive ? const Color(0xFFE50914) : Colors.white,
+                                            size: 22,
+                                          ),
+                                          onPressed: () => showSleepTimerSheet(context, onTimerChanged: () => setState(() {})),
+                                        ),
+                                        if (_sleepTimerManager.isActive)
+                                          Positioned(
+                                            right: 4,
+                                            top: 6,
+                                            child: Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                              decoration: BoxDecoration(
+                                                color: const Color(0xFFE50914),
+                                                borderRadius: BorderRadius.circular(8),
+                                              ),
+                                              child: Text(
+                                                _sleepTimerManager.badgeText,
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 9,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
                                             ),
                                           ),
                                       ],
                                     ),
-                                  ),
 
-                                  // Download Button in OSD
-                                  IconButton(
-                                    tooltip: isCurPartDownloaded
-                                        ? '已下載'
-                                        : (isCurPartDownloading ? '下載中' : '下載此分段'),
-                                    icon: isCurPartDownloading
-                                        ? SizedBox(
-                                            width: 22,
-                                            height: 22,
-                                            child: CircularProgressIndicator(
-                                              value: downloadItem?.progress,
-                                              strokeWidth: 2.5,
-                                              color: const Color(0xFFE50914),
-                                            ),
-                                          )
-                                        : Icon(
-                                            isCurPartDownloaded ? Icons.download_done : Icons.download,
-                                            color: isCurPartDownloaded ? const Color(0xFF46D369) : Colors.white,
+                                    // Audio-Only Radio Mode Button in OSD (Feature 11)
+                                    IconButton(
+                                      tooltip: _isAudioOnlyMode
+                                          ? '切換回視訊播放模式 (Video)'
+                                          : '切換純音頻聽劇模式 (Audio-Only)',
+                                      icon: Icon(
+                                        _isAudioOnlyMode ? Icons.headphones : Icons.headphones_outlined,
+                                        color: _isAudioOnlyMode ? const Color(0xFFE50914) : Colors.white,
+                                        size: 22,
+                                      ),
+                                      onPressed: _toggleAudioOnlyMode,
+                                    ),
+
+                                    // Playback Settings Button in OSD
+                                    IconButton(
+                                      tooltip: '播放偏好設定 (背景播放 / 防止休眠)',
+                                      icon: const Icon(Icons.tune, color: Colors.white, size: 22),
+                                      onPressed: _showPlaybackSettingsSheet,
+                                    ),
+
+                                    // Share Button in OSD (QR Code & Link)
+                                    IconButton(
+                                      tooltip: '分享此集影片 (QR Code / 連結)',
+                                      icon: const Icon(Icons.share_outlined, color: Colors.white, size: 22),
+                                      onPressed: () {
+                                        showShareDialog(
+                                          context,
+                                          _currentEpisode,
+                                          partIndex: _currentPartIndex,
+                                          localFilePath: widget.localFile?.path,
+                                        );
+                                      },
+                                    ),
+
+                                    // Favorite Button in OSD (Watch Later)
+                                    ListenableBuilder(
+                                      listenable: _favoritesManager,
+                                      builder: (context, _) {
+                                        final isFav = _favoritesManager.isFavorite(_currentEpisode.id);
+                                        return IconButton(
+                                          tooltip: isFav ? '已收藏 (點擊取消)' : '加入收藏',
+                                          icon: Icon(
+                                            isFav ? Icons.favorite : Icons.favorite_border,
+                                            color: isFav ? const Color(0xFFE50914) : Colors.white,
                                             size: 22,
                                           ),
-                                    onPressed: _triggerDownloadCurrentPart,
-                                  ),
-
-                                  // PiP (Picture-in-Picture) Button in OSD
-                                  IconButton(
-                                    tooltip: '子母畫面 (Picture-in-Picture)',
-                                    icon: const Icon(Icons.picture_in_picture_alt, color: Colors.white, size: 22),
-                                    onPressed: () => _pipManager.enterPip(),
-                                  ),
-
-                                  // Aspect Ratio Scale Mode Button in OSD
-                                  IconButton(
-                                    tooltip: _scaleModeTooltip,
-                                    icon: Icon(_scaleModeIcon, color: Colors.white, size: 22),
-                                    onPressed: _cycleScaleMode,
-                                  ),
-
-                                  const SizedBox(width: 4),
-
-                                  // Speed Toggle Chip
-                                  GestureDetector(
-                                    onTap: _cyclePlaybackSpeed,
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white.withValues(alpha: 0.15),
-                                        borderRadius: BorderRadius.circular(14),
-                                        border: Border.all(color: Colors.white24),
-                                      ),
-                                      child: Text(
-                                        '${_playbackSpeed}x',
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 12,
-                                        ),
-                                      ),
+                                          onPressed: () async {
+                                            final added = await _favoritesManager.toggleFavorite(_currentEpisode);
+                                            HapticFeedback.lightImpact();
+                                            if (context.mounted) {
+                                              ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                SnackBar(
+                                                  content: Text(added ? '❤️ 已加入收藏清單' : '已從收藏清單移除'),
+                                                  duration: const Duration(milliseconds: 1200),
+                                                  behavior: SnackBarBehavior.floating,
+                                                ),
+                                              );
+                                            }
+                                          },
+                                        );
+                                      },
                                     ),
-                                  ),
+                                  ];
 
-                                  const SizedBox(width: 4),
-
-                                  // Sleep Timer Button in OSD
-                                  Stack(
-                                    clipBehavior: Clip.none,
-                                    children: [
-                                      IconButton(
-                                        tooltip: _sleepTimerManager.isActive
-                                            ? '睡眠定時器 (剩餘 ${_sleepTimerManager.badgeText})'
-                                            : '睡眠定時器 (Sleep Timer)',
-                                        icon: Icon(
-                                          _sleepTimerManager.isActive ? Icons.alarm_on : Icons.timer_outlined,
-                                          color: _sleepTimerManager.isActive ? const Color(0xFFE50914) : Colors.white,
-                                          size: 22,
-                                        ),
-                                        onPressed: () => showSleepTimerSheet(context, onTimerChanged: () => setState(() {})),
-                                      ),
-                                      if (_sleepTimerManager.isActive)
-                                        Positioned(
-                                          right: 4,
-                                          top: 6,
-                                          child: Container(
-                                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                                            decoration: BoxDecoration(
-                                              color: const Color(0xFFE50914),
-                                              borderRadius: BorderRadius.circular(8),
-                                            ),
-                                            child: Text(
-                                              _sleepTimerManager.badgeText,
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 9,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                    ],
-                                  ),
-
-                                  const SizedBox(width: 4),
-
-                                  // Audio-Only Radio Mode Button in OSD (Feature 11)
-                                  IconButton(
-                                    tooltip: _isAudioOnlyMode
-                                        ? '切換回視訊播放模式 (Video)'
-                                        : '切換純音頻聽劇模式 (Audio-Only)',
-                                    icon: Icon(
-                                      _isAudioOnlyMode ? Icons.headphones : Icons.headphones_outlined,
-                                      color: _isAudioOnlyMode ? const Color(0xFFE50914) : Colors.white,
-                                      size: 22,
-                                    ),
-                                    onPressed: _toggleAudioOnlyMode,
-                                  ),
-
-                                  // Playback Settings Button in OSD
-                                  IconButton(
-                                    tooltip: '播放偏好設定 (背景播放 / 防止休眠)',
-                                    icon: const Icon(Icons.tune, color: Colors.white, size: 22),
-                                    onPressed: _showPlaybackSettingsSheet,
-                                  ),
-
-                                  // Share Button in OSD (QR Code & Link)
-                                  IconButton(
-                                    tooltip: '分享此集影片 (QR Code / 連結)',
-                                    icon: const Icon(Icons.share_outlined, color: Colors.white, size: 22),
-                                    onPressed: () {
-                                      showShareDialog(
-                                        context,
-                                        _currentEpisode,
-                                        partIndex: _currentPartIndex,
-                                        localFilePath: widget.localFile?.path,
-                                      );
-                                    },
-                                  ),
-
-                                  // Favorite Button in OSD (Watch Later)
-                                  ListenableBuilder(
-                                    listenable: _favoritesManager,
-                                    builder: (context, _) {
-                                      final isFav = _favoritesManager.isFavorite(_currentEpisode.id);
-                                      return IconButton(
-                                        tooltip: isFav ? '已收藏 (點擊取消)' : '加入收藏',
-                                        icon: Icon(
-                                          isFav ? Icons.favorite : Icons.favorite_border,
-                                          color: isFav ? const Color(0xFFE50914) : Colors.white,
-                                          size: 22,
-                                        ),
-                                        onPressed: () async {
-                                          final added = await _favoritesManager.toggleFavorite(_currentEpisode);
-                                          HapticFeedback.lightImpact();
-                                          if (context.mounted) {
-                                            ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              SnackBar(
-                                                content: Text(added ? '❤️ 已加入收藏清單' : '已從收藏清單移除'),
-                                                duration: const Duration(milliseconds: 1200),
-                                                behavior: SnackBarBehavior.floating,
-                                              ),
-                                            );
-                                          }
-                                        },
-                                      );
-                                    },
-                                  ),
-
-                                  // Lock Screen Button in Top OSD
-                                  IconButton(
+                                  final lockBtn = IconButton(
                                     tooltip: '鎖定螢幕 (防誤觸)',
                                     icon: const Icon(Icons.lock_open_rounded, color: Colors.white, size: 22),
                                     onPressed: _lockScreen,
-                                  ),
-                                ],
+                                  );
+
+                                  if (isPortraitOrNarrow) {
+                                    return Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            backBtn,
+                                            const SizedBox(width: 4),
+                                            Expanded(child: titleWidget),
+                                            lockBtn,
+                                          ],
+                                        ),
+                                        SingleChildScrollView(
+                                          scrollDirection: Axis.horizontal,
+                                          child: Row(children: secondaryActions),
+                                        ),
+                                      ],
+                                    );
+                                  }
+
+                                  return Row(
+                                    children: [
+                                      backBtn,
+                                      const SizedBox(width: 8),
+                                      Expanded(child: titleWidget),
+                                      ...secondaryActions,
+                                      lockBtn,
+                                    ],
+                                  );
+                                },
                               ),
                             ),
                           ),
@@ -2395,45 +2510,48 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
                                 children: [
                                   // Parts Selector
                                   if (parts.length > 1) ...[
-                                    Row(
-                                      children: [
-                                        const Text(
-                                          '分段 (Parts):',
-                                          style: TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.bold),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        ...List.generate(parts.length, (idx) {
-                                          final p = parts[idx];
-                                          final isSelected = idx == _currentPartIndex;
-                                          return Padding(
-                                            padding: const EdgeInsets.only(right: 8.0),
-                                            child: InkWell(
-                                              borderRadius: BorderRadius.circular(4),
-                                              onTap: () => _switchPart(idx),
-                                              child: Container(
-                                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                                                decoration: BoxDecoration(
-                                                  color: isSelected
-                                                      ? const Color(0xFFE50914)
-                                                      : Colors.white.withValues(alpha: 0.15),
-                                                  borderRadius: BorderRadius.circular(4),
-                                                  border: Border.all(
-                                                    color: isSelected ? const Color(0xFFE50914) : Colors.white24,
+                                    SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      child: Row(
+                                        children: [
+                                          const Text(
+                                            '分段 (Parts):',
+                                            style: TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.bold),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          ...List.generate(parts.length, (idx) {
+                                            final p = parts[idx];
+                                            final isSelected = idx == _currentPartIndex;
+                                            return Padding(
+                                              padding: const EdgeInsets.only(right: 8.0),
+                                              child: InkWell(
+                                                borderRadius: BorderRadius.circular(4),
+                                                onTap: () => _switchPart(idx),
+                                                child: Container(
+                                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                                                  decoration: BoxDecoration(
+                                                    color: isSelected
+                                                        ? const Color(0xFFE50914)
+                                                        : Colors.white.withValues(alpha: 0.15),
+                                                    borderRadius: BorderRadius.circular(4),
+                                                    border: Border.all(
+                                                      color: isSelected ? const Color(0xFFE50914) : Colors.white24,
+                                                    ),
                                                   ),
-                                                ),
-                                                child: Text(
-                                                  p.label,
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 12,
-                                                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                                  child: Text(
+                                                    p.label,
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 12,
+                                                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                                    ),
                                                   ),
                                                 ),
                                               ),
-                                            ),
-                                          );
-                                        }),
-                                      ],
+                                            );
+                                          }),
+                                        ],
+                                      ),
                                     ),
                                     const SizedBox(height: 12),
                                   ],
@@ -2453,7 +2571,7 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
                                       onChanged: (val) {
                                         if (duration > Duration.zero) {
                                           final targetMs = (val * duration.inMilliseconds).round();
-                                          _controller?.seekTo(Duration(milliseconds: targetMs));
+                                          _safeSeekTo(_controller, Duration(milliseconds: targetMs));
                                           _resetOsdTimer();
                                         }
                                       },
@@ -2480,11 +2598,15 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
                                         onPressed: () => _seekRelative(10),
                                       ),
                                       const SizedBox(width: 8),
-                                      Text(
-                                        '${_formatDuration(position)} / ${_formatDuration(duration)}',
-                                        style: const TextStyle(color: Colors.white70, fontSize: 13, fontFamily: 'monospace'),
+                                      Expanded(
+                                        child: Text(
+                                          '${_formatDuration(position)} / ${_formatDuration(duration)}',
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(color: Colors.white70, fontSize: 13, fontFamily: 'monospace'),
+                                        ),
                                       ),
-                                      const Spacer(),
+                                      const SizedBox(width: 8),
                                       Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                                         decoration: BoxDecoration(

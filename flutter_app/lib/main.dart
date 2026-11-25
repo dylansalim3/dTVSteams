@@ -100,6 +100,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _checkRemoteUpdate() async {
+    // Ensure native version and cache are initialized before checking remote updates
+    await _updateManager.init();
     // Silent check on startup with 12h cooldown
     final update = await _updateManager.checkForUpdate();
     if (mounted && update != null && update.hasUpdate) {

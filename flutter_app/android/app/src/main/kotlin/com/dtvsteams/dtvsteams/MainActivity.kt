@@ -133,12 +133,43 @@ class MainActivity : FlutterActivity() {
                     }
                     try {
                         val file = File(filePath)
-                        if (!file.exists()) {
-                            result.error("FILE_NOT_FOUND", "File does not exist: $filePath", null)
+                        if (!file.exists() || file.length() == 0L) {
+                            result.error("FILE_NOT_FOUND", "APK file is missing or empty: $filePath", null)
                             return@setMethodCallHandler
                         }
 
-                        // Ensure world-readable permissions for external installer processes
+                        // Verify the downloaded file is a valid APK and not a downgrade
+                        val archiveInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            packageManager.getPackageArchiveInfo(filePath, PackageManager.PackageInfoFlags.of(0))
+                        } else {
+                            @Suppress("DEPRECATION")
+                            packageManager.getPackageArchiveInfo(filePath, 0)
+                        }
+                        if (archiveInfo == null) {
+                            result.error("INVALID_APK", "下載的安裝檔已損毀或格式無效，請重新下載", null)
+                            return@setMethodCallHandler
+                        }
+                        if (archiveInfo.packageName == packageName) {
+                            val currentInfo = packageManager.getPackageInfo(packageName, 0)
+                            val currentCode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                                currentInfo.longVersionCode
+                            } else {
+                                @Suppress("DEPRECATION")
+                                currentInfo.versionCode.toLong()
+                            }
+                            val apkCode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                                archiveInfo.longVersionCode
+                            } else {
+                                @Suppress("DEPRECATION")
+                                archiveInfo.versionCode.toLong()
+                            }
+                            if (apkCode < currentCode) {
+                                result.error("DOWNGRADE_BLOCKED", "安裝檔版本 ($apkCode) 低於目前安裝版本 ($currentCode)", null)
+                                return@setMethodCallHandler
+                            }
+                        }
+
+                        // Ensure readable permissions for external installer processes
                         file.setReadable(true, false)
 
                         val contentUri = FileProvider.getUriForFile(
@@ -149,9 +180,7 @@ class MainActivity : FlutterActivity() {
                         val installIntent = Intent(Intent.ACTION_VIEW).apply {
                             setDataAndType(contentUri, "application/vnd.android.package-archive")
                             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                            addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
                             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                            putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, true)
                         }
 
                         // Explicitly grant URI read permissions to all matching installer components

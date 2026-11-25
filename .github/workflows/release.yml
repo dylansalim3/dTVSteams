@@ -70,7 +70,21 @@ jobs:
           cd flutter_app
           flutter test
 
+      - name: Decode Release Keystore (if configured)
+        id: keystore
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$ANDROID_KEYSTORE_BASE64" ]; then
+            echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > flutter_app/android/release-keystore.jks
+            echo "ANDROID_KEYSTORE_PATH=release-keystore.jks" >> $GITHUB_ENV
+          fi
+
       - name: Build Android Release APK
+        env:
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
         run: |
           cd flutter_app
           flutter build apk --release
