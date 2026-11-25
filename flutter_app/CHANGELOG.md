@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.3](https://github.com/dylansalim3/dTVSteams/compare/v1.2.2...v1.2.3) (2026-11-25)
+
+
+### Bug Fixes
+
+* **android:** resolve relative release keystore paths from rootProject ([6e2363e](https://github.com/dylansalim3/dTVSteams/commit/6e2363e886802ac9b8ad046ecc03322422b652f0))
+
 ## [1.2.2](https://github.com/dylansalim3/dTVSteams/compare/v1.2.1...v1.2.2) (2026-11-25)
 
 
