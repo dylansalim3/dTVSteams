@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.4](https://github.com/dylansalim3/dTVSteams/compare/v1.2.3...v1.2.4) (2026-11-25)
+
+
+### Bug Fixes
+
+* **ui:** remove redundant show name from list item titles ([ac30c80](https://github.com/dylansalim3/dTVSteams/commit/ac30c80dbf716099163568582d5ff6fb8aa47b0a))
+
 ## [1.2.3](https://github.com/dylansalim3/dTVSteams/compare/v1.2.2...v1.2.3) (2026-11-25)
 
 
