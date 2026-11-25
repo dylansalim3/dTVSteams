@@ -165,6 +165,21 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
     );
   }
 
+  // Tracks last applied native system UI bar visibility so we only toggle Chrome on state changes
+  bool? _lastImmersiveUiState;
+
+  void _syncSystemUiMode() {
+    final shouldHideSystemBars =
+        !_isExiting && !_pipManager.isInPipMode.value && !_isAudioOnlyMode && (!_showOsd || _isScreenLocked);
+    if (_lastImmersiveUiState == shouldHideSystemBars) return;
+    _lastImmersiveUiState = shouldHideSystemBars;
+    if (shouldHideSystemBars) {
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    } else {
+      AppSystemUi.restoreNormalChrome();
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -178,7 +193,7 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
     );
     _currentEpisode = widget.episode;
     WidgetsBinding.instance.addObserver(this);
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    _syncSystemUiMode();
     _currentPartIndex = widget.initialPartIndex;
     _pipManager.isInPipMode.addListener(_onPipUpdate);
     _pipManager.setAutoPip(true);
@@ -403,6 +418,9 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
       if (!_settingsManager.backgroundPlay && !_pipManager.isInPipMode.value) {
         _controller?.pause();
       }
+    } else if (state == AppLifecycleState.resumed) {
+      _lastImmersiveUiState = null;
+      _syncSystemUiMode();
     }
   }
 
@@ -1150,6 +1168,7 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
   Future<void> _handleExitPlayer() async {
     if (_isExiting) return;
     _isExiting = true;
+    _lastImmersiveUiState = false;
 
     // 0. Immediately restore native top status bar and bottom navigation buttons synchronously
     AppSystemUi.restoreNormalChrome();
@@ -1982,6 +2001,7 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
 
   @override
   Widget build(BuildContext context) {
+    _syncSystemUiMode();
     final parts = _currentEpisode.parts;
     final currentPart = parts.isNotEmpty && _currentPartIndex < parts.length
         ? parts[_currentPartIndex]
@@ -2517,12 +2537,7 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
                           left: 0,
                           right: 0,
                           child: Container(
-                            padding: EdgeInsets.fromLTRB(
-                              20,
-                              16,
-                              20,
-                              MediaQuery.of(context).padding.bottom + 16,
-                            ),
+                            padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 colors: [Colors.transparent, Colors.black.withValues(alpha: 0.92)],
