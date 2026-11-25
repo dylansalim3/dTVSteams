@@ -3,6 +3,7 @@ import '../services/download_manager.dart';
 import '../services/settings_manager.dart';
 import '../services/sleep_timer_manager.dart';
 import '../services/update_manager.dart';
+import 'app_tokens.dart';
 import 'sleep_timer_sheet.dart';
 import 'storage_location_sheet.dart';
 
@@ -33,32 +34,32 @@ class AboutUpdateDialog {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF1E1E1E),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        backgroundColor: AppColors.surfaceOverlay,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.modal)),
         title: Row(
           children: const [
-            Icon(Icons.security, color: Color(0xFFE50914), size: 24),
-            SizedBox(width: 8),
+            Icon(Icons.security, color: AppColors.accent, size: 24),
+            SizedBox(width: AppSpacing.sm),
             Text(
               '需要安裝應用權限',
-              style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(color: AppColors.textPrimary, fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ],
         ),
         content: const Text(
           '為讓應用程式能自動完成更新安裝，Android 系統要求為 dTVSteams 開啟「允許安裝未知應用程式」權限。\n\n點選下方按鈕前往系統設定開啟後，即可繼續安裝。',
-          style: TextStyle(color: Colors.white70, fontSize: 14, height: 1.5),
+          style: TextStyle(color: AppColors.textSecondary, fontSize: 14, height: 1.5),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('稍後再說', style: TextStyle(color: Colors.white54)),
+            child: const Text('稍後再說', style: TextStyle(color: AppColors.textMuted)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFE50914),
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              backgroundColor: AppColors.accent,
+              foregroundColor: AppColors.textPrimary,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.card)),
             ),
             onPressed: () async {
               Navigator.of(ctx).pop();
@@ -121,19 +122,20 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
       constraints: BoxConstraints(maxHeight: maxSheetHeight),
       child: Container(
         decoration: const BoxDecoration(
-          color: Color(0xFF1E1E1E),
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          color: AppColors.surfaceOverlay,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.modal)),
+          border: Border(top: BorderSide(color: AppColors.borderSubtle, width: 1)),
         ),
         child: SafeArea(
           top: true,
           bottom: true,
-          minimum: const EdgeInsets.only(top: 8),
+          minimum: const EdgeInsets.only(top: AppSpacing.sm),
           child: Padding(
             padding: EdgeInsets.fromLTRB(
-              18,
-              6,
-              18,
-              mediaQuery.viewInsets.bottom + (bottomInset + 16) / 2,
+              AppSpacing.lg,
+              AppSpacing.xs,
+              AppSpacing.lg,
+              mediaQuery.viewInsets.bottom + (bottomInset + AppSpacing.lg) / 2,
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -142,9 +144,9 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                 // Top drag handle indicator (pinned)
                 Center(
                   child: Container(
-                    width: 38,
+                    width: 36,
                     height: 4,
-                    margin: const EdgeInsets.only(bottom: 8),
+                    margin: const EdgeInsets.only(bottom: AppSpacing.sm),
                     decoration: BoxDecoration(
                       color: Colors.white24,
                       borderRadius: BorderRadius.circular(2),
@@ -160,23 +162,23 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFE50914),
-                            borderRadius: BorderRadius.circular(4),
+                            color: AppColors.accent,
+                            borderRadius: BorderRadius.circular(AppRadius.badge),
                           ),
                           child: const Text(
                             'dTV',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: AppColors.textPrimary,
                               fontWeight: FontWeight.w900,
                               fontSize: 13,
                             ),
                           ),
                         ),
-                        const SizedBox(width: 6),
+                        const SizedBox(width: AppSpacing.sm),
                         const Text(
                           '關於與版本更新',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: AppColors.textPrimary,
                             fontSize: 17,
                             fontWeight: FontWeight.bold,
                           ),
@@ -184,13 +186,15 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                       ],
                     ),
                     IconButton(
-                      visualDensity: VisualDensity.compact,
-                      icon: const Icon(Icons.close, color: Colors.white70),
+                      constraints: const BoxConstraints.tightFor(width: 44, height: 44),
+                      style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+                      tooltip: '關閉設定',
+                      icon: const Icon(Icons.close, color: AppColors.textSecondary),
                       onPressed: () => Navigator.of(context).pop(),
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppSpacing.sm),
                 Flexible(
                   child: SingleChildScrollView(
                     child: Column(
@@ -199,16 +203,16 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                       children: [
                         // Current Version Card
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                          padding: const EdgeInsets.all(AppSpacing.md),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF2A2A2A),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.white12),
+                            color: AppColors.cardBg,
+                            borderRadius: BorderRadius.circular(AppRadius.card),
+                            border: Border.all(color: AppColors.borderSubtle),
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.info_outline, color: Colors.white70, size: 22),
-                              const SizedBox(width: 10),
+                              const Icon(Icons.info_outline, color: AppColors.textSecondary, size: 22),
+                              const SizedBox(width: AppSpacing.sm),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -216,7 +220,7 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                                     const Text(
                                       'dTVSteams 綜藝影音串流平台',
                                       style: TextStyle(
-                                        color: Colors.white,
+                                        color: AppColors.textPrimary,
                                         fontSize: 14,
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -224,18 +228,22 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                                     const SizedBox(height: 2),
                                     Text(
                                       '目前安裝版本: v${UpdateManager.currentAppVersion}',
-                                      style: const TextStyle(color: Colors.white60, fontSize: 12),
+                                      style: const TextStyle(
+                                        color: AppColors.textMuted,
+                                        fontSize: 12,
+                                        fontFeatures: [FontFeature.tabularFigures()],
+                                      ),
                                     ),
                                   ],
                                 ),
                               ),
                               ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFFE50914),
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                                  minimumSize: const Size(0, 34),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                                  backgroundColor: AppColors.accent,
+                                  foregroundColor: AppColors.textPrimary,
+                                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+                                  minimumSize: const Size(0, 44),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                                 ),
                                 onPressed: mgr.isChecking
                                     ? null
@@ -244,7 +252,7 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                                     ? const SizedBox(
                                         width: 14,
                                         height: 14,
-                                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                                        child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.textPrimary),
                                       )
                                     : const Icon(Icons.sync, size: 15),
                                 label: Text(mgr.isChecking ? '檢查中...' : '檢查更新', style: const TextStyle(fontSize: 12)),
@@ -254,18 +262,18 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                         ),
 
                         if (mgr.errorMessage != null) ...[
-                          const SizedBox(height: 8),
+                          const SizedBox(height: AppSpacing.sm),
                           Container(
-                            padding: const EdgeInsets.all(8),
+                            padding: const EdgeInsets.all(AppSpacing.sm),
                             decoration: BoxDecoration(
                               color: Colors.red.withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(AppRadius.chip),
                               border: Border.all(color: Colors.red.withValues(alpha: 0.4)),
                             ),
                             child: Row(
                               children: [
                                 const Icon(Icons.error_outline, color: Colors.redAccent, size: 16),
-                                const SizedBox(width: 8),
+                                const SizedBox(width: AppSpacing.sm),
                                 Expanded(
                                   child: Text(
                                     mgr.errorMessage!,
@@ -277,23 +285,35 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                           ),
                         ],
 
-                        const SizedBox(height: 12),
+                        const SizedBox(height: AppSpacing.md),
 
-                        // Playback Preferences Settings Section
-                        const Text(
-                          '播放偏好設定 (Settings)',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        // Playback Preferences Settings Section (with declared autosave indicator)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: const [
+                            Text(
+                              '播放偏好設定 (Settings)',
+                              style: TextStyle(
+                                color: AppColors.textPrimary,
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              '變更將自動儲存',
+                              style: TextStyle(
+                                color: AppColors.textMuted,
+                                fontSize: 11,
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 6),
+                        const SizedBox(height: AppSpacing.sm),
                         Material(
-                          color: const Color(0xFF2A2A2A),
+                          color: AppColors.cardBg,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            side: const BorderSide(color: Colors.white12),
+                            borderRadius: BorderRadius.circular(AppRadius.card),
+                            side: const BorderSide(color: AppColors.borderSubtle),
                           ),
                           clipBehavior: Clip.antiAlias,
                           child: Column(
@@ -301,59 +321,59 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                               SwitchListTile(
                                 dense: true,
                                 visualDensity: VisualDensity.compact,
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-                                activeColor: const Color(0xFFE50914),
+                                contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 2),
+                                activeColor: AppColors.accent,
                                 title: const Text('背景播放 (鎖定螢幕繼續播放音訊)',
-                                    style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+                                    style: TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w600)),
                                 subtitle: const Text('螢幕關閉鎖定或切換應用時，背景繼續播放節目聲音',
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(color: Colors.white60, fontSize: 11)),
+                                    style: TextStyle(color: AppColors.textMuted, fontSize: 11)),
                                 value: _settingsManager.backgroundPlay,
                                 onChanged: (val) => _settingsManager.setBackgroundPlay(val),
                               ),
-                              const Divider(color: Colors.white12, height: 1),
+                              const Divider(color: AppColors.borderSubtle, height: 1),
                               SwitchListTile(
                                 dense: true,
                                 visualDensity: VisualDensity.compact,
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-                                activeColor: const Color(0xFFE50914),
+                                contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 2),
+                                activeColor: AppColors.accent,
                                 title: const Text('播放時保持螢幕常亮 (防止休眠)',
-                                    style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+                                    style: TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w600)),
                                 subtitle: const Text('影片播放中螢幕不會因逾時自動變暗或關閉',
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(color: Colors.white60, fontSize: 11)),
+                                    style: TextStyle(color: AppColors.textMuted, fontSize: 11)),
                                 value: _settingsManager.keepScreenAwake,
                                 onChanged: (val) => _settingsManager.setKeepScreenAwake(val),
                               ),
-                              const Divider(color: Colors.white12, height: 1),
+                              const Divider(color: AppColors.borderSubtle, height: 1),
                               SwitchListTile(
                                 dense: true,
                                 visualDensity: VisualDensity.compact,
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-                                activeColor: const Color(0xFFE50914),
+                                contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 2),
+                                activeColor: AppColors.accent,
                                 title: const Text('自動連續播放下一段 / 下一集',
-                                    style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+                                    style: TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w600)),
                                 subtitle: const Text('分段或整集播畢前浮現 5 秒倒數並自動續播',
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(color: Colors.white60, fontSize: 11)),
+                                    style: TextStyle(color: AppColors.textMuted, fontSize: 11)),
                                 value: _settingsManager.autoPlayNext,
                                 onChanged: (val) => _settingsManager.setAutoPlayNext(val),
                               ),
-                              const Divider(color: Colors.white12, height: 1),
+                              const Divider(color: AppColors.borderSubtle, height: 1),
                               ListTile(
                                 dense: true,
                                 visualDensity: VisualDensity.compact,
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                                contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 2),
                                 leading: Icon(
                                   _sleepTimerManager.isActive ? Icons.alarm_on : Icons.timer_outlined,
                                   size: 20,
-                                  color: _sleepTimerManager.isActive ? const Color(0xFFE50914) : Colors.white70,
+                                  color: _sleepTimerManager.isActive ? AppColors.accent : AppColors.textSecondary,
                                 ),
                                 title: const Text('睡眠定時器 (Sleep Timer)',
-                                    style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+                                    style: TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w600)),
                                 subtitle: Text(
                                   _sleepTimerManager.isActive
                                       ? '倒數中：${_sleepTimerManager.formattedTime}'
@@ -361,8 +381,9 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
-                                    color: _sleepTimerManager.isActive ? const Color(0xFFE50914) : Colors.white60,
+                                    color: _sleepTimerManager.isActive ? AppColors.accent : AppColors.textMuted,
                                     fontSize: 11,
+                                    fontFeatures: const [FontFeature.tabularFigures()],
                                   ),
                                 ),
                                 trailing: const Icon(Icons.chevron_right, color: Colors.white38, size: 18),
@@ -375,21 +396,21 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                           ),
                         ),
 
-                        const SizedBox(height: 12),
+                        const SizedBox(height: AppSpacing.md),
 
                         // Download Storage Location Section
                         const Text(
                           '下載儲存位置 (Download Storage)',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: AppColors.textPrimary,
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 6),
+                        const SizedBox(height: AppSpacing.sm),
                         _buildStorageLocationCard(context),
 
-                        const SizedBox(height: 12),
+                        const SizedBox(height: AppSpacing.md),
 
                         // If Update Available
                         if (mgr.updateAvailable && update != null) ...[
@@ -397,19 +418,20 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                         ] else if (!mgr.isChecking && mgr.lastCheckedAt != null && !mgr.updateAvailable) ...[
                           Container(
                             width: double.infinity,
-                            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                            padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm, horizontal: AppSpacing.md),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF242424),
-                              borderRadius: BorderRadius.circular(10),
+                              color: AppColors.cardBg,
+                              borderRadius: BorderRadius.circular(AppRadius.card),
+                              border: Border.all(color: AppColors.borderSubtle),
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: const [
-                                Icon(Icons.check_circle, color: Color(0xFF46D369), size: 18),
-                                SizedBox(width: 8),
+                                Icon(Icons.check_circle, color: AppColors.success, size: 18),
+                                SizedBox(width: AppSpacing.sm),
                                 Text(
                                   '目前已是最新版本，無需更新',
-                                  style: TextStyle(color: Colors.white70, fontSize: 13),
+                                  style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
                                 ),
                               ],
                             ),
@@ -460,14 +482,14 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
     final currentPath = _downloadManager.downloadDirectoryPath;
 
     return Material(
-      color: const Color(0xFF2A2A2A),
+      color: AppColors.cardBg,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: const BorderSide(color: Colors.white12),
+        borderRadius: BorderRadius.circular(AppRadius.card),
+        side: const BorderSide(color: AppColors.borderSubtle),
       ),
       clipBehavior: Clip.antiAlias,
       child: Padding(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(AppSpacing.md),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -476,10 +498,10 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
               children: [
                 Icon(
                   isCustom ? Icons.sd_storage : Icons.folder,
-                  color: isCustom ? const Color(0xFFE50914) : Colors.white70,
-                  size: 26,
+                  color: AppColors.textSecondary,
+                  size: 22,
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -489,29 +511,29 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                           Text(
                             isCustom ? '自訂儲存目錄' : '預設內部儲存空間',
                             style: const TextStyle(
-                              color: Colors.white,
+                              color: AppColors.textPrimary,
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: AppSpacing.sm),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
                               color: isCustom
-                                  ? const Color(0xFFE50914).withValues(alpha: 0.2)
+                                  ? AppColors.success.withValues(alpha: 0.16)
                                   : Colors.white12,
-                              borderRadius: BorderRadius.circular(4),
+                              borderRadius: BorderRadius.circular(AppRadius.badge),
                               border: Border.all(
                                 color: isCustom
-                                    ? const Color(0xFFE50914).withValues(alpha: 0.5)
+                                    ? AppColors.success.withValues(alpha: 0.45)
                                     : Colors.white24,
                               ),
                             ),
                             child: Text(
                               isCustom ? '已自訂' : '預設',
                               style: TextStyle(
-                                color: isCustom ? const Color(0xFFE50914) : Colors.white70,
+                                color: isCustom ? AppColors.success : AppColors.textSecondary,
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -519,34 +541,36 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        currentPath.isEmpty ? '載入中...' : currentPath,
-                        style: const TextStyle(
-                          color: Colors.white60,
-                          fontSize: 12,
-                          fontFamily: 'monospace',
+                      const SizedBox(height: AppSpacing.xs),
+                      Tooltip(
+                        message: currentPath,
+                        child: Text(
+                          currentPath.isEmpty ? '載入中...' : currentPath,
+                          style: const TextStyle(
+                            color: AppColors.textMuted,
+                            fontSize: 12,
+                            fontFamily: 'monospace',
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.md),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 if (isCustom) ...[
-                  OutlinedButton.icon(
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.white70,
-                      side: const BorderSide(color: Colors.white24),
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                      minimumSize: const Size(0, 32),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  TextButton.icon(
+                    style: TextButton.styleFrom(
+                      foregroundColor: AppColors.textSecondary,
+                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+                      minimumSize: const Size(0, 44),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.chip)),
                     ),
                     onPressed: () => StorageLocationHelper.handleResetStorage(context, onStorageChanged: () {
                       if (mounted) setState(() {});
@@ -554,15 +578,15 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                     icon: const Icon(Icons.restore, size: 14),
                     label: const Text('還原預設', style: TextStyle(fontSize: 12)),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppSpacing.sm),
                 ],
                 ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFE50914),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    minimumSize: const Size(0, 32),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    backgroundColor: AppColors.accent,
+                    foregroundColor: AppColors.textPrimary,
+                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+                    minimumSize: const Size(0, 44),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.chip)),
                   ),
                   onPressed: () => StorageLocationHelper.showStoragePickerSheet(context, onStorageChanged: () {
                     if (mounted) setState(() {});
@@ -580,11 +604,11 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
 
   Widget _buildUpdateAvailableCard(BuildContext context, UpdateManager mgr, AppUpdateInfo update) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: const Color(0xFF252525),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE50914).withValues(alpha: 0.6), width: 1.2),
+        color: AppColors.cardBg,
+        borderRadius: BorderRadius.circular(AppRadius.card),
+        border: Border.all(color: AppColors.accent.withValues(alpha: 0.6), width: 1.2),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -592,52 +616,57 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 3),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE50914),
-                  borderRadius: BorderRadius.circular(12),
+                  color: AppColors.accent,
+                  borderRadius: BorderRadius.circular(AppRadius.modal),
                 ),
                 child: Text(
                   '發現新版本 v${update.latestVersion}',
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: AppColors.textPrimary,
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
+                    fontFeatures: [FontFeature.tabularFigures()],
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               Text(
                 '安裝包大小: ${update.formattedSize}',
-                style: const TextStyle(color: Colors.white54, fontSize: 12),
+                style: const TextStyle(
+                  color: AppColors.textMuted,
+                  fontSize: 12,
+                  fontFeatures: [FontFeature.tabularFigures()],
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppSpacing.sm),
           Text(
             update.releaseTitle,
             style: const TextStyle(
-              color: Colors.white,
+              color: AppColors.textPrimary,
               fontSize: 15,
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.sm),
 
           // Release Notes Container
           Container(
             constraints: const BoxConstraints(maxHeight: 140),
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(AppSpacing.sm),
             decoration: BoxDecoration(
-              color: const Color(0xFF191919),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.white10),
+              color: AppColors.surfaceSunken,
+              borderRadius: BorderRadius.circular(AppRadius.chip),
+              border: Border.all(color: AppColors.borderSubtle),
             ),
             child: SingleChildScrollView(
               child: Text(
                 update.releaseNotes,
                 style: const TextStyle(
-                  color: Colors.white70,
+                  color: AppColors.textSecondary,
                   fontSize: 12,
                   height: 1.4,
                   fontFamily: 'monospace',
@@ -645,7 +674,7 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
               ),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
 
           // Downloading Progress Bar
           if (mgr.isDownloading) ...[
@@ -657,25 +686,34 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                   children: [
                     Text(
                       '背景下載中... ${(mgr.downloadProgress * 100).toInt()}%',
-                      style: const TextStyle(color: Color(0xFFE50914), fontSize: 12, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        color: AppColors.accent,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        fontFeatures: [FontFeature.tabularFigures()],
+                      ),
                     ),
                     Text(
                       '${(mgr.downloadedBytes / (1024 * 1024)).toStringAsFixed(1)} MB / ${(mgr.totalBytes / (1024 * 1024)).toStringAsFixed(1)} MB',
-                      style: const TextStyle(color: Colors.white54, fontSize: 11),
+                      style: const TextStyle(
+                        color: AppColors.textMuted,
+                        fontSize: 11,
+                        fontFeatures: [FontFeature.tabularFigures()],
+                      ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: AppSpacing.xs),
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(AppRadius.badge),
                   child: LinearProgressIndicator(
                     value: mgr.downloadProgress > 0 ? mgr.downloadProgress : null,
                     minHeight: 6,
-                    backgroundColor: Colors.white12,
-                    valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFE50914)),
+                    backgroundColor: AppColors.borderSubtle,
+                    valueColor: const AlwaysStoppedAnimation<Color>(AppColors.accent),
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppSpacing.sm),
                 const Text(
                   '下載於背景進行中，您可以關閉此視窗繼續觀看劇集',
                   style: TextStyle(color: Colors.white38, fontSize: 11),
@@ -690,10 +728,10 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                   Expanded(
                     child: ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF46D369),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 11),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        backgroundColor: AppColors.success,
+                        foregroundColor: AppColors.textPrimary,
+                        minimumSize: const Size(0, 44),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.chip)),
                       ),
                       onPressed: () => _handleInstall(context, mgr),
                       icon: const Icon(Icons.install_mobile, size: 18),
@@ -707,10 +745,10 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                   Expanded(
                     child: ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFE50914),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 11),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        backgroundColor: AppColors.accent,
+                        foregroundColor: AppColors.textPrimary,
+                        minimumSize: const Size(0, 44),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.chip)),
                       ),
                       onPressed: () async {
                         final success = await mgr.startDownload();
@@ -728,23 +766,23 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                 ],
               ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: AppSpacing.sm),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.sm),
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.05),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.white12),
+                borderRadius: BorderRadius.circular(AppRadius.chip),
+                border: Border.all(color: AppColors.borderSubtle),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: const [
                   Icon(Icons.info_outline, color: Colors.amberAccent, size: 16),
-                  SizedBox(width: 8),
+                  SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: Text(
                       '提示：若系統提示「安裝套件無效」，通常是因目前手機安裝的是 Debug 開發版，與 GitHub 正式發布版簽名不相容。請先手動解除安裝舊版後再安裝即可。',
-                      style: TextStyle(color: Colors.white70, fontSize: 11, height: 1.4),
+                      style: TextStyle(color: AppColors.textSecondary, fontSize: 11, height: 1.4),
                     ),
                   ),
                 ],
@@ -776,23 +814,28 @@ class _NewVersionDialog extends StatelessWidget {
     if (update == null) return const SizedBox.shrink();
 
     return AlertDialog(
-      backgroundColor: const Color(0xFF1E1E1E),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      backgroundColor: AppColors.surfaceOverlay,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.modal)),
       title: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(6),
+            padding: const EdgeInsets.all(AppSpacing.xs),
             decoration: BoxDecoration(
-              color: const Color(0xFFE50914).withValues(alpha: 0.2),
+              color: AppColors.accent.withValues(alpha: 0.2),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.system_update_alt, color: Color(0xFFE50914), size: 22),
+            child: const Icon(Icons.system_update_alt, color: AppColors.accent, size: 22),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Text(
               '發現新版本 v${update.latestVersion}',
-              style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                color: AppColors.textPrimary,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                fontFeatures: [FontFeature.tabularFigures()],
+              ),
             ),
           ),
         ],
@@ -803,28 +846,32 @@ class _NewVersionDialog extends StatelessWidget {
         children: [
           Text(
             update.releaseTitle,
-            style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+            style: const TextStyle(color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.sm),
           Container(
             constraints: const BoxConstraints(maxHeight: 120),
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(AppSpacing.sm),
             decoration: BoxDecoration(
-              color: const Color(0xFF141414),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.white10),
+              color: AppColors.canvas,
+              borderRadius: BorderRadius.circular(AppRadius.chip),
+              border: Border.all(color: AppColors.borderSubtle),
             ),
             child: SingleChildScrollView(
               child: Text(
                 update.releaseNotes,
-                style: const TextStyle(color: Colors.white70, fontSize: 12, height: 1.4),
+                style: const TextStyle(color: AppColors.textSecondary, fontSize: 12, height: 1.4),
               ),
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppSpacing.sm),
           Text(
             '檔案大小: ${update.formattedSize}',
-            style: const TextStyle(color: Colors.white38, fontSize: 11),
+            style: const TextStyle(
+              color: Colors.white38,
+              fontSize: 11,
+              fontFeatures: [FontFeature.tabularFigures()],
+            ),
           ),
         ],
       ),
@@ -834,13 +881,13 @@ class _NewVersionDialog extends StatelessWidget {
             updateManager.dismissVersion(update.latestVersion);
             Navigator.of(context).pop();
           },
-          child: const Text('稍後再說', style: TextStyle(color: Colors.white54)),
+          child: const Text('稍後再說', style: TextStyle(color: AppColors.textMuted)),
         ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFFE50914),
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            backgroundColor: AppColors.accent,
+            foregroundColor: AppColors.textPrimary,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.chip)),
           ),
           onPressed: () {
             Navigator.of(context).pop();

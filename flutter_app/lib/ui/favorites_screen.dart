@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../catalog/parser.dart';
 import '../services/favorites_manager.dart';
+import 'app_tokens.dart';
 import 'episode_card.dart';
 import 'player_screen.dart';
 import 'share_dialog.dart';
@@ -38,33 +39,38 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     final favorites = _favoritesManager.favoriteEpisodes;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF141414),
+      backgroundColor: AppColors.canvas,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1E1E1E),
+        backgroundColor: AppColors.surfaceOverlay,
         elevation: 0,
+        bottom: const PreferredSize(
+          preferredSize: Size.fromHeight(1),
+          child: Divider(color: AppColors.borderSubtle, height: 1),
+        ),
         title: Row(
           children: [
-            const Icon(Icons.favorite, color: Color(0xFFE50914), size: 22),
-            const SizedBox(width: 8),
+            const Icon(Icons.favorite, color: AppColors.accent, size: 22),
+            const SizedBox(width: AppSpacing.sm),
             const Text(
               '我的收藏 (Favorites)',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+              style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 18),
             ),
             if (favorites.isNotEmpty) ...[
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE50914).withValues(alpha: 0.2),
+                  color: AppColors.accent.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: const Color(0xFFE50914).withValues(alpha: 0.5)),
+                  border: Border.all(color: AppColors.accent.withValues(alpha: 0.5)),
                 ),
                 child: Text(
                   '${favorites.length}',
                   style: const TextStyle(
-                    color: Color(0xFFE50914),
+                    color: AppColors.accent,
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
+                    fontFeatures: [FontFeature.tabularFigures()],
                   ),
                 ),
               ),
@@ -74,7 +80,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         actions: [
           if (favorites.isNotEmpty)
             IconButton(
-              icon: const Icon(Icons.delete_sweep_outlined, color: Colors.white70),
+              icon: const Icon(Icons.delete_sweep_outlined, color: AppColors.textSecondary),
               tooltip: '清空所有收藏',
               onPressed: () => FavoritesBody.confirmClearAll(context, _favoritesManager),
             ),
@@ -93,26 +99,32 @@ class FavoritesBody extends StatefulWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF1E1E1E),
+        backgroundColor: AppColors.surfaceOverlay,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.modal)),
         title: const Row(
           children: [
-            Icon(Icons.warning_amber_rounded, color: Color(0xFFE50914), size: 24),
-            SizedBox(width: 8),
-            Text('清空所有收藏？', style: TextStyle(color: Colors.white, fontSize: 18)),
+            Icon(Icons.warning_amber_rounded, color: AppColors.accent, size: 24),
+            SizedBox(width: AppSpacing.sm),
+            Text('清空所有收藏？', style: TextStyle(color: AppColors.textPrimary, fontSize: 18)),
           ],
         ),
         content: const Text(
           '確定要清空所有收藏的節目嗎？此操作將移除全部收藏項目。',
-          style: TextStyle(color: Colors.white70, fontSize: 14),
+          style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('取消', style: TextStyle(color: Colors.white70)),
-          ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFE50914),
+              backgroundColor: AppColors.surfaceInteractive,
+              foregroundColor: AppColors.textPrimary,
+            ),
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('取消'),
+          ),
+          OutlinedButton(
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppColors.accent,
+              side: const BorderSide(color: AppColors.accent),
             ),
             onPressed: () {
               Navigator.of(ctx).pop();
@@ -126,7 +138,7 @@ class FavoritesBody extends StatefulWidget {
                 ),
               );
             },
-            child: const Text('確認清空', style: TextStyle(color: Colors.white)),
+            child: const Text('清空收藏'),
           ),
         ],
       ),
@@ -174,40 +186,59 @@ class _FavoritesBodyState extends State<FavoritesBody> {
     final favorites = _favoritesManager.favoriteEpisodes;
     if (favorites.isEmpty) {
       return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 72,
-              height: 72,
-              decoration: BoxDecoration(
-                color: const Color(0xFFE50914).withValues(alpha: 0.1),
-                shape: BoxShape.circle,
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.xl),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 72,
+                height: 72,
+                decoration: BoxDecoration(
+                  color: AppColors.cardBg,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppColors.borderSubtle),
+                ),
+                child: const Icon(
+                  Icons.favorite_border,
+                  size: 36,
+                  color: AppColors.accent,
+                ),
               ),
-              child: const Icon(
-                Icons.favorite_border,
-                size: 40,
-                color: Color(0xFFE50914),
+              const SizedBox(height: AppSpacing.lg),
+              const Text(
+                '尚未加入任何收藏',
+                style: TextStyle(
+                  color: AppColors.textPrimary,
+                  fontSize: 17,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            const SizedBox(height: 18),
-            const Text(
-              '尚未加入任何收藏',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+              const SizedBox(height: AppSpacing.sm),
+              const Text(
+                '在首頁或播放器點擊收藏按鈕，即可集中整理喜愛的集數！',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: AppColors.textMuted,
+                  fontSize: 13,
+                  height: 1.4,
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              '在首頁或播放器點擊 ❤️ 即可收藏至此，隨時觀看！',
-              style: TextStyle(
-                color: Colors.white54,
-                fontSize: 13,
+              const SizedBox(height: AppSpacing.lg),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.accent,
+                  foregroundColor: AppColors.textPrimary,
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+                  minimumSize: const Size(0, 44),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+                ),
+                icon: const Icon(Icons.explore_outlined, size: 18),
+                label: const Text('瀏覽節目清單', style: TextStyle(fontWeight: FontWeight.bold)),
+                onPressed: () => Navigator.of(context).pop(),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       );
     }

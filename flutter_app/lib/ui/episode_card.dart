@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../catalog/parser.dart';
@@ -6,6 +7,7 @@ import '../catalog/show_channel.dart';
 import '../services/download_manager.dart';
 import '../services/favorites_manager.dart';
 import '../services/playback_history_manager.dart';
+import 'app_tokens.dart';
 import 'downloads_screen.dart';
 import 'player_screen.dart';
 import 'share_dialog.dart';
@@ -58,29 +60,43 @@ class TripleCircleDownloadButton extends StatelessWidget {
     final allDownloaded = isDownloadedList.isNotEmpty && isDownloadedList.every((d) => d);
     final anyDownloading = isDownloadingList.any((d) => d);
 
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: onTap,
+    return TvFocusableButton(
+      onPressed: onTap,
       child: Tooltip(
         message: allDownloaded
             ? '已下載全部分段 (點擊管理)'
             : (anyDownloading ? '分段下載中 (點擊查看)' : '下載此集分段'),
-        child: Container(
-          width: 36,
-          height: 36,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.04),
-            shape: BoxShape.circle,
-          ),
-          child: CustomPaint(
-            size: const Size(30, 30),
-            painter: TripleRingPainter(
-              progresses: progresses,
-              isDownloading: isDownloadingList,
-              isDownloaded: isDownloadedList,
-              allDownloaded: allDownloaded,
-              anyDownloading: anyDownloading,
+        child: SizedBox(
+          width: AppCardTokens.actionHitSize,
+          height: AppCardTokens.actionHitSize,
+          child: Material(
+            color: Colors.transparent,
+            shape: const CircleBorder(),
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              customBorder: const CircleBorder(),
+              onTap: onTap,
+              child: Center(
+                child: Container(
+                  width: AppCardTokens.actionVisualSize,
+                  height: AppCardTokens.actionVisualSize,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: AppColors.actionCircleBg,
+                    shape: BoxShape.circle,
+                  ),
+                  child: CustomPaint(
+                    size: const Size(30, 30),
+                    painter: TripleRingPainter(
+                      progresses: progresses,
+                      isDownloading: isDownloadingList,
+                      isDownloaded: isDownloadedList,
+                      allDownloaded: allDownloaded,
+                      anyDownloading: anyDownloading,
+                    ),
+                  ),
+                ),
+              ),
             ),
           ),
         ),
@@ -132,9 +148,9 @@ class TripleRingPainter extends CustomPainter {
         ..strokeCap = StrokeCap.round
         ..strokeWidth = strokeWidth
         ..color = isDown
-            ? const Color(0xFF46D369).withValues(alpha: 0.25)
+            ? AppColors.success.withValues(alpha: 0.25)
             : (isDl
-                ? const Color(0xFFE50914).withValues(alpha: 0.25)
+                ? AppColors.accent.withValues(alpha: 0.25)
                 : Colors.white.withValues(alpha: 0.20));
 
       canvas.drawArc(
@@ -151,7 +167,7 @@ class TripleRingPainter extends CustomPainter {
           ..style = PaintingStyle.stroke
           ..strokeCap = StrokeCap.round
           ..strokeWidth = strokeWidth
-          ..color = const Color(0xFF46D369);
+          ..color = AppColors.success;
 
         canvas.drawArc(
           Rect.fromCircle(center: center, radius: radius),
@@ -165,7 +181,7 @@ class TripleRingPainter extends CustomPainter {
           ..style = PaintingStyle.stroke
           ..strokeCap = StrokeCap.round
           ..strokeWidth = strokeWidth
-          ..color = const Color(0xFFE50914);
+          ..color = AppColors.accent;
 
         final fillSweep = math.max(arcLength * 0.12, arcLength * progress);
         canvas.drawArc(
@@ -185,7 +201,7 @@ class TripleRingPainter extends CustomPainter {
       final p2 = Offset(center.dx - 1.0, center.dy + 3.2);
       final p3 = Offset(center.dx + 4.2, center.dy - 3.2);
       final checkPaint = Paint()
-        ..color = const Color(0xFF46D369)
+        ..color = AppColors.success
         ..style = PaintingStyle.stroke
         ..strokeCap = StrokeCap.round
         ..strokeWidth = 1.8;
@@ -193,7 +209,7 @@ class TripleRingPainter extends CustomPainter {
       canvas.drawLine(p2, p3, checkPaint);
     } else {
       // Crisp Download Arrow & Tray
-      final arrowColor = anyDownloading ? const Color(0xFFE50914) : Colors.white70;
+      final arrowColor = anyDownloading ? AppColors.accent : AppColors.textSecondary;
       final arrowPaint = Paint()
         ..color = arrowColor
         ..style = PaintingStyle.stroke
@@ -224,7 +240,13 @@ class TripleRingPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant TripleRingPainter oldDelegate) => true;
+  bool shouldRepaint(covariant TripleRingPainter oldDelegate) {
+    return allDownloaded != oldDelegate.allDownloaded ||
+        anyDownloading != oldDelegate.anyDownloading ||
+        !listEquals(progresses, oldDelegate.progresses) ||
+        !listEquals(isDownloading, oldDelegate.isDownloading) ||
+        !listEquals(isDownloaded, oldDelegate.isDownloaded);
+  }
 }
 
 /// Download Part Selection Modal Sheet
@@ -237,9 +259,9 @@ void showDownloadSelectionSheet(
     context: context,
     isScrollControlled: true,
     useSafeArea: true,
-    backgroundColor: const Color(0xFF1E1E1E),
+    backgroundColor: AppColors.surfaceOverlay,
     shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.modal)),
     ),
     builder: (ctx) {
       return StatefulBuilder(
@@ -263,9 +285,9 @@ void showDownloadSelectionSheet(
           return SafeArea(
             top: true,
             bottom: true,
-            minimum: const EdgeInsets.only(top: 8),
+            minimum: const EdgeInsets.only(top: AppSpacing.sm),
             child: Padding(
-              padding: EdgeInsets.fromLTRB(16.0, 8.0, 16.0, (bottomInset + 16.0) / 2),
+              padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.sm, AppSpacing.lg, (bottomInset + AppSpacing.lg) / 2),
               child: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -275,7 +297,7 @@ void showDownloadSelectionSheet(
                       child: Container(
                         width: 38,
                         height: 4,
-                        margin: const EdgeInsets.only(bottom: 12),
+                        margin: const EdgeInsets.only(bottom: AppSpacing.md),
                         decoration: BoxDecoration(
                           color: Colors.white24,
                           borderRadius: BorderRadius.circular(2),
@@ -285,14 +307,14 @@ void showDownloadSelectionSheet(
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(8),
+                          padding: const EdgeInsets.all(AppSpacing.sm),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFE50914).withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(8),
+                            color: AppColors.accent.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(AppRadius.card),
                           ),
-                          child: const Icon(Icons.download_for_offline, color: Color(0xFFE50914), size: 22),
+                          child: const Icon(Icons.download_for_offline, color: AppColors.accent, size: 22),
                         ),
-                        const SizedBox(width: 10),
+                        const SizedBox(width: AppSpacing.md),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -302,7 +324,7 @@ void showDownloadSelectionSheet(
                                   '$showEmoji $showName',
                                   style: const TextStyle(
                                     fontSize: 12,
-                                    color: Color(0xFFE50914),
+                                    color: AppColors.accent,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -313,7 +335,7 @@ void showDownloadSelectionSheet(
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                                  color: AppColors.textPrimary,
                                 ),
                               ),
                               const SizedBox(height: 2),
@@ -323,22 +345,23 @@ void showDownloadSelectionSheet(
                                     : '已下載 $downloadedCount/${parts.length} 個分段 • 點擊選擇分段下載',
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: allDone ? const Color(0xFF46D369) : Colors.white60,
+                                  color: allDone ? AppColors.success : AppColors.textMuted,
                                   fontWeight: FontWeight.w500,
+                                  fontFeatures: const [FontFeature.tabularFigures()],
                                 ),
                               ),
                             ],
                           ),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.close, color: Colors.white54, size: 20),
+                          icon: const Icon(Icons.close, color: AppColors.textMuted, size: 20),
                           onPressed: () => Navigator.of(ctx).pop(),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
-                    const Divider(color: Colors.white12, height: 1),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppSpacing.md),
+                    const Divider(color: AppColors.borderSubtle, height: 1),
+                    const SizedBox(height: AppSpacing.md),
 
                     // One-tap Batch Download All Parts Button
                     if (!allDone) ...[
@@ -346,10 +369,10 @@ void showDownloadSelectionSheet(
                         width: double.infinity,
                         child: ElevatedButton.icon(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFE50914),
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            backgroundColor: AppColors.accent,
+                            foregroundColor: AppColors.textPrimary,
+                            minimumSize: const Size(0, 44),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.card)),
                           ),
                           icon: const Icon(Icons.download_for_offline, size: 18),
                           label: Text(
@@ -362,10 +385,10 @@ void showDownloadSelectionSheet(
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text('已開始批量下載「${episode.title}」所有分段'),
-                                backgroundColor: const Color(0xFFE50914),
+                                backgroundColor: AppColors.accent,
                                 action: SnackBarAction(
                                   label: '查看進度',
-                                  textColor: Colors.white,
+                                  textColor: AppColors.textPrimary,
                                   onPressed: () => Navigator.of(context).push(
                                     MaterialPageRoute(builder: (_) => const DownloadsScreen()),
                                   ),
@@ -375,7 +398,7 @@ void showDownloadSelectionSheet(
                           },
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppSpacing.md),
                     ],
 
                     // List of Parts with Downloaded vs Not-Downloaded Standoff
@@ -394,17 +417,17 @@ void showDownloadSelectionSheet(
                               : '';
 
                           return Container(
-                            margin: const EdgeInsets.only(bottom: 10),
-                            padding: const EdgeInsets.all(12),
+                            margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+                            padding: const EdgeInsets.all(AppSpacing.md),
                             decoration: BoxDecoration(
                               color: isDown
-                                  ? const Color(0xFF13381B)
-                                  : (isDl ? const Color(0xFF331111) : const Color(0xFF262626)),
-                              borderRadius: BorderRadius.circular(8),
+                                  ? AppColors.successSurface
+                                  : (isDl ? AppColors.dangerSurface : AppColors.surfaceInteractive),
+                              borderRadius: BorderRadius.circular(AppRadius.card),
                               border: Border.all(
                                 color: isDown
-                                    ? const Color(0xFF46D369)
-                                    : (isDl ? const Color(0xFFE50914) : Colors.white12),
+                                    ? AppColors.success
+                                    : (isDl ? AppColors.accent : AppColors.borderSubtle),
                                 width: isDown ? 1.4 : 1.0,
                               ),
                             ),
@@ -415,38 +438,39 @@ void showDownloadSelectionSheet(
                                 Row(
                                   children: [
                                     Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 2),
                                       decoration: BoxDecoration(
-                                        color: isDown ? const Color(0xFF46D369) : const Color(0xFFE50914),
-                                        borderRadius: BorderRadius.circular(4),
+                                        color: isDown ? AppColors.success : AppColors.accent,
+                                        borderRadius: BorderRadius.circular(AppRadius.badge),
                                       ),
                                       child: Text(
                                         p.label,
                                         style: const TextStyle(
-                                          color: Colors.white,
+                                          color: AppColors.textPrimary,
                                           fontSize: 12,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
                                     ),
-                                    const SizedBox(width: 8),
+                                    const SizedBox(width: AppSpacing.sm),
 
                                     // Status Badge
                                     if (isDown)
                                       Expanded(
                                         child: Row(
                                           children: [
-                                            const Icon(Icons.check_circle, size: 14, color: Color(0xFF46D369)),
-                                            const SizedBox(width: 4),
+                                            const Icon(Icons.check_circle, size: 14, color: AppColors.success),
+                                            const SizedBox(width: AppSpacing.xs),
                                             Flexible(
                                               child: Text(
                                                 '已下載完成 ${sizeStr.isNotEmpty ? "($sizeStr)" : ""}',
                                                 maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
                                                 style: const TextStyle(
-                                                  color: Color(0xFF46D369),
+                                                  color: AppColors.success,
                                                   fontSize: 12,
                                                   fontWeight: FontWeight.bold,
+                                                  fontFeatures: [FontFeature.tabularFigures()],
                                                 ),
                                               ),
                                             ),
@@ -460,7 +484,7 @@ void showDownloadSelectionSheet(
                                             const SizedBox(
                                               width: 12,
                                               height: 12,
-                                              child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFFE50914)),
+                                              child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.accent),
                                             ),
                                             const SizedBox(width: 6),
                                             Flexible(
@@ -469,9 +493,10 @@ void showDownloadSelectionSheet(
                                                 maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
                                                 style: const TextStyle(
-                                                  color: Color(0xFFE50914),
+                                                  color: AppColors.accent,
                                                   fontSize: 12,
                                                   fontWeight: FontWeight.bold,
+                                                  fontFeatures: [FontFeature.tabularFigures()],
                                                 ),
                                               ),
                                             ),
@@ -485,7 +510,7 @@ void showDownloadSelectionSheet(
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                           style: TextStyle(
-                                            color: Colors.white54,
+                                            color: AppColors.textMuted,
                                             fontSize: 12,
                                           ),
                                         ),
@@ -495,8 +520,9 @@ void showDownloadSelectionSheet(
                                     if (isDown) ...[
                                       IconButton(
                                         padding: EdgeInsets.zero,
-                                        constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                                        icon: const Icon(Icons.share_outlined, color: Colors.white70, size: 20),
+                                        constraints: const BoxConstraints.tightFor(width: 36, height: 36),
+                                        style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+                                        icon: const Icon(Icons.share_outlined, color: AppColors.textSecondary, size: 19),
                                         tooltip: '分享此分段影片',
                                         onPressed: () {
                                           final localFile = downloadManager.getLocalFile(
@@ -510,11 +536,12 @@ void showDownloadSelectionSheet(
                                           );
                                         },
                                       ),
-                                      const SizedBox(width: 4),
+                                      const SizedBox(width: AppSpacing.xs),
                                       IconButton(
                                         padding: EdgeInsets.zero,
-                                        constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                                        icon: const Icon(Icons.play_circle_fill, color: Color(0xFF46D369), size: 26),
+                                        constraints: const BoxConstraints.tightFor(width: 36, height: 36),
+                                        style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+                                        icon: const Icon(Icons.play_circle_fill, color: AppColors.success, size: 24),
                                         tooltip: '播放本機離線檔案',
                                         onPressed: () {
                                           Navigator.of(ctx).pop();
@@ -534,11 +561,12 @@ void showDownloadSelectionSheet(
                                           }
                                         },
                                       ),
-                                      const SizedBox(width: 4),
+                                      const SizedBox(width: AppSpacing.xs),
                                       IconButton(
                                         padding: EdgeInsets.zero,
-                                        constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                                        icon: const Icon(Icons.delete_outline, color: Colors.white38, size: 20),
+                                        constraints: const BoxConstraints.tightFor(width: 36, height: 36),
+                                        style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+                                        icon: const Icon(Icons.delete_outline, color: Colors.white38, size: 19),
                                         tooltip: '刪除下載檔案',
                                         onPressed: () {
                                           downloadManager.deleteDownload(
@@ -553,15 +581,15 @@ void showDownloadSelectionSheet(
 
                                 // Row 2: Single Full 1080p Download Option (No 快速版)
                                 if (!isDown && !isDl) ...[
-                                  const SizedBox(height: 8),
+                                  const SizedBox(height: AppSpacing.sm),
                                   SizedBox(
                                     width: double.infinity,
                                     child: ElevatedButton.icon(
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color(0xFFE50914),
-                                        foregroundColor: Colors.white,
-                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                                        backgroundColor: AppColors.accent,
+                                        foregroundColor: AppColors.textPrimary,
+                                        minimumSize: const Size(0, 44),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.chip)),
                                       ),
                                       icon: const Icon(Icons.download, size: 16),
                                       label: const Text('下載全集 (1080p FHD)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
@@ -571,10 +599,10 @@ void showDownloadSelectionSheet(
                                         ScaffoldMessenger.of(context).showSnackBar(
                                           SnackBar(
                                             content: Text('已開始下載 ${episode.title} - ${p.label}'),
-                                            backgroundColor: const Color(0xFFE50914),
+                                            backgroundColor: AppColors.accent,
                                             action: SnackBarAction(
                                               label: '查看進度',
-                                              textColor: Colors.white,
+                                              textColor: AppColors.textPrimary,
                                               onPressed: () => Navigator.of(context).push(
                                                 MaterialPageRoute(builder: (_) => const DownloadsScreen()),
                                               ),
@@ -659,13 +687,13 @@ class _TvFocusableButtonState extends State<TvFocusableButton> {
         behavior: HitTestBehavior.opaque,
         onTap: widget.onPressed,
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 180),
+          duration: AppDurations.focus,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(AppRadius.card),
             boxShadow: _isFocused
                 ? [
                     BoxShadow(
-                      color: const Color(0xFFE50914).withValues(alpha: 0.5),
+                      color: AppColors.accent.withValues(alpha: 0.5),
                       blurRadius: 8,
                       spreadRadius: 2,
                     ),
@@ -731,126 +759,155 @@ class YouTubeEpisodeCard extends StatelessWidget {
     }
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 4.0),
+      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E1E1E),
-        borderRadius: BorderRadius.circular(10),
+        color: AppColors.cardBg,
+        borderRadius: BorderRadius.circular(AppRadius.card),
         border: Border.all(
           color: downloadedParts > 0
-              ? const Color(0xFF46D369).withValues(alpha: 0.35)
-              : Colors.white12,
+              ? AppColors.success.withValues(alpha: 0.35)
+              : AppColors.borderSubtle,
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0),
+        padding: const EdgeInsets.all(AppSpacing.md),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Top Row: Play Indicator + Title & Clean Metadata + Download & Delete Buttons
+            // Top Row: Play Indicator + Title & Clean Metadata + Uniform 44x44 Action Cluster (36x36 visual circles)
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Quick Play Icon
-                GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: onPlayTapped,
-                  child: Container(
-                    width: 34,
-                    height: 34,
-                    margin: const EdgeInsets.only(top: 2, right: 10),
-                    decoration: BoxDecoration(
-                      color: downloadedParts > 0
-                          ? const Color(0xFF46D369).withValues(alpha: 0.15)
-                          : const Color(0xFFE50914).withValues(alpha: 0.15),
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: downloadedParts > 0
-                            ? const Color(0xFF46D369).withValues(alpha: 0.5)
-                            : const Color(0xFFE50914).withValues(alpha: 0.4),
+                // Quick Play Icon (44x44 touch target with 36x36 visual circle matching trailing actions)
+                Padding(
+                  padding: const EdgeInsets.only(right: AppSpacing.sm),
+                  child: TvFocusableButton(
+                    onPressed: onPlayTapped,
+                    child: Tooltip(
+                      message: '播放節目',
+                      child: SizedBox(
+                        width: AppCardTokens.actionHitSize,
+                        height: AppCardTokens.actionHitSize,
+                        child: Material(
+                          color: Colors.transparent,
+                          shape: const CircleBorder(),
+                          clipBehavior: Clip.antiAlias,
+                          child: InkWell(
+                            customBorder: const CircleBorder(),
+                            onTap: onPlayTapped,
+                            child: Center(
+                              child: Container(
+                                width: AppCardTokens.actionVisualSize,
+                                height: AppCardTokens.actionVisualSize,
+                                decoration: BoxDecoration(
+                                  color: downloadedParts > 0
+                                      ? AppColors.success.withValues(alpha: 0.15)
+                                      : AppColors.accent.withValues(alpha: 0.15),
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: downloadedParts > 0
+                                        ? AppColors.success.withValues(alpha: 0.5)
+                                        : AppColors.accent.withValues(alpha: 0.4),
+                                  ),
+                                ),
+                                child: Icon(
+                                  Icons.play_arrow,
+                                  color: downloadedParts > 0 ? AppColors.success : AppColors.accent,
+                                  size: 20,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
-                    child: Icon(
-                      downloadedParts > 0 ? Icons.play_arrow : Icons.play_arrow,
-                      color: downloadedParts > 0 ? const Color(0xFF46D369) : const Color(0xFFE50914),
-                      size: 20,
                     ),
                   ),
                 ),
 
                 // Title and Clean Subtitle
                 Expanded(
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: onPlayTapped,
+                  child: TvFocusableButton(
+                    onPressed: onPlayTapped,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          episode.title,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            height: 1.25,
+                        Tooltip(
+                          message: episode.title,
+                          child: Text(
+                            episode.title,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.textPrimary,
+                              height: 1.25,
+                            ),
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: AppSpacing.xs),
                         Wrap(
-                          spacing: 6,
-                          runSpacing: 4,
+                          spacing: AppSpacing.sm,
+                          runSpacing: AppSpacing.xs,
                           crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
                             Text(
                               episode.date,
                               style: const TextStyle(
                                 fontSize: 12,
-                                color: Colors.white54,
+                                color: AppColors.textMuted,
                                 fontWeight: FontWeight.w500,
+                                fontFeatures: [FontFeature.tabularFigures()],
                               ),
                             ),
                             if (showName.isNotEmpty) ...[
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFE50914).withValues(alpha: 0.15),
-                                  borderRadius: BorderRadius.circular(3),
-                                  border: Border.all(color: const Color(0xFFE50914).withValues(alpha: 0.4)),
+                                  color: AppColors.accent.withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(AppRadius.badge),
+                                  border: Border.all(color: AppColors.accent.withValues(alpha: 0.4)),
                                 ),
                                 child: Text(
                                   '$showEmoji $showName',
                                   style: const TextStyle(
                                     fontSize: 10,
-                                    color: Colors.white,
+                                    color: AppColors.textPrimary,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ),
                             ],
                             if (location.isNotEmpty) ...[
-                              Text(
-                                '📍 $location',
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  color: Color(0xFFE50914),
-                                  fontWeight: FontWeight.w600,
-                                ),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.location_on_outlined, size: 12, color: AppColors.accent),
+                                  const SizedBox(width: 2),
+                                  Text(
+                                    location,
+                                    style: const TextStyle(
+                                      fontSize: 11,
+                                      color: AppColors.accent,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                               decoration: BoxDecoration(
                                 color: Colors.black45,
-                                borderRadius: BorderRadius.circular(3),
-                                border: Border.all(color: Colors.white12),
+                                borderRadius: BorderRadius.circular(AppRadius.badge),
+                                border: Border.all(color: AppColors.borderSubtle),
                               ),
                               child: const Text(
                                 '1080p FHD',
                                 style: TextStyle(
                                   fontSize: 10,
-                                  color: Colors.white70,
+                                  color: AppColors.textSecondary,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -859,14 +916,14 @@ class YouTubeEpisodeCard extends StatelessWidget {
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF46D369).withValues(alpha: 0.15),
-                                  borderRadius: BorderRadius.circular(3),
-                                  border: Border.all(color: const Color(0xFF46D369).withValues(alpha: 0.5)),
+                                  color: AppColors.success.withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(AppRadius.badge),
+                                  border: Border.all(color: AppColors.success.withValues(alpha: 0.5)),
                                 ),
                                 child: const Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Icon(Icons.check, size: 10, color: Color(0xFF46D369)),
+                                    Icon(Icons.check, size: 10, color: AppColors.success),
                                     SizedBox(width: 2),
                                     Flexible(
                                       child: Text(
@@ -875,7 +932,7 @@ class YouTubeEpisodeCard extends StatelessWidget {
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
                                           fontSize: 10,
-                                          color: Color(0xFF46D369),
+                                          color: AppColors.success,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
@@ -888,14 +945,14 @@ class YouTubeEpisodeCard extends StatelessWidget {
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF46D369).withValues(alpha: 0.15),
-                                  borderRadius: BorderRadius.circular(3),
-                                  border: Border.all(color: const Color(0xFF46D369).withValues(alpha: 0.6)),
+                                  color: AppColors.success.withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(AppRadius.badge),
+                                  border: Border.all(color: AppColors.success.withValues(alpha: 0.6)),
                                 ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    const Icon(Icons.check_circle, size: 10, color: Color(0xFF46D369)),
+                                    const Icon(Icons.check_circle, size: 10, color: AppColors.success),
                                     const SizedBox(width: 3),
                                     Flexible(
                                       child: Text(
@@ -906,8 +963,9 @@ class YouTubeEpisodeCard extends StatelessWidget {
                                         overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(
                                           fontSize: 10,
-                                          color: Color(0xFF46D369),
+                                          color: AppColors.success,
                                           fontWeight: FontWeight.bold,
+                                          fontFeatures: [FontFeature.tabularFigures()],
                                         ),
                                       ),
                                     ),
@@ -922,69 +980,67 @@ class YouTubeEpisodeCard extends StatelessWidget {
                   ),
                 ),
 
-                // Favorite Button (Save to Favorites / Watch Later)
-                ListenableBuilder(
-                  listenable: FavoritesManager(),
-                  builder: (context, _) {
-                    final favManager = FavoritesManager();
-                    final isFav = favManager.isFavorite(episode.id);
-                    return IconButton(
-                      icon: Icon(
-                        isFav ? Icons.favorite : Icons.favorite_border,
-                        color: isFav ? const Color(0xFFE50914) : Colors.white70,
-                        size: 20,
-                      ),
-                      tooltip: isFav ? '已收藏 (點擊取消)' : '加入收藏',
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                      onPressed: () async {
-                        final added = await favManager.toggleFavorite(episode);
-                        HapticFeedback.lightImpact();
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(added ? '❤️ 已加入收藏清單' : '已從收藏清單移除'),
-                              duration: const Duration(milliseconds: 1200),
-                              behavior: SnackBarBehavior.floating,
-                            ),
-                          );
-                        }
+                const SizedBox(width: AppSpacing.xs),
+
+                // Uniformly aligned trailing action cluster (44x44 touch boxes, 36x36 visual circles)
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Favorite Button (Save to Favorites / Watch Later)
+                    ListenableBuilder(
+                      listenable: FavoritesManager(),
+                      builder: (context, _) {
+                        final favManager = FavoritesManager();
+                        final isFav = favManager.isFavorite(episode.id);
+                        return _buildCardActionButton(
+                          icon: isFav ? Icons.favorite : Icons.favorite_border,
+                          color: isFav ? AppColors.accent : AppColors.textSecondary,
+                          tooltip: isFav ? '已收藏 (點擊取消)' : '加入收藏',
+                          animateIconSwap: true,
+                          onPressed: () async {
+                            final added = await favManager.toggleFavorite(episode);
+                            HapticFeedback.lightImpact();
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(added ? '已加入收藏清單' : '已從收藏清單移除'),
+                                  duration: const Duration(milliseconds: 1200),
+                                  behavior: SnackBarBehavior.floating,
+                                ),
+                              );
+                            }
+                          },
+                        );
                       },
-                    );
-                  },
-                ),
-                const SizedBox(width: 4),
+                    ),
 
-                // Share Button (Available in both Home Feed and Downloads View)
-                if (onShareTapped != null) ...[
-                  IconButton(
-                    icon: const Icon(Icons.share_outlined, color: Colors.white70, size: 20),
-                    tooltip: '分享此集影片',
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                    onPressed: onShareTapped,
-                  ),
-                  const SizedBox(width: 4),
-                ],
+                    // Share Button (Available in both Home Feed and Downloads View)
+                    if (onShareTapped != null)
+                      _buildCardActionButton(
+                        icon: Icons.share_outlined,
+                        color: AppColors.textSecondary,
+                        tooltip: '分享此集影片',
+                        onPressed: onShareTapped!,
+                      ),
 
-                // Delete Button for Downloads View
-                if (isDownloadView && onDeleteTapped != null) ...[
-                  IconButton(
-                    icon: const Icon(Icons.delete_outline, color: Colors.white38, size: 20),
-                    tooltip: '刪除此集離線檔案',
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                    onPressed: onDeleteTapped,
-                  ),
-                  const SizedBox(width: 4),
-                ],
+                    // Delete Button for Downloads View
+                    if (isDownloadView && onDeleteTapped != null)
+                      _buildCardActionButton(
+                        icon: Icons.delete_outline,
+                        color: Colors.white38,
+                        tooltip: '刪除此集離線檔案',
+                        onPressed: onDeleteTapped!,
+                      ),
 
-                // Triple-Ring Concentric Circular Progress Download Button (Part 1, Part 2, Part 3)
-                TripleCircleDownloadButton(
-                  episode: episode,
-                  downloadManager: downloadManager,
-                  onTap: () => showDownloadSelectionSheet(context, episode, downloadManager),
+                    // Triple-Ring Concentric Circular Progress Download Button (Part 1, Part 2, Part 3)
+                    TripleCircleDownloadButton(
+                      episode: episode,
+                      downloadManager: downloadManager,
+                      onTap: () => showDownloadSelectionSheet(context, episode, downloadManager),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -1026,23 +1082,23 @@ class YouTubeEpisodeCard extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                         decoration: BoxDecoration(
                           color: isPartDown
-                              ? const Color(0xFF13381B)
+                              ? AppColors.successSurface
                               : (isPartDownloading
-                                  ? const Color(0xFF331111)
-                                  : (isPartWatched ? const Color(0xFF1F2E22) : const Color(0xFF262626))),
-                          borderRadius: BorderRadius.circular(6),
+                                  ? AppColors.dangerSurface
+                                  : (isPartWatched ? AppColors.successMutedSurface : AppColors.surfaceInteractive)),
+                          borderRadius: BorderRadius.circular(AppRadius.chip),
                           border: Border.all(
                             color: isPartDown
-                                ? const Color(0xFF46D369)
+                                ? AppColors.success
                                 : (isPartDownloading
-                                    ? const Color(0xFFE50914)
-                                    : (isPartWatched ? const Color(0xFF46D369).withValues(alpha: 0.6) : Colors.white12)),
+                                    ? AppColors.accent
+                                    : (isPartWatched ? AppColors.success.withValues(alpha: 0.6) : AppColors.borderSubtle)),
                             width: isPartDown ? 1.4 : 1.0,
                           ),
                           boxShadow: isPartDown
                               ? [
                                   BoxShadow(
-                                    color: const Color(0xFF46D369).withValues(alpha: 0.3),
+                                    color: AppColors.success.withValues(alpha: 0.3),
                                     blurRadius: 4,
                                     spreadRadius: 0.5,
                                   ),
@@ -1056,15 +1112,15 @@ class YouTubeEpisodeCard extends StatelessWidget {
                               const SizedBox(
                                 width: 10,
                                 height: 10,
-                                child: CircularProgressIndicator(strokeWidth: 1.5, color: Color(0xFFE50914)),
+                                child: CircularProgressIndicator(strokeWidth: 1.5, color: AppColors.accent),
                               )
                             else
                               Icon(
                                 isPartDown ? Icons.check_circle : (isPartWatched ? Icons.check : Icons.play_arrow),
                                 size: 12,
                                 color: isPartDown
-                                    ? const Color(0xFF46D369)
-                                    : (isPartWatched ? const Color(0xFF46D369) : const Color(0xFFE50914)),
+                                    ? AppColors.success
+                                    : (isPartWatched ? AppColors.success : AppColors.accent),
                               ),
                             const SizedBox(width: 4),
                             Text(
@@ -1072,7 +1128,8 @@ class YouTubeEpisodeCard extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
-                                color: isPartDown ? const Color(0xFF46D369) : (isPartWatched ? const Color(0xFF46D369) : Colors.white),
+                                fontFeatures: const [FontFeature.tabularFigures()],
+                                color: isPartDown ? AppColors.success : (isPartWatched ? AppColors.success : AppColors.textPrimary),
                               ),
                             ),
                           ],
@@ -1086,19 +1143,69 @@ class YouTubeEpisodeCard extends StatelessWidget {
 
             // Watch History Overall Progress Bar (YouTube/Netflix style)
             if (epProgress > 0.02) ...[
-              const SizedBox(height: 8),
+              const SizedBox(height: AppSpacing.sm),
               ClipRRect(
                 borderRadius: BorderRadius.circular(2),
                 child: LinearProgressIndicator(
                   value: epProgress,
                   minHeight: 2.5,
-                  color: const Color(0xFFE50914),
-                  backgroundColor: Colors.white12,
+                  color: AppColors.accent,
+                  backgroundColor: AppColors.borderSubtle,
                 ),
               ),
             ],
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildCardActionButton({
+    required IconData icon,
+    required Color color,
+    required String tooltip,
+    required VoidCallback onPressed,
+    bool animateIconSwap = false,
+  }) {
+    final iconWidget = Icon(
+      icon,
+      key: animateIconSwap ? ValueKey(icon) : null,
+      color: color,
+      size: AppCardTokens.actionIconSize,
+    );
+
+    return SizedBox(
+      width: AppCardTokens.actionHitSize,
+      height: AppCardTokens.actionHitSize,
+      child: IconButton(
+        tooltip: tooltip,
+        padding: EdgeInsets.zero,
+        constraints: const BoxConstraints.tightFor(
+          width: AppCardTokens.actionHitSize,
+          height: AppCardTokens.actionHitSize,
+        ),
+        style: IconButton.styleFrom(
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          shape: const CircleBorder(),
+        ),
+        icon: Container(
+          width: AppCardTokens.actionVisualSize,
+          height: AppCardTokens.actionVisualSize,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: AppColors.actionCircleBg,
+            shape: BoxShape.circle,
+          ),
+          child: animateIconSwap
+              ? AnimatedSwitcher(
+                  duration: AppDurations.fast,
+                  switchInCurve: Curves.easeOut,
+                  switchOutCurve: Curves.easeOut,
+                  child: iconWidget,
+                )
+              : iconWidget,
+        ),
+        onPressed: onPressed,
       ),
     );
   }

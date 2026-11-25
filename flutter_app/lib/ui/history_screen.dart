@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../catalog/parser.dart';
 import '../services/playback_history_manager.dart';
+import 'app_tokens.dart';
 import 'player_screen.dart';
 
 class HistoryScreen extends StatefulWidget {
@@ -36,36 +37,41 @@ class _HistoryScreenState extends State<HistoryScreen> {
     final records = _historyManager.allRecordsSorted;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF141414),
+      backgroundColor: AppColors.canvas,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1E1E1E),
+        backgroundColor: AppColors.surfaceOverlay,
         elevation: 0,
+        bottom: const PreferredSize(
+          preferredSize: Size.fromHeight(1),
+          child: Divider(color: AppColors.borderSubtle, height: 1),
+        ),
         title: Row(
           children: [
-            const Icon(Icons.history, color: Color(0xFFE50914), size: 22),
-            const SizedBox(width: 8),
+            const Icon(Icons.history, color: AppColors.accent, size: 22),
+            const SizedBox(width: AppSpacing.sm),
             const Text(
               '觀看紀錄',
               style: TextStyle(
-                color: Colors.white,
+                color: AppColors.textPrimary,
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
               ),
             ),
             if (records.isNotEmpty) ...[
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF2A2A2A),
+                  color: AppColors.surfaceInteractive,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
                   '${records.length}',
                   style: const TextStyle(
-                    color: Colors.white70,
+                    color: AppColors.textSecondary,
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
+                    fontFeatures: [FontFeature.tabularFigures()],
                   ),
                 ),
               ),
@@ -75,7 +81,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         actions: [
           if (records.isNotEmpty)
             IconButton(
-              icon: const Icon(Icons.delete_sweep_outlined, color: Colors.white70),
+              icon: const Icon(Icons.delete_sweep_outlined, color: AppColors.textSecondary),
               tooltip: '清空歷史紀錄',
               onPressed: () => HistoryBody.confirmClearAll(context, _historyManager),
             ),
@@ -94,26 +100,32 @@ class HistoryBody extends StatefulWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF1E1E1E),
+        backgroundColor: AppColors.surfaceOverlay,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.modal)),
         title: const Row(
           children: [
-            Icon(Icons.warning_amber_rounded, color: Color(0xFFE50914), size: 24),
-            SizedBox(width: 8),
-            Text('清空所有歷史紀錄？', style: TextStyle(color: Colors.white, fontSize: 18)),
+            Icon(Icons.warning_amber_rounded, color: AppColors.accent, size: 24),
+            SizedBox(width: AppSpacing.sm),
+            Text('清空所有歷史紀錄？', style: TextStyle(color: AppColors.textPrimary, fontSize: 18)),
           ],
         ),
         content: const Text(
           '確定要清空所有的觀看紀錄嗎？此操作將清除所有集數的播放進度與暫存時間戳。',
-          style: TextStyle(color: Colors.white70, fontSize: 14),
+          style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('取消', style: TextStyle(color: Colors.white70)),
-          ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFE50914),
+              backgroundColor: AppColors.surfaceInteractive,
+              foregroundColor: AppColors.textPrimary,
+            ),
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('取消'),
+          ),
+          OutlinedButton(
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppColors.accent,
+              side: const BorderSide(color: AppColors.accent),
             ),
             onPressed: () {
               Navigator.of(ctx).pop();
@@ -127,7 +139,7 @@ class HistoryBody extends StatefulWidget {
                 ),
               );
             },
-            child: const Text('確認清空', style: TextStyle(color: Colors.white)),
+            child: const Text('確認清空'),
           ),
         ],
       ),
@@ -250,50 +262,51 @@ class _HistoryBodyState extends State<HistoryBody> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 88,
-              height: 88,
+              width: 72,
+              height: 72,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: const Color(0xFF1E1E1E),
-                border: Border.all(color: const Color(0xFF2E2E2E), width: 1.5),
+                color: AppColors.cardBg,
+                border: Border.all(color: AppColors.borderSubtle),
               ),
               child: const Icon(
                 Icons.history_toggle_off_rounded,
-                size: 44,
-                color: Colors.white38,
+                size: 36,
+                color: AppColors.textMuted,
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: AppSpacing.lg),
             const Text(
               '尚無觀看歷史紀錄',
               style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
+                color: AppColors.textPrimary,
+                fontSize: 17,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
             const Text(
               '您播放過的任何精彩節目與分段都會自動記錄在這裡，隨時隨地一鍵續播。',
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Colors.white54,
-                fontSize: 14,
+                color: AppColors.textMuted,
+                fontSize: 13,
                 height: 1.4,
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppSpacing.lg),
             ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFE50914),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                backgroundColor: AppColors.accent,
+                foregroundColor: AppColors.textPrimary,
+                minimumSize: const Size(0, 44),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(24),
+                  borderRadius: BorderRadius.circular(22),
                 ),
               ),
               icon: const Icon(Icons.explore_outlined, size: 18),
-              label: const Text('開始探索節目'),
+              label: const Text('開始探索節目', style: TextStyle(fontWeight: FontWeight.bold)),
               onPressed: () => Navigator.of(context).pop(),
             ),
           ],
@@ -312,33 +325,34 @@ class _HistoryBodyState extends State<HistoryBody> {
         for (final groupName in groupOrder)
           if (groups.containsKey(groupName) && groups[groupName]!.isNotEmpty) ...[
             Padding(
-              padding: const EdgeInsets.only(left: 4, top: 12, bottom: 8),
+              padding: const EdgeInsets.only(left: AppSpacing.xs, top: AppSpacing.md, bottom: AppSpacing.sm),
               child: Row(
                 children: [
                   Container(
                     width: 3,
                     height: 14,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFE50914),
+                      color: AppColors.accent,
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppSpacing.sm),
                   Text(
                     groupName,
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: AppColors.textPrimary,
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 0.5,
                     ),
                   ),
-                  const SizedBox(width: 6),
+                  const SizedBox(width: AppSpacing.xs),
                   Text(
                     '(${groups[groupName]!.length})',
                     style: const TextStyle(
                       color: Colors.white38,
                       fontSize: 12,
+                      fontFeatures: [FontFeature.tabularFigures()],
                     ),
                   ),
                 ],
@@ -359,12 +373,12 @@ class _HistoryBodyState extends State<HistoryBody> {
       key: Key('${record.episodeId}_${record.partLabel}'),
       direction: DismissDirection.endToStart,
       background: Container(
-        margin: const EdgeInsets.symmetric(vertical: 6),
+        margin: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
         alignment: Alignment.centerRight,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
         decoration: BoxDecoration(
-          color: const Color(0xFFE50914),
-          borderRadius: BorderRadius.circular(10),
+          color: AppColors.accent,
+          borderRadius: BorderRadius.circular(AppRadius.card),
         ),
         child: const Row(
           mainAxisSize: MainAxisSize.min,
@@ -390,28 +404,28 @@ class _HistoryBodyState extends State<HistoryBody> {
         );
       },
       child: Card(
-        margin: const EdgeInsets.symmetric(vertical: 6),
-        color: const Color(0xFF1E1E1E),
-        elevation: 2,
+        margin: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
+        color: AppColors.cardBg,
+        elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-          side: const BorderSide(color: Color(0xFF2A2A2A), width: 1),
+          borderRadius: BorderRadius.circular(AppRadius.card),
+          side: const BorderSide(color: AppColors.borderSubtle, width: 1),
         ),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: () => _playHistoryRecord(record),
           child: Padding(
-            padding: const EdgeInsets.all(10.0),
+            padding: const EdgeInsets.all(AppSpacing.md),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Thumbnail with progress indicator
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(6),
+                  borderRadius: BorderRadius.circular(AppRadius.chip),
                   child: Container(
                     width: 104,
                     height: 62,
-                    color: const Color(0xFF2A2A2A),
+                    color: AppColors.surfaceInteractive,
                     child: Stack(
                       fit: StackFit.expand,
                       children: [
@@ -419,6 +433,10 @@ class _HistoryBodyState extends State<HistoryBody> {
                           Image.network(
                             record.effectiveThumbnail,
                             fit: BoxFit.cover,
+                            loadingBuilder: (ctx, child, progress) {
+                              if (progress == null) return child;
+                              return Container(color: AppColors.surfaceInteractive);
+                            },
                             errorBuilder: (ctx, err, stack) => const Center(
                               child: Icon(Icons.movie_creation_outlined, color: Colors.white24, size: 30),
                             ),
@@ -431,17 +449,18 @@ class _HistoryBodyState extends State<HistoryBody> {
                         // Completed status badge
                         if (record.isCompleted)
                           Positioned(
-                            top: 4,
-                            left: 4,
+                            top: AppSpacing.xs,
+                            left: AppSpacing.xs,
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF2E7D32),
-                                borderRadius: BorderRadius.circular(4),
+                                color: AppColors.successSurface,
+                                borderRadius: BorderRadius.circular(AppRadius.badge),
+                                border: Border.all(color: AppColors.success.withValues(alpha: 0.7)),
                               ),
                               child: const Text(
                                 '✓ 已看完',
-                                style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
+                                style: TextStyle(color: AppColors.success, fontSize: 9, fontWeight: FontWeight.bold),
                               ),
                             ),
                           ),
@@ -453,11 +472,11 @@ class _HistoryBodyState extends State<HistoryBody> {
                             height: 28,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: Colors.black.withOpacity(0.6),
+                              color: Colors.black.withValues(alpha: 0.6),
                             ),
                             child: const Icon(
                               Icons.play_arrow_rounded,
-                              color: Colors.white,
+                              color: AppColors.textPrimary,
                               size: 18,
                             ),
                           ),
@@ -474,7 +493,7 @@ class _HistoryBodyState extends State<HistoryBody> {
                             alignment: Alignment.centerLeft,
                             child: FractionallySizedBox(
                               widthFactor: record.progress,
-                              child: Container(color: const Color(0xFFE50914)),
+                              child: Container(color: AppColors.accent),
                             ),
                           ),
                         ),
@@ -482,7 +501,7 @@ class _HistoryBodyState extends State<HistoryBody> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppSpacing.md),
 
                 // Episode Metadata
                 Expanded(
@@ -499,36 +518,40 @@ class _HistoryBodyState extends State<HistoryBody> {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
-                                color: Color(0xFFE50914),
+                                color: AppColors.accent,
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                           ),
-                          const SizedBox(width: 4),
+                          const SizedBox(width: AppSpacing.xs),
                           Text(
                             _formatRelativeDate(record.updatedAt),
                             style: const TextStyle(
                               color: Colors.white38,
                               fontSize: 10,
+                              fontFeatures: [FontFeature.tabularFigures()],
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 3),
+                      const SizedBox(height: AppSpacing.xs),
 
                       // Episode Title
-                      Text(
-                        record.effectiveTitle,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
+                      Tooltip(
+                        message: record.effectiveTitle,
+                        child: Text(
+                          record.effectiveTitle,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: AppColors.textPrimary,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
-                      const SizedBox(height: 6),
+                      const SizedBox(height: AppSpacing.sm),
 
                       // Part badge + Time & progress
                       Row(
@@ -536,28 +559,30 @@ class _HistoryBodyState extends State<HistoryBody> {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF2A2A2A),
-                              borderRadius: BorderRadius.circular(4),
-                              border: Border.all(color: const Color(0xFF3E3E3E), width: 0.8),
+                              color: AppColors.surfaceInteractive,
+                              borderRadius: BorderRadius.circular(AppRadius.badge),
+                              border: Border.all(color: AppColors.borderSubtle, width: 0.8),
                             ),
                             child: Text(
                               record.partLabel,
                               style: const TextStyle(
-                                color: Colors.white70,
+                                color: AppColors.textSecondary,
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
+                                fontFeatures: [FontFeature.tabularFigures()],
                               ),
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: AppSpacing.sm),
                           Expanded(
                             child: Text(
                               '${record.positionFormatted} / ${record.durationFormatted} ($progressPct%)',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
-                                color: Colors.white54,
+                                color: AppColors.textMuted,
                                 fontSize: 11,
+                                fontFeatures: [FontFeature.tabularFigures()],
                               ),
                             ),
                           ),
@@ -567,11 +592,28 @@ class _HistoryBodyState extends State<HistoryBody> {
                   ),
                 ),
 
-                // Direct Delete Button
+                // Direct Delete Button (44x44 hit box, 36x36 visual slot)
                 IconButton(
-                  icon: const Icon(Icons.close, color: Colors.white38, size: 18),
+                  icon: Container(
+                    width: AppCardTokens.actionVisualSize,
+                    height: AppCardTokens.actionVisualSize,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: AppColors.actionCircleBg,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.close, color: Colors.white38, size: AppCardTokens.actionIconSize),
+                  ),
                   tooltip: '刪除紀錄',
-                  splashRadius: 18,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints.tightFor(
+                    width: AppCardTokens.actionHitSize,
+                    height: AppCardTokens.actionHitSize,
+                  ),
+                  style: IconButton.styleFrom(
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    shape: const CircleBorder(),
+                  ),
                   onPressed: () {
                     _historyManager.clearRecord(record.episodeId, record.partLabel);
                     HapticFeedback.lightImpact();

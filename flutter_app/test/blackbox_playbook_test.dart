@@ -310,7 +310,8 @@ void main() {
       expect(find.byType(YouTubeEpisodeCard), findsOneWidget);
       expect(find.text('綜藝玩很大 2026-11-08 台北 搗蛋鬼到你家'), findsOneWidget);
       expect(find.text('2026-11-08'), findsOneWidget);
-      expect(find.text('📍 台北'), findsOneWidget);
+      expect(find.byIcon(Icons.location_on_outlined), findsOneWidget);
+      expect(find.text('台北'), findsOneWidget);
       expect(find.text('1080p FHD'), findsOneWidget);
       expect(find.textContaining('已儲存 25.0 MB'), findsOneWidget);
       expect(find.text('Part 1 (已下載)'), findsOneWidget);

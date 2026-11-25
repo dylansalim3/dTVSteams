@@ -5,6 +5,7 @@ import '../catalog/parser.dart';
 import '../services/download_manager.dart';
 import '../services/favorites_manager.dart';
 import '../services/playback_history_manager.dart';
+import 'app_tokens.dart';
 import 'episode_card.dart';
 import 'favorites_screen.dart';
 import 'history_screen.dart';
@@ -72,19 +73,28 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF1E1E1E),
-        title: const Text('刪除此集離線檔案', style: TextStyle(color: Colors.white)),
+        backgroundColor: AppColors.surfaceOverlay,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.modal),
+          side: const BorderSide(color: AppColors.borderSubtle, width: 1),
+        ),
+        title: const Text('刪除此集離線檔案', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold)),
         content: Text(
           '確定要刪除「${ep.title}」的所有已下載分段檔案嗎？',
-          style: const TextStyle(color: Colors.white70),
+          style: const TextStyle(color: AppColors.textSecondary, height: 1.4),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('取消', style: TextStyle(color: Colors.white54)),
+            child: const Text('取消', style: TextStyle(color: AppColors.textMuted)),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFE50914)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.accent,
+              foregroundColor: AppColors.textPrimary,
+              minimumSize: const Size(0, 44),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.chip)),
+            ),
             onPressed: () {
               Navigator.of(ctx).pop();
               for (final p in ep.parts) {
@@ -94,7 +104,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
               }
               if (mounted) setState(() {});
             },
-            child: const Text('刪除', style: TextStyle(color: Colors.white)),
+            child: const Text('刪除', style: TextStyle(fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -190,10 +200,14 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
     };
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0F0F0F),
+      backgroundColor: AppColors.canvas,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF141414),
+        backgroundColor: AppColors.surfaceOverlay,
         elevation: 0,
+        bottom: const PreferredSize(
+          preferredSize: Size.fromHeight(1),
+          child: Divider(color: AppColors.borderSubtle, height: 1),
+        ),
         title: Row(
           children: [
             Flexible(
@@ -205,37 +219,39 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
               ),
             ),
             if (_currentTabIndex == 1 && favoritesCount > 0) ...[
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE50914).withValues(alpha: 0.2),
+                  color: AppColors.accent.withValues(alpha: 0.16),
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: const Color(0xFFE50914).withValues(alpha: 0.5)),
+                  border: Border.all(color: AppColors.accent.withValues(alpha: 0.45)),
                 ),
                 child: Text(
                   '$favoritesCount',
                   style: const TextStyle(
-                    color: Color(0xFFE50914),
+                    color: AppColors.accent,
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
+                    fontFeatures: [FontFeature.tabularFigures()],
                   ),
                 ),
               ),
             ] else if (_currentTabIndex == 2 && historyRecords.isNotEmpty) ...[
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF2A2A2A),
+                  color: AppColors.surfaceInteractive,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
                   '${historyRecords.length}',
                   style: const TextStyle(
-                    color: Colors.white70,
+                    color: AppColors.textSecondary,
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
+                    fontFeatures: [FontFeature.tabularFigures()],
                   ),
                 ),
               ),
@@ -245,7 +261,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
         actions: [
           if (_currentTabIndex == 0) ...[
             IconButton(
-              icon: const Icon(Icons.drive_file_move_outlined, color: Colors.white70),
+              icon: const Icon(Icons.drive_file_move_outlined, color: AppColors.textSecondary),
               tooltip: '變更下載儲存位置',
               onPressed: () => StorageLocationHelper.showStoragePickerSheet(
                 context,
@@ -256,25 +272,33 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
             ),
             if (completedList.isNotEmpty || activeList.isNotEmpty)
               IconButton(
-                icon: const Icon(Icons.delete_sweep, color: Colors.white70),
+                icon: const Icon(Icons.delete_sweep, color: AppColors.textSecondary),
                 tooltip: '清空所有下載檔案',
                 onPressed: () {
                   showDialog(
                     context: context,
                     builder: (ctx) => AlertDialog(
-                      backgroundColor: const Color(0xFF1E1E1E),
-                      title: const Text('清空所有下載檔案', style: TextStyle(color: Colors.white)),
+                      backgroundColor: AppColors.surfaceOverlay,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.modal)),
+                      title: const Text('清空所有下載檔案', style: TextStyle(color: AppColors.textPrimary)),
                       content: Text(
                         '確定要刪除所有 ${completedList.length} 個已下載分段檔案嗎？\n將釋出 $totalSize 儲存空間。',
-                        style: const TextStyle(color: Colors.white70),
+                        style: const TextStyle(color: AppColors.textSecondary),
                       ),
                       actions: [
-                        TextButton(
-                          onPressed: () => Navigator.of(ctx).pop(),
-                          child: const Text('取消', style: TextStyle(color: Colors.white54)),
-                        ),
                         ElevatedButton(
-                          style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFE50914)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.surfaceInteractive,
+                            foregroundColor: AppColors.textPrimary,
+                          ),
+                          onPressed: () => Navigator.of(ctx).pop(),
+                          child: const Text('取消'),
+                        ),
+                        OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppColors.accent,
+                            side: const BorderSide(color: AppColors.accent),
+                          ),
                           onPressed: () async {
                             Navigator.of(ctx).pop();
                             await _manager.deleteAllDownloads();
@@ -283,7 +307,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                               SnackBar(content: Text('已清空所有下載檔案，釋出 $totalSize 儲存空間')),
                             );
                           },
-                          child: const Text('全部清空', style: TextStyle(color: Colors.white)),
+                          child: const Text('清空下載'),
                         ),
                       ],
                     ),
@@ -292,13 +316,13 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
               ),
           ] else if (_currentTabIndex == 1 && favoritesCount > 0) ...[
             IconButton(
-              icon: const Icon(Icons.delete_sweep_outlined, color: Colors.white70),
+              icon: const Icon(Icons.delete_sweep_outlined, color: AppColors.textSecondary),
               tooltip: '清空所有收藏',
               onPressed: () => FavoritesBody.confirmClearAll(context, _favoritesManager),
             ),
           ] else if (_currentTabIndex == 2 && historyRecords.isNotEmpty) ...[
             IconButton(
-              icon: const Icon(Icons.delete_sweep_outlined, color: Colors.white70),
+              icon: const Icon(Icons.delete_sweep_outlined, color: AppColors.textSecondary),
               tooltip: '清空歷史紀錄',
               onPressed: () => HistoryBody.confirmClearAll(context, _historyManager),
             ),
@@ -310,15 +334,15 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
         children: [
           CustomScrollView(
             slivers: [
-          // Storage Summary Card
+          // Storage Summary Card (4px grid aligned with YouTubeEpisodeCard)
           SliverToBoxAdapter(
             child: Container(
-              margin: const EdgeInsets.all(14),
-              padding: const EdgeInsets.all(14),
+              margin: const EdgeInsets.all(AppSpacing.md),
+              padding: const EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
-                color: const Color(0xFF1E1E1E),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.white12),
+                color: AppColors.cardBg,
+                borderRadius: BorderRadius.circular(AppRadius.card),
+                border: Border.all(color: AppColors.borderSubtle),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -326,21 +350,24 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(8),
+                        width: 40,
+                        height: 40,
+                        alignment: Alignment.center,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFE50914).withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(8),
+                          color: AppColors.surfaceInteractive,
+                          borderRadius: BorderRadius.circular(AppRadius.chip),
+                          border: Border.all(color: AppColors.borderSubtle),
                         ),
-                        child: const Icon(Icons.storage, color: Color(0xFFE50914), size: 22),
+                        child: const Icon(Icons.storage, color: AppColors.textSecondary, size: 20),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: AppSpacing.md),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text(
                               '本機離線空間',
-                              style: TextStyle(fontSize: 13, color: Colors.white70),
+                              style: TextStyle(fontSize: 12, color: AppColors.textMuted),
                             ),
                             const SizedBox(height: 2),
                             Text(
@@ -348,7 +375,8 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                                color: AppColors.textPrimary,
+                                fontFeatures: [FontFeature.tabularFigures()],
                               ),
                             ),
                           ],
@@ -356,38 +384,45 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 10),
-                  const Divider(color: Colors.white12, height: 1),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppSpacing.md),
+                  const Divider(color: AppColors.borderSubtle, height: 1),
+                  const SizedBox(height: AppSpacing.sm),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Icon(Icons.folder_open, size: 14, color: Colors.white54),
-                      const SizedBox(width: 6),
+                      const Padding(
+                        padding: EdgeInsets.only(top: 1),
+                        child: Icon(Icons.folder_open, size: 14, color: AppColors.textMuted),
+                      ),
+                      const SizedBox(width: AppSpacing.xs),
                       Expanded(
-                        child: Text(
-                          folderPath.isNotEmpty ? folderPath : '正在載入儲存路徑...',
-                          style: const TextStyle(
-                            fontSize: 11,
-                            color: Colors.white54,
-                            fontFamily: 'monospace',
+                        child: Tooltip(
+                          message: folderPath,
+                          child: Text(
+                            folderPath.isNotEmpty ? folderPath : '正在載入儲存路徑...',
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: AppColors.textMuted,
+                              fontFamily: 'monospace',
+                            ),
                           ),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: AppSpacing.md),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       if (_manager.isUsingCustomDirectory) ...[
-                        OutlinedButton.icon(
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.white70,
-                            side: const BorderSide(color: Colors.white24),
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                            minimumSize: const Size(0, 32),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        TextButton.icon(
+                          style: TextButton.styleFrom(
+                            foregroundColor: AppColors.textSecondary,
+                            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+                            minimumSize: const Size(0, 44),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.chip)),
                           ),
                           onPressed: () => StorageLocationHelper.handleResetStorage(
                             context,
@@ -395,18 +430,18 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                               if (mounted) setState(() {});
                             },
                           ),
-                          icon: const Icon(Icons.restore, size: 14),
+                          icon: const Icon(Icons.restore, size: 15),
                           label: const Text('還原預設', style: TextStyle(fontSize: 12)),
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: AppSpacing.sm),
                       ],
                       ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFE50914),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                          minimumSize: const Size(0, 32),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          backgroundColor: AppColors.accent,
+                          foregroundColor: AppColors.textPrimary,
+                          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+                          minimumSize: const Size(0, 44),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.chip)),
                         ),
                         onPressed: () => StorageLocationHelper.showStoragePickerSheet(
                           context,
@@ -414,8 +449,8 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                             if (mounted) setState(() {});
                           },
                         ),
-                        icon: const Icon(Icons.drive_file_move_outlined, size: 14),
-                        label: const Text('變更位置', style: TextStyle(fontSize: 12)),
+                        icon: const Icon(Icons.drive_file_move_outlined, size: 15),
+                        label: const Text('變更位置', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
                       ),
                     ],
                   ),
@@ -428,17 +463,22 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
           if (episodes.isNotEmpty)
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.xs),
                 child: Row(
                   children: [
-                    const Icon(Icons.check_circle_outline, size: 16, color: Color(0xFF46D369)),
-                    const SizedBox(width: 6),
+                    const Icon(Icons.check_circle_outline, size: 16, color: AppColors.success),
+                    const SizedBox(width: AppSpacing.sm),
                     Flexible(
                       child: Text(
                         '已下載節目清單 (${episodes.length})',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white),
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                          fontFeatures: [FontFeature.tabularFigures()],
+                        ),
                       ),
                     ),
                   ],
@@ -451,25 +491,47 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
             SliverFillRemaining(
               hasScrollBody: false,
               child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.download_for_offline_outlined, size: 64, color: Colors.white.withValues(alpha: 0.2)),
-                    const SizedBox(height: 16),
-                    const Text(
-                      '尚無已下載的離線影片',
-                      style: TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 8),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 40),
-                      child: Text(
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSpacing.xl),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 72,
+                        height: 72,
+                        decoration: BoxDecoration(
+                          color: AppColors.cardBg,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: AppColors.borderSubtle),
+                        ),
+                        child: const Icon(Icons.download_for_offline_outlined, size: 36, color: AppColors.textMuted),
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                      const Text(
+                        '尚無已下載的離線影片',
+                        style: TextStyle(color: AppColors.textPrimary, fontSize: 17, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      const Text(
                         '在首頁或播放器中點擊「下載」按鈕，即可將節目儲存至本機資料夾隨時離線觀看。',
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.white38, fontSize: 13),
+                        style: TextStyle(color: AppColors.textMuted, fontSize: 13, height: 1.4),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: AppSpacing.lg),
+                      ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.accent,
+                          foregroundColor: AppColors.textPrimary,
+                          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+                          minimumSize: const Size(0, 44),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+                        ),
+                        icon: const Icon(Icons.explore_outlined, size: 18),
+                        label: const Text('瀏覽節目清單', style: TextStyle(fontWeight: FontWeight.bold)),
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             )
@@ -499,32 +561,37 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
           const HistoryBody(),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentTabIndex,
-        onTap: (idx) => setState(() => _currentTabIndex = idx),
-        backgroundColor: const Color(0xFF141414),
-        selectedItemColor: const Color(0xFFE50914),
-        unselectedItemColor: Colors.white54,
-        selectedFontSize: 12,
-        unselectedFontSize: 11,
-        type: BottomNavigationBarType.fixed,
-        items: [
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.folder_special_outlined),
-            activeIcon: Icon(Icons.folder_special),
-            label: '下載',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(favoritesCount > 0 ? Icons.favorite_border : Icons.favorite_border),
-            activeIcon: const Icon(Icons.favorite),
-            label: favoritesCount > 0 ? '收藏 ($favoritesCount)' : '收藏',
-          ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.history),
-            activeIcon: Icon(Icons.history),
-            label: '觀看紀錄',
-          ),
-        ],
+      bottomNavigationBar: Container(
+        decoration: const BoxDecoration(
+          border: Border(top: BorderSide(color: AppColors.borderSubtle, width: 1)),
+        ),
+        child: BottomNavigationBar(
+          currentIndex: _currentTabIndex,
+          onTap: (idx) => setState(() => _currentTabIndex = idx),
+          backgroundColor: AppColors.surfaceOverlay,
+          selectedItemColor: AppColors.accent,
+          unselectedItemColor: AppColors.textMuted,
+          selectedFontSize: 12,
+          unselectedFontSize: 11,
+          type: BottomNavigationBarType.fixed,
+          items: [
+            const BottomNavigationBarItem(
+              icon: Icon(Icons.folder_special_outlined),
+              activeIcon: Icon(Icons.folder_special),
+              label: '下載',
+            ),
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.favorite_border),
+              activeIcon: const Icon(Icons.favorite),
+              label: favoritesCount > 0 ? '收藏 ($favoritesCount)' : '收藏',
+            ),
+            const BottomNavigationBarItem(
+              icon: Icon(Icons.history),
+              activeIcon: Icon(Icons.history),
+              label: '觀看紀錄',
+            ),
+          ],
+        ),
       ),
     );
   }

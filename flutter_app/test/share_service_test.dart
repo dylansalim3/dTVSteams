@@ -199,6 +199,50 @@ void main() {
       final shareBtn = find.byTooltip('分享此集影片');
       expect(shareBtn, findsNothing);
     });
+
+    testWidgets('all list item action buttons share identical 44x44 touch targets and vertical center alignment',
+        (WidgetTester tester) async {
+      final ep = CatalogEpisode(
+        id: 'ep_align',
+        title: '【綜藝玩很大】對齊測試集數標題很長很長確保多行標題不影響頂部按鈕對齊',
+        date: '2026-11-08',
+        url: 'https://example.com/ep_align',
+        overview: '測試簡介',
+        parts: [CatalogPart(label: 'Part 1', url: 'https://example.com/p1')],
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: YouTubeEpisodeCard(
+              episode: ep,
+              isDownloadView: true,
+              onPlayTapped: () {},
+              onPartTapped: (_) {},
+              onShareTapped: () {},
+              onDeleteTapped: () {},
+            ),
+          ),
+        ),
+      );
+
+      final playCenter = tester.getCenter(find.byTooltip('播放節目'));
+      final favCenter = tester.getCenter(find.byTooltip('加入收藏'));
+      final shareCenter = tester.getCenter(find.byTooltip('分享此集影片'));
+      final deleteCenter = tester.getCenter(find.byTooltip('刪除此集離線檔案'));
+      final downloadCenter = tester.getCenter(find.byType(TripleCircleDownloadButton));
+
+      expect(favCenter.dy, equals(downloadCenter.dy));
+      expect(shareCenter.dy, equals(downloadCenter.dy));
+      expect(deleteCenter.dy, equals(downloadCenter.dy));
+      expect(playCenter.dy, equals(downloadCenter.dy));
+
+      expect(tester.getSize(find.byTooltip('播放節目')), equals(const Size(44, 44)));
+      expect(tester.getSize(find.byTooltip('加入收藏')), equals(const Size(44, 44)));
+      expect(tester.getSize(find.byTooltip('分享此集影片')), equals(const Size(44, 44)));
+      expect(tester.getSize(find.byTooltip('刪除此集離線檔案')), equals(const Size(44, 44)));
+      expect(tester.getSize(find.byType(TripleCircleDownloadButton)), equals(const Size(44, 44)));
+    });
   });
 
   group('ShareDialog Widget Tests', () {
