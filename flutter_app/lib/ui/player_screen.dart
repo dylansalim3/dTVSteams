@@ -12,6 +12,7 @@ import '../services/playback_bridge.dart';
 import '../services/playback_history_manager.dart';
 import '../services/settings_manager.dart';
 import '../services/sleep_timer_manager.dart';
+import 'app_tokens.dart';
 import 'downloads_screen.dart';
 import 'history_screen.dart';
 import 'share_dialog.dart';
@@ -1150,6 +1151,9 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
     if (_isExiting) return;
     _isExiting = true;
 
+    // 0. Immediately restore native top status bar and bottom navigation buttons synchronously
+    AppSystemUi.restoreNormalChrome();
+
     // 1. Instantly silence and pause audio/video
     try {
       await _controller?.pause();
@@ -1170,13 +1174,14 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
     // 3. Persist current watch history
     _persistCurrentPosition(force: true);
 
-    // 4. Restore system navigation/status bar
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    // 4. Re-assert system navigation/status bar after native bridge calls complete
+    AppSystemUi.restoreNormalChrome();
   }
 
   @override
   void dispose() {
     _isExiting = true;
+    AppSystemUi.restoreNormalChrome();
     _playbackBridge.setKeepScreenOn(false);
     _playbackBridge.stopBackgroundPlay();
     _playbackBridge.setScreenBrightness(-1.0);
@@ -1194,7 +1199,7 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
     _vinylAnimationController.dispose();
     _waveformAnimationController.dispose();
     WidgetsBinding.instance.removeObserver(this);
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    AppSystemUi.restoreNormalChrome();
     _persistCurrentPosition(force: true);
     _pipManager.setAutoPip(false);
     _pipManager.isInPipMode.removeListener(_onPipUpdate);
@@ -1933,14 +1938,14 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
       return;
     }
 
-    _downloadManager.startDownload(widget.episode, part);
-    ScaffoldMessenger.of(context).showSnackBar(
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.showSnackBar(
       SnackBar(
         content: Text('開始下載 ${widget.episode.title} - ${part.label}'),
-        backgroundColor: const Color(0xFFE50914),
+        backgroundColor: AppColors.accent,
         action: SnackBarAction(
           label: '查看進度',
-          textColor: Colors.white,
+          textColor: AppColors.textPrimary,
           onPressed: () {
             Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const DownloadsScreen()),
@@ -1949,6 +1954,30 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
         ),
       ),
     );
+    _downloadManager.startDownload(widget.episode, part).then((ok) {
+      if (!ok && mounted) {
+        final failedItem = _downloadManager.getItem(
+          widget.episode.id,
+          part.label,
+          showId: widget.episode.showId,
+          title: widget.episode.title,
+        );
+        if (failedItem?.status == DownloadStatus.failed) {
+          messenger.removeCurrentSnackBar();
+          messenger.showSnackBar(
+            SnackBar(
+              content: Text('下載失敗 (${part.label})：${failedItem?.error ?? "請稍後重試"}'),
+              backgroundColor: AppColors.warningSurface,
+              action: SnackBarAction(
+                label: '重試',
+                textColor: AppColors.warning,
+                onPressed: () => _downloadManager.startDownload(widget.episode, part),
+              ),
+            ),
+          );
+        }
+      }
+    });
   }
 
   @override

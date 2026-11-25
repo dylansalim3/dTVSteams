@@ -9,6 +9,7 @@ import 'services/favorites_manager.dart';
 import 'services/playback_history_manager.dart';
 import 'services/update_manager.dart';
 import 'ui/about_update_dialog.dart';
+import 'ui/app_tokens.dart';
 import 'ui/downloads_screen.dart';
 import 'ui/episode_card.dart';
 import 'ui/player_screen.dart';
@@ -18,6 +19,7 @@ export 'ui/episode_card.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  AppSystemUi.restoreNormalChrome();
   runApp(const DTVSteamsApp());
 }
 
@@ -645,9 +647,11 @@ class _HomeScreenState extends State<HomeScreen> {
     final downloadedCount = _downloadManager.completedDownloads.length;
     final activeCount = _downloadManager.activeDownloads.length;
 
-    return Scaffold(
-      body: SafeArea(
-        child: CustomScrollView(
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: AppSystemUi.normalOverlayStyle,
+      child: Scaffold(
+        body: SafeArea(
+          child: CustomScrollView(
           controller: _scrollController,
           slivers: [
             // Top App Bar with Logo, Download Folder Button, and Refresh
@@ -1063,6 +1067,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
+    ),
     );
   }
 }

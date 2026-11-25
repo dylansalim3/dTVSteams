@@ -90,5 +90,75 @@ void main() {
       expect(pipCalls.last.method, 'setAutoPip');
       expect(pipCalls.last.arguments['enabled'], isFalse);
     });
+
+    testWidgets('Exiting player restores SystemUiMode.manual with top and bottom overlays instead of edgeToEdge',
+        (WidgetTester tester) async {
+      final List<MethodCall> platformCalls = [];
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(SystemChannels.platform, (MethodCall call) async {
+        platformCalls.add(call);
+        return null;
+      });
+      addTearDown(() {
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockMethodCallHandler(SystemChannels.platform, null);
+      });
+
+      final testEp = CatalogEpisode(
+        id: 'https://example.com/player_sysui_test',
+        title: '綜藝玩很大 2026-11-08 台北 系統欄測試',
+        date: '2026-11-08',
+        url: 'https://example.com/player_sysui_test',
+        parts: [
+          CatalogPart(label: 'Part 1', url: 'https://example.com/part1', streamUrl: 'https://example.com/stream.m3u8'),
+        ],
+      );
+
+      await tester.pumpWidget(MaterialApp(
+        home: Navigator(
+          onGenerateRoute: (_) => MaterialPageRoute(
+            builder: (ctx) => Scaffold(
+              body: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(ctx).push(
+                    MaterialPageRoute(
+                      builder: (_) => NativePlayerScreen(episode: testEp, initialPartIndex: 0),
+                    ),
+                  );
+                },
+                child: const Text('Launch Video'),
+              ),
+            ),
+          ),
+        ),
+      ));
+
+      await tester.tap(find.text('Launch Video'));
+      await tester.pumpAndSettle();
+
+      final enteredImmersive = platformCalls.any((c) =>
+          c.method == 'SystemChrome.setEnabledSystemUIMode' &&
+          c.arguments == 'SystemUiMode.immersiveSticky');
+      expect(enteredImmersive, isTrue);
+
+      platformCalls.clear();
+
+      // Exit fullscreen player
+      await tester.tap(find.byIcon(Icons.arrow_back));
+      await tester.pumpAndSettle();
+
+      final restoredOverlays = platformCalls.where((c) => c.method == 'SystemChrome.setEnabledSystemUIOverlays').toList();
+      final restoredManual = platformCalls.where((c) => c.method == 'SystemChrome.setEnabledSystemUIMode').toList();
+      final usedEdgeToEdge = restoredManual.any((c) => c.arguments == 'SystemUiMode.edgeToEdge');
+      expect(usedEdgeToEdge, isFalse);
+      expect(
+        restoredManual.any((c) => c.arguments == 'SystemUiMode.manual') ||
+            restoredOverlays.any((c) =>
+                c.arguments is List &&
+                (c.arguments as List).contains('SystemUiOverlay.top') &&
+                (c.arguments as List).contains('SystemUiOverlay.bottom')),
+        isTrue,
+      );
+    });
   });
 }

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../catalog/parser.dart';
 import '../services/download_manager.dart';
 import '../services/favorites_manager.dart';
@@ -95,14 +96,21 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
               minimumSize: const Size(0, 44),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.chip)),
             ),
-            onPressed: () {
+            onPressed: () async {
               Navigator.of(ctx).pop();
-              for (final p in ep.parts) {
-                if (_manager.isDownloaded(ep.id, p.label, showId: ep.showId, title: ep.title)) {
-                  _manager.deleteDownload(ep.id, p.label, showId: ep.showId, title: ep.title);
-                }
-              }
-              if (mounted) setState(() {});
+              final freedBytes = await _manager.deleteEpisodeDownloads(ep);
+              if (!mounted) return;
+              setState(() {});
+              ScaffoldMessenger.of(context).removeCurrentSnackBar();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    freedBytes > 0
+                        ? '已刪除「${ep.title}」（釋出 ${_manager.formatBytes(freedBytes)}）'
+                        : '已清除「${ep.title}」的下載紀錄',
+                  ),
+                ),
+              );
             },
             child: const Text('刪除', style: TextStyle(fontWeight: FontWeight.bold)),
           ),
@@ -187,6 +195,8 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
   Widget build(BuildContext context) {
     final completedList = _manager.completedDownloads;
     final activeList = _manager.activeDownloads;
+    final failedList = _manager.failedDownloads;
+    final totalItemCount = completedList.length + activeList.length + failedList.length;
     final totalSize = _manager.formatBytes(_manager.totalDownloadedBytes);
     final folderPath = _manager.downloadDirectoryPath;
     final episodes = downloadedEpisodes;
@@ -199,7 +209,9 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
       _ => '下載資料夾 (Downloads)',
     };
 
-    return Scaffold(
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: AppSystemUi.normalOverlayStyle,
+      child: Scaffold(
       backgroundColor: AppColors.canvas,
       appBar: AppBar(
         backgroundColor: AppColors.surfaceOverlay,
@@ -270,7 +282,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                 },
               ),
             ),
-            if (completedList.isNotEmpty || activeList.isNotEmpty)
+            if (totalItemCount > 0)
               IconButton(
                 icon: const Icon(Icons.delete_sweep, color: AppColors.textSecondary),
                 tooltip: '清空所有下載檔案',
@@ -282,7 +294,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.modal)),
                       title: const Text('清空所有下載檔案', style: TextStyle(color: AppColors.textPrimary)),
                       content: Text(
-                        '確定要刪除所有 ${completedList.length} 個已下載分段檔案嗎？\n將釋出 $totalSize 儲存空間。',
+                        '確定要刪除全部 $totalItemCount 個下載紀錄與離線檔案嗎？\n將釋出 $totalSize 儲存空間。',
                         style: const TextStyle(color: AppColors.textSecondary),
                       ),
                       actions: [
@@ -301,10 +313,17 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                           ),
                           onPressed: () async {
                             Navigator.of(ctx).pop();
-                            await _manager.deleteAllDownloads();
+                            final freed = await _manager.deleteAllDownloads();
                             if (!context.mounted) return;
+                            ScaffoldMessenger.of(context).removeCurrentSnackBar();
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('已清空所有下載檔案，釋出 $totalSize 儲存空間')),
+                              SnackBar(
+                                content: Text(
+                                  freed > 0
+                                      ? '已清空所有下載檔案，釋出 ${_manager.formatBytes(freed)} 儲存空間'
+                                      : '已清空所有下載紀錄',
+                                ),
+                              ),
                             );
                           },
                           child: const Text('清空下載'),
@@ -329,7 +348,10 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
           ],
         ],
       ),
-      body: IndexedStack(
+      body: SafeArea(
+        top: false,
+        bottom: false,
+        child: IndexedStack(
         index: _currentTabIndex,
         children: [
           CustomScrollView(
@@ -561,6 +583,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
           const HistoryBody(),
         ],
       ),
+      ),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
           border: Border(top: BorderSide(color: AppColors.borderSubtle, width: 1)),
@@ -593,6 +616,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
           ],
         ),
       ),
+    ),
     );
   }
 }

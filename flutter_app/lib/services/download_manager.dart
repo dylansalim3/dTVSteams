@@ -72,6 +72,7 @@ class DownloadItem {
         'totalBytes': totalBytes,
         'downloadedBytes': downloadedBytes,
         'status': status.name,
+        if (error != null && error!.isNotEmpty) 'error': error,
       };
 
   factory DownloadItem.fromJson(Map<String, dynamic> json) {
@@ -102,6 +103,7 @@ class DownloadItem {
         (e) => e.name == json['status'],
         orElse: () => DownloadStatus.idle,
       ),
+      error: json['error'] as String?,
     );
   }
 }
@@ -270,6 +272,7 @@ class DownloadManager extends ChangeNotifier {
   @visibleForTesting
   void setDirectoryForTesting(String path) {
     _downloadDirectoryPath = path;
+    _isInitialized = true;
   }
 
   Future<void> init() async {
@@ -310,21 +313,25 @@ class DownloadManager extends ChangeNotifier {
           final seenPaths = <String>{};
           for (final raw in list) {
             final item = DownloadItem.fromJson(raw as Map<String, dynamic>);
-            final file = File(item.localFilePath);
-            if (await file.exists()) {
-              if (seenPaths.contains(item.localFilePath)) {
-                // Skip duplicate entry for the exact same file
-                continue;
-              }
-              seenPaths.add(item.localFilePath);
+            final dedupKey = item.localFilePath.isNotEmpty
+                ? item.localFilePath
+                : _buildKey(item.episodeId, item.partLabel);
+            if (!seenPaths.add(dedupKey)) {
+              continue;
+            }
 
+            final file = item.localFilePath.isNotEmpty ? File(item.localFilePath) : null;
+            final exists = file != null && await file.exists();
+            if (item.status == DownloadStatus.failed || item.status == DownloadStatus.paused) {
+              item.downloadedBytes = exists ? await file.length() : 0;
+              _items[_buildKey(item.episodeId, item.partLabel)] = item;
+            } else if (exists) {
               final len = await file.length();
+              if (len <= 0) continue;
               item.downloadedBytes = len;
               if (item.totalBytes <= 0) item.totalBytes = len;
               item.status = DownloadStatus.completed;
-
-              final key = _buildKey(item.episodeId, item.partLabel);
-              _items[key] = item;
+              _items[_buildKey(item.episodeId, item.partLabel)] = item;
             }
           }
         } catch (e) {
@@ -431,8 +438,13 @@ class DownloadManager extends ChangeNotifier {
       final seen = <String>{};
       final list = <Map<String, dynamic>>[];
       for (final item in _items.values) {
-        if (item.status == DownloadStatus.completed) {
-          if (seen.add(item.localFilePath)) {
+        if (item.status == DownloadStatus.completed ||
+            item.status == DownloadStatus.failed ||
+            item.status == DownloadStatus.paused) {
+          final dedupKey = item.localFilePath.isNotEmpty
+              ? item.localFilePath
+              : _buildKey(item.episodeId, item.partLabel);
+          if (seen.add(dedupKey)) {
             list.add(item.toJson());
           }
         }
@@ -569,6 +581,11 @@ class DownloadManager extends ChangeNotifier {
     return item?.status == DownloadStatus.downloading;
   }
 
+  bool isFailed(String episodeId, String partLabel, {String? showId, String? title}) {
+    final item = _findItem(episodeId, partLabel, showId: showId, title: title);
+    return item?.status == DownloadStatus.failed || item?.status == DownloadStatus.paused;
+  }
+
   DownloadItem? getItem(String episodeId, String partLabel, {String? showId, String? title}) {
     return _findItem(episodeId, partLabel, showId: showId, title: title);
   }
@@ -615,12 +632,98 @@ class DownloadManager extends ChangeNotifier {
     }
   }
 
-  Future<void> startDownload(CatalogEpisode episode, CatalogPart part, {int? maxBytes}) async {
+  bool _isValidPartialFile(File file) {
+    if (!file.existsSync()) return false;
+    final len = file.lengthSync();
+    if (len < 1024) return false;
+    try {
+      final raf = file.openSync(mode: FileMode.read);
+      try {
+        final headerBytes = raf.readSync(64);
+        final head = String.fromCharCodes(headerBytes).trimLeft().toLowerCase();
+        if (head.startsWith('<html') ||
+            head.startsWith('<!doc') ||
+            head.startsWith('<?xml') ||
+            head.startsWith('{')) {
+          return false;
+        }
+      } finally {
+        raf.closeSync();
+      }
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  int _deleteFileQuietly(File file) {
+    if (!file.existsSync()) return 0;
+    try {
+      final len = file.lengthSync();
+      file.deleteSync();
+      return len;
+    } catch (_) {
+      return 0;
+    }
+  }
+
+  String _formatDownloadError(Object err) {
+    if (err is _DownloadHttpException) {
+      if (err.statusCode == 403 || err.statusCode == 410) {
+        return '下載連結已失效 (HTTP ${err.statusCode})，請重試以重新取得網址';
+      }
+      if (err.statusCode == 404) {
+        return '伺服器找不到此影片檔案 (HTTP 404)';
+      }
+      if (err.statusCode == 416) {
+        return '續傳範圍無效 (HTTP 416)，請重試從頭下載';
+      }
+      return '伺服器連線異常 (HTTP ${err.statusCode})';
+    }
+    if (err is TimeoutException) {
+      return '下載連線逾時，請檢查網路狀態後重試';
+    }
+    if (err is SocketException) {
+      return '網路連線中斷，請確認連線後重試';
+    }
+    if (err is FileSystemException) {
+      final msg = err.message.toLowerCase();
+      if (msg.contains('space') || err.osError?.errorCode == 28) {
+        return '裝置儲存空間不足，請釋出空間後再試';
+      }
+      return '無法寫入儲存空間：${err.message}';
+    }
+    final raw = err.toString().replaceFirst('Exception: ', '');
+    return raw.isNotEmpty ? raw : '下載失敗，請稍後重試';
+  }
+
+  bool _shouldRetryError(Object err) {
+    if (err is FileSystemException) {
+      final msg = err.message.toLowerCase();
+      if (msg.contains('space') || err.osError?.errorCode == 28) return false;
+    }
+    if (err is _DownloadHttpException) {
+      return err.statusCode == 416 ||
+          err.statusCode == 403 ||
+          err.statusCode == 410 ||
+          err.statusCode >= 500 ||
+          err.statusCode == 429;
+    }
+    return err is TimeoutException || err is SocketException || err is HttpException;
+  }
+
+  Future<bool> startDownload(
+    CatalogEpisode episode,
+    CatalogPart part, {
+    int? maxBytes,
+    http.Client? client,
+    Duration retryDelay = const Duration(milliseconds: 600),
+  }) async {
     // Synchronous mutex to prevent race condition from double-tapping or multiple triggers
     final startLockKey = '${episode.date}_${episode.id}_${part.label}';
     if (_inFlightStarts.contains(startLockKey)) {
       debugPrint('startDownload already in flight for $startLockKey');
-      return;
+      return false;
     }
     _inFlightStarts.add(startLockKey);
 
@@ -653,23 +756,24 @@ class DownloadManager extends ChangeNotifier {
         debugPrint('Episode ${episode.title} - ${part.label} is already downloaded.');
         if (existingItem != null) {
           existingItem.status = DownloadStatus.completed;
+          existingItem.error = null;
           _items[_buildKey(episode.id, part.label)] = existingItem;
           await _saveManifest();
           notifyListeners();
         }
-        return;
+        return true;
       }
 
       if (isDownloading(episode.id, part.label, showId: showId, title: episode.title)) {
         debugPrint('Already downloading: ${episode.id} - ${part.label}');
-        return;
+        return false;
       }
 
       final key = _buildKey(episode.id, part.label);
-      int existingBytes = 0;
-      if (targetFile.existsSync()) {
-        existingBytes = targetFile.lengthSync();
+      if (targetFile.existsSync() && !_isValidPartialFile(targetFile)) {
+        _deleteFileQuietly(targetFile);
       }
+      int existingBytes = targetFile.existsSync() ? targetFile.lengthSync() : 0;
 
       var downloadItem = existingItem ?? _items[key];
       if (downloadItem == null) {
@@ -694,162 +798,257 @@ class DownloadManager extends ChangeNotifier {
       }
       final DownloadItem currentItem = downloadItem;
       notifyListeners();
-      notifyListeners();
 
-      final client = http.Client();
-      _activeClients[key] = client;
+      const int maxAttempts = 3;
+      Object? lastError;
 
-      try {
-        // 1. Resolve live direct MP4 stream URL
-        String? streamUrl;
-        if (part.url.isNotEmpty) {
-          try {
-            final res = await http.get(
-              Uri.parse(part.url),
-              headers: {
-                'User-Agent': 'Mozilla/5.0 (Linux; Android 14; sdk_gphone64_x86_64)',
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-              },
-            ).timeout(const Duration(seconds: 8));
-            if (res.statusCode == 200) {
-              streamUrl = CatalogParser.parseStreamUrl(res.body);
-            }
-          } catch (_) {}
+      for (int attempt = 1; attempt <= maxAttempts; attempt++) {
+        if (currentItem.status == DownloadStatus.paused) {
+          return false;
         }
 
-        if (streamUrl == null || streamUrl.isEmpty) {
-          if (part.streamUrl.isNotEmpty) {
-            streamUrl = part.streamUrl;
-          } else if (part.fallbackStreamUrl.isNotEmpty) {
-            streamUrl = part.fallbackStreamUrl;
-          }
-        }
+        final activeClient = client ?? http.Client();
+        _activeClients[key] = activeClient;
+        IOSink? sink;
 
-        if (streamUrl == null || streamUrl.isEmpty) {
-          throw Exception('無法取得下載串流權杖');
-        }
-
-        // 2. Prepare HTTP request with Range support for resuming
-        final request = http.Request('GET', Uri.parse(streamUrl));
-        request.headers.addAll({
-          'Referer': 'https://srgoideas.com/',
-          'User-Agent': 'Mozilla/5.0 (Linux; Android 14; sdk_gphone64_x86_64)',
-        });
-
-        if (existingBytes > 0) {
-          request.headers['Range'] = 'bytes=$existingBytes-';
-        }
-
-        final streamedResponse = await client.send(request);
-
-        if (streamedResponse.statusCode != 200 && streamedResponse.statusCode != 206) {
-          throw Exception('下載連線失敗: HTTP ${streamedResponse.statusCode}');
-        }
-
-        FileMode writeMode = FileMode.write;
-        int startOffset = 0;
-
-        if (streamedResponse.statusCode == 206) {
-          // Resuming from partial download
-          writeMode = FileMode.append;
-          startOffset = existingBytes;
-          currentItem.totalBytes = startOffset + (streamedResponse.contentLength ?? 0);
-        } else {
-          // Starting fresh
-          writeMode = FileMode.write;
-          startOffset = 0;
-          currentItem.totalBytes = streamedResponse.contentLength ?? 0;
-        }
-
-        final sink = targetFile.openWrite(mode: writeMode);
-        int received = startOffset;
-        var lastNotifyTime = DateTime.now();
-        int lastNotifyBytes = received;
-
-        late StreamSubscription<List<int>> subscription;
-        final completer = Completer<void>();
-
-        subscription = streamedResponse.stream.listen(
-          (chunk) {
-            sink.add(chunk);
-            received += chunk.length;
-            currentItem.downloadedBytes = received;
-
-            final now = DateTime.now();
-            final ms = now.difference(lastNotifyTime).inMilliseconds;
-            // Throttle updates: every 400ms or 500KB
-            if (ms >= 400 || (received - lastNotifyBytes) > 500 * 1024) {
-              if (ms > 0) {
-                currentItem.speedBytesPerSec = (received - lastNotifyBytes) / (ms / 1000.0);
+        try {
+          // 1. Resolve live direct MP4 stream URL (fresh resolve on retry handles expired CDN tokens)
+          String? streamUrl;
+          if (part.url.isNotEmpty) {
+            try {
+              final res = await activeClient
+                  .get(
+                    Uri.parse(part.url),
+                    headers: {
+                      'User-Agent': 'Mozilla/5.0 (Linux; Android 14; sdk_gphone64_x86_64)',
+                      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                    },
+                  )
+                  .timeout(const Duration(seconds: 8));
+              if (res.statusCode == 200) {
+                streamUrl = CatalogParser.parseStreamUrl(res.body);
               }
-              lastNotifyTime = now;
-              lastNotifyBytes = received;
-              notifyListeners();
-            }
+            } catch (_) {}
+          }
 
-            if (maxBytes != null && received >= maxBytes) {
-              subscription.cancel();
+          if (streamUrl == null || streamUrl.isEmpty) {
+            if (part.streamUrl.isNotEmpty) {
+              streamUrl = part.streamUrl;
+            } else if (part.fallbackStreamUrl.isNotEmpty) {
+              streamUrl = part.fallbackStreamUrl;
+            }
+          }
+
+          if (streamUrl == null || streamUrl.isEmpty) {
+            throw Exception('無法取得下載串流位址');
+          }
+
+          // Re-check partial file validity before sending Range request
+          if (targetFile.existsSync() && !_isValidPartialFile(targetFile)) {
+            _deleteFileQuietly(targetFile);
+            existingBytes = 0;
+            currentItem.downloadedBytes = 0;
+          } else {
+            existingBytes = targetFile.existsSync() ? targetFile.lengthSync() : 0;
+          }
+
+          final request = http.Request('GET', Uri.parse(streamUrl));
+          request.headers.addAll({
+            'Referer': 'https://srgoideas.com/',
+            'User-Agent': 'Mozilla/5.0 (Linux; Android 14; sdk_gphone64_x86_64)',
+          });
+          if (existingBytes > 0) {
+            request.headers['Range'] = 'bytes=$existingBytes-';
+          }
+
+          final streamedResponse = await activeClient.send(request).timeout(const Duration(seconds: 20));
+
+          if (streamedResponse.statusCode == 416) {
+            // Partial file exceeds/mismatches remote content length: clear partial and restart cleanly from 0
+            await streamedResponse.stream.drain<void>().catchError((_) {});
+            _deleteFileQuietly(targetFile);
+            existingBytes = 0;
+            currentItem.downloadedBytes = 0;
+            currentItem.totalBytes = 0;
+            throw const _DownloadHttpException(416);
+          }
+
+          if (streamedResponse.statusCode != 200 && streamedResponse.statusCode != 206) {
+            await streamedResponse.stream.drain<void>().catchError((_) {});
+            throw _DownloadHttpException(streamedResponse.statusCode);
+          }
+
+          final FileMode writeMode = streamedResponse.statusCode == 206 ? FileMode.append : FileMode.write;
+          final int startOffset = streamedResponse.statusCode == 206 ? existingBytes : 0;
+          if (streamedResponse.statusCode == 206) {
+            currentItem.totalBytes = startOffset + (streamedResponse.contentLength ?? 0);
+          } else {
+            currentItem.totalBytes = streamedResponse.contentLength ?? 0;
+          }
+
+          sink = targetFile.openWrite(mode: writeMode);
+          int received = startOffset;
+          var lastNotifyTime = DateTime.now();
+          int lastNotifyBytes = received;
+
+          late StreamSubscription<List<int>> subscription;
+          final completer = Completer<void>();
+
+          subscription = streamedResponse.stream.listen(
+            (chunk) {
+              sink?.add(chunk);
+              received += chunk.length;
+              currentItem.downloadedBytes = received;
+
+              final now = DateTime.now();
+              final ms = now.difference(lastNotifyTime).inMilliseconds;
+              if (ms >= 400 || (received - lastNotifyBytes) > 500 * 1024) {
+                if (ms > 0) {
+                  currentItem.speedBytesPerSec = (received - lastNotifyBytes) / (ms / 1000.0);
+                }
+                lastNotifyTime = now;
+                lastNotifyBytes = received;
+                notifyListeners();
+              }
+
+              if (maxBytes != null && received >= maxBytes) {
+                subscription.cancel();
+                if (!completer.isCompleted) completer.complete();
+              }
+            },
+            onError: (err) {
+              if (!completer.isCompleted) completer.completeError(err);
+            },
+            onDone: () {
               if (!completer.isCompleted) completer.complete();
+            },
+            cancelOnError: true,
+          );
+
+          await completer.future;
+
+          await sink.flush();
+          await sink.close();
+          sink = null;
+          _activeClients.remove(key);
+          if (client == null) {
+            activeClient.close();
+          }
+
+          currentItem.downloadedBytes = received;
+          if (currentItem.totalBytes <= 0 || received >= currentItem.totalBytes) {
+            currentItem.totalBytes = received;
+          }
+          currentItem.speedBytesPerSec = 0.0;
+          currentItem.error = null;
+          currentItem.status = DownloadStatus.completed;
+          await _saveManifest();
+          notifyListeners();
+          return true;
+        } catch (e) {
+          lastError = e;
+          debugPrint('Download attempt $attempt/$maxAttempts failed: $e');
+          try {
+            await sink?.close();
+          } catch (_) {}
+          _activeClients.remove(key);
+          if (client == null) {
+            try {
+              activeClient.close();
+            } catch (_) {}
+          }
+          currentItem.speedBytesPerSec = 0.0;
+
+          if (currentItem.status == DownloadStatus.paused) {
+            await _saveManifest();
+            notifyListeners();
+            return false;
+          }
+
+          if (attempt < maxAttempts && _shouldRetryError(e)) {
+            if (retryDelay > Duration.zero) {
+              await Future.delayed(retryDelay * attempt);
             }
-          },
-          onError: (err) {
-            if (!completer.isCompleted) completer.completeError(err);
-          },
-          onDone: () {
-            if (!completer.isCompleted) completer.complete();
-          },
-          cancelOnError: true,
-        );
-
-        await completer.future;
-
-        await sink.flush();
-        await sink.close();
-        client.close();
-        _activeClients.remove(key);
-
-        currentItem.downloadedBytes = received;
-        if (currentItem.totalBytes <= 0 || received >= currentItem.totalBytes) {
-          currentItem.totalBytes = received;
+            continue;
+          }
+          break;
         }
-        currentItem.speedBytesPerSec = 0.0;
-        currentItem.status = DownloadStatus.completed;
+      }
+
+      if (currentItem.status != DownloadStatus.paused && currentItem.status != DownloadStatus.completed) {
+        currentItem.status = DownloadStatus.failed;
+        currentItem.error = _formatDownloadError(lastError ?? Exception('未知錯誤'));
+        currentItem.downloadedBytes = targetFile.existsSync() ? targetFile.lengthSync() : 0;
         await _saveManifest();
         notifyListeners();
-      } catch (e) {
-        debugPrint('Download interrupted/failed: $e');
-        _activeClients.remove(key);
-        currentItem.speedBytesPerSec = 0.0;
-
-        // Check if task was paused by user or completed via maxBytes
-        if (currentItem.status != DownloadStatus.paused && currentItem.status != DownloadStatus.completed) {
-          currentItem.status = DownloadStatus.failed;
-          currentItem.error = e.toString();
-        }
-        // Note: We preserve the partial file on disk so the user can RESUME anytime!
-        notifyListeners();
       }
+      return false;
     } finally {
       _inFlightStarts.remove(startLockKey);
     }
   }
 
-  Future<void> deleteDownload(String episodeId, String partLabel, {String? showId, String? title}) async {
+  Future<int> deleteDownload(String episodeId, String partLabel, {String? showId, String? title}) async {
     final item = _findItem(episodeId, partLabel, showId: showId, title: title);
     cancelDownload(episodeId, partLabel, showId: showId, title: title);
 
+    int freedBytes = 0;
     if (item != null) {
       final filePath = item.localFilePath;
-      final file = File(filePath);
-      if (file.existsSync()) {
-        try {
-          file.deleteSync();
-        } catch (_) {}
+      if (filePath.isNotEmpty) {
+        freedBytes += _deleteFileQuietly(File(filePath));
+        freedBytes += _deleteFileQuietly(File('$filePath.tmp'));
       }
-      _items.removeWhere((k, v) => v.localFilePath == filePath || v == item);
+      _items.removeWhere((k, v) =>
+          v == item || (filePath.isNotEmpty && v.localFilePath == filePath));
       await _saveManifest();
       notifyListeners();
     }
+    return freedBytes;
+  }
+
+  /// Deletes all parts (completed, downloading, paused, failed, and partial files) for [episode].
+  /// Returns the total freed disk bytes.
+  Future<int> deleteEpisodeDownloads(CatalogEpisode episode) async {
+    int freedBytes = 0;
+    final showId = episode.showId.isNotEmpty
+        ? episode.showId
+        : CatalogParser.detectShowId('${episode.title} ${episode.id}');
+
+    for (final p in episode.parts) {
+      final item = _findItem(episode.id, p.label, showId: showId, title: episode.title);
+      if (item != null) {
+        freedBytes += await deleteDownload(
+          episode.id,
+          p.label,
+          showId: showId,
+          title: episode.title,
+        );
+      }
+    }
+
+    // Catch any tracked items whose partLabel wasn't in episode.parts
+    final remainingKeys = <String>[];
+    final normEpId = _normalizeId(episode.id);
+    for (final entry in _items.entries) {
+      final it = entry.value;
+      final sameId = _normalizeId(it.episodeId) == normEpId || it.episodeId == episode.id;
+      final sameShowDate = showId.isNotEmpty &&
+          it.showId == showId &&
+          episode.date.isNotEmpty &&
+          it.date == episode.date;
+      if (sameId || sameShowDate) {
+        remainingKeys.add(entry.key);
+      }
+    }
+    for (final k in remainingKeys) {
+      final it = _items[k];
+      if (it != null) {
+        freedBytes += await deleteDownload(it.episodeId, it.partLabel, showId: it.showId, title: it.episodeTitle);
+      }
+    }
+
+    return freedBytes;
   }
 
   /// One-click batch download all un-downloaded parts of an episode sequentially
@@ -862,27 +1061,28 @@ class DownloadManager extends ChangeNotifier {
     }
   }
 
-  /// Purges all downloaded files and clears the manifest
-  Future<void> deleteAllDownloads() async {
+  /// Purges all downloaded/partial/failed files and clears the manifest.
+  /// Returns total freed disk bytes.
+  Future<int> deleteAllDownloads() async {
     final clients = List<http.Client>.from(_activeClients.values);
     for (final c in clients) {
-      c.close();
+      try {
+        c.close();
+      } catch (_) {}
     }
     _activeClients.clear();
 
-    final filePaths = _items.values.map((e) => e.localFilePath).toSet();
+    int freedBytes = 0;
+    final filePaths = _items.values.map((e) => e.localFilePath).where((p) => p.isNotEmpty).toSet();
     for (final path in filePaths) {
-      try {
-        final f = File(path);
-        if (f.existsSync()) {
-          f.deleteSync();
-        }
-      } catch (_) {}
+      freedBytes += _deleteFileQuietly(File(path));
+      freedBytes += _deleteFileQuietly(File('$path.tmp'));
     }
 
     _items.clear();
     await _saveManifest();
     notifyListeners();
+    return freedBytes;
   }
 
   /// Auto-clean single watched downloaded file to free up storage
@@ -899,8 +1099,14 @@ class DownloadManager extends ChangeNotifier {
     final seen = <String>{};
     int total = 0;
     for (final item in _items.values) {
-      if (item.status == DownloadStatus.completed || item.status == DownloadStatus.downloading) {
-        if (seen.add(item.localFilePath)) {
+      if (item.status == DownloadStatus.completed ||
+          item.status == DownloadStatus.downloading ||
+          item.status == DownloadStatus.failed ||
+          item.status == DownloadStatus.paused) {
+        final dedupKey = item.localFilePath.isNotEmpty
+            ? item.localFilePath
+            : _buildKey(item.episodeId, item.partLabel);
+        if (seen.add(dedupKey)) {
           total += item.downloadedBytes;
         }
       }
@@ -924,4 +1130,12 @@ class DownloadManager extends ChangeNotifier {
     }
     return '${(bytesPerSec / (1024 * 1024)).toStringAsFixed(1)} MB/s';
   }
+}
+
+class _DownloadHttpException implements Exception {
+  final int statusCode;
+  const _DownloadHttpException(this.statusCode);
+
+  @override
+  String toString() => 'HTTP $statusCode';
 }

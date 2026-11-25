@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 /// Primitive palette values for dTVSteams (Netflix Edition).
 abstract final class AppPrimitives {
@@ -29,6 +30,8 @@ abstract final class AppColors {
   static const Color successSurface = Color(0xFF13381B);
   static const Color successMutedSurface = Color(0xFF1F2E22);
   static const Color dangerSurface = Color(0xFF331111);
+  static const Color warning = Color(0xFFFFB300);
+  static const Color warningSurface = Color(0xFF33260D);
   static const Color surfaceSunken = Color(0xFF191919);
 
   static const Color textPrimary = Colors.white;
@@ -67,4 +70,25 @@ abstract final class AppCardTokens {
   static const double actionVisualSize = 36.0;
   static const double actionHitSize = 44.0;
   static const double actionIconSize = 18.0;
+}
+
+/// Shared Android/iOS system chrome helpers so exiting fullscreen playback
+/// reliably restores native top status and bottom navigation bars.
+abstract final class AppSystemUi {
+  static const SystemUiOverlayStyle normalOverlayStyle = SystemUiOverlayStyle(
+    statusBarColor: AppColors.canvas,
+    statusBarIconBrightness: Brightness.light,
+    statusBarBrightness: Brightness.dark,
+    systemNavigationBarColor: AppColors.canvas,
+    systemNavigationBarIconBrightness: Brightness.light,
+    systemNavigationBarDividerColor: AppColors.borderSubtle,
+  );
+
+  static void restoreNormalChrome() {
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.manual,
+      overlays: SystemUiOverlay.values,
+    );
+    SystemChrome.setSystemUIOverlayStyle(normalOverlayStyle);
+  }
 }

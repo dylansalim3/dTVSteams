@@ -1,6 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
+import 'package:dtvsteams/catalog/parser.dart';
 import 'package:dtvsteams/services/download_manager.dart';
 import 'package:dtvsteams/ui/downloads_screen.dart';
 import 'package:dtvsteams/ui/episode_card.dart';
@@ -195,6 +198,172 @@ void main() {
       await tester.tap(find.text('觀看紀錄').last);
       await tester.pumpAndSettle();
       expect(find.text('尚無觀看歷史紀錄'), findsOneWidget);
+    });
+
+    test('startDownload resets on HTTP 416 and succeeds on auto-retry; persistent failed state records error', () async {
+      manager.setDirectoryForTesting(tempDir.path);
+      final ep = CatalogEpisode(
+        id: 'https://example.com/retry_ep',
+        title: '綜藝玩很大 2026-11-25 台北 重試測試',
+        date: '2026-11-25',
+        url: 'https://example.com/retry_ep',
+        showId: 'mr_player',
+        showName: '綜藝玩很大',
+        parts: [
+          CatalogPart(
+            label: 'Part 1',
+            url: '',
+            streamUrl: 'https://cdn.example.com/video_ok.mp4',
+          ),
+          CatalogPart(
+            label: 'Part 2',
+            url: '',
+            streamUrl: 'https://cdn.example.com/video_fail.mp4',
+          ),
+        ],
+      );
+
+      // Part 1: 1st request gets 416 (with stale partial file), retry gets 200 and succeeds
+      final partialPath =
+          '${tempDir.path}/mr_player_2026-11-25_綜藝玩很大_2026-11-25_台北_重試測試_Part 1.mp4';
+      File(partialPath).writeAsBytesSync(List.filled(2048, 0x41));
+
+      int part1Calls = 0;
+      final retryClient = MockClient.streaming((request, bodyStream) async {
+        part1Calls++;
+        if (part1Calls == 1) {
+          expect(request.headers['Range'], isNotNull);
+          return http.StreamedResponse(const Stream.empty(), 416);
+        }
+        expect(request.headers['Range'], isNull);
+        final payload = List.filled(1500, 0x42);
+        return http.StreamedResponse(Stream.value(payload), 200, contentLength: payload.length);
+      });
+
+      final ok = await manager.startDownload(
+        ep,
+        ep.parts[0],
+        client: retryClient,
+        retryDelay: Duration.zero,
+      );
+      expect(ok, isTrue);
+      expect(part1Calls, equals(2));
+      expect(manager.isDownloaded(ep.id, 'Part 1', showId: 'mr_player', title: ep.title), isTrue);
+
+      // Part 2: persistent HTTP 500 exhausts retries and persists failed state + error
+      int part2Calls = 0;
+      final failClient = MockClient.streaming((request, bodyStream) async {
+        part2Calls++;
+        return http.StreamedResponse(const Stream.empty(), 500);
+      });
+
+      final failOk = await manager.startDownload(
+        ep,
+        ep.parts[1],
+        client: failClient,
+        retryDelay: Duration.zero,
+      );
+      expect(failOk, isFalse);
+      expect(part2Calls, equals(3));
+      expect(manager.isFailed(ep.id, 'Part 2', showId: 'mr_player', title: ep.title), isTrue);
+      final failedItem = manager.getItem(ep.id, 'Part 2', showId: 'mr_player', title: ep.title);
+      expect(failedItem?.error, contains('500'));
+      final manifestContent = File('${tempDir.path}/manifest.json').readAsStringSync();
+      expect(manifestContent, contains('"status":"failed"'));
+    });
+
+    testWidgets('Failed download surfaces retry UI, sheet delete confirms, and episode delete clears failed+completed parts',
+        (WidgetTester tester) async {
+      manager.setDirectoryForTesting(tempDir.path);
+      final fComp = File('${tempDir.path}/ep_mix_p1.mp4')..writeAsStringSync('complete_bytes');
+      final fFail = File('${tempDir.path}/ep_mix_p2.mp4')..writeAsStringSync('partial_bytes');
+
+      final ep = CatalogEpisode(
+        id: 'https://example.com/mix_ep',
+        title: '綜藝玩很大 2026-11-25 花蓮 失敗與刪除測試',
+        date: '2026-11-25',
+        url: 'https://example.com/mix_ep',
+        showId: 'mr_player',
+        showName: '綜藝玩很大',
+        parts: [
+          CatalogPart(label: 'Part 1', url: 'https://example.com/p1'),
+          CatalogPart(label: 'Part 2', url: 'https://example.com/p2'),
+        ],
+      );
+
+      manager.addItemForTesting(DownloadItem(
+        episodeId: ep.id,
+        episodeTitle: ep.title,
+        showId: 'mr_player',
+        showName: '綜藝玩很大',
+        partLabel: 'Part 1',
+        partUrl: 'https://example.com/p1',
+        localFilePath: fComp.path,
+        date: ep.date,
+        downloadedBytes: fComp.lengthSync(),
+        totalBytes: fComp.lengthSync(),
+        status: DownloadStatus.completed,
+      ));
+      manager.addItemForTesting(DownloadItem(
+        episodeId: ep.id,
+        episodeTitle: ep.title,
+        showId: 'mr_player',
+        showName: '綜藝玩很大',
+        partLabel: 'Part 2',
+        partUrl: 'https://example.com/p2',
+        localFilePath: fFail.path,
+        date: ep.date,
+        downloadedBytes: fFail.lengthSync(),
+        totalBytes: 1000,
+        status: DownloadStatus.failed,
+        error: '網路連線中斷，請確認連線後重試',
+      ));
+
+      await tester.pumpWidget(MaterialApp(
+        home: Scaffold(
+          body: YouTubeEpisodeCard(
+            episode: ep,
+            isDownloadView: true,
+            onPlayTapped: () {},
+            onPartTapped: (_) {},
+            onDeleteTapped: () async {
+              await manager.deleteEpisodeDownloads(ep);
+            },
+          ),
+        ),
+      ));
+      await tester.pumpAndSettle();
+
+      // Card surfaces failed badge and failed chip
+      expect(find.text('下載失敗 1 • 點擊重試'), findsOneWidget);
+      expect(find.text('Part 2 (失敗)'), findsOneWidget);
+
+      // Open download selection sheet from failed badge
+      await tester.tap(find.text('下載失敗 1 • 點擊重試'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('重試下載 (Part 2)'), findsOneWidget);
+      expect(find.text('網路連線中斷，請確認連線後重試'), findsOneWidget);
+
+      // Tapping delete on completed Part 1 inside sheet requires confirmation
+      await tester.tap(find.byTooltip('刪除下載檔案').first);
+      await tester.pumpAndSettle();
+
+      expect(find.text('刪除離線檔案'), findsOneWidget);
+      await tester.tap(find.text('刪除'));
+      await tester.pumpAndSettle();
+
+      expect(fComp.existsSync(), isFalse);
+      expect(find.textContaining('已刪除 Part 1'), findsOneWidget);
+
+      // Close sheet and confirm episode-level delete removes remaining failed part too
+      await tester.tap(find.byIcon(Icons.close));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('刪除此集離線檔案'));
+      await tester.pumpAndSettle();
+
+      expect(fFail.existsSync(), isFalse);
+      expect(manager.failedDownloads, isEmpty);
     });
   });
 }

@@ -36,9 +36,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
   Widget build(BuildContext context) {
     final records = _historyManager.allRecordsSorted;
 
-    return Scaffold(
-      backgroundColor: AppColors.canvas,
-      appBar: AppBar(
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: AppSystemUi.normalOverlayStyle,
+      child: Scaffold(
+        backgroundColor: AppColors.canvas,
+        appBar: AppBar(
         backgroundColor: AppColors.surfaceOverlay,
         elevation: 0,
         bottom: const PreferredSize(
@@ -87,7 +89,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
             ),
         ],
       ),
-      body: const HistoryBody(),
+      body: const SafeArea(
+        top: false,
+        child: HistoryBody(),
+      ),
+    ),
     );
   }
 }

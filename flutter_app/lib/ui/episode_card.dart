@@ -36,6 +36,7 @@ class TripleCircleDownloadButton extends StatelessWidget {
     final progresses = <double>[];
     final isDownloadingList = <bool>[];
     final isDownloadedList = <bool>[];
+    final isFailedList = <bool>[];
 
     for (int i = 0; i < totalParts; i++) {
       if (i < parts.length) {
@@ -44,28 +45,35 @@ class TripleCircleDownloadButton extends StatelessWidget {
             showId: episode.showId, title: episode.title);
         final isDl = downloadManager.isDownloading(episode.id, p.label,
             showId: episode.showId, title: episode.title);
+        final isFail = downloadManager.isFailed(episode.id, p.label,
+            showId: episode.showId, title: episode.title);
         final item = downloadManager.getItem(episode.id, p.label,
             showId: episode.showId, title: episode.title);
 
         isDownloadedList.add(isDown);
         isDownloadingList.add(isDl);
-        progresses.add(isDown ? 1.0 : (isDl && item != null ? item.progress : 0.0));
+        isFailedList.add(isFail);
+        progresses.add(isDown ? 1.0 : ((isDl || isFail) && item != null ? item.progress : 0.0));
       } else {
         isDownloadedList.add(false);
         isDownloadingList.add(false);
+        isFailedList.add(false);
         progresses.add(0.0);
       }
     }
 
     final allDownloaded = isDownloadedList.isNotEmpty && isDownloadedList.every((d) => d);
     final anyDownloading = isDownloadingList.any((d) => d);
+    final anyFailed = isFailedList.any((f) => f);
 
     return TvFocusableButton(
       onPressed: onTap,
       child: Tooltip(
         message: allDownloaded
             ? '已下載全部分段 (點擊管理)'
-            : (anyDownloading ? '分段下載中 (點擊查看)' : '下載此集分段'),
+            : (anyDownloading
+                ? '分段下載中 (點擊查看)'
+                : (anyFailed ? '部分分段下載失敗 (點擊重試)' : '下載此集分段')),
         child: SizedBox(
           width: AppCardTokens.actionHitSize,
           height: AppCardTokens.actionHitSize,
@@ -91,8 +99,10 @@ class TripleCircleDownloadButton extends StatelessWidget {
                       progresses: progresses,
                       isDownloading: isDownloadingList,
                       isDownloaded: isDownloadedList,
+                      isFailed: isFailedList,
                       allDownloaded: allDownloaded,
                       anyDownloading: anyDownloading,
+                      anyFailed: anyFailed,
                     ),
                   ),
                 ),
@@ -110,15 +120,19 @@ class TripleRingPainter extends CustomPainter {
   final List<double> progresses;
   final List<bool> isDownloading;
   final List<bool> isDownloaded;
+  final List<bool> isFailed;
   final bool allDownloaded;
   final bool anyDownloading;
+  final bool anyFailed;
 
   TripleRingPainter({
     required this.progresses,
     required this.isDownloading,
     required this.isDownloaded,
+    required this.isFailed,
     required this.allDownloaded,
     required this.anyDownloading,
+    required this.anyFailed,
   });
 
   @override
@@ -140,6 +154,7 @@ class TripleRingPainter extends CustomPainter {
       final partStart = baseStart + (i * totalAnglePerPart) + (gapAngle / 2);
       final isDown = i < isDownloaded.length && isDownloaded[i];
       final isDl = i < isDownloading.length && isDownloading[i];
+      final isFail = i < isFailed.length && isFailed[i];
       final progress = i < progresses.length ? progresses[i] : 0.0;
 
       // 1. Background arc track for this pie piece
@@ -151,7 +166,9 @@ class TripleRingPainter extends CustomPainter {
             ? AppColors.success.withValues(alpha: 0.25)
             : (isDl
                 ? AppColors.accent.withValues(alpha: 0.25)
-                : Colors.white.withValues(alpha: 0.20));
+                : (isFail
+                    ? AppColors.warning.withValues(alpha: 0.35)
+                    : Colors.white.withValues(alpha: 0.20)));
 
       canvas.drawArc(
         Rect.fromCircle(center: center, radius: radius),
@@ -161,7 +178,7 @@ class TripleRingPainter extends CustomPainter {
         bgPaint,
       );
 
-      // 2. Completed / Downloading arc for this pie piece
+      // 2. Completed / Downloading / Failed arc for this pie piece
       if (isDown) {
         final fgPaint = Paint()
           ..style = PaintingStyle.stroke
@@ -176,18 +193,32 @@ class TripleRingPainter extends CustomPainter {
           false,
           fgPaint,
         );
-      } else if (isDl && progress > 0.0) {
+      } else if ((isDl || isFail) && progress > 0.0) {
         final fgPaint = Paint()
           ..style = PaintingStyle.stroke
           ..strokeCap = StrokeCap.round
           ..strokeWidth = strokeWidth
-          ..color = AppColors.accent;
+          ..color = isFail ? AppColors.warning : AppColors.accent;
 
         final fillSweep = math.max(arcLength * 0.12, arcLength * progress);
         canvas.drawArc(
           Rect.fromCircle(center: center, radius: radius),
           partStart,
           fillSweep,
+          false,
+          fgPaint,
+        );
+      } else if (isFail) {
+        final fgPaint = Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeCap = StrokeCap.round
+          ..strokeWidth = strokeWidth
+          ..color = AppColors.warning;
+
+        canvas.drawArc(
+          Rect.fromCircle(center: center, radius: radius),
+          partStart,
+          arcLength * 0.28,
           false,
           fgPaint,
         );
@@ -207,6 +238,23 @@ class TripleRingPainter extends CustomPainter {
         ..strokeWidth = 1.8;
       canvas.drawLine(p1, p2, checkPaint);
       canvas.drawLine(p2, p3, checkPaint);
+    } else if (anyFailed && !anyDownloading) {
+      // Warning Exclamation Icon
+      final warnPaint = Paint()
+        ..color = AppColors.warning
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
+        ..strokeWidth = 2.0;
+      canvas.drawLine(
+        Offset(center.dx, center.dy - 4.0),
+        Offset(center.dx, center.dy + 1.0),
+        warnPaint,
+      );
+      canvas.drawCircle(
+        Offset(center.dx, center.dy + 3.8),
+        1.1,
+        Paint()..color = AppColors.warning,
+      );
     } else {
       // Crisp Download Arrow & Tray
       final arrowColor = anyDownloading ? AppColors.accent : AppColors.textSecondary;
@@ -243,9 +291,144 @@ class TripleRingPainter extends CustomPainter {
   bool shouldRepaint(covariant TripleRingPainter oldDelegate) {
     return allDownloaded != oldDelegate.allDownloaded ||
         anyDownloading != oldDelegate.anyDownloading ||
+        anyFailed != oldDelegate.anyFailed ||
         !listEquals(progresses, oldDelegate.progresses) ||
         !listEquals(isDownloading, oldDelegate.isDownloading) ||
-        !listEquals(isDownloaded, oldDelegate.isDownloaded);
+        !listEquals(isDownloaded, oldDelegate.isDownloaded) ||
+        !listEquals(isFailed, oldDelegate.isFailed);
+  }
+}
+
+void _startPartDownloadWithFeedback({
+  required ScaffoldMessengerState messenger,
+  required NavigatorState navigator,
+  required DownloadManager downloadManager,
+  required CatalogEpisode episode,
+  required CatalogPart part,
+  required String showId,
+}) {
+  messenger.removeCurrentSnackBar();
+  messenger.showSnackBar(
+    SnackBar(
+      content: Text('已開始下載 ${episode.title} - ${part.label}'),
+      backgroundColor: AppColors.accent,
+      action: SnackBarAction(
+        label: '查看進度',
+        textColor: AppColors.textPrimary,
+        onPressed: () => navigator.push(
+          MaterialPageRoute(builder: (_) => const DownloadsScreen()),
+        ),
+      ),
+    ),
+  );
+
+  downloadManager.startDownload(episode, part).then((ok) {
+    if (!ok && messenger.mounted) {
+      final failedItem = downloadManager.getItem(
+        episode.id,
+        part.label,
+        showId: showId,
+        title: episode.title,
+      );
+      if (failedItem?.status == DownloadStatus.failed) {
+        messenger.removeCurrentSnackBar();
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(
+              '下載失敗 (${part.label})：${failedItem?.error ?? "請檢查網路後重試"}',
+            ),
+            backgroundColor: AppColors.warningSurface,
+            duration: const Duration(seconds: 5),
+            action: SnackBarAction(
+              label: '重試',
+              textColor: AppColors.warning,
+              onPressed: () => _startPartDownloadWithFeedback(
+                messenger: messenger,
+                navigator: navigator,
+                downloadManager: downloadManager,
+                episode: episode,
+                part: part,
+                showId: showId,
+              ),
+            ),
+          ),
+        );
+      }
+    }
+  });
+}
+
+Future<void> _confirmDeletePart({
+  required BuildContext dialogContext,
+  required ScaffoldMessengerState messenger,
+  required DownloadManager downloadManager,
+  required CatalogEpisode episode,
+  required CatalogPart part,
+  required String showId,
+  required bool isDownloading,
+  required bool isFailed,
+  required VoidCallback onDeleted,
+}) async {
+  final actionVerb = isDownloading ? '取消並刪除' : (isFailed ? '刪除失敗紀錄與暫存' : '刪除離線檔案');
+  final confirmed = await showDialog<bool>(
+    context: dialogContext,
+    builder: (ctx) => AlertDialog(
+      backgroundColor: AppColors.surfaceOverlay,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadius.modal),
+        side: const BorderSide(color: AppColors.borderSubtle, width: 1),
+      ),
+      title: Text(actionVerb, style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold)),
+      content: Text(
+        isDownloading
+            ? '確定要取消下載「${episode.title} - ${part.label}」並刪除已下載的部分檔案嗎？'
+            : '確定要刪除「${episode.title} - ${part.label}」的${isFailed ? "失敗下載紀錄與暫存檔" : "離線檔案"}嗎？',
+        style: const TextStyle(color: AppColors.textSecondary, height: 1.4),
+      ),
+      actions: [
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.surfaceInteractive,
+            foregroundColor: AppColors.textPrimary,
+            minimumSize: const Size(0, 44),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.chip)),
+          ),
+          onPressed: () => Navigator.of(ctx).pop(false),
+          child: const Text('取消'),
+        ),
+        OutlinedButton(
+          style: OutlinedButton.styleFrom(
+            foregroundColor: AppColors.accent,
+            side: const BorderSide(color: AppColors.accent),
+            minimumSize: const Size(0, 44),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.chip)),
+          ),
+          onPressed: () => Navigator.of(ctx).pop(true),
+          child: Text(isDownloading ? '取消下載' : '刪除', style: const TextStyle(fontWeight: FontWeight.bold)),
+        ),
+      ],
+    ),
+  );
+
+  if (confirmed != true) return;
+  final freedBytes = await downloadManager.deleteDownload(
+    episode.id,
+    part.label,
+    showId: showId,
+    title: episode.title,
+  );
+  onDeleted();
+  if (messenger.mounted) {
+    messenger.removeCurrentSnackBar();
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          freedBytes > 0
+              ? '已刪除 ${part.label}（釋出 ${downloadManager.formatBytes(freedBytes)}）'
+              : '已清除 ${part.label} 下載紀錄',
+        ),
+      ),
+    );
   }
 }
 
@@ -255,6 +438,9 @@ void showDownloadSelectionSheet(
   CatalogEpisode episode,
   DownloadManager downloadManager,
 ) {
+  final rootMessenger = ScaffoldMessenger.of(context);
+  final rootNavigator = Navigator.of(context);
+
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -264,8 +450,9 @@ void showDownloadSelectionSheet(
       borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.modal)),
     ),
     builder: (ctx) {
-      return StatefulBuilder(
-        builder: (sheetContext, setSheetState) {
+      return ListenableBuilder(
+        listenable: downloadManager,
+        builder: (sheetContext, _) {
           final showId = episode.showId.isNotEmpty
               ? episode.showId
               : CatalogParser.detectShowId('${episode.title} ${episode.id}');
@@ -401,7 +588,7 @@ void showDownloadSelectionSheet(
                       const SizedBox(height: AppSpacing.md),
                     ],
 
-                    // List of Parts with Downloaded vs Not-Downloaded Standoff
+                    // List of Parts with Downloaded vs Downloading vs Failed vs Idle Standoff
                     for (int i = 0; i < parts.length; i++) ...[
                       Builder(
                         builder: (partContext) {
@@ -410,6 +597,10 @@ void showDownloadSelectionSheet(
                               showId: showId, title: episode.title);
                           final isDl = downloadManager.isDownloading(episode.id, p.label,
                               showId: showId, title: episode.title);
+                          final isFail = !isDown &&
+                              !isDl &&
+                              downloadManager.isFailed(episode.id, p.label,
+                                  showId: showId, title: episode.title);
                           final item = downloadManager.getItem(episode.id, p.label,
                               showId: showId, title: episode.title);
                           final sizeStr = item != null && item.downloadedBytes > 0
@@ -422,13 +613,17 @@ void showDownloadSelectionSheet(
                             decoration: BoxDecoration(
                               color: isDown
                                   ? AppColors.successSurface
-                                  : (isDl ? AppColors.dangerSurface : AppColors.surfaceInteractive),
+                                  : (isDl
+                                      ? AppColors.dangerSurface
+                                      : (isFail ? AppColors.warningSurface : AppColors.surfaceInteractive)),
                               borderRadius: BorderRadius.circular(AppRadius.card),
                               border: Border.all(
                                 color: isDown
                                     ? AppColors.success
-                                    : (isDl ? AppColors.accent : AppColors.borderSubtle),
-                                width: isDown ? 1.4 : 1.0,
+                                    : (isDl
+                                        ? AppColors.accent
+                                        : (isFail ? AppColors.warning : AppColors.borderSubtle)),
+                                width: (isDown || isFail) ? 1.4 : 1.0,
                               ),
                             ),
                             child: Column(
@@ -440,13 +635,15 @@ void showDownloadSelectionSheet(
                                     Container(
                                       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 2),
                                       decoration: BoxDecoration(
-                                        color: isDown ? AppColors.success : AppColors.accent,
+                                        color: isDown
+                                            ? AppColors.success
+                                            : (isFail ? AppColors.warning : AppColors.accent),
                                         borderRadius: BorderRadius.circular(AppRadius.badge),
                                       ),
                                       child: Text(
                                         p.label,
-                                        style: const TextStyle(
-                                          color: AppColors.textPrimary,
+                                        style: TextStyle(
+                                          color: isFail ? AppColors.canvas : AppColors.textPrimary,
                                           fontSize: 12,
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -503,6 +700,28 @@ void showDownloadSelectionSheet(
                                           ],
                                         ),
                                       )
+                                    else if (isFail)
+                                      Expanded(
+                                        child: Row(
+                                          children: [
+                                            const Icon(Icons.error_outline, size: 14, color: AppColors.warning),
+                                            const SizedBox(width: AppSpacing.xs),
+                                            Flexible(
+                                              child: Text(
+                                                '下載失敗 ${sizeStr.isNotEmpty ? "(已暫存 $sizeStr)" : ""}',
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(
+                                                  color: AppColors.warning,
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontFeatures: [FontFeature.tabularFigures()],
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      )
                                     else
                                       const Expanded(
                                         child: Text(
@@ -516,11 +735,11 @@ void showDownloadSelectionSheet(
                                         ),
                                       ),
 
-                                    // Action for Already Downloaded: Share, Play or Delete
+                                    // Action for Already Downloaded / Active / Failed
                                     if (isDown) ...[
                                       IconButton(
                                         padding: EdgeInsets.zero,
-                                        constraints: const BoxConstraints.tightFor(width: 36, height: 36),
+                                        constraints: const BoxConstraints.tightFor(width: 44, height: 44),
                                         style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
                                         icon: const Icon(Icons.share_outlined, color: AppColors.textSecondary, size: 19),
                                         tooltip: '分享此分段影片',
@@ -536,10 +755,9 @@ void showDownloadSelectionSheet(
                                           );
                                         },
                                       ),
-                                      const SizedBox(width: AppSpacing.xs),
                                       IconButton(
                                         padding: EdgeInsets.zero,
-                                        constraints: const BoxConstraints.tightFor(width: 36, height: 36),
+                                        constraints: const BoxConstraints.tightFor(width: 44, height: 44),
                                         style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
                                         icon: const Icon(Icons.play_circle_fill, color: AppColors.success, size: 24),
                                         tooltip: '播放本機離線檔案',
@@ -549,7 +767,7 @@ void showDownloadSelectionSheet(
                                               episode.id, p.label,
                                               showId: showId, title: episode.title);
                                           if (localFile != null) {
-                                            Navigator.of(context).push(
+                                            rootNavigator.push(
                                               MaterialPageRoute(
                                                 builder: (_) => NativePlayerScreen(
                                                   episode: episode,
@@ -561,53 +779,87 @@ void showDownloadSelectionSheet(
                                           }
                                         },
                                       ),
-                                      const SizedBox(width: AppSpacing.xs),
                                       IconButton(
                                         padding: EdgeInsets.zero,
-                                        constraints: const BoxConstraints.tightFor(width: 36, height: 36),
+                                        constraints: const BoxConstraints.tightFor(width: 44, height: 44),
                                         style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-                                        icon: const Icon(Icons.delete_outline, color: Colors.white38, size: 19),
+                                        icon: const Icon(Icons.delete_outline, color: Colors.white54, size: 19),
                                         tooltip: '刪除下載檔案',
-                                        onPressed: () {
-                                          downloadManager.deleteDownload(
-                                              episode.id, p.label,
-                                              showId: showId, title: episode.title);
-                                          setSheetState(() {});
-                                        },
+                                        onPressed: () => _confirmDeletePart(
+                                          dialogContext: sheetContext,
+                                          messenger: rootMessenger,
+                                          downloadManager: downloadManager,
+                                          episode: episode,
+                                          part: p,
+                                          showId: showId,
+                                          isDownloading: false,
+                                          isFailed: false,
+                                          onDeleted: () {},
+                                        ),
+                                      ),
+                                    ] else if (isDl || isFail) ...[
+                                      IconButton(
+                                        padding: EdgeInsets.zero,
+                                        constraints: const BoxConstraints.tightFor(width: 44, height: 44),
+                                        style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+                                        icon: const Icon(Icons.delete_outline, color: Colors.white54, size: 19),
+                                        tooltip: isDl ? '取消並刪除下載' : '刪除失敗下載檔案',
+                                        onPressed: () => _confirmDeletePart(
+                                          dialogContext: sheetContext,
+                                          messenger: rootMessenger,
+                                          downloadManager: downloadManager,
+                                          episode: episode,
+                                          part: p,
+                                          showId: showId,
+                                          isDownloading: isDl,
+                                          isFailed: isFail,
+                                          onDeleted: () {},
+                                        ),
                                       ),
                                     ],
                                   ],
                                 ),
 
-                                // Row 2: Single Full 1080p Download Option (No 快速版)
+                                if (isFail && item?.error != null && item!.error!.isNotEmpty) ...[
+                                  const SizedBox(height: AppSpacing.xs),
+                                  Text(
+                                    item.error!,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      color: AppColors.textSecondary,
+                                      fontSize: 11,
+                                      height: 1.35,
+                                    ),
+                                  ),
+                                ],
+
+                                // Row 2: Retry or Download Action
                                 if (!isDown && !isDl) ...[
                                   const SizedBox(height: AppSpacing.sm),
                                   SizedBox(
                                     width: double.infinity,
                                     child: ElevatedButton.icon(
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: AppColors.accent,
-                                        foregroundColor: AppColors.textPrimary,
+                                        backgroundColor: isFail ? AppColors.warning : AppColors.accent,
+                                        foregroundColor: isFail ? AppColors.canvas : AppColors.textPrimary,
                                         minimumSize: const Size(0, 44),
                                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.chip)),
                                       ),
-                                      icon: const Icon(Icons.download, size: 16),
-                                      label: const Text('下載全集 (1080p FHD)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                                      icon: Icon(isFail ? Icons.refresh : Icons.download, size: 16),
+                                      label: Text(
+                                        isFail ? '重試下載 (${p.label})' : '下載全集 (1080p FHD)',
+                                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                                      ),
                                       onPressed: () {
                                         Navigator.of(ctx).pop();
-                                        downloadManager.startDownload(episode, p);
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(
-                                            content: Text('已開始下載 ${episode.title} - ${p.label}'),
-                                            backgroundColor: AppColors.accent,
-                                            action: SnackBarAction(
-                                              label: '查看進度',
-                                              textColor: AppColors.textPrimary,
-                                              onPressed: () => Navigator.of(context).push(
-                                                MaterialPageRoute(builder: (_) => const DownloadsScreen()),
-                                              ),
-                                            ),
-                                          ),
+                                        _startPartDownloadWithFeedback(
+                                          messenger: rootMessenger,
+                                          navigator: rootNavigator,
+                                          downloadManager: downloadManager,
+                                          episode: episode,
+                                          part: p,
+                                          showId: showId,
                                         );
                                       },
                                     ),
@@ -625,11 +877,11 @@ void showDownloadSelectionSheet(
                     // Bottom Link to Downloads Screen
                     Center(
                       child: TextButton.icon(
-                        icon: const Icon(Icons.folder_special, size: 16, color: Colors.white70),
-                        label: const Text('前往下載資料夾 (Downloads)', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                        icon: const Icon(Icons.folder_special, size: 16, color: AppColors.textSecondary),
+                        label: const Text('前往下載資料夾 (Downloads)', style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
                         onPressed: () {
                           Navigator.of(ctx).pop();
-                          Navigator.of(context).push(
+                          rootNavigator.push(
                             MaterialPageRoute(builder: (_) => const DownloadsScreen()),
                           );
                         },
@@ -748,6 +1000,10 @@ class YouTubeEpisodeCard extends StatelessWidget {
         .where((p) => downloadManager.isDownloaded(episode.id, p.label,
             showId: showId, title: episode.title))
         .length;
+    final failedParts = episode.parts
+        .where((p) => downloadManager.isFailed(episode.id, p.label,
+            showId: showId, title: episode.title))
+        .length;
     final isEpDone = historyManager.isEpisodeCompleted(episode.id, episode.parts.length);
     final epProgress = historyManager.getEpisodeProgress(episode.id, episode.parts.length);
 
@@ -769,7 +1025,9 @@ class YouTubeEpisodeCard extends StatelessWidget {
         border: Border.all(
           color: downloadedParts > 0
               ? AppColors.success.withValues(alpha: 0.35)
-              : AppColors.borderSubtle,
+              : (failedParts > 0
+                  ? AppColors.warning.withValues(alpha: 0.45)
+                  : AppColors.borderSubtle),
         ),
       ),
       child: Padding(
@@ -976,6 +1234,39 @@ class YouTubeEpisodeCard extends StatelessWidget {
                                 ),
                               ),
                             ],
+                            if (failedParts > 0) ...[
+                              GestureDetector(
+                                onTap: () => showDownloadSelectionSheet(context, episode, downloadManager),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.warningSurface,
+                                    borderRadius: BorderRadius.circular(AppRadius.badge),
+                                    border: Border.all(color: AppColors.warning.withValues(alpha: 0.7)),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(Icons.error_outline, size: 10, color: AppColors.warning),
+                                      const SizedBox(width: 3),
+                                      Flexible(
+                                        child: Text(
+                                          '下載失敗 $failedParts • 點擊重試',
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                            fontSize: 10,
+                                            color: AppColors.warning,
+                                            fontWeight: FontWeight.bold,
+                                            fontFeatures: [FontFeature.tabularFigures()],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
                           ],
                         ),
                       ],
@@ -1060,6 +1351,10 @@ class YouTubeEpisodeCard extends StatelessWidget {
                       showId: showId, title: episode.title);
                   final isPartDownloading = downloadManager.isDownloading(episode.id, p.label,
                       showId: showId, title: episode.title);
+                  final isPartFailed = !isPartDown &&
+                      !isPartDownloading &&
+                      downloadManager.isFailed(episode.id, p.label,
+                          showId: showId, title: episode.title);
                   final item = downloadManager.getItem(episode.id, p.label,
                       showId: showId, title: episode.title);
                   final partRec = historyManager.getRecord(episode.id, p.label);
@@ -1071,6 +1366,8 @@ class YouTubeEpisodeCard extends StatelessWidget {
                     chipLabel = '${p.label} (已下載)';
                   } else if (isPartDownloading && item != null) {
                     chipLabel = '${p.label} ${(item.progress * 100).toInt()}%';
+                  } else if (isPartFailed) {
+                    chipLabel = '${p.label} (失敗)';
                   } else if (isPartWatched) {
                     chipLabel = '${p.label} ✓';
                   } else if (inProgressWatched) {
@@ -1080,7 +1377,9 @@ class YouTubeEpisodeCard extends StatelessWidget {
                   return GestureDetector(
                     onLongPress: () => showDownloadSelectionSheet(context, episode, downloadManager),
                     child: TvFocusableButton(
-                      onPressed: () => onPartTapped(idx),
+                      onPressed: isPartFailed && isDownloadView
+                          ? () => showDownloadSelectionSheet(context, episode, downloadManager)
+                          : () => onPartTapped(idx),
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                         decoration: BoxDecoration(
@@ -1088,15 +1387,19 @@ class YouTubeEpisodeCard extends StatelessWidget {
                               ? AppColors.successSurface
                               : (isPartDownloading
                                   ? AppColors.dangerSurface
-                                  : (isPartWatched ? AppColors.successMutedSurface : AppColors.surfaceInteractive)),
+                                  : (isPartFailed
+                                      ? AppColors.warningSurface
+                                      : (isPartWatched ? AppColors.successMutedSurface : AppColors.surfaceInteractive))),
                           borderRadius: BorderRadius.circular(AppRadius.chip),
                           border: Border.all(
                             color: isPartDown
                                 ? AppColors.success
                                 : (isPartDownloading
                                     ? AppColors.accent
-                                    : (isPartWatched ? AppColors.success.withValues(alpha: 0.6) : AppColors.borderSubtle)),
-                            width: isPartDown ? 1.4 : 1.0,
+                                    : (isPartFailed
+                                        ? AppColors.warning
+                                        : (isPartWatched ? AppColors.success.withValues(alpha: 0.6) : AppColors.borderSubtle))),
+                            width: (isPartDown || isPartFailed) ? 1.4 : 1.0,
                           ),
                           boxShadow: isPartDown
                               ? [
@@ -1119,11 +1422,17 @@ class YouTubeEpisodeCard extends StatelessWidget {
                               )
                             else
                               Icon(
-                                isPartDown ? Icons.check_circle : (isPartWatched ? Icons.check : Icons.play_arrow),
+                                isPartDown
+                                    ? Icons.check_circle
+                                    : (isPartFailed
+                                        ? Icons.error_outline
+                                        : (isPartWatched ? Icons.check : Icons.play_arrow)),
                                 size: 12,
                                 color: isPartDown
                                     ? AppColors.success
-                                    : (isPartWatched ? AppColors.success : AppColors.accent),
+                                    : (isPartFailed
+                                        ? AppColors.warning
+                                        : (isPartWatched ? AppColors.success : AppColors.accent)),
                               ),
                             const SizedBox(width: 4),
                             Text(
@@ -1132,7 +1441,11 @@ class YouTubeEpisodeCard extends StatelessWidget {
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
                                 fontFeatures: const [FontFeature.tabularFigures()],
-                                color: isPartDown ? AppColors.success : (isPartWatched ? AppColors.success : AppColors.textPrimary),
+                                color: isPartDown
+                                    ? AppColors.success
+                                    : (isPartFailed
+                                        ? AppColors.warning
+                                        : (isPartWatched ? AppColors.success : AppColors.textPrimary)),
                               ),
                             ),
                           ],
