@@ -104,22 +104,22 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      // Initially all 3 episodes are shown
-      expect(find.text('綜藝玩很大 2026-11-20 苗栗大對抗'), findsOneWidget);
-      expect(find.text('綜藝玩很大 2025-08-15 澎湖歡樂行'), findsOneWidget);
+      // Initially all 3 episodes are shown (show name stripped from title since badge shows it)
+      expect(find.text('2026-11-20 苗栗大對抗'), findsOneWidget);
+      expect(find.text('2025-08-15 澎湖歡樂行'), findsOneWidget);
 
       // Tap '2025' chip
       await tester.tap(find.text('2025'));
       await tester.pumpAndSettle();
 
       // Now only 2025 episode is shown
-      expect(find.text('綜藝玩很大 2025-08-15 澎湖歡樂行'), findsOneWidget);
-      expect(find.text('綜藝玩很大 2026-11-20 苗栗大對抗'), findsNothing);
+      expect(find.text('2025-08-15 澎湖歡樂行'), findsOneWidget);
+      expect(find.text('2026-11-20 苗栗大對抗'), findsNothing);
 
       // Tap '全部' to restore
       await tester.tap(find.text('全部'));
       await tester.pumpAndSettle();
-      expect(find.text('綜藝玩很大 2026-11-20 苗栗大對抗'), findsOneWidget);
+      expect(find.text('2026-11-20 苗栗大對抗'), findsOneWidget);
     });
 
     testWidgets('toggling sort order reverses episode sequence', (WidgetTester tester) async {
@@ -148,8 +148,31 @@ void main() {
       await tester.pumpAndSettle();
 
       // Only the 澎湖 episode should match
-      expect(find.text('綜藝玩很大 2025-08-15 澎湖歡樂行'), findsOneWidget);
-      expect(find.text('綜藝玩很大 2026-11-20 苗栗大對抗'), findsNothing);
+      expect(find.text('2025-08-15 澎湖歡樂行'), findsOneWidget);
+      expect(find.text('2026-11-20 苗栗大對抗'), findsNothing);
+    });
+
+    test('CatalogParser.stripShowNameFromTitle removes redundant show title when badge is shown', () {
+      expect(
+        CatalogParser.stripShowNameFromTitle('綜藝玩很大 2026-11-08 台北 搗蛋鬼到你家', showName: '綜藝玩很大'),
+        equals('2026-11-08 台北 搗蛋鬼到你家'),
+      );
+      expect(
+        CatalogParser.stripShowNameFromTitle('【綜藝玩很大】高雄 世紀爭霸戰', showName: '綜藝玩很大'),
+        equals('高雄 世紀爭霸戰'),
+      );
+      expect(
+        CatalogParser.stripShowNameFromTitle('飢餓遊戲 - 2026-11-22 飢餓指數特別企劃', showName: '飢餓遊戲'),
+        equals('2026-11-22 飢餓指數特別企劃'),
+      );
+      expect(
+        CatalogParser.stripShowNameFromTitle('綜藝玩很大', showName: '綜藝玩很大'),
+        equals('綜藝玩很大'),
+      );
+      expect(
+        CatalogParser.stripShowNameFromTitle('綜藝玩很大 2026-11-08 台北', showName: ''),
+        equals('綜藝玩很大 2026-11-08 台北'),
+      );
     });
   });
 }

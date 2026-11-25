@@ -216,5 +216,30 @@ void main() {
       expect(find.text('尚無觀看歷史紀錄'), findsOneWidget);
       expect(historyManager.records.isEmpty, isTrue);
     });
+
+    testWidgets('Strips redundant show name from history item title when show label is shown',
+        (WidgetTester tester) async {
+      historyManager.addRecordForTesting(PlaybackRecord(
+        episodeId: 'test_ep_strip',
+        partLabel: 'Part 1',
+        partIndex: 0,
+        positionMs: 60000,
+        durationMs: 600000,
+        updatedAt: DateTime.now(),
+        episodeTitle: '綜藝玩很大 2026-11-08 台北 搗蛋鬼到你家',
+        showName: '綜藝玩很大',
+      ));
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: HistoryScreen(),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('綜藝玩很大'), findsOneWidget);
+      expect(find.text('2026-11-08 台北 搗蛋鬼到你家'), findsOneWidget);
+      expect(find.text('綜藝玩很大 2026-11-08 台北 搗蛋鬼到你家'), findsNothing);
+    });
   });
 }

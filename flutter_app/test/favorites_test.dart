@@ -113,7 +113,8 @@ void main() {
 
       expect(find.text('我的收藏 (Favorites)'), findsOneWidget);
       expect(find.text('1'), findsOneWidget); // badge count
-      expect(find.text('【綜藝玩很大】高雄 世紀爭霸戰'), findsOneWidget);
+      expect(find.text('高雄 世紀爭霸戰'), findsOneWidget);
+      expect(find.text('🔥 綜藝玩很大'), findsOneWidget);
     });
   });
 }

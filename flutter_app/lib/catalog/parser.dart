@@ -274,6 +274,28 @@ class CatalogParser {
     return '';
   }
 
+  /// Removes redundant [showName] (with optional brackets or separators)
+  /// from an episode title when the show badge already displays it in list cards.
+  static String stripShowNameFromTitle(String title, {String showName = ''}) {
+    final trimmed = title.trim();
+    final targetShow = showName.trim();
+    if (trimmed.isEmpty || targetShow.isEmpty) return trimmed;
+
+    final escaped = RegExp.escape(targetShow);
+    final pattern = RegExp(
+      '(?:[【《\\[「(]\\s*)?$escaped(?:\\s*[】》\\]」)])?(?:\\s*[-–—:：|｜/·]\\s*|\\s+)?',
+    );
+
+    final cleaned = trimmed
+        .replaceAll(pattern, ' ')
+        .replaceAll(RegExp(r'\s{2,}'), ' ')
+        .replaceFirst(RegExp(r'^[-–—:：|｜/·\s]+'), '')
+        .replaceFirst(RegExp(r'[-–—:：|｜/·\s]+$'), '')
+        .trim();
+
+    return cleaned.isNotEmpty ? cleaned : trimmed;
+  }
+
   /// Native Dart port of parseList from catalog-core
   static List<CatalogEpisode> parseList(
     String html, {

@@ -541,7 +541,12 @@ class _HistoryBodyState extends State<HistoryBody> {
                       Tooltip(
                         message: record.effectiveTitle,
                         child: Text(
-                          record.effectiveTitle,
+                          record.effectiveShowName.isNotEmpty
+                              ? CatalogParser.stripShowNameFromTitle(
+                                  record.effectiveTitle,
+                                  showName: record.effectiveShowName,
+                                )
+                              : record.effectiveTitle,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(

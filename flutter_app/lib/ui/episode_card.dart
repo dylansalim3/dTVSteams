@@ -738,6 +738,9 @@ class YouTubeEpisodeCard extends StatelessWidget {
         ? episode.showName
         : ShowChannels.getShowName(showId);
     final showEmoji = ShowChannels.getEmoji(showId);
+    final displayTitle = showName.isNotEmpty
+        ? CatalogParser.stripShowNameFromTitle(episode.title, showName: showName)
+        : episode.title;
 
     final downloadManager = DownloadManager();
     final historyManager = PlaybackHistoryManager();
@@ -835,7 +838,7 @@ class YouTubeEpisodeCard extends StatelessWidget {
                         Tooltip(
                           message: episode.title,
                           child: Text(
-                            episode.title,
+                            displayTitle,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(

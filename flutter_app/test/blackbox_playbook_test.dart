@@ -308,7 +308,8 @@ void main() {
 
       // 8.1 Verify useful information stands out clearly on the unified episode card
       expect(find.byType(YouTubeEpisodeCard), findsOneWidget);
-      expect(find.text('綜藝玩很大 2026-11-08 台北 搗蛋鬼到你家'), findsOneWidget);
+      expect(find.text('2026-11-08 台北 搗蛋鬼到你家'), findsOneWidget);
+      expect(find.text('🔥 綜藝玩很大'), findsOneWidget);
       expect(find.text('2026-11-08'), findsOneWidget);
       expect(find.byIcon(Icons.location_on_outlined), findsOneWidget);
       expect(find.text('台北'), findsOneWidget);
