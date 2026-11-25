@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/dylansalim3/dTVSteams/compare/v1.1.0...v1.2.0) (2026-11-25)
+
+
+### Features
+
+* **ui:** remove recent/hot search row and move favorites and history into downloads bottom bar ([8d99a8b](https://github.com/dylansalim3/dTVSteams/commit/8d99a8b04d2ecb0c866b5db33f1d3c35ae1157ae))
+
 ## [1.1.0](https://github.com/dylansalim3/dTVSteams/compare/v1.0.0...v1.1.0) (2026-11-25)
 
 
