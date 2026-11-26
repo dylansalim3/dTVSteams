@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.7](https://github.com/dylansalim3/dTVSteams/compare/v1.2.6...v1.2.7) (2026-11-26)
+
+
+### Bug Fixes
+
+* **android,player:** prevent ForegroundServiceDidNotStartInTimeException during fast-forward seeks ([952efb3](https://github.com/dylansalim3/dTVSteams/commit/952efb32e1eda79f729c6d99345e0df9837231c7))
+
 ## [1.2.6](https://github.com/dylansalim3/dTVSteams/compare/v1.2.5...v1.2.6) (2026-11-25)
 
 
