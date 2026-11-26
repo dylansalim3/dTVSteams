@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.1](https://github.com/dylansalim3/dTVSteams/compare/v1.4.0...v1.4.1) (2026-11-26)
+
+
+### Bug Fixes
+
+* live-sync Flutter theme across all views, keep only React v10 and TV web, and remove duplicate Video.js controls ([eb09330](https://github.com/dylansalim3/dTVSteams/commit/eb093304c0225fe15a8384cac98c230e02a8970d))
+
 ## [1.4.0](https://github.com/dylansalim3/dTVSteams/compare/v1.3.0...v1.4.0) (2026-11-26)
 
 
