@@ -1,0 +1,440 @@
+import 'dart:math' as math;
+import 'package:flutter/material.dart';
+
+/// Immutable palette definition matching BoardUI semantic surface & contrast layers.
+class AppThemePalette {
+  final String id;
+  final String name;
+  final String source;
+  final Brightness brightness;
+  final Color canvas;
+  final Color surfaceSecondary;
+  final Color surfacePrimary;
+  final Color surfaceRaised;
+  final Color surfaceSunken;
+  final Color accent;
+  final Color onAccent;
+  final Color textPrimary;
+  final Color textSecondary;
+  final Color textTertiary;
+  final Color borderSeparator;
+  final Color borderDefault;
+
+  const AppThemePalette({
+    required this.id,
+    required this.name,
+    required this.source,
+    this.brightness = Brightness.dark,
+    required this.canvas,
+    required this.surfaceSecondary,
+    required this.surfacePrimary,
+    required this.surfaceRaised,
+    required this.surfaceSunken,
+    required this.accent,
+    required this.onAccent,
+    required this.textPrimary,
+    required this.textSecondary,
+    required this.textTertiary,
+    required this.borderSeparator,
+    required this.borderDefault,
+  });
+
+  Color get accentHover => Color.lerp(accent, onAccent, 0.12) ?? accent;
+  Color get accentSoft => accent.withValues(alpha: 0.16);
+  Color get borderSubtle => borderSeparator;
+  Color get borderHover => borderDefault;
+  Color get actionCircleBg => textPrimary.withValues(alpha: 0.06);
+
+  /// WCAG 2.1 relative luminance (0.0 - 1.0).
+  static double relativeLuminance(Color c) {
+    double lin(double v) => v <= 0.03928 ? v / 12.92 : math.pow((v + 0.055) / 1.055, 2.4).toDouble();
+    return 0.2126 * lin(c.r) + 0.7152 * lin(c.g) + 0.0722 * lin(c.b);
+  }
+
+  /// WCAG 2.1 contrast ratio (1.0 - 21.0) between two opaque colors.
+  static double contrastRatio(Color a, Color b) {
+    final la = relativeLuminance(a);
+    final lb = relativeLuminance(b);
+    return (math.max(la, lb) + 0.05) / (math.min(la, lb) + 0.05);
+  }
+}
+
+/// Curated default BoardUI theme plus the first 20 community themes from https://21st.dev/themes.
+abstract final class AppThemes {
+  static const String defaultThemeId = 'boardui';
+
+  static const AppThemePalette boardUiDefault = AppThemePalette(
+    id: 'boardui',
+    name: 'BoardUI Crimson (預設)',
+    source: 'BoardUI',
+    canvas: Color(0xFF121212),
+    surfaceSecondary: Color(0xFF171717),
+    surfacePrimary: Color(0xFF262626),
+    surfaceRaised: Color(0xFF1B1B1B),
+    surfaceSunken: Color(0xFF0E0E0E),
+    accent: Color(0xFFE50914),
+    onAccent: Color(0xFFFFFFFF),
+    textPrimary: Color(0xFFFAFAFA),
+    textSecondary: Color(0xFFA3A3A3),
+    textTertiary: Color(0xFF737373),
+    borderSeparator: Color(0xFF262626),
+    borderDefault: Color(0xFF404040),
+  );
+
+  /// First 20 themes sourced from https://21st.dev/themes
+  static const List<AppThemePalette> twentyFirstDevThemes = [
+    AppThemePalette(
+      id: 'vercel',
+      name: 'Vercel',
+      source: '21st.dev',
+      canvas: Color(0xFF000000),
+      surfaceSecondary: Color(0xFF090909),
+      surfacePrimary: Color(0xFF1D1D1D),
+      surfaceRaised: Color(0xFF121212),
+      surfaceSunken: Color(0xFF000000),
+      accent: Color(0xFFFFFFFF),
+      onAccent: Color(0xFF000000),
+      textPrimary: Color(0xFFFFFFFF),
+      textSecondary: Color(0xFFA4A4A4),
+      textTertiary: Color(0xFF828282),
+      borderSeparator: Color(0xFF242424),
+      borderDefault: Color(0xFF474747),
+    ),
+    AppThemePalette(
+      id: 'claude',
+      name: 'Claude',
+      source: '21st.dev',
+      canvas: Color(0xFF262624),
+      surfaceSecondary: Color(0xFF2E2E2B),
+      surfacePrimary: Color(0xFF1B1B19),
+      surfaceRaised: Color(0xFF252523),
+      surfaceSunken: Color(0xFF191917),
+      accent: Color(0xFFD97757),
+      onAccent: Color(0xFF0A0A0A),
+      textPrimary: Color(0xFFC3C0B6),
+      textSecondary: Color(0xFFB7B5A9),
+      textTertiary: Color(0xFF99978D),
+      borderSeparator: Color(0xFF3E3E38),
+      borderDefault: Color(0xFF53534C),
+    ),
+    AppThemePalette(
+      id: 'supabase',
+      name: 'Supabase',
+      source: '21st.dev',
+      canvas: Color(0xFF121212),
+      surfaceSecondary: Color(0xFF171717),
+      surfacePrimary: Color(0xFF1F1F1F),
+      surfaceRaised: Color(0xFF1B1B1B),
+      surfaceSunken: Color(0xFF0C0C0C),
+      accent: Color(0xFF006239),
+      onAccent: Color(0xFFDDE8E3),
+      textPrimary: Color(0xFFE2E8F0),
+      textSecondary: Color(0xFFA2A2A2),
+      textTertiary: Color(0xFF838383),
+      borderSeparator: Color(0xFF292929),
+      borderDefault: Color(0xFF474849),
+    ),
+    AppThemePalette(
+      id: 'catppuccin',
+      name: 'Catppuccin',
+      source: '21st.dev',
+      canvas: Color(0xFF181825),
+      surfaceSecondary: Color(0xFF1E1E2E),
+      surfacePrimary: Color(0xFF292C3C),
+      surfaceRaised: Color(0xFF232434),
+      surfaceSunken: Color(0xFF101018),
+      accent: Color(0xFFCBA6F7),
+      onAccent: Color(0xFF1E1E2E),
+      textPrimary: Color(0xFFCDD6F4),
+      textSecondary: Color(0xFFA6ADC8),
+      textTertiary: Color(0xFF888EA6),
+      borderSeparator: Color(0xFF313244),
+      borderDefault: Color(0xFF4A4C60),
+    ),
+    AppThemePalette(
+      id: 'solar-dusk',
+      name: 'Solar Dusk',
+      source: '21st.dev',
+      canvas: Color(0xFF1C1917),
+      surfaceSecondary: Color(0xFF292524),
+      surfacePrimary: Color(0xFF201D1A),
+      surfaceRaised: Color(0xFF252120),
+      surfaceSunken: Color(0xFF12100F),
+      accent: Color(0xFFF97316),
+      onAccent: Color(0xFF0A0A0A),
+      textPrimary: Color(0xFFF5F5F4),
+      textSecondary: Color(0xFFA8A29E),
+      textTertiary: Color(0xFF8C8783),
+      borderSeparator: Color(0xFF44403C),
+      borderDefault: Color(0xFF605D59),
+    ),
+    AppThemePalette(
+      id: 'lime-frost',
+      name: 'Lime Frost',
+      source: '21st.dev',
+      canvas: Color(0xFF020617),
+      surfaceSecondary: Color(0xFF0F172A),
+      surfacePrimary: Color(0xFF1E293B),
+      surfaceRaised: Color(0xFF161F32),
+      surfaceSunken: Color(0xFF01040F),
+      accent: Color(0xFFAFF33E),
+      onAccent: Color(0xFF000000),
+      textPrimary: Color(0xFFF8FAFC),
+      textSecondary: Color(0xFF94A3B8),
+      textTertiary: Color(0xFF778499),
+      borderSeparator: Color(0xFF1E293B),
+      borderDefault: Color(0xFF414A5A),
+    ),
+    AppThemePalette(
+      id: 'ocean-breeze',
+      name: 'Ocean Breeze',
+      source: '21st.dev',
+      canvas: Color(0xFF0F172A),
+      surfaceSecondary: Color(0xFF1E293B),
+      surfacePrimary: Color(0xFF19212E),
+      surfaceRaised: Color(0xFF1C2535),
+      surfaceSunken: Color(0xFF0A0F1B),
+      accent: Color(0xFF34D399),
+      onAccent: Color(0xFF0F172A),
+      textPrimary: Color(0xFFD1D5DB),
+      textSecondary: Color(0xFFA9ADB5),
+      textTertiary: Color(0xFF8A909A),
+      borderSeparator: Color(0xFF4B5563),
+      borderDefault: Color(0xFF606976),
+    ),
+    AppThemePalette(
+      id: 'doom-64',
+      name: 'Doom 64',
+      source: '21st.dev',
+      canvas: Color(0xFF1A1A1A),
+      surfaceSecondary: Color(0xFF2A2A2A),
+      surfacePrimary: Color(0xFF252525),
+      surfaceRaised: Color(0xFF282828),
+      surfaceSunken: Color(0xFF111111),
+      accent: Color(0xFFE53935),
+      onAccent: Color(0xFF0A0A0A),
+      textPrimary: Color(0xFFE0E0E0),
+      textSecondary: Color(0xFFA0A0A0),
+      textTertiary: Color(0xFF868686),
+      borderSeparator: Color(0xFF4A4A4A),
+      borderDefault: Color(0xFF626262),
+    ),
+    AppThemePalette(
+      id: 'modern-minimal',
+      name: 'Modern Minimal',
+      source: '21st.dev',
+      canvas: Color(0xFF171717),
+      surfaceSecondary: Color(0xFF262626),
+      surfacePrimary: Color(0xFF1F1F1F),
+      surfaceRaised: Color(0xFF232323),
+      surfaceSunken: Color(0xFF0F0F0F),
+      accent: Color(0xFF3B82F6),
+      onAccent: Color(0xFF0A0A0A),
+      textPrimary: Color(0xFFE5E5E5),
+      textSecondary: Color(0xFFA3A3A3),
+      textTertiary: Color(0xFF888888),
+      borderSeparator: Color(0xFF404040),
+      borderDefault: Color(0xFF5A5A5A),
+    ),
+    AppThemePalette(
+      id: 'zen-linen',
+      name: 'Zen Linen',
+      source: '21st.dev',
+      canvas: Color(0xFF141414),
+      surfaceSecondary: Color(0xFF1C1C1C),
+      surfacePrimary: Color(0xFF2A2A2A),
+      surfaceRaised: Color(0xFF222222),
+      surfaceSunken: Color(0xFF0D0D0D),
+      accent: Color(0xFFD1CFC0),
+      onAccent: Color(0xFF363636),
+      textPrimary: Color(0xFFE8E3DA),
+      textSecondary: Color(0xFFBEBAB3),
+      textTertiary: Color(0xFF9A9792),
+      borderSeparator: Color(0xFF2C2C2C),
+      borderDefault: Color(0xFF4A4948),
+    ),
+    AppThemePalette(
+      id: 'claude-amber',
+      name: 'Claude Amber',
+      source: '21st.dev',
+      canvas: Color(0xFF262624),
+      surfaceSecondary: Color(0xFF2C2C2B),
+      surfacePrimary: Color(0xFF1B1B19),
+      surfaceRaised: Color(0xFF242423),
+      surfaceSunken: Color(0xFF191917),
+      accent: Color(0xFFD97757),
+      onAccent: Color(0xFF141413),
+      textPrimary: Color(0xFFF1F1EF),
+      textSecondary: Color(0xFFB7B5A9),
+      textTertiary: Color(0xFF98978D),
+      borderSeparator: Color(0xFF3E3E38),
+      borderDefault: Color(0xFF5B5B55),
+    ),
+    AppThemePalette(
+      id: 'sage-garden',
+      name: 'Sage Garden',
+      source: '21st.dev',
+      canvas: Color(0xFF0A0A0A),
+      surfaceSecondary: Color(0xFF121212),
+      surfacePrimary: Color(0xFF1A1A1A),
+      surfaceRaised: Color(0xFF161616),
+      surfaceSunken: Color(0xFF070707),
+      accent: Color(0xFF7C9082),
+      onAccent: Color(0xFF000000),
+      textPrimary: Color(0xFFF5F5F5),
+      textSecondary: Color(0xFFA0A0A0),
+      textTertiary: Color(0xFF818181),
+      borderSeparator: Color(0xFF2A2A2A),
+      borderDefault: Color(0xFF4A4A4A),
+    ),
+    AppThemePalette(
+      id: 'elegant-luxury',
+      name: 'Elegant Luxury',
+      source: '21st.dev',
+      canvas: Color(0xFF1C1917),
+      surfaceSecondary: Color(0xFF292524),
+      surfacePrimary: Color(0xFF1F1C1A),
+      surfaceRaised: Color(0xFF252120),
+      surfaceSunken: Color(0xFF12100F),
+      accent: Color(0xFFB91C1C),
+      onAccent: Color(0xFFFAF7F5),
+      textPrimary: Color(0xFFF5F5F4),
+      textSecondary: Color(0xFFD6D3D1),
+      textTertiary: Color(0xFFB0ADAB),
+      borderSeparator: Color(0xFF44403C),
+      borderDefault: Color(0xFF605D59),
+    ),
+    AppThemePalette(
+      id: 'twitter',
+      name: 'Twitter',
+      source: '21st.dev',
+      canvas: Color(0xFF000000),
+      surfaceSecondary: Color(0xFF17181C),
+      surfacePrimary: Color(0xFF181818),
+      surfaceRaised: Color(0xFF17181A),
+      surfaceSunken: Color(0xFF000000),
+      accent: Color(0xFF1C9CF0),
+      onAccent: Color(0xFF0A0A0A),
+      textPrimary: Color(0xFFE7E9EA),
+      textSecondary: Color(0xFFB9BBBC),
+      textTertiary: Color(0xFF959799),
+      borderSeparator: Color(0xFF242628),
+      borderDefault: Color(0xFF434547),
+    ),
+    AppThemePalette(
+      id: 'vintage-paper',
+      name: 'Vintage Paper',
+      source: '21st.dev',
+      canvas: Color(0xFF2D2621),
+      surfaceSecondary: Color(0xFF3A322C),
+      surfacePrimary: Color(0xFF312B26),
+      surfaceRaised: Color(0xFF362F29),
+      surfaceSunken: Color(0xFF1D1915),
+      accent: Color(0xFFC0A080),
+      onAccent: Color(0xFF2D2621),
+      textPrimary: Color(0xFFECE5D8),
+      textSecondary: Color(0xFFC5BCAC),
+      textTertiary: Color(0xFFA69E90),
+      borderSeparator: Color(0xFF4A4039),
+      borderDefault: Color(0xFF645A52),
+    ),
+    AppThemePalette(
+      id: 'graphite-mono',
+      name: 'Graphite Mono',
+      source: '21st.dev',
+      canvas: Color(0xFF171717),
+      surfaceSecondary: Color(0xFF0E0E0E),
+      surfacePrimary: Color(0xFF262626),
+      surfaceRaised: Color(0xFF191919),
+      surfaceSunken: Color(0xFF0F0F0F),
+      accent: Color(0xFFE5E5E5),
+      onAccent: Color(0xFF171717),
+      textPrimary: Color(0xFFFAFAFA),
+      textSecondary: Color(0xFFA1A1A1),
+      textTertiary: Color(0xFF818181),
+      borderSeparator: Color(0xFF262626),
+      borderDefault: Color(0xFF484848),
+    ),
+    AppThemePalette(
+      id: 'amber-slate',
+      name: 'Amber Slate',
+      source: '21st.dev',
+      canvas: Color(0xFF1A1A1A),
+      surfaceSecondary: Color(0xFF202020),
+      surfacePrimary: Color(0xFF2A2A2A),
+      surfaceRaised: Color(0xFF252525),
+      surfaceSunken: Color(0xFF111111),
+      accent: Color(0xFFDF6035),
+      onAccent: Color(0xFF0A0A0A),
+      textPrimary: Color(0xFFE5E5E5),
+      textSecondary: Color(0xFFBCBCBC),
+      textTertiary: Color(0xFF9A9A9A),
+      borderSeparator: Color(0xFF353535),
+      borderDefault: Color(0xFF515151),
+    ),
+    AppThemePalette(
+      id: 'azure-mono',
+      name: 'Azure Mono',
+      source: '21st.dev',
+      canvas: Color(0xFF000000),
+      surfaceSecondary: Color(0xFF0F0F0F),
+      surfacePrimary: Color(0xFF181818),
+      surfaceRaised: Color(0xFF131313),
+      surfaceSunken: Color(0xFF000000),
+      accent: Color(0xFF2B65FF),
+      onAccent: Color(0xFFFFFFFF),
+      textPrimary: Color(0xFFFFFFFF),
+      textSecondary: Color(0xFFCCCCCC),
+      textTertiary: Color(0xFFA2A2A2),
+      borderSeparator: Color(0xFF26272E),
+      borderDefault: Color(0xFF494A4F),
+    ),
+    AppThemePalette(
+      id: 't3-chat',
+      name: 'T3 Chat',
+      source: '21st.dev',
+      canvas: Color(0xFF221D27),
+      surfaceSecondary: Color(0xFF2C2632),
+      surfacePrimary: Color(0xFF28222D),
+      surfaceRaised: Color(0xFF2A2430),
+      surfaceSunken: Color(0xFF161319),
+      accent: Color(0xFFA3004C),
+      onAccent: Color(0xFFEFC0D8),
+      textPrimary: Color(0xFFD2C4DE),
+      textSecondary: Color(0xFFC2B6CF),
+      textTertiary: Color(0xFFA196AC),
+      borderSeparator: Color(0xFF3B3237),
+      borderDefault: Color(0xFF534952),
+    ),
+    AppThemePalette(
+      id: 'indigo-mono',
+      name: 'Indigo Mono',
+      source: '21st.dev',
+      canvas: Color(0xFF000000),
+      surfaceSecondary: Color(0xFF181818),
+      surfacePrimary: Color(0xFF1D1D1D),
+      surfaceRaised: Color(0xFF1A1A1A),
+      surfaceSunken: Color(0xFF000000),
+      accent: Color(0xFF3F5EC2),
+      onAccent: Color(0xFFEFF6FF),
+      textPrimary: Color(0xFFFFFFFF),
+      textSecondary: Color(0xFFA4A4A4),
+      textTertiary: Color(0xFF858585),
+      borderSeparator: Color(0xFF242424),
+      borderDefault: Color(0xFF474747),
+    ),
+  ];
+
+  static const List<AppThemePalette> all = [
+    boardUiDefault,
+    ...twentyFirstDevThemes,
+  ];
+
+  static AppThemePalette byId(String? id) {
+    if (id == null || id.isEmpty) return boardUiDefault;
+    for (final t in all) {
+      if (t.id == id) return t;
+    }
+    return boardUiDefault;
+  }
+}

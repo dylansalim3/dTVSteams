@@ -205,11 +205,11 @@ function updateCardResume(episodeId, record) {
   const card = document.querySelector(`.yt-card[data-id="${episodeId}"]`);
   if (!card) return;
 
-  const thumbWrapper = card.querySelector(".yt-thumb-wrapper");
+  const progressBarEl = card.querySelector(".yt-thumb-progress");
   const cardBody = card.querySelector(".yt-card-body");
-  if (!thumbWrapper || !cardBody) return;
+  if (!cardBody) return;
 
-  let progressBar = thumbWrapper.querySelector(".yt-thumb-progress");
+  let progressBar = progressBarEl;
   let resumeMeta = cardBody.querySelector(".yt-card-resume-meta");
 
   if (!record || record.percentage <= 0) {
@@ -221,16 +221,16 @@ function updateCardResume(episodeId, record) {
   if (!progressBar) {
     progressBar = document.createElement("div");
     progressBar.className = "yt-thumb-progress";
-    thumbWrapper.appendChild(progressBar);
+    card.appendChild(progressBar);
   }
   progressBar.style.width = `${record.percentage}%`;
 
   if (!resumeMeta) {
     resumeMeta = document.createElement("div");
     resumeMeta.className = "yt-card-resume-meta";
-    const titleEl = cardBody.querySelector(".yt-card-title");
-    if (titleEl && titleEl.nextSibling) {
-      cardBody.insertBefore(resumeMeta, titleEl.nextSibling);
+    const metaWrap = cardBody.querySelector(".card-meta-wrap");
+    if (metaWrap && metaWrap.nextSibling) {
+      cardBody.insertBefore(resumeMeta, metaWrap.nextSibling);
     } else {
       cardBody.appendChild(resumeMeta);
     }
@@ -358,7 +358,7 @@ function initPlayer() {
     player.addEventListener("playing", () => {
       clearTimeout(stallWatchdogTimer);
       hideStallCard();
-      if (playerStreamStatus) playerStreamStatus.textContent = "串流狀態：播放中 (1080p HD)";
+      if (playerStreamStatus) playerStreamStatus.textContent = "串流狀態：播放中";
       player.playbackRate = currentSpeed;
     });
 
@@ -372,7 +372,7 @@ function initPlayer() {
     });
 
     player.addEventListener("seeked", () => {
-      if (playerStreamStatus) playerStreamStatus.textContent = "串流狀態：播放中 (1080p HD)";
+      if (playerStreamStatus) playerStreamStatus.textContent = "串流狀態：播放中";
     });
 
     player.addEventListener("loadedmetadata", () => {
@@ -691,7 +691,7 @@ function renderDownloadMenu() {
           <span>${idx === activePartIndex ? "▶" : "•"}</span>
           <span>${p.label || 'Part ' + (idx + 1)}</span>
         </span>
-        <span class="yt-download-item-size">1080p MP4</span>
+        <span class="yt-download-item-size">MP4 下載</span>
       `;
       itemBtn.onclick = () => {
         downloadMenu.style.display = "none";
@@ -796,10 +796,9 @@ function closeShareModal() {
 function setupShareModal() {
   if (shareBtn) {
     shareBtn.onclick = () => {
-      if (activeEpisode) {
-        openShareModal(activeEpisode, activePartIndex);
-      } else {
-        if (playerStreamStatus) playerStreamStatus.textContent = "請先選擇欲分享的集數";
+      const targetEp = activeEpisode || (catalog?.episodes && catalog.episodes[0]) || WEB_SHOW_CHANNELS[0].fallbackEpisodes[0];
+      if (targetEp) {
+        openShareModal(targetEp, activeEpisode ? activePartIndex : 0);
       }
     };
   }
@@ -873,22 +872,170 @@ function resolveEpisodeThumb(ep) {
   return `./media/thumb-default.svg`;
 }
 
-// Render Episode Grid (Simple YouTube-style list, No fake recommendations)
+// Show Channels (mirrored from mobile ShowChannels)
+const WEB_SHOW_CHANNELS = [
+  {
+    id: "mr_player",
+    name: "綜藝玩很大",
+    englishName: "Mr. Player",
+    emoji: "🔥",
+    tagline: "憲哥領軍・黃黑兩隊命運對決",
+    fallbackEpisodes: [
+      {
+        id: "https://srgoideas.com/%e7%b6%9c%e8%97%9d%e7%8e%a9%e5%be%88%e5%a4%a7-2026-11-08-%e5%8f%b0%e5%8c%97-%e6%90%97%e8%9b%8b%e9%ac%bc%e5%88%b0%e4%bd%a0%e5%ae%b6/",
+        title: "綜藝玩很大 2026-11-08 台北 搗蛋鬼到你家",
+        date: "2026-11-08",
+        url: "https://srgoideas.com/%e7%b6%9c%e8%97%9d%e7%8e%a9%e5%be%88%e5%a4%a7-2026-11-08-%e5%8f%b0%e5%8c%97-%e6%90%97%e8%9b%8b%e9%ac%bc%e5%88%b0%e4%bd%a0%e5%ae%b6/",
+        showId: "mr_player",
+        showName: "綜藝玩很大",
+        parts: [
+          { label: "Part 1", streamUrl: "./media/sample-part1.mp4", duration: "35分" },
+          { label: "Part 2", streamUrl: "./media/sample-part2.mp4", duration: "35分" },
+          { label: "Part 3", streamUrl: "./media/sample-part3.mp4", duration: "35分" }
+        ]
+      }
+    ]
+  },
+  {
+    id: "hunger_games",
+    name: "飢餓遊戲",
+    englishName: "The Hunger Games",
+    emoji: "⚡",
+    tagline: "飢餓指數對決・爭奪充飢美食與獎金",
+    fallbackEpisodes: [
+      {
+        id: "https://srgoideas.com/%e9%a3%a2%e9%a4%93%e9%81%8a%e6%88%b2-2026-11-22-%e9%a3%a2%e9%a4%93%e6%8c%87%e6%95%b8%e7%89%b9%e5%88%a5%e4%bc%81%e5%8a%83/",
+        title: "飢餓遊戲 2026-11-22 飢餓指數特別企劃",
+        date: "2026-11-22",
+        url: "https://srgoideas.com/%e9%a3%a2%e9%a4%93%e9%81%8a%e6%88%b2-2026-11-22-%e9%a3%a2%e9%a4%93%e6%8c%87%e6%95%b8%e7%89%b9%e5%88%a5%e4%bc%81%e5%8a%83/",
+        showId: "hunger_games",
+        showName: "飢餓遊戲",
+        parts: [
+          { label: "Part 1", url: "https://srgoideas.com/%e9%a3%a2%e9%a4%93%e9%81%8a%e6%88%b2-2026-11-22-%e9%a3%a2%e9%a4%93%e6%8c%87%e6%95%b8%e7%89%b9%e5%88%a5%e4%bc%81%e5%8a%83/" },
+          { label: "Part 2", url: "https://srgoideas.com/%e9%a3%a2%e9%a4%93%e9%81%8a%e6%88%b2-2026-11-22-%e9%a3%a2%e9%a4%93%e6%8c%87%e6%95%b8%e7%89%b9%e5%88%a5%e4%bc%81%e5%8a%83/2/" },
+          { label: "Part 3", url: "https://srgoideas.com/%e9%a3%a2%e9%a4%93%e9%81%8a%e6%88%b2-2026-11-22-%e9%a3%a2%e9%a4%93%e6%8c%87%e6%95%b8%e7%89%b9%e5%88%a5%e4%bc%81%e5%8a%83/3/" }
+        ]
+      }
+    ]
+  },
+  {
+    id: "all_stars",
+    name: "全明星運動會",
+    englishName: "All Star Sports Day",
+    emoji: "🏆",
+    tagline: "紅藍巔峰對決・挑戰體育競技極限",
+    fallbackEpisodes: [
+      {
+        id: "https://srgoideas.com/%e5%85%a8%e6%98%8e%e6%98%9f%e9%81%8b%e5%8b%95%e6%9c%83-2023-01-08/",
+        title: "全明星運動會 2023-01-08 總冠軍賽殊死戰",
+        date: "2023-01-08",
+        url: "https://srgoideas.com/%e5%85%a8%e6%98%8e%e6%98%9f%e9%81%8b%e5%8b%95%e6%9c%83-2023-01-08/",
+        showId: "all_stars",
+        showName: "全明星運動會",
+        parts: [
+          { label: "Part 1", url: "https://srgoideas.com/%e5%85%a8%e6%98%8e%e6%98%9f%e9%81%8b%e5%8b%95%e6%9c%83-2023-01-08/" },
+          { label: "Part 2", url: "https://srgoideas.com/%e5%85%a8%e6%98%8e%e6%98%9f%e9%81%8b%e5%8b%95%e6%9c%83-2023-01-08/2/" },
+          { label: "Part 3", url: "https://srgoideas.com/%e5%85%a8%e6%98%8e%e6%98%9f%e9%81%8b%e5%8b%95%e6%9c%83-2023-01-08/3/" }
+        ]
+      }
+    ]
+  },
+  {
+    id: "super_ent",
+    name: "小明星大跟班",
+    englishName: "Super Ent.",
+    emoji: "⭐",
+    tagline: "憲哥與Sandy・麻辣爆笑娛樂話題",
+    fallbackEpisodes: [
+      {
+        id: "https://srgoideas.com/%e5%b0%8f%e6%98%8e%e6%98%9f%e5%a4%a7%e8%b7%9f%e7%8f%ad-2026-11-20/",
+        title: "小明星大跟班 2026-11-20 演藝圈真心話大冒險",
+        date: "2026-11-20",
+        url: "https://srgoideas.com/%e5%b0%8f%e6%98%8e%e6%98%9f%e5%a4%a7%e8%b7%9f%e7%8f%ad-2026-11-20/",
+        showId: "super_ent",
+        showName: "小明星大跟班",
+        parts: [
+          { label: "Part 1", url: "https://srgoideas.com/%e5%b0%8f%e6%98%8e%e6%98%9f%e5%a4%a7%e8%b7%9f%e7%8f%ad-2026-11-20/" },
+          { label: "Part 2", url: "https://srgoideas.com/%e5%b0%8f%e6%98%8e%e6%98%9f%e5%a4%a7%e8%b7%9f%e7%8f%ad-2026-11-20/2/" }
+        ]
+      }
+    ]
+  },
+  {
+    id: "hot_shop",
+    name: "11點熱吵店",
+    englishName: "11 O'Clock Hot Shop",
+    emoji: "🌶️",
+    tagline: "沈玉琳與Melody・生活辛辣話題爆笑開講",
+    fallbackEpisodes: [
+      {
+        id: "https://srgoideas.com/11%e9%bb%9e%e7%86%b1%e5%90%b5%e5%ba%97-2026-11-19/",
+        title: "11點熱吵店 2026-11-19 荒謬日常大吐槽",
+        date: "2026-11-19",
+        url: "https://srgoideas.com/11%e9%bb%9e%e7%86%b1%e5%90%b5%e5%ba%97-2026-11-19/",
+        showId: "hot_shop",
+        showName: "11點熱吵店",
+        parts: [
+          { label: "Part 1", url: "https://srgoideas.com/11%e9%bb%9e%e7%86%b1%e5%90%b5%e5%ba%97-2026-11-19/" },
+          { label: "Part 2", url: "https://srgoideas.com/11%e9%bb%9e%e7%86%b1%e5%90%b5%e5%ba%97-2026-11-19/2/" }
+        ]
+      }
+    ]
+  }
+];
+
+let currentChannel = WEB_SHOW_CHANNELS[0];
+const channelPageCache = new Map();
+
+const KNOWN_WEB_LOCATIONS = [
+  "台北", "新北", "基隆", "桃園", "新竹", "苗栗", "台中", "彰化", "南投", "雲林",
+  "嘉義", "台南", "高雄", "屏東", "宜蘭", "花蓮", "台東", "澎湖", "金門", "馬祖",
+  "綠島", "蘭嶼", "小琉球", "日本", "韓國", "泰國", "越南", "馬來西亞", "新加坡",
+  "峇里島", "沖繩", "北海道", "東京", "大阪", "京都", "首爾", "曼谷", "關西", "紐西蘭"
+];
+
+function extractLocationFromTitle(title) {
+  for (const loc of KNOWN_WEB_LOCATIONS) {
+    if ((title || "").includes(loc)) return loc;
+  }
+  return "";
+}
+
+function detectEpisodeShowMeta(ep) {
+  if (ep?.showId) {
+    const match = WEB_SHOW_CHANNELS.find(c => c.id === ep.showId);
+    if (match) return match;
+  }
+  const haystack = `${ep?.showName || ""} ${ep?.title || ""} ${ep?.id || ""}`;
+  return WEB_SHOW_CHANNELS.find(c => haystack.includes(c.name)) || currentChannel || WEB_SHOW_CHANNELS[0];
+}
+
+function stripShowNameFromEpisodeTitle(title, showName) {
+  let clean = (title || "").trim();
+  if (!clean) return "";
+  if (showName) {
+    clean = clean.replace(new RegExp(`^[【\\[]?\\s*${showName}\\s*[】\\]]?\\s*[-·|:]?\\s*`), "").trim();
+  }
+  return clean || title;
+}
+
+// Render Episode Feed (1-by-1 Vertical List Matching Mobile YouTubeEpisodeCard)
 function renderGrid(list) {
   if (!episodesGrid) return;
   episodesGrid.innerHTML = "";
 
   if (episodeCountBadge) {
-    episodeCountBadge.textContent = `共 ${list.length} 集`;
+    episodeCountBadge.textContent = `(${list.length} 集)`;
   }
 
   if (!list.length) {
     episodesGrid.innerHTML = `
-      <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--yt-text-secondary);">
-        <p style="font-size: 1.1rem; margin-bottom: 0.5rem;">查無符合的集數</p>
-        <p style="font-size: 0.9rem;">請嘗試不同關鍵字或清空搜尋條件</p>
+      <div style="text-align: center; padding: 3rem 1.5rem; color: var(--yt-text-secondary); background: var(--yt-surface); border: 1px solid var(--yt-border); border-radius: var(--yt-radius-card);">
+        <p style="font-size: 15px; font-weight: 600; color: var(--yt-text-primary); margin-bottom: 6px;">找不到符合搜尋或篩選條件的集數</p>
+        <p style="font-size: 13px;">請嘗試不同關鍵字或重設年份篩選條件</p>
       </div>
     `;
+    renderGooglePagination();
     return;
   }
 
@@ -898,51 +1045,94 @@ function renderGrid(list) {
     card.setAttribute("data-id", ep.id);
     card.tabIndex = 0;
 
-    const thumb = resolveEpisodeThumb(ep);
-    const totalParts = ep.parts?.length || 3;
+    const showMeta = detectEpisodeShowMeta(ep);
+    const displayTitle = stripShowNameFromEpisodeTitle(ep.title, showMeta.name);
+    const location = extractLocationFromTitle(ep.title || "");
     const resume = getEpisodeResume(ep.id);
+    const isCompleted = Boolean(resume && resume.completed);
+    const isFav = isFavorite(ep.id);
+    const isActiveEp = Boolean(activeEpisode && activeEpisode.id === ep.id);
 
-    const progressBarHtml = resume && resume.percentage > 0
+    const progressBarHtml = resume && resume.percentage > 2
       ? `<div class="yt-thumb-progress" style="width: ${resume.percentage}%;"></div>`
       : "";
 
-    const resumeMetaHtml = resume && resume.percentage > 0
-      ? `<div class="yt-card-resume-meta">
-           ${resume.completed
-             ? `<span class="yt-card-watched-badge">✓ 已看完</span>`
-             : `<span class="yt-card-resume-text">上次看至 Part ${resume.partIndex + 1} (${formatTime(resume.currentTime)})</span>`
-           }
-         </div>`
+    const resumeMetaHtml = resume && resume.percentage > 0 && !isCompleted
+      ? `<div class="yt-card-resume-meta"><span class="yt-card-resume-text">上次看至 Part ${resume.partIndex + 1} (${formatTime(resume.currentTime)})</span></div>`
       : "";
 
     card.innerHTML = `
-      <div class="yt-thumb-wrapper">
-        <img class="yt-thumb-img" src="${thumb}" alt="${ep.title}" loading="lazy" onerror="this.src='./media/thumb-default.svg'">
-        <span class="yt-thumb-badge">${ep.duration || "1小時 48分"}</span>
-        ${progressBarHtml}
-      </div>
-      <div class="yt-card-body">
-        <h3 class="yt-card-title">${ep.title}</h3>
-        ${resumeMetaHtml}
-        <div class="yt-card-meta">${ep.date} · 綜藝玩很大 · 共 ${totalParts} 個分段</div>
-        <div class="yt-card-parts" role="group" aria-label="分段播放">
-          ${(ep.parts || []).map((part, pIdx) => `
-            <button class="yt-card-part-btn" data-part="${pIdx}" aria-label="播放 ${part.label || 'Part ' + (pIdx + 1)}">
-              ▶ ${part.label || 'Part ' + (pIdx + 1)}
-            </button>
-          `).join("")}
+      <div class="yt-card-top-row">
+        <button type="button" class="card-play-btn" aria-label="播放節目">
+          <span class="card-play-circle ${isCompleted ? "completed" : ""}">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+          </span>
+        </button>
+
+        <div class="yt-card-body">
+          <h3 class="yt-card-title" title="${ep.title}">${displayTitle}</h3>
+          <div class="card-meta-wrap">
+            ${ep.date ? `<span class="card-date-text">${ep.date}</span>` : ""}
+            <span class="card-show-badge">${showMeta.emoji} ${showMeta.name}</span>
+            ${location ? `<span class="card-location-badge">📍 ${location}</span>` : ""}
+            ${isCompleted ? `<span class="yt-card-watched-badge">✓ 已看完</span>` : ""}
+          </div>
+          ${resumeMetaHtml}
+        </div>
+
+        <div class="card-actions-cluster">
+          <button type="button" class="card-circle-btn card-fav-btn ${isFav ? "is-favorite" : ""}" aria-label="${isFav ? "取消收藏" : "加入收藏"}" title="${isFav ? "已收藏" : "加入收藏"}">
+            <span class="card-circle-visual">
+              <svg viewBox="0 0 24 24" width="17" height="17" fill="${isFav ? "currentColor" : "none"}" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+              </svg>
+            </span>
+          </button>
+          <button type="button" class="card-circle-btn card-dl-btn" aria-label="下載此集" title="下載目前集數">
+            <span class="card-circle-visual">
+              <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+            </span>
+          </button>
         </div>
       </div>
+
+      <div class="yt-card-parts" role="group" aria-label="分段播放">
+        ${(ep.parts || []).map((part, pIdx) => {
+          const playingThisPart = isActiveEp && activePartIndex === pIdx;
+          const partDone = isCompleted || (resume && resume.partIndex > pIdx);
+          return `
+            <button type="button" class="yt-card-part-btn ${playingThisPart ? "is-playing" : (partDone ? "is-watched" : "")}" data-part="${pIdx}" aria-label="播放 ${part.label || 'Part ' + (pIdx + 1)}">
+              ▶ ${part.label || "Part " + (pIdx + 1)}${partDone ? " ✓" : ""}
+            </button>
+          `;
+        }).join("")}
+      </div>
+      ${progressBarHtml}
     `;
 
-    // Replace the poster with the real middle frame of Part 1 when possible.
-    const thumbImg = card.querySelector(".yt-thumb-img");
-    const partOne = ep.parts?.[0];
-    if (thumbImg && partOne && window.DTVFrameThumbs) {
-      window.DTVFrameThumbs.attach(ep.id, thumbImg, resolveStreamUrl(partOne));
+    const favAction = card.querySelector(".card-fav-btn");
+    if (favAction) {
+      favAction.addEventListener("click", (e) => {
+        e.stopPropagation();
+        toggleFavorite(ep);
+        applyFilters();
+      });
     }
 
-    // Click whole card to play (uses resume if available) & scroll to player
+    const dlAction = card.querySelector(".card-dl-btn");
+    if (dlAction) {
+      dlAction.addEventListener("click", (e) => {
+        e.stopPropagation();
+        downloadEpisodePart(ep, 0);
+      });
+    }
+
     card.addEventListener("click", (e) => {
       const partBtn = e.target.closest(".yt-card-part-btn");
       if (partBtn) {
@@ -951,13 +1141,14 @@ function renderGrid(list) {
       } else {
         playPart(ep, 0, true, false);
       }
+      expandPlayerCard();
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
 
-    // Keyboard Enter on card
     card.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" && !e.target.classList.contains("yt-card-part-btn")) {
+      if (e.key === "Enter" && !e.target.closest("button")) {
         playPart(ep, 0, true, false);
+        expandPlayerCard();
         window.scrollTo({ top: 0, behavior: "smooth" });
       }
     });
@@ -968,6 +1159,183 @@ function renderGrid(list) {
   if (activeEpisode) {
     highlightActiveCard(activeEpisode.id);
   }
+  renderGooglePagination();
+}
+
+function expandPlayerCard() {
+  const body = document.getElementById("player-collapsible-body");
+  const btn = document.getElementById("player-collapse-btn");
+  if (body) body.style.display = "block";
+  if (btn) {
+    btn.setAttribute("aria-expanded", "true");
+    btn.textContent = "收合播放器";
+  }
+}
+
+function setupPlayerCollapse() {
+  const btn = document.getElementById("player-collapse-btn");
+  const body = document.getElementById("player-collapsible-body");
+  if (!btn || !body) return;
+  btn.addEventListener("click", () => {
+    const collapsed = body.style.display === "none";
+    body.style.display = collapsed ? "block" : "none";
+    btn.setAttribute("aria-expanded", collapsed ? "true" : "false");
+    btn.textContent = collapsed ? "收合播放器" : "展開播放器";
+  });
+}
+
+function renderGooglePagination() {
+  const nav = document.getElementById("google-pagination-bar");
+  if (!nav) return;
+
+  const effectiveTotal = Math.max(10, TOTAL_SOURCE_PAGES);
+  const startPage = Math.max(1, Math.min(currentCatalogPage - 2, effectiveTotal - 4));
+  const endPage = Math.min(effectiveTotal, startPage + 4);
+  const pages = [];
+  for (let p = startPage; p <= endPage; p++) {
+    pages.push(p);
+  }
+
+  nav.innerHTML = `
+    <button type="button" class="gpage-prev-next" id="gpage-prev" ${currentCatalogPage <= 1 ? "disabled" : ""} aria-label="上一頁">
+      ‹ 上一頁
+    </button>
+    ${pages.map((p) => `
+      <button type="button" class="gpage-num ${p === currentCatalogPage ? "active" : ""}" data-page="${p}" aria-label="第 ${p} 頁" ${p === currentCatalogPage ? 'aria-current="page"' : ""}>
+        ${p}
+      </button>
+    `).join("")}
+    <button type="button" class="gpage-prev-next" id="gpage-next" ${currentCatalogPage >= TOTAL_SOURCE_PAGES ? "disabled" : ""} aria-label="下一頁">
+      下一頁 ›
+    </button>
+  `;
+
+  const prevBtn = nav.querySelector("#gpage-prev");
+  if (prevBtn) prevBtn.addEventListener("click", () => goToCatalogPage(currentCatalogPage - 1));
+  const nextBtn = nav.querySelector("#gpage-next");
+  if (nextBtn) nextBtn.addEventListener("click", () => goToCatalogPage(currentCatalogPage + 1));
+  nav.querySelectorAll(".gpage-num").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const targetPage = parseInt(btn.getAttribute("data-page") || "1", 10);
+      goToCatalogPage(targetPage);
+    });
+  });
+}
+
+async function goToCatalogPage(page) {
+  if (page < 1 || page > TOTAL_SOURCE_PAGES || page === currentCatalogPage) return;
+  const cacheKey = `${currentChannel.id}:${page}`;
+  if (channelPageCache.has(cacheKey)) {
+    currentCatalogPage = page;
+    catalog.episodes = channelPageCache.get(cacheKey);
+    filteredEpisodes = [...catalog.episodes];
+    applyFilters();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    return;
+  }
+
+  if (catalogStatus) catalogStatus.textContent = `載入第 ${page} 頁...`;
+  try {
+    const res = await fetch(`/api/episodes?page=${page}&show=${encodeURIComponent(currentChannel.id)}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    if (!data.ok || !Array.isArray(data.episodes) || !data.episodes.length) throw new Error("無集數資料");
+    channelPageCache.set(cacheKey, data.episodes);
+    currentCatalogPage = page;
+    catalog.episodes = data.episodes;
+    filteredEpisodes = [...catalog.episodes];
+    if (catalogStatus) catalogStatus.textContent = `第 ${page} 頁 (${data.episodes.length} 集)`;
+    applyFilters();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  } catch (err) {
+    if (catalogStatus) catalogStatus.textContent = `載入第 ${page} 頁失敗`;
+  }
+}
+
+function setupChannelPicker() {
+  const pickerBtn = document.getElementById("channel-picker-btn");
+  const modal = document.getElementById("channel-modal");
+  const backdrop = document.getElementById("channel-modal-backdrop");
+  const closeBtn = document.getElementById("channel-modal-close");
+  const container = document.getElementById("channel-list-container");
+  if (!pickerBtn || !modal || !container) return;
+
+  function renderChannelOptions() {
+    container.innerHTML = WEB_SHOW_CHANNELS.map((ch) => {
+      const isSelected = ch.id === currentChannel.id;
+      return `
+        <button type="button" class="channel-option-btn ${isSelected ? "active" : ""}" data-channel-id="${ch.id}">
+          <span class="channel-option-emoji">${ch.emoji}</span>
+          <span class="channel-option-meta">
+            <div class="channel-option-title">${ch.name} <span style="font-size:12px; color:var(--yt-text-secondary); font-weight:400;">${ch.englishName}</span></div>
+            <div class="channel-option-sub">${ch.tagline}</div>
+          </span>
+          ${isSelected ? '<span style="color:var(--yt-red); font-weight:700;">✓</span>' : ""}
+        </button>
+      `;
+    }).join("");
+
+    container.querySelectorAll(".channel-option-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const id = btn.getAttribute("data-channel-id");
+        const ch = WEB_SHOW_CHANNELS.find((c) => c.id === id);
+        modal.style.display = "none";
+        pickerBtn.setAttribute("aria-expanded", "false");
+        if (ch) switchChannel(ch);
+      });
+    });
+  }
+
+  function closeModal() {
+    modal.style.display = "none";
+    pickerBtn.setAttribute("aria-expanded", "false");
+  }
+
+  pickerBtn.addEventListener("click", () => {
+    renderChannelOptions();
+    modal.style.display = "flex";
+    pickerBtn.setAttribute("aria-expanded", "true");
+  });
+  if (backdrop) backdrop.addEventListener("click", closeModal);
+  if (closeBtn) closeBtn.addEventListener("click", closeModal);
+}
+
+async function switchChannel(ch) {
+  if (!ch || ch.id === currentChannel.id) return;
+  currentChannel = ch;
+  currentCatalogPage = 1;
+  const emojiEl = document.getElementById("channel-emoji");
+  const nameEl = document.getElementById("channel-name");
+  if (emojiEl) emojiEl.textContent = ch.emoji;
+  if (nameEl) nameEl.textContent = ch.name;
+
+  const cacheKey = `${ch.id}:1`;
+  if (channelPageCache.has(cacheKey)) {
+    catalog.episodes = channelPageCache.get(cacheKey);
+    filteredEpisodes = [...catalog.episodes];
+    applyFilters();
+    return;
+  }
+
+  // Immediate fallback render before async fetch
+  catalog.episodes = [...ch.fallbackEpisodes];
+  filteredEpisodes = [...catalog.episodes];
+  if (catalogStatus) catalogStatus.textContent = `切換至「${ch.name}」...`;
+  applyFilters();
+
+  try {
+    const res = await fetch(`/api/episodes?page=1&show=${encodeURIComponent(ch.id)}`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data.ok && Array.isArray(data.episodes) && data.episodes.length) {
+        channelPageCache.set(cacheKey, data.episodes);
+        catalog.episodes = data.episodes;
+        filteredEpisodes = [...data.episodes];
+        if (catalogStatus) catalogStatus.textContent = `已同步 (${data.episodes.length} 集)`;
+        applyFilters();
+      }
+    }
+  } catch (_) {}
 }
 
 // Year Filter & Search History & Chronological Sorting (Feature 10)
@@ -1075,8 +1443,10 @@ function setYearFilter(year) {
 function toggleSortOrder() {
   isSortAscending = !isSortAscending;
   if (isBrowser) {
+    const sortBtn = document.getElementById("sort-order-btn");
     const sortIcon = document.getElementById("sort-icon");
     const sortLabel = document.getElementById("sort-label");
+    if (sortBtn) sortBtn.classList.toggle("ascending", isSortAscending);
     if (sortIcon) sortIcon.textContent = isSortAscending ? "⬆" : "⬇";
     if (sortLabel) sortLabel.textContent = isSortAscending ? "舊到新" : "新到舊";
   }
@@ -1267,6 +1637,9 @@ async function loadCatalog() {
   const loadMoreBtn = document.getElementById("load-more-btn");
   if (loadMoreBtn) {
     loadMoreBtn.onclick = () => loadNextPage();
+  }
+  if (refreshBtn) {
+    refreshBtn.onclick = () => loadCatalog();
   }
 }
 
@@ -2563,6 +2936,8 @@ if (typeof window !== "undefined") {
     setupSearchAndFilters();
     setupRadioMode();
     setupSkipIntroAndStall();
+    setupChannelPicker();
+    setupPlayerCollapse();
     loadCatalog();
   });
 }

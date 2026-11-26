@@ -101,7 +101,7 @@ class _ShareDialogState extends State<ShareDialog> {
       backgroundColor: AppColors.surfaceSecondary,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppRadius.modal),
-        side: const BorderSide(color: AppColors.borderSeparator, width: 1),
+        side: BorderSide(color: AppColors.borderSeparator, width: 1),
       ),
       insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       child: SingleChildScrollView(
@@ -121,7 +121,7 @@ class _ShareDialogState extends State<ShareDialog> {
                       borderRadius: BorderRadius.circular(AppRadius.control),
                       border: Border.all(color: AppColors.accent.withValues(alpha: 0.35)),
                     ),
-                    child: const Icon(Icons.share, color: AppColors.accent, size: 20),
+                    child: Icon(Icons.share, color: AppColors.accent, size: 20),
                   ),
                   const SizedBox(width: AppSpacing.md),
                   Expanded(
@@ -145,7 +145,7 @@ class _ShareDialogState extends State<ShareDialog> {
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.close, color: AppColors.textSecondary, size: 20),
+                    icon: Icon(Icons.close, color: AppColors.textSecondary, size: 20),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints.tightFor(width: 44, height: 44),
                     style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
@@ -154,7 +154,7 @@ class _ShareDialogState extends State<ShareDialog> {
                 ],
               ),
               const SizedBox(height: AppSpacing.lg),
-              const Divider(color: AppColors.borderSeparator, height: 1),
+              Divider(color: AppColors.borderSeparator, height: 1),
               const SizedBox(height: AppSpacing.lg),
 
               // QR Code Container
@@ -191,7 +191,7 @@ class _ShareDialogState extends State<ShareDialog> {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.link, size: 16, color: AppColors.textSecondary),
+                    Icon(Icons.link, size: 16, color: AppColors.textSecondary),
                     const SizedBox(width: AppSpacing.sm),
                     Expanded(
                       child: Text(
@@ -233,7 +233,7 @@ class _ShareDialogState extends State<ShareDialog> {
                     child: ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.accent,
-                        foregroundColor: AppColors.textPrimary,
+                        foregroundColor: AppColors.onAccent,
                         elevation: 0,
                         minimumSize: const Size(0, 44),
                         padding: const EdgeInsets.symmetric(vertical: 10),
@@ -243,7 +243,10 @@ class _ShareDialogState extends State<ShareDialog> {
                       ),
                       onPressed: _shareLink,
                       icon: const Icon(Icons.share, size: 16),
-                      label: const Text('分享連結', style: AppType.body2Medium),
+                      label: Text(
+                        '分享連結',
+                        style: AppType.body2Medium.copyWith(color: AppColors.onAccent),
+                      ),
                     ),
                   ),
                 ],
@@ -257,7 +260,7 @@ class _ShareDialogState extends State<ShareDialog> {
                   child: OutlinedButton.icon(
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.textPrimary,
-                      side: const BorderSide(color: AppColors.borderDefault),
+                      side: BorderSide(color: AppColors.borderDefault),
                       minimumSize: const Size(0, 44),
                       padding: const EdgeInsets.symmetric(vertical: 9),
                       shape: RoundedRectangleBorder(
@@ -265,7 +268,7 @@ class _ShareDialogState extends State<ShareDialog> {
                       ),
                     ),
                     onPressed: _shareLocalFile,
-                    icon: const Icon(Icons.video_file_outlined, size: 16, color: AppColors.success),
+                    icon: Icon(Icons.video_file_outlined, size: 16, color: AppColors.success),
                     label: Text(
                       '傳送本機離線影片檔 (MP4)',
                       style: AppType.caption1Medium.copyWith(color: AppColors.textPrimary),

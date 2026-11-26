@@ -2080,18 +2080,18 @@ var require_react_dom_client_production = __commonJS({
       var isCustomProperty = 0 === styleName.indexOf("--");
       null == value || "boolean" === typeof value || "" === value ? isCustomProperty ? style2.setProperty(styleName, "") : "float" === styleName ? style2.cssFloat = "" : style2[styleName] = "" : isCustomProperty ? style2.setProperty(styleName, value) : "number" !== typeof value || 0 === value || unitlessNumbers.has(styleName) ? "float" === styleName ? style2.cssFloat = value : style2[styleName] = ("" + value).trim() : style2[styleName] = value + "px";
     }
-    function setValueForStyles(node, styles8, prevStyles) {
-      if (null != styles8 && "object" !== typeof styles8)
+    function setValueForStyles(node, styles9, prevStyles) {
+      if (null != styles9 && "object" !== typeof styles9)
         throw Error(formatProdErrorMessage(62));
       node = node.style;
       if (null != prevStyles) {
         for (var styleName in prevStyles)
-          !prevStyles.hasOwnProperty(styleName) || null != styles8 && styles8.hasOwnProperty(styleName) || (0 === styleName.indexOf("--") ? node.setProperty(styleName, "") : "float" === styleName ? node.cssFloat = "" : node[styleName] = "", viewTransitionMutationContext = true);
-        for (var styleName$16 in styles8)
-          styleName = styles8[styleName$16], styles8.hasOwnProperty(styleName$16) && prevStyles[styleName$16] !== styleName && (setValueForStyle(node, styleName$16, styleName), viewTransitionMutationContext = true);
+          !prevStyles.hasOwnProperty(styleName) || null != styles9 && styles9.hasOwnProperty(styleName) || (0 === styleName.indexOf("--") ? node.setProperty(styleName, "") : "float" === styleName ? node.cssFloat = "" : node[styleName] = "", viewTransitionMutationContext = true);
+        for (var styleName$16 in styles9)
+          styleName = styles9[styleName$16], styles9.hasOwnProperty(styleName$16) && prevStyles[styleName$16] !== styleName && (setValueForStyle(node, styleName$16, styleName), viewTransitionMutationContext = true);
       } else
-        for (var styleName$17 in styles8)
-          styles8.hasOwnProperty(styleName$17) && setValueForStyle(node, styleName$17, styles8[styleName$17]);
+        for (var styleName$17 in styles9)
+          styles9.hasOwnProperty(styleName$17) && setValueForStyle(node, styleName$17, styles9[styleName$17]);
     }
     function isCustomElement(tagName) {
       if (-1 === tagName.indexOf("-")) return false;
@@ -13356,9 +13356,9 @@ var require_react_dom_client_production = __commonJS({
       previousDispatcher.S(href, precedence, options2);
       var ownerDocument = globalDocument;
       if (ownerDocument && href) {
-        var styles8 = getResourcesFromRoot(ownerDocument).hoistableStyles, key = getStyleKey(href);
+        var styles9 = getResourcesFromRoot(ownerDocument).hoistableStyles, key = getStyleKey(href);
         precedence = precedence || "default";
-        var resource = styles8.get(key);
+        var resource = styles9.get(key);
         if (!resource) {
           var state = { loading: 0, preload: null };
           if (resource = ownerDocument.querySelector(
@@ -13393,7 +13393,7 @@ var require_react_dom_client_production = __commonJS({
             count: 1,
             state
           };
-          styles8.set(key, resource);
+          styles9.set(key, resource);
         }
       }
     }
@@ -15239,18 +15239,30 @@ var import_client = __toESM(require_client(), 1);
 
 // node_modules/@remixicon/react/index.mjs
 var import_react = __toESM(require_react(), 1);
+var u1 = ({ color: C = "currentColor", size: e = 24, className: l, ...i }) => import_react.default.createElement("svg", { viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg", width: e, height: e, fill: C, ...i, className: "remixicon " + (l || "") }, import_react.default.createElement("path", { d: "M13.0001 16.1716L18.3641 10.8076L19.7783 12.2218L12.0001 20L4.22192 12.2218L5.63614 10.8076L11.0001 16.1716V4H13.0001V16.1716Z" }));
 var f1 = ({ color: C = "currentColor", size: e = 24, className: l, ...i }) => import_react.default.createElement("svg", { viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg", width: e, height: e, fill: C, ...i, className: "remixicon " + (l || "") }, import_react.default.createElement("path", { d: "M11.9999 13.1714L16.9497 8.22168L18.3639 9.63589L11.9999 15.9999L5.63599 9.63589L7.0502 8.22168L11.9999 13.1714Z" }));
 var K1 = ({ color: C = "currentColor", size: e = 24, className: l, ...i }) => import_react.default.createElement("svg", { viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg", width: e, height: e, fill: C, ...i, className: "remixicon " + (l || "") }, import_react.default.createElement("path", { d: "M7.82843 10.9999H20V12.9999H7.82843L13.1924 18.3638L11.7782 19.778L4 11.9999L11.7782 4.22168L13.1924 5.63589L7.82843 10.9999Z" }));
 var J1 = ({ color: C = "currentColor", size: e = 24, className: l, ...i }) => import_react.default.createElement("svg", { viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg", width: e, height: e, fill: C, ...i, className: "remixicon " + (l || "") }, import_react.default.createElement("path", { d: "M10.8284 12.0007L15.7782 16.9504L14.364 18.3646L8 12.0007L14.364 5.63672L15.7782 7.05093L10.8284 12.0007Z" }));
 var i2 = ({ color: C = "currentColor", size: e = 24, className: l, ...i }) => import_react.default.createElement("svg", { viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg", width: e, height: e, fill: C, ...i, className: "remixicon " + (l || "") }, import_react.default.createElement("path", { d: "M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z" }));
 var r2 = ({ color: C = "currentColor", size: e = 24, className: l, ...i }) => import_react.default.createElement("svg", { viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg", width: e, height: e, fill: C, ...i, className: "remixicon " + (l || "") }, import_react.default.createElement("path", { d: "M13.1717 12.0007L8.22192 7.05093L9.63614 5.63672L16.0001 12.0007L9.63614 18.3646L8.22192 16.9504L13.1717 12.0007Z" }));
-var R5 = ({ color: C = "currentColor", size: e = 24, className: l, ...i }) => import_react.default.createElement("svg", { viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg", width: e, height: e, fill: C, ...i, className: "remixicon " + (l || "") }, import_react.default.createElement("path", { d: "M9 1V3H15V1H17V3H21C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H7V1H9ZM20 11H4V19H20V11ZM7 5H4V9H20V5H17V7H15V5H9V7H7V5Z" }));
+var h2 = ({ color: C = "currentColor", size: e = 24, className: l, ...i }) => import_react.default.createElement("svg", { viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg", width: e, height: e, fill: C, ...i, className: "remixicon " + (l || "") }, import_react.default.createElement("path", { d: "M13.0001 7.82843V20H11.0001V7.82843L5.63614 13.1924L4.22192 11.7782L12.0001 4L19.7783 11.7782L18.3641 13.1924L13.0001 7.82843Z" }));
+var s7 = ({ color: C = "currentColor", size: e = 24, className: l, ...i }) => import_react.default.createElement("svg", { viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg", width: e, height: e, fill: C, ...i, className: "remixicon " + (l || "") }, import_react.default.createElement("path", { d: "M9.9997 15.1709L19.1921 5.97852L20.6063 7.39273L9.9997 17.9993L3.63574 11.6354L5.04996 10.2212L9.9997 15.1709Z" }));
+var P7 = ({ color: C = "currentColor", size: e = 24, className: l, ...i }) => import_react.default.createElement("svg", { viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg", width: e, height: e, fill: C, ...i, className: "remixicon " + (l || "") }, import_react.default.createElement("path", { d: "M11.9997 10.5865L16.9495 5.63672L18.3637 7.05093L13.4139 12.0007L18.3637 16.9504L16.9495 18.3646L11.9997 13.4149L7.04996 18.3646L5.63574 16.9504L10.5855 12.0007L5.63574 7.05093L7.04996 5.63672L11.9997 10.5865Z" }));
+var we = ({ color: C = "currentColor", size: e = 24, className: l, ...i }) => import_react.default.createElement("svg", { viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg", width: e, height: e, fill: C, ...i, className: "remixicon " + (l || "") }, import_react.default.createElement("path", { d: "M3 19H21V21H3V19ZM13 13.1716L19.0711 7.1005L20.4853 8.51472L12 17L3.51472 8.51472L4.92893 7.1005L11 13.1716V2H13V13.1716Z" }));
 var Wt = ({ color: C = "currentColor", size: e = 24, className: l, ...i }) => import_react.default.createElement("svg", { viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg", width: e, height: e, fill: C, ...i, className: "remixicon " + (l || "") }, import_react.default.createElement("path", { d: "M10 6V8H5V19H16V14H18V20C18 20.5523 17.5523 21 17 21H4C3.44772 21 3 20.5523 3 20V7C3 6.44772 3.44772 6 4 6H10ZM21 3V11H19L18.9999 6.413L11.2071 14.2071L9.79289 12.7929L17.5849 5H13V3H21Z" }));
+var BC = ({ color: C = "currentColor", size: e = 24, className: l, ...i }) => import_react.default.createElement("svg", { viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg", width: e, height: e, fill: C, ...i, className: "remixicon " + (l || "") }, import_react.default.createElement("path", { d: "M6.9998 6V3C6.9998 2.44772 7.44752 2 7.9998 2H19.9998C20.5521 2 20.9998 2.44772 20.9998 3V17C20.9998 17.5523 20.5521 18 19.9998 18H16.9998V20.9991C16.9998 21.5519 16.5499 22 15.993 22H4.00666C3.45059 22 3 21.5554 3 20.9991L3.0026 7.00087C3.0027 6.44811 3.45264 6 4.00942 6H6.9998ZM5.00242 8L5.00019 20H14.9998V8H5.00242ZM8.9998 6H16.9998V16H18.9998V4H8.9998V6Z" }));
 var Xl = ({ color: C = "currentColor", size: e = 24, className: l, ...i }) => import_react.default.createElement("svg", { viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg", width: e, height: e, fill: C, ...i, className: "remixicon " + (l || "") }, import_react.default.createElement("path", { d: "M2 3.9934C2 3.44476 2.45531 3 2.9918 3H21.0082C21.556 3 22 3.44495 22 3.9934V20.0066C22 20.5552 21.5447 21 21.0082 21H2.9918C2.44405 21 2 20.5551 2 20.0066V3.9934ZM8 5V19H16V5H8ZM4 5V7H6V5H4ZM18 5V7H20V5H18ZM4 9V11H6V9H4ZM18 9V11H20V9H18ZM4 13V15H6V13H4ZM18 13V15H20V13H18ZM4 17V19H6V17H4ZM18 17V19H20V17H18Z" }));
+var Ms = ({ color: C = "currentColor", size: e = 24, className: l, ...i }) => import_react.default.createElement("svg", { viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg", width: e, height: e, fill: C, ...i, className: "remixicon " + (l || "") }, import_react.default.createElement("path", { d: "M12.4142 5H21C21.5523 5 22 5.44772 22 6V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H10.4142L12.4142 5ZM4 5V19H20V7H11.5858L9.58579 5H4ZM11 13.05V9H16V11H13V15.5C13 16.8807 11.8807 18 10.5 18C9.11929 18 8 16.8807 8 15.5C8 14.1193 9.11929 13 10.5 13C10.6712 13 10.8384 13.0172 11 13.05Z" }));
+var Vo = ({ color: C = "currentColor", size: e = 24, className: l, ...i }) => import_react.default.createElement("svg", { viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg", width: e, height: e, fill: C, ...i, className: "remixicon " + (l || "") }, import_react.default.createElement("path", { d: "M12.001 4.52853C14.35 2.42 17.98 2.49 20.2426 4.75736C22.5053 7.02472 22.583 10.637 20.4786 12.993L11.9999 21.485L3.52138 12.993C1.41705 10.637 1.49571 7.01901 3.75736 4.75736C6.02157 2.49315 9.64519 2.41687 12.001 4.52853Z" }));
+var go = ({ color: C = "currentColor", size: e = 24, className: l, ...i }) => import_react.default.createElement("svg", { viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg", width: e, height: e, fill: C, ...i, className: "remixicon " + (l || "") }, import_react.default.createElement("path", { d: "M12.001 4.52853C14.35 2.42 17.98 2.49 20.2426 4.75736C22.5053 7.02472 22.583 10.637 20.4786 12.993L11.9999 21.485L3.52138 12.993C1.41705 10.637 1.49571 7.01901 3.75736 4.75736C6.02157 2.49315 9.64519 2.41687 12.001 4.52853ZM18.827 6.1701C17.3279 4.66794 14.9076 4.60701 13.337 6.01687L12.0019 7.21524L10.6661 6.01781C9.09098 4.60597 6.67506 4.66808 5.17157 6.17157C3.68183 7.66131 3.60704 10.0473 4.97993 11.6232L11.9999 18.6543L19.0201 11.6232C20.3935 10.0467 20.319 7.66525 18.827 6.1701Z" }));
+var uo = ({ color: C = "currentColor", size: e = 24, className: l, ...i }) => import_react.default.createElement("svg", { viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg", width: e, height: e, fill: C, ...i, className: "remixicon " + (l || "") }, import_react.default.createElement("path", { d: "M12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12H4C4 16.4183 7.58172 20 12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C9.25022 4 6.82447 5.38734 5.38451 7.50024L8 7.5V9.5H2V3.5H4L3.99989 5.99918C5.82434 3.57075 8.72873 2 12 2ZM13 7L12.9998 11.585L16.2426 14.8284L14.8284 16.2426L10.9998 12.413L11 7H13Z" }));
 var ya = ({ color: C = "currentColor", size: e = 24, className: l, ...i }) => import_react.default.createElement("svg", { viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg", width: e, height: e, fill: C, ...i, className: "remixicon " + (l || "") }, import_react.default.createElement("path", { d: "M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM11 11V17H13V11H11ZM11 7V9H13V7H11Z" }));
+var nL = ({ color: C = "currentColor", size: e = 24, className: l, ...i }) => import_react.default.createElement("svg", { viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg", width: e, height: e, fill: C, ...i, className: "remixicon " + (l || "") }, import_react.default.createElement("path", { d: "M12 20.8995L16.9497 15.9497C19.6834 13.2161 19.6834 8.78392 16.9497 6.05025C14.2161 3.31658 9.78392 3.31658 7.05025 6.05025C4.31658 8.78392 4.31658 13.2161 7.05025 15.9497L12 20.8995ZM12 23.7279L5.63604 17.364C2.12132 13.8492 2.12132 8.15076 5.63604 4.63604C9.15076 1.12132 14.8492 1.12132 18.364 4.63604C21.8787 8.15076 21.8787 13.8492 18.364 17.364L12 23.7279ZM12 13C13.1046 13 14 12.1046 14 11C14 9.89543 13.1046 9 12 9C10.8954 9 10 9.89543 10 11C10 12.1046 10.8954 13 12 13ZM12 15C9.79086 15 8 13.2091 8 11C8 8.79086 9.79086 7 12 7C14.2091 7 16 8.79086 16 11C16 13.2091 14.2091 15 12 15Z" }));
 var Ug = ({ color: C = "currentColor", size: e = 24, className: l, ...i }) => import_react.default.createElement("svg", { viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg", width: e, height: e, fill: C, ...i, className: "remixicon " + (l || "") }, import_react.default.createElement("path", { d: "M19.376 12.4161L8.77735 19.4818C8.54759 19.635 8.23715 19.5729 8.08397 19.3432C8.02922 19.261 8 19.1645 8 19.0658V4.93433C8 4.65818 8.22386 4.43433 8.5 4.43433C8.59871 4.43433 8.69522 4.46355 8.77735 4.5183L19.376 11.584C19.6057 11.7372 19.6678 12.0477 19.5146 12.2774C19.478 12.3323 19.4309 12.3795 19.376 12.4161Z" }));
 var dZ = ({ color: C = "currentColor", size: e = 24, className: l, ...i }) => import_react.default.createElement("svg", { viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg", width: e, height: e, fill: C, ...i, className: "remixicon " + (l || "") }, import_react.default.createElement("path", { d: "M5.46257 4.43262C7.21556 2.91688 9.5007 2 12 2C17.5228 2 22 6.47715 22 12C22 14.1361 21.3302 16.1158 20.1892 17.7406L17 12H20C20 7.58172 16.4183 4 12 4C9.84982 4 7.89777 4.84827 6.46023 6.22842L5.46257 4.43262ZM18.5374 19.5674C16.7844 21.0831 14.4993 22 12 22C6.47715 22 2 17.5228 2 12C2 9.86386 2.66979 7.88416 3.8108 6.25944L7 12H4C4 16.4183 7.58172 20 12 20C14.1502 20 16.1022 19.1517 17.5398 17.7716L18.5374 19.5674Z" }));
 var pv = ({ color: C = "currentColor", size: e = 24, className: l, ...i }) => import_react.default.createElement("svg", { viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg", width: e, height: e, fill: C, ...i, className: "remixicon " + (l || "") }, import_react.default.createElement("path", { d: "M18.031 16.6168L22.3137 20.8995L20.8995 22.3137L16.6168 18.031C15.0769 19.263 13.124 20 11 20C6.032 20 2 15.968 2 11C2 6.032 6.032 2 11 2C15.968 2 20 6.032 20 11C20 13.124 19.263 15.0769 18.031 16.6168ZM16.0247 15.8748C17.2475 14.6146 18 12.8956 18 11C18 7.1325 14.8675 4 11 4C7.1325 4 4 7.1325 4 11C4 14.8675 7.1325 18 11 18C12.8956 18 14.6146 17.2475 15.8748 16.0247L16.0247 15.8748Z" }));
+var Ov = ({ color: C = "currentColor", size: e = 24, className: l, ...i }) => import_react.default.createElement("svg", { viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg", width: e, height: e, fill: C, ...i, className: "remixicon " + (l || "") }, import_react.default.createElement("path", { d: "M3.33946 17.0002C2.90721 16.2515 2.58277 15.4702 2.36133 14.6741C3.3338 14.1779 3.99972 13.1668 3.99972 12.0002C3.99972 10.8345 3.3348 9.824 2.36353 9.32741C2.81025 7.71651 3.65857 6.21627 4.86474 4.99001C5.7807 5.58416 6.98935 5.65534 7.99972 5.072C9.01009 4.48866 9.55277 3.40635 9.4962 2.31604C11.1613 1.8846 12.8847 1.90004 14.5031 2.31862C14.4475 3.40806 14.9901 4.48912 15.9997 5.072C17.0101 5.65532 18.2187 5.58416 19.1346 4.99007C19.7133 5.57986 20.2277 6.25151 20.66 7.00021C21.0922 7.7489 21.4167 8.53025 21.6381 9.32628C20.6656 9.82247 19.9997 10.8336 19.9997 12.0002C19.9997 13.166 20.6646 14.1764 21.6359 14.673C21.1892 16.2839 20.3409 17.7841 19.1347 19.0104C18.2187 18.4163 17.0101 18.3451 15.9997 18.9284C14.9893 19.5117 14.4467 20.5941 14.5032 21.6844C12.8382 22.1158 11.1148 22.1004 9.49633 21.6818C9.55191 20.5923 9.00929 19.5113 7.99972 18.9284C6.98938 18.3451 5.78079 18.4162 4.86484 19.0103C4.28617 18.4205 3.77172 17.7489 3.33946 17.0002ZM8.99972 17.1964C10.0911 17.8265 10.8749 18.8227 11.2503 19.9659C11.7486 20.0133 12.2502 20.014 12.7486 19.9675C13.1238 18.8237 13.9078 17.8268 14.9997 17.1964C16.0916 16.5659 17.347 16.3855 18.5252 16.6324C18.8146 16.224 19.0648 15.7892 19.2729 15.334C18.4706 14.4373 17.9997 13.2604 17.9997 12.0002C17.9997 10.74 18.4706 9.5632 19.2729 8.6665C19.1688 8.4405 19.0538 8.21822 18.9279 8.00021C18.802 7.78219 18.667 7.57148 18.5233 7.36842C17.3457 7.61476 16.0911 7.43414 14.9997 6.80405C13.9083 6.17395 13.1246 5.17768 12.7491 4.03455C12.2509 3.98714 11.7492 3.98646 11.2509 4.03292C10.8756 5.17671 10.0916 6.17364 8.99972 6.80405C7.9078 7.43447 6.65245 7.61494 5.47428 7.36803C5.18485 7.77641 4.93463 8.21117 4.72656 8.66637C5.52881 9.56311 5.99972 10.74 5.99972 12.0002C5.99972 13.2604 5.52883 14.4372 4.72656 15.3339C4.83067 15.5599 4.94564 15.7822 5.07152 16.0002C5.19739 16.2182 5.3324 16.4289 5.47612 16.632C6.65377 16.3857 7.90838 16.5663 8.99972 17.1964ZM11.9997 15.0002C10.3429 15.0002 8.99972 13.6571 8.99972 12.0002C8.99972 10.3434 10.3429 9.00021 11.9997 9.00021C13.6566 9.00021 14.9997 10.3434 14.9997 12.0002C14.9997 13.6571 13.6566 15.0002 11.9997 15.0002ZM11.9997 13.0002C12.552 13.0002 12.9997 12.5525 12.9997 12.0002C12.9997 11.4479 12.552 11.0002 11.9997 11.0002C11.4474 11.0002 10.9997 11.4479 10.9997 12.0002C10.9997 12.5525 11.4474 13.0002 11.9997 13.0002Z" }));
+var Ld = ({ color: C = "currentColor", size: e = 24, className: l, ...i }) => import_react.default.createElement("svg", { viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg", width: e, height: e, fill: C, ...i, className: "remixicon " + (l || "") }, import_react.default.createElement("path", { d: "M13 14H11C7.54202 14 4.53953 15.9502 3.03239 18.8107C3.01093 18.5433 3 18.2729 3 18C3 12.4772 7.47715 8 13 8V2.5L23.5 11L13 19.5V14ZM11 12H15V15.3078L20.3214 11L15 6.69224V10H13C10.5795 10 8.41011 11.0749 6.94312 12.7735C8.20873 12.2714 9.58041 12 11 12Z" }));
 var tf = ({ color: C = "currentColor", size: e = 24, className: l, ...i }) => import_react.default.createElement("svg", { viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg", width: e, height: e, fill: C, ...i, className: "remixicon " + (l || "") }, import_react.default.createElement("path", { d: "M2 4.00087C2 3.44811 2.45531 3 2.9918 3H21.0082C21.556 3 22 3.44463 22 4.00087V17.9991C22 18.5519 21.5447 19 21.0082 19H2.9918C2.44405 19 2 18.5554 2 17.9991V4.00087ZM4 5V17H20V5H4ZM5 20H19V22H5V20Z" }));
 var wb = ({ color: C = "currentColor", size: e = 24, className: l, ...i }) => import_react.default.createElement("svg", { viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg", width: e, height: e, fill: C, ...i, className: "remixicon " + (l || "") }, import_react.default.createElement("path", { d: "M5 5H13V19H5V5ZM19 19H15V5H19V19ZM4 3C3.44772 3 3 3.44772 3 4V20C3 20.5523 3.44772 21 4 21H20C20.5523 21 21 20.5523 21 20V4C21 3.44772 20.5523 3 20 3H4ZM7 12L11 8.5V15.5L7 12Z" }));
 var hb = ({ color: C = "currentColor", size: e = 24, className: l, ...i }) => import_react.default.createElement("svg", { viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg", width: e, height: e, fill: C, ...i, className: "remixicon " + (l || "") }, import_react.default.createElement("path", { d: "M5 5H13V19H5V5ZM19 19H15V5H19V19ZM4 3C3.44772 3 3 3.44772 3 4V20C3 20.5523 3.44772 21 4 21H20C20.5523 21 21 20.5523 21 20V4C21 3.44772 20.5523 3 20 3H4ZM11 12L7 8.5V15.5L11 12Z" }));
@@ -18812,9 +18824,148 @@ function Button({
   );
 }
 
-// src/react/components/base/buttons/link-button.tsx
+// src/react/components/base/buttons/close-button.tsx
 var import_jsx_runtime4 = __toESM(require_jsx_runtime(), 1);
+var GLYPH_SIZE = {
+  "2xs": 6.8,
+  xs: 10.8,
+  sm: 12.6,
+  md: 16.2
+};
+var STROKE_WIDTH = {
+  "2xs": 1.6,
+  xs: 2,
+  sm: 2,
+  md: 2.5
+};
+var GLYPH_INSET = {
+  // Figma's 8px bars rotate inside a 6.8px square, leaving ~0.57px at
+  // each corner once projected onto the diagonal.
+  "2xs": 0.57,
+  xs: 2,
+  sm: 2,
+  md: 2
+};
 var styles4 = sortCx({
+  base: [
+    "inline-flex shrink-0 items-center justify-center rounded-full",
+    "bg-background-tertiary-default text-foreground-icon-secondary",
+    "select-none cursor-pointer",
+    "transition-colors duration-150 ease",
+    "hover:text-text-primary",
+    "outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-border-focus-ring"
+  ].join(" "),
+  container: {
+    "2xs": "size-4",
+    xs: "size-5",
+    sm: "size-6",
+    md: "size-8"
+  }
+});
+function CloseButton({
+  size = "xs",
+  className,
+  type = "button",
+  ref,
+  ...props
+}) {
+  const glyph = GLYPH_SIZE[size];
+  const strokeWidth = STROKE_WIDTH[size];
+  const inset = GLYPH_INSET[size];
+  return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+    "button",
+    {
+      ref,
+      type,
+      className: cx(styles4.base, styles4.container[size], className),
+      ...props,
+      children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { width: glyph, height: glyph, viewBox: `0 0 ${glyph} ${glyph}`, fill: "none", "aria-hidden": true, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+          "path",
+          {
+            d: `M${inset} ${inset}L${glyph - inset} ${glyph - inset}`,
+            stroke: "currentColor",
+            strokeWidth,
+            strokeLinecap: "round"
+          }
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+          "path",
+          {
+            d: `M${glyph - inset} ${inset}L${inset} ${glyph - inset}`,
+            stroke: "currentColor",
+            strokeWidth,
+            strokeLinecap: "round"
+          }
+        )
+      ] })
+    }
+  );
+}
+
+// src/react/components/base/buttons/icon-button.tsx
+var import_jsx_runtime5 = __toESM(require_jsx_runtime(), 1);
+var styles5 = sortCx({
+  base: [
+    "relative inline-flex shrink-0 items-center justify-center overflow-visible rounded-2lg",
+    "bg-background-primary-default text-foreground-icon-primary",
+    "border border-border-button-default shadow-xs",
+    "select-none cursor-pointer",
+    "transition-[background-color,border-color,box-shadow,color] duration-150 ease",
+    "outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-border-focus-ring",
+    "hover:bg-background-primary-hover hover:border-border-button-hover",
+    "active:bg-background-primary-active active:border-border-button-active",
+    "disabled:cursor-not-allowed disabled:bg-background-primary-disabled disabled:border-border-button-default disabled:text-icon-button-disabled-foreground disabled:opacity-60 disabled:shadow-none"
+  ].join(" "),
+  size: {
+    medium: "size-9",
+    small: "size-8"
+  },
+  icon: {
+    medium: "size-5 shrink-0",
+    small: "size-4 shrink-0"
+  }
+});
+function IconButton({
+  icon: Icon,
+  size = "medium",
+  className,
+  type = "button",
+  ref,
+  ...props
+}) {
+  return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+    "button",
+    {
+      ref,
+      type,
+      className: cx(styles5.base, styles5.size[size], className),
+      ...props,
+      children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Icon, { className: cx(styles5.icon[size], directionalIconClass(Icon)), "aria-hidden": true })
+    }
+  );
+}
+function IconLinkButton({
+  icon: Icon,
+  size = "medium",
+  className,
+  ref,
+  ...props
+}) {
+  return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+    "a",
+    {
+      ref,
+      className: cx(styles5.base, styles5.size[size], className),
+      ...props,
+      children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Icon, { className: cx(styles5.icon[size], directionalIconClass(Icon)), "aria-hidden": true })
+    }
+  );
+}
+
+// src/react/components/base/buttons/link-button.tsx
+var import_jsx_runtime6 = __toESM(require_jsx_runtime(), 1);
+var styles6 = sortCx({
   base: [
     "inline-flex items-center justify-center gap-1 whitespace-nowrap",
     "font-sans select-none cursor-pointer rounded-sm",
@@ -18856,15 +19007,15 @@ function LinkButton({
   disabled = false,
   ...props
 }) {
-  const classes = cx(styles4.base, styles4.size[size], styles4.variant[variant], className);
-  const content = /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_jsx_runtime4.Fragment, { children: [
-    Leading ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Leading, { className: cx(styles4.icon[size], directionalIconClass(Leading)), "aria-hidden": true }) : null,
-    children !== void 0 && children !== null && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { children }),
-    Trailing ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Trailing, { className: cx(styles4.icon[size], directionalIconClass(Trailing)), "aria-hidden": true }) : null
+  const classes = cx(styles6.base, styles6.size[size], styles6.variant[variant], className);
+  const content = /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(import_jsx_runtime6.Fragment, { children: [
+    Leading ? /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Leading, { className: cx(styles6.icon[size], directionalIconClass(Leading)), "aria-hidden": true }) : null,
+    children !== void 0 && children !== null && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { children }),
+    Trailing ? /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Trailing, { className: cx(styles6.icon[size], directionalIconClass(Trailing)), "aria-hidden": true }) : null
   ] });
   if (props.href !== void 0) {
     const { ref: ref2, href, ...anchorProps } = props;
-    return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+    return /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
       "a",
       {
         ref: ref2,
@@ -18877,12 +19028,12 @@ function LinkButton({
     );
   }
   const { ref, type = "button", ...buttonProps } = props;
-  return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { ref, type, disabled, className: classes, ...buttonProps, children: content });
+  return /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("button", { ref, type, disabled, className: classes, ...buttonProps, children: content });
 }
 
 // src/react/components/base/divider/divider.tsx
-var import_jsx_runtime5 = __toESM(require_jsx_runtime(), 1);
-var styles5 = sortCx({
+var import_jsx_runtime7 = __toESM(require_jsx_runtime(), 1);
+var styles7 = sortCx({
   root: "w-full",
   line: "h-px min-w-0 flex-1 bg-separator-border",
   content: "shrink-0 text-body-medium text-text-secondary",
@@ -18913,37 +19064,37 @@ function Divider({
 }) {
   const hasContent = children !== void 0 && children !== null;
   if (!hasContent) {
-    return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+    return /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
       "div",
       {
         ref,
         role: "separator",
         "aria-orientation": "horizontal",
         "data-variant": variant,
-        className: cx(styles5.root, styles5.empty[variant], className),
+        className: cx(styles7.root, styles7.empty[variant], className),
         ...props
       }
     );
   }
   const showLeadingLine = variant === "single" && align !== "start";
   const showTrailingLine = variant === "single" && align !== "end";
-  return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(
     "div",
     {
       ref,
       "data-variant": variant,
       "data-align": align,
       className: cx(
-        styles5.root,
-        styles5.withContent[variant],
-        styles5.align[align],
+        styles7.root,
+        styles7.withContent[variant],
+        styles7.align[align],
         className
       ),
       ...props,
       children: [
-        showLeadingLine ? /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { "aria-hidden": true, className: styles5.line }) : null,
-        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: cx(styles5.content, contentClassName), children }),
-        showTrailingLine ? /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { "aria-hidden": true, className: styles5.line }) : null
+        showLeadingLine ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { "aria-hidden": true, className: styles7.line }) : null,
+        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: cx(styles7.content, contentClassName), children }),
+        showTrailingLine ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { "aria-hidden": true, className: styles7.line }) : null
       ]
     }
   );
@@ -23417,87 +23568,8 @@ var $75afe627ae0cc0fa$export$d2b052e7b4be1756 = /* @__PURE__ */ (0, import_react
   }, renderProps2.children));
 });
 
-// src/react/components/base/buttons/close-button.tsx
-var import_jsx_runtime6 = __toESM(require_jsx_runtime(), 1);
-var GLYPH_SIZE = {
-  "2xs": 6.8,
-  xs: 10.8,
-  sm: 12.6,
-  md: 16.2
-};
-var STROKE_WIDTH = {
-  "2xs": 1.6,
-  xs: 2,
-  sm: 2,
-  md: 2.5
-};
-var GLYPH_INSET = {
-  // Figma's 8px bars rotate inside a 6.8px square, leaving ~0.57px at
-  // each corner once projected onto the diagonal.
-  "2xs": 0.57,
-  xs: 2,
-  sm: 2,
-  md: 2
-};
-var styles6 = sortCx({
-  base: [
-    "inline-flex shrink-0 items-center justify-center rounded-full",
-    "bg-background-tertiary-default text-foreground-icon-secondary",
-    "select-none cursor-pointer",
-    "transition-colors duration-150 ease",
-    "hover:text-text-primary",
-    "outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-border-focus-ring"
-  ].join(" "),
-  container: {
-    "2xs": "size-4",
-    xs: "size-5",
-    sm: "size-6",
-    md: "size-8"
-  }
-});
-function CloseButton({
-  size = "xs",
-  className,
-  type = "button",
-  ref,
-  ...props
-}) {
-  const glyph = GLYPH_SIZE[size];
-  const strokeWidth = STROKE_WIDTH[size];
-  const inset = GLYPH_INSET[size];
-  return /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
-    "button",
-    {
-      ref,
-      type,
-      className: cx(styles6.base, styles6.container[size], className),
-      ...props,
-      children: /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("svg", { width: glyph, height: glyph, viewBox: `0 0 ${glyph} ${glyph}`, fill: "none", "aria-hidden": true, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
-          "path",
-          {
-            d: `M${inset} ${inset}L${glyph - inset} ${glyph - inset}`,
-            stroke: "currentColor",
-            strokeWidth,
-            strokeLinecap: "round"
-          }
-        ),
-        /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
-          "path",
-          {
-            d: `M${glyph - inset} ${inset}L${inset} ${glyph - inset}`,
-            stroke: "currentColor",
-            strokeWidth,
-            strokeLinecap: "round"
-          }
-        )
-      ] })
-    }
-  );
-}
-
 // src/react/components/base/input/hint-text.tsx
-var import_jsx_runtime7 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime8 = __toESM(require_jsx_runtime(), 1);
 function hintTextClassName(isInvalid, className) {
   return cx(
     "pt-px text-caption-1-medium text-text-secondary",
@@ -23510,7 +23582,7 @@ function HintText({
   className,
   ...props
 }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
     $efe09c6d1c304b50$export$5f1af8db9871e1d6,
     {
       slot: isInvalid ? "errorMessage" : "description",
@@ -23524,7 +23596,7 @@ function HintText({
 var import_react50 = __toESM(require_react(), 1);
 
 // src/react/components/base/input/label.tsx
-var import_jsx_runtime8 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime9 = __toESM(require_jsx_runtime(), 1);
 function Label2({
   isRequired = false,
   isInvalid: _isInvalid,
@@ -23533,7 +23605,7 @@ function Label2({
   children,
   ...props
 }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(
     $43a3b93638fe5db9$export$b04be29aa201d4f5,
     {
       "data-label": "true",
@@ -23545,7 +23617,7 @@ function Label2({
       ),
       children: [
         children,
-        isRequired && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+        isRequired && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
           "span",
           {
             "aria-hidden": "true",
@@ -23553,7 +23625,7 @@ function Label2({
             children: "*"
           }
         ),
-        tooltip && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+        tooltip && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
           ya,
           {
             className: "size-4 shrink-0 text-foreground-icon-quaternary",
@@ -23566,7 +23638,7 @@ function Label2({
 }
 
 // src/react/components/base/input/input.tsx
-var import_jsx_runtime9 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime10 = __toESM(require_jsx_runtime(), 1);
 var TextFieldContext = (0, import_react50.createContext)({});
 function TextField2({
   size = "medium",
@@ -23576,7 +23648,7 @@ function TextField2({
   children,
   ...props
 }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(TextFieldContext.Provider, { value: { size, fieldClassName, inputClassName }, children: /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(TextFieldContext.Provider, { value: { size, fieldClassName, inputClassName }, children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
     $b8dcdc58eeae0d40$export$2c73285ae9390cec,
     {
       ...props,
@@ -23654,15 +23726,15 @@ function InputBase({
   const ctx = (0, import_react50.useContext)(TextFieldContext);
   const size = sizeProp ?? ctx.size ?? "medium";
   const hasAddon = leadingAddon !== void 0 && leadingAddon !== null;
-  return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
     $3a442827418ebe87$export$eb2fcfdbd7ba97d4,
     {
       ref: groupRef,
       className: (state) => cx(inputFieldClassName(state, size, hasAddon), ctx.fieldClassName, fieldClassName),
-      children: /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: inputStyles.content, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: inputStyles.leftSection, children: [
-          hasAddon ? leadingAddon : Leading ? /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(Leading, { className: inputStyles.icon, "aria-hidden": true }) : null,
-          /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
+      children: /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("div", { className: inputStyles.content, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("div", { className: inputStyles.leftSection, children: [
+          hasAddon ? leadingAddon : Leading ? /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Leading, { className: inputStyles.icon, "aria-hidden": true }) : null,
+          /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
             $41fb335299a4a39e$export$f5b8910cec6cf069,
             {
               ref,
@@ -23671,7 +23743,7 @@ function InputBase({
             }
           )
         ] }),
-        trailingAddon ?? (Trailing ? /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(Trailing, { className: inputStyles.icon, "aria-hidden": true }) : null)
+        trailingAddon ?? (Trailing ? /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Trailing, { className: inputStyles.icon, "aria-hidden": true }) : null)
       ] })
     }
   );
@@ -23693,14 +23765,14 @@ function Input2({
   className,
   ...textFieldProps
 }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
     TextField2,
     {
       ...textFieldProps,
       className,
       "aria-label": textFieldProps["aria-label"] ?? (!label && typeof placeholder === "string" ? placeholder : void 0),
-      children: ({ isRequired, isInvalid }) => /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(import_jsx_runtime9.Fragment, { children: [
-        label && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
+      children: ({ isRequired, isInvalid }) => /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(import_jsx_runtime10.Fragment, { children: [
+        label && /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
           Label2,
           {
             isRequired,
@@ -23709,7 +23781,7 @@ function Input2({
             children: label
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
           InputBase,
           {
             dir: inputDir ?? (["email", "url", "tel"].includes(textFieldProps.type ?? "") ? "ltr" : void 0),
@@ -23722,7 +23794,7 @@ function Input2({
             fieldClassName
           }
         ),
-        isInvalid && errorMessage != null ? /* @__PURE__ */ (0, import_jsx_runtime9.jsx)($1f3c3b1a70cec653$export$f551688fc98f2e09, { className: hintTextClassName(true), children: errorMessage }) : hint && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(HintText, { isInvalid, children: hint })
+        isInvalid && errorMessage != null ? /* @__PURE__ */ (0, import_jsx_runtime10.jsx)($1f3c3b1a70cec653$export$f551688fc98f2e09, { className: hintTextClassName(true), children: errorMessage }) : hint && /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(HintText, { isInvalid, children: hint })
       ] })
     }
   );
@@ -23730,7 +23802,7 @@ function Input2({
 Input2.displayName = "Input";
 
 // src/react/components/base/spinner/spinner.tsx
-var import_jsx_runtime10 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime11 = __toESM(require_jsx_runtime(), 1);
 var SIZES = {
   xs: { box: 12, line: 1.5 },
   sm: { box: 16, line: 2 },
@@ -23758,7 +23830,7 @@ function Arc({
     opacity,
     rotate: `${-lag}deg`
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("span", { "aria-hidden": true, className: "absolute", style, children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("span", { "aria-hidden": true, className: "absolute", style, children: /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
     "span",
     {
       className: "absolute inset-0",
@@ -23772,19 +23844,19 @@ function Arc({
 }
 function SpinnerGlyph({ size = "md", track = true, className }) {
   const { box, line } = SIZES[size];
-  return /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)(
     "span",
     {
       "aria-hidden": true,
       className: cx("relative inline-flex shrink-0 text-accent-500", className),
       style: { width: box, height: box },
       children: [
-        track ? /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("span", { className: "absolute inset-0 rounded-full border-current opacity-15", style: { borderWidth: line } }) : null,
-        /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("span", { className: "absolute inset-0 animate-spin [animation-duration:900ms] motion-reduce:[animation-duration:2400ms]", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Arc, { box, line, width: line * 4, blur: line * 1.6, opacity: 0.32, arc: 110, lag: 22 }),
-          /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Arc, { box, line, width: line * 2, blur: line * 0.6, opacity: 0.6, arc: 200, lag: 9 }),
-          /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Arc, { box, line, width: line, blur: 0, opacity: 1, arc: 290, lag: 0 }),
-          /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+        track ? /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("span", { className: "absolute inset-0 rounded-full border-current opacity-15", style: { borderWidth: line } }) : null,
+        /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)("span", { className: "absolute inset-0 animate-spin [animation-duration:900ms] motion-reduce:[animation-duration:2400ms]", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(Arc, { box, line, width: line * 4, blur: line * 1.6, opacity: 0.32, arc: 110, lag: 22 }),
+          /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(Arc, { box, line, width: line * 2, blur: line * 0.6, opacity: 0.6, arc: 200, lag: 9 }),
+          /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(Arc, { box, line, width: line, blur: 0, opacity: 1, arc: 290, lag: 0 }),
+          /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
             "span",
             {
               className: "absolute left-1/2 top-0 rounded-full bg-current",
@@ -23799,7 +23871,7 @@ function SpinnerGlyph({ size = "md", track = true, className }) {
 
 // src/react/components/foundations/template-copy/template-copy.tsx
 var import_react51 = __toESM(require_react(), 1);
-var import_jsx_runtime11 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime12 = __toESM(require_jsx_runtime(), 1);
 var CopyContext = (0, import_react51.createContext)(null);
 var MenuContext = (0, import_react51.createContext)(null);
 var textProps = /* @__PURE__ */ new Set([
@@ -23860,7 +23932,7 @@ function useTemplateCopy() {
 }
 
 // src/react/components/base/search-field/search-field.tsx
-var import_jsx_runtime12 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime13 = __toESM(require_jsx_runtime(), 1);
 function SearchField2({
   label,
   hint,
@@ -23892,7 +23964,7 @@ function SearchField2({
     onClear?.();
     inputRef.current?.focus();
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
     $29a5029ff43c9612$export$b94867ecbd698f21,
     {
       ...props,
@@ -23901,9 +23973,9 @@ function SearchField2({
       onClear,
       "aria-label": ariaLabel ?? (!label ? placeholder : void 0),
       className: cx("group flex w-full flex-col items-start gap-1", className),
-      children: ({ isEmpty, isDisabled, isInvalid }) => /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)(import_jsx_runtime12.Fragment, { children: [
-        label ? /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(Label2, { isRequired: props.isRequired, isInvalid, children: label }) : null,
-        /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
+      children: ({ isEmpty, isDisabled, isInvalid }) => /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(import_jsx_runtime13.Fragment, { children: [
+        label ? /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Label2, { isRequired: props.isRequired, isInvalid, children: label }) : null,
+        /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
           InputBase,
           {
             ref: inputRef,
@@ -23913,8 +23985,8 @@ function SearchField2({
             className: "[&::-webkit-search-cancel-button]:hidden",
             leadingAddon: (
               // The icon and the light share one 20px box and cross-fade.
-              /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)("span", { "aria-hidden": true, className: "relative ms-1 size-5 shrink-0", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("span", { "aria-hidden": true, className: "relative ms-1 size-5 shrink-0", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
                   Icon,
                   {
                     className: cx(
@@ -23923,7 +23995,7 @@ function SearchField2({
                     )
                   }
                 ),
-                /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
+                /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
                   "span",
                   {
                     className: cx(
@@ -23931,12 +24003,12 @@ function SearchField2({
                       // Hidden, the light stays mounted for the fade but stops turning.
                       !isLoading && "scale-75 opacity-0 [&_*]:[animation-play-state:paused]"
                     ),
-                    children: /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(SpinnerGlyph, { size: "sm" })
+                    children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(SpinnerGlyph, { size: "sm" })
                   }
                 )
               ] })
             ),
-            trailingAddon: /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
+            trailingAddon: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
               CloseButton,
               {
                 size: "2xs",
@@ -23954,20 +24026,20 @@ function SearchField2({
             )
           }
         ),
-        hint ? /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(HintText, { isInvalid, children: hint }) : null
+        hint ? /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(HintText, { isInvalid, children: hint }) : null
       ] })
     }
   );
 }
 
 // src/react/components/foundations/direction/direction.tsx
-var import_jsx_runtime13 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime14 = __toESM(require_jsx_runtime(), 1);
 function DirectionProvider({ locale, ...props }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime13.jsx)($2eb8e6d23f3d0cb0$export$a54013f0d02a8f82, { locale, children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(DirectionBoundary, { ...props }) });
+  return /* @__PURE__ */ (0, import_jsx_runtime14.jsx)($2eb8e6d23f3d0cb0$export$a54013f0d02a8f82, { locale, children: /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(DirectionBoundary, { ...props }) });
 }
 function DirectionBoundary({ children, className, ...props }) {
   const { locale, direction } = $2eb8e6d23f3d0cb0$export$43bb16f9c6d9e3f7();
-  return /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("div", { ...props, lang: locale, dir: direction, className: cx("contents", className), children });
+  return /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("div", { ...props, lang: locale, dir: direction, className: cx("contents", className), children });
 }
 function useDirection() {
   return $2eb8e6d23f3d0cb0$export$43bb16f9c6d9e3f7().direction;
@@ -23975,7 +24047,7 @@ function useDirection() {
 
 // src/react/components/base/segmented-control/segmented-control.tsx
 var import_react54 = __toESM(require_react(), 1);
-var import_jsx_runtime14 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime15 = __toESM(require_jsx_runtime(), 1);
 var useIsomorphicLayoutEffect = typeof window !== "undefined" ? import_react54.useLayoutEffect : import_react54.useEffect;
 function SegmentedControl({ className, children, variant = "solid", ref, ...props }) {
   const direction = useDirection();
@@ -24015,7 +24087,7 @@ function SegmentedControl({ className, children, variant = "solid", ref, ...prop
     if (typeof ref === "function") ref(node);
     else if (ref) ref.current = node;
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(
     $bc25b811ec97a172$export$40258cc1d95ff477,
     {
       ref: setRefs,
@@ -24028,7 +24100,7 @@ function SegmentedControl({ className, children, variant = "solid", ref, ...prop
         typeof className === "function" ? className(state) : className
       ),
       children: [
-        variant === "solid" && thumb && /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+        variant === "solid" && thumb && /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
           "span",
           {
             "aria-hidden": true,
@@ -24051,7 +24123,7 @@ function SegmentedControlItem({
   ref,
   ...props
 }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
     $75afe627ae0cc0fa$export$d2b052e7b4be1756,
     {
       ref,
@@ -24070,8 +24142,8 @@ function SegmentedControlItem({
 }
 
 // src/react/components/base/skeleton/skeleton.tsx
-var import_jsx_runtime15 = __toESM(require_jsx_runtime(), 1);
-var styles7 = sortCx({
+var import_jsx_runtime16 = __toESM(require_jsx_runtime(), 1);
+var styles8 = sortCx({
   block: "bui-skeleton block bg-text-primary/8",
   shape: {
     rect: "rounded-xl",
@@ -24082,10 +24154,10 @@ var styles7 = sortCx({
 var FADE = "transition-[opacity,filter] duration-300 ease-out motion-reduce:transition-none";
 function Skeleton({ shape = "rect", isLoaded = false, className, style, children }) {
   if (children === void 0) {
-    return /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("span", { "aria-hidden": true, className: cx(styles7.block, "relative", styles7.shape[shape], className), style });
+    return /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("span", { "aria-hidden": true, className: cx(styles8.block, "relative", styles8.shape[shape], className), style });
   }
-  return /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("span", { className: cx("relative block", className), style, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("span", { className: cx("relative block", className), style, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
       "span",
       {
         "aria-hidden": !isLoaded || void 0,
@@ -24094,11 +24166,11 @@ function Skeleton({ shape = "rect", isLoaded = false, className, style, children
         children
       }
     ),
-    /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
       "span",
       {
         "aria-hidden": true,
-        className: cx(styles7.block, styles7.shape[shape], "pointer-events-none absolute inset-0", FADE, isLoaded && "opacity-0")
+        className: cx(styles8.block, styles8.shape[shape], "pointer-events-none absolute inset-0", FADE, isLoaded && "opacity-0")
       }
     )
   ] });
@@ -24240,7 +24312,7 @@ function useStore(store, selector, isEqual) {
 // node_modules/@videojs/react/dist/default/player/context.js
 var import_react_compiler_runtime3 = __toESM(require_dist(), 1);
 var import_react58 = __toESM(require_react(), 1);
-var import_jsx_runtime16 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime17 = __toESM(require_jsx_runtime(), 1);
 var PlayerContext = (0, import_react58.createContext)(null);
 var EMPTY_UNSUBSCRIBE = () => {
 };
@@ -24253,7 +24325,7 @@ function PlayerContextProvider(t0) {
   const { value, children } = t0;
   let t1;
   if ($[0] !== children || $[1] !== value) {
-    t1 = /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(PlayerContext.Provider, {
+    t1 = /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(PlayerContext.Provider, {
       value,
       children
     });
@@ -24297,9 +24369,9 @@ function useContainerAttach() {
 }
 
 // node_modules/@videojs/react/dist/default/media/fallback.js
-var import_jsx_runtime17 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime18 = __toESM(require_jsx_runtime(), 1);
 var MEDIA_HELP_URL = "https://videojs.org/help";
-var videoFallback = /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("a", {
+var videoFallback = /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("a", {
   href: MEDIA_HELP_URL,
   children: "Video player not working?"
 });
@@ -24307,7 +24379,7 @@ var videoFallback = /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("a", {
 // node_modules/@videojs/react/dist/default/media/video.js
 var import_react_compiler_runtime4 = __toESM(require_dist(), 1);
 var import_react59 = __toESM(require_react(), 1);
-var import_jsx_runtime18 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime19 = __toESM(require_jsx_runtime(), 1);
 var Video = (0, import_react59.forwardRef)(function Video2(t0, ref) {
   const $ = (0, import_react_compiler_runtime4.c)(10);
   let children;
@@ -24332,7 +24404,7 @@ var Video = (0, import_react59.forwardRef)(function Video2(t0, ref) {
   const composedRef = useComposedRefs(ref, mediaRef, setMedia);
   let t2;
   if ($[5] !== children || $[6] !== composedRef || $[7] !== fallback || $[8] !== props) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)("video", {
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)("video", {
       ref: composedRef,
       ...props,
       children: [children, fallback]
@@ -24529,14 +24601,14 @@ function useLocale() {
 // node_modules/@videojs/react/dist/default/player/popup-group-context.js
 var import_react_compiler_runtime6 = __toESM(require_dist(), 1);
 var import_react61 = __toESM(require_react(), 1);
-var import_jsx_runtime19 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime20 = __toESM(require_jsx_runtime(), 1);
 var PopupGroupContext = (0, import_react61.createContext)(void 0);
 function PopupGroupProvider(t0) {
   const $ = (0, import_react_compiler_runtime6.c)(3);
   const { value, children } = t0;
   let t1;
   if ($[0] !== children || $[1] !== value) {
-    t1 = /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(PopupGroupContext.Provider, {
+    t1 = /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(PopupGroupContext.Provider, {
       value,
       children
     });
@@ -26110,8 +26182,8 @@ function getAnchorNames(element) {
   if (!value || value === "none") return [];
   return value.split(",").map((name) => name.trim()).filter(Boolean);
 }
-function applyStyles(element, styles8) {
-  for (const [prop, value] of Object.entries(styles8)) if (typeof value === "string") element.style.setProperty(normalizeStyleProperty(prop), value);
+function applyStyles(element, styles9) {
+  for (const [prop, value] of Object.entries(styles9)) if (typeof value === "string") element.style.setProperty(normalizeStyleProperty(prop), value);
 }
 function snapshotInlineStyles(element, properties) {
   return [...properties].map((property) => {
@@ -26127,10 +26199,10 @@ function restoreInlineStyles(element, snapshot) {
   for (const { property, value, priority } of snapshot) if (value) element.style.setProperty(property, value, priority);
   else element.style.removeProperty(property);
 }
-function withInlineStyles(element, styles8, callback) {
-  const snapshot = snapshotInlineStyles(element, Object.keys(styles8));
+function withInlineStyles(element, styles9, callback) {
+  const snapshot = snapshotInlineStyles(element, Object.keys(styles9));
   try {
-    applyStyles(element, styles8);
+    applyStyles(element, styles9);
     return callback();
   } finally {
     restoreInlineStyles(element, snapshot);
@@ -26198,9 +26270,9 @@ function isPointInElement(element, point) {
   return rect.width > 0 && rect.height > 0 && point.clientX >= rect.left && point.clientX < rect.right && point.clientY >= rect.top && point.clientY < rect.bottom;
 }
 function measureElement(element, options = {}) {
-  const { styles: styles8, ...sizeOptions } = options;
+  const { styles: styles9, ...sizeOptions } = options;
   const measure = () => getElementSize(element, sizeOptions);
-  return styles8 ? withInlineStyles(element, styles8, measure) : measure();
+  return styles9 ? withInlineStyles(element, styles9, measure) : measure();
 }
 function getElementPadding(element) {
   const style = getComputedStyle(element);
@@ -34174,7 +34246,7 @@ function toDataAttrName(key) {
 // node_modules/@videojs/react/dist/default/player/container.js
 var import_react_compiler_runtime7 = __toESM(require_dist(), 1);
 var import_react62 = __toESM(require_react(), 1);
-var import_jsx_runtime20 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime21 = __toESM(require_jsx_runtime(), 1);
 
 // node_modules/@videojs/core/dist/default/i18n/text/container.js
 var labelText2 = {
@@ -34294,7 +34366,7 @@ var Container = (0, import_react62.forwardRef)(function Container2(t0, ref) {
   const stateAttrs = t9;
   let t10;
   if ($[27] !== children || $[28] !== popupGroup) {
-    t10 = /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(PopupGroupProvider, {
+    t10 = /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(PopupGroupProvider, {
       value: popupGroup,
       children
     });
@@ -34304,7 +34376,7 @@ var Container = (0, import_react62.forwardRef)(function Container2(t0, ref) {
   } else t10 = $[29];
   let t11;
   if ($[30] !== accessibleNameProps || $[31] !== composedRef || $[32] !== handlePointerUp || $[33] !== localeProps || $[34] !== props || $[35] !== role || $[36] !== stateAttrs || $[37] !== t10 || $[38] !== tabIndex) {
-    t11 = /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("div", {
+    t11 = /* @__PURE__ */ (0, import_jsx_runtime21.jsx)("div", {
       ref: composedRef,
       role,
       tabIndex,
@@ -34712,7 +34784,7 @@ function createDialogCore() {
 // node_modules/@videojs/react/dist/default/ui/error-dialog/root.js
 var import_react_compiler_runtime10 = __toESM(require_dist(), 1);
 var import_react75 = __toESM(require_react(), 1);
-var import_jsx_runtime21 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime22 = __toESM(require_jsx_runtime(), 1);
 function ErrorDialogRoot(t0) {
   const $ = (0, import_react_compiler_runtime10.c)(11);
   const { children } = t0;
@@ -34746,7 +34818,7 @@ function ErrorDialogRoot(t0) {
   } else t3 = $[4];
   let t4;
   if ($[5] !== children || $[6] !== dialogContext) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(DialogContextProvider, {
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(DialogContextProvider, {
       value: dialogContext,
       children
     });
@@ -34756,7 +34828,7 @@ function ErrorDialogRoot(t0) {
   } else t4 = $[7];
   let t5;
   if ($[8] !== t3 || $[9] !== t4) {
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(ErrorDialogContextProvider, {
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(ErrorDialogContextProvider, {
       value: t3,
       children: t4
     });
@@ -34793,7 +34865,7 @@ var ErrorDialogTitle = (0, import_react76.forwardRef)(function ErrorDialogTitle2
 
 // node_modules/@videojs/react/dist/default/ui/status-announcer/component.js
 var import_react77 = __toESM(require_react(), 1);
-var import_jsx_runtime22 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime23 = __toESM(require_jsx_runtime(), 1);
 var StatusAnnouncer = (0, import_react77.forwardRef)(function StatusAnnouncer2(componentProps, forwardedRef) {
   const { render, className, style, closeDelay, labels, ...elementProps } = componentProps;
   const translator = useTranslator();
@@ -34821,7 +34893,7 @@ var StatusAnnouncer = (0, import_react77.forwardRef)(function StatusAnnouncer2(c
     ref: forwardedRef,
     props: [elementProps, {
       role: "status",
-      children: /* @__PURE__ */ (0, import_jsx_runtime22.jsx)("span", {
+      children: /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("span", {
         "data-status-announcer-content": "",
         children: state.label ?? ""
       }, state.generation)
@@ -34991,14 +35063,14 @@ function useInputIndicatorRoot(createCore, props, options) {
 // node_modules/@videojs/react/dist/default/ui/status-indicator/context.js
 var import_react_compiler_runtime14 = __toESM(require_dist(), 1);
 var import_react82 = __toESM(require_react(), 1);
-var import_jsx_runtime23 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime24 = __toESM(require_jsx_runtime(), 1);
 var StatusIndicatorContext = (0, import_react82.createContext)(null);
 function StatusIndicatorProvider(t0) {
   const $ = (0, import_react_compiler_runtime14.c)(3);
   const { value, children } = t0;
   let t1;
   if ($[0] !== children || $[1] !== value) {
-    t1 = /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(StatusIndicatorContext.Provider, {
+    t1 = /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(StatusIndicatorContext.Provider, {
       value,
       children
     });
@@ -35017,7 +35089,7 @@ function useStatusIndicatorContext() {
 // node_modules/@videojs/react/dist/default/ui/status-indicator/root.js
 var import_react_compiler_runtime15 = __toESM(require_dist(), 1);
 var import_react83 = __toESM(require_react(), 1);
-var import_jsx_runtime24 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime25 = __toESM(require_jsx_runtime(), 1);
 var StatusIndicatorRoot = (0, import_react83.forwardRef)(function StatusIndicatorRoot2(componentProps, forwardedRef) {
   const $ = (0, import_react_compiler_runtime15.c)(14);
   const { render, className, style, actions, closeDelay, deriveCustomStatus, ...elementProps } = componentProps;
@@ -35068,7 +35140,7 @@ var StatusIndicatorRoot = (0, import_react83.forwardRef)(function StatusIndicato
   });
   let t5;
   if ($[10] !== T0 || $[11] !== t3 || $[12] !== t4) {
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(T0, {
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime25.jsx)(T0, {
       value: t3,
       children: t4
     });
@@ -35102,14 +35174,14 @@ var StatusIndicatorValue = (0, import_react84.forwardRef)(function StatusIndicat
 // node_modules/@videojs/react/dist/default/ui/volume-indicator/context.js
 var import_react_compiler_runtime16 = __toESM(require_dist(), 1);
 var import_react85 = __toESM(require_react(), 1);
-var import_jsx_runtime25 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime26 = __toESM(require_jsx_runtime(), 1);
 var VolumeIndicatorContext = (0, import_react85.createContext)(null);
 function VolumeIndicatorProvider(t0) {
   const $ = (0, import_react_compiler_runtime16.c)(3);
   const { value, children } = t0;
   let t1;
   if ($[0] !== children || $[1] !== value) {
-    t1 = /* @__PURE__ */ (0, import_jsx_runtime25.jsx)(VolumeIndicatorContext.Provider, {
+    t1 = /* @__PURE__ */ (0, import_jsx_runtime26.jsx)(VolumeIndicatorContext.Provider, {
       value,
       children
     });
@@ -35158,7 +35230,7 @@ function getVolumeIndicatorFillStyle(state, style) {
 // node_modules/@videojs/react/dist/default/ui/volume-indicator/root.js
 var import_react_compiler_runtime17 = __toESM(require_dist(), 1);
 var import_react87 = __toESM(require_react(), 1);
-var import_jsx_runtime26 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime27 = __toESM(require_jsx_runtime(), 1);
 var VolumeIndicatorRoot = (0, import_react87.forwardRef)(function VolumeIndicatorRoot2(componentProps, forwardedRef) {
   const $ = (0, import_react_compiler_runtime17.c)(12);
   const { render, className, style, closeDelay, ...elementProps } = componentProps;
@@ -35205,7 +35277,7 @@ var VolumeIndicatorRoot = (0, import_react87.forwardRef)(function VolumeIndicato
   });
   let t5;
   if ($[8] !== T0 || $[9] !== t3 || $[10] !== t4) {
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime26.jsx)(T0, {
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(T0, {
       value: t3,
       children: t4
     });
@@ -35284,14 +35356,14 @@ var BufferingIndicator = (0, import_react90.forwardRef)(function BufferingIndica
 // node_modules/@videojs/react/dist/default/ui/poster/context.js
 var import_react_compiler_runtime18 = __toESM(require_dist(), 1);
 var import_react91 = __toESM(require_react(), 1);
-var import_jsx_runtime27 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime28 = __toESM(require_jsx_runtime(), 1);
 var PosterContext = (0, import_react91.createContext)(null);
 function PosterProvider(t0) {
   const $ = (0, import_react_compiler_runtime18.c)(3);
   const { value, children } = t0;
   let t1;
   if ($[0] !== children || $[1] !== value) {
-    t1 = /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(PosterContext.Provider, {
+    t1 = /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(PosterContext.Provider, {
       value,
       children
     });
@@ -35418,7 +35490,7 @@ var PosterImage = (0, import_react92.forwardRef)(function PosterImage2(component
 
 // node_modules/@videojs/react/dist/default/ui/poster/root.js
 var import_react93 = __toESM(require_react(), 1);
-var import_jsx_runtime28 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime29 = __toESM(require_jsx_runtime(), 1);
 var PosterRoot = (0, import_react93.forwardRef)(function PosterRoot2(componentProps, forwardedRef) {
   const { render, className, style, ...elementProps } = componentProps;
   const playback = usePlayer(selectPlayback);
@@ -35432,7 +35504,7 @@ var PosterRoot = (0, import_react93.forwardRef)(function PosterRoot2(componentPr
   });
   core.setImageLoadState(reportedLoadState ?? (metadata?.poster ? "loading" : "none"));
   const state = core.getState();
-  return /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(PosterProvider, {
+  return /* @__PURE__ */ (0, import_jsx_runtime29.jsx)(PosterProvider, {
     value: {
       state,
       setImageLoadState
@@ -35456,14 +35528,14 @@ function _temp5() {
 // node_modules/@videojs/react/dist/default/ui/seek-indicator/context.js
 var import_react_compiler_runtime20 = __toESM(require_dist(), 1);
 var import_react94 = __toESM(require_react(), 1);
-var import_jsx_runtime29 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime30 = __toESM(require_jsx_runtime(), 1);
 var SeekIndicatorContext = (0, import_react94.createContext)(null);
 function SeekIndicatorProvider(t0) {
   const $ = (0, import_react_compiler_runtime20.c)(3);
   const { value, children } = t0;
   let t1;
   if ($[0] !== children || $[1] !== value) {
-    t1 = /* @__PURE__ */ (0, import_jsx_runtime29.jsx)(SeekIndicatorContext.Provider, {
+    t1 = /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(SeekIndicatorContext.Provider, {
       value,
       children
     });
@@ -35482,7 +35554,7 @@ function useSeekIndicatorContext() {
 // node_modules/@videojs/react/dist/default/ui/seek-indicator/root.js
 var import_react_compiler_runtime21 = __toESM(require_dist(), 1);
 var import_react95 = __toESM(require_react(), 1);
-var import_jsx_runtime30 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime31 = __toESM(require_jsx_runtime(), 1);
 var SeekIndicatorRoot = (0, import_react95.forwardRef)(function SeekIndicatorRoot2(componentProps, forwardedRef) {
   const $ = (0, import_react_compiler_runtime21.c)(9);
   const { render, className, style, closeDelay, ...elementProps } = componentProps;
@@ -35518,7 +35590,7 @@ var SeekIndicatorRoot = (0, import_react95.forwardRef)(function SeekIndicatorRoo
   });
   let t3;
   if ($[5] !== T0 || $[6] !== t1 || $[7] !== t2) {
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(T0, {
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(T0, {
       value: t1,
       children: t2
     });
@@ -35616,7 +35688,7 @@ function Gesture(t0) {
 
 // node_modules/@videojs/react/dist/default/internal/skins/shared/skins/shared/video/behaviors/gestures.js
 var import_react_compiler_runtime23 = __toESM(require_dist(), 1);
-var import_jsx_runtime31 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime32 = __toESM(require_jsx_runtime(), 1);
 function VideoGestures(t0) {
   const $ = (0, import_react_compiler_runtime23.c)(4);
   let t1;
@@ -35629,33 +35701,33 @@ function VideoGestures(t0) {
   const disabled = t2 === void 0 ? false : t2;
   let t3;
   if ($[2] !== disabled) {
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime31.jsxs)(import_jsx_runtime31.Fragment, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(Gesture, {
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime32.jsxs)(import_jsx_runtime32.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(Gesture, {
         disabled,
         type: "tap",
         action: "togglePaused",
         pointer: "mouse",
         region: "center"
       }),
-      /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(Gesture, {
+      /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(Gesture, {
         disabled,
         type: "tap",
         action: "toggleControls",
         pointer: "touch"
       }),
-      /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(Gesture, {
+      /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(Gesture, {
         disabled,
         type: "doubletap",
         action: "seekStep",
         region: "left"
       }),
-      /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(Gesture, {
+      /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(Gesture, {
         disabled,
         type: "doubletap",
         action: "toggleFullscreen",
         region: "center"
       }),
-      /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(Gesture, {
+      /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(Gesture, {
         disabled,
         type: "doubletap",
         action: "seekStep",
@@ -35727,7 +35799,7 @@ function Hotkey(t0) {
 
 // node_modules/@videojs/react/dist/default/internal/skins/shared/skins/shared/behaviors/playback-hotkeys.js
 var import_react_compiler_runtime25 = __toESM(require_dist(), 1);
-var import_jsx_runtime32 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime33 = __toESM(require_jsx_runtime(), 1);
 function PlaybackHotkeys(t0) {
   const $ = (0, import_react_compiler_runtime25.c)(4);
   let t1;
@@ -35740,75 +35812,75 @@ function PlaybackHotkeys(t0) {
   const disabled = t2 === void 0 ? false : t2;
   let t3;
   if ($[2] !== disabled) {
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime32.jsxs)(import_jsx_runtime32.Fragment, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(Hotkey, {
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime33.jsxs)(import_jsx_runtime33.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime33.jsx)(Hotkey, {
         disabled,
         keys: "Space",
         action: "togglePaused"
       }),
-      /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(Hotkey, {
+      /* @__PURE__ */ (0, import_jsx_runtime33.jsx)(Hotkey, {
         disabled,
         keys: "k",
         action: "togglePaused"
       }),
-      /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(Hotkey, {
+      /* @__PURE__ */ (0, import_jsx_runtime33.jsx)(Hotkey, {
         disabled,
         keys: "m",
         action: "toggleMuted"
       }),
-      /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(Hotkey, {
+      /* @__PURE__ */ (0, import_jsx_runtime33.jsx)(Hotkey, {
         disabled,
         keys: "ArrowRight",
         action: "seekStep"
       }),
-      /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(Hotkey, {
+      /* @__PURE__ */ (0, import_jsx_runtime33.jsx)(Hotkey, {
         disabled,
         keys: "ArrowLeft",
         action: "seekStep"
       }),
-      /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(Hotkey, {
+      /* @__PURE__ */ (0, import_jsx_runtime33.jsx)(Hotkey, {
         disabled,
         keys: "l",
         action: "seekStep"
       }),
-      /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(Hotkey, {
+      /* @__PURE__ */ (0, import_jsx_runtime33.jsx)(Hotkey, {
         disabled,
         keys: "j",
         action: "seekStep"
       }),
-      /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(Hotkey, {
+      /* @__PURE__ */ (0, import_jsx_runtime33.jsx)(Hotkey, {
         disabled,
         keys: "ArrowUp",
         action: "volumeStep"
       }),
-      /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(Hotkey, {
+      /* @__PURE__ */ (0, import_jsx_runtime33.jsx)(Hotkey, {
         disabled,
         keys: "ArrowDown",
         action: "volumeStep"
       }),
-      /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(Hotkey, {
+      /* @__PURE__ */ (0, import_jsx_runtime33.jsx)(Hotkey, {
         disabled,
         keys: "0-9",
         action: "seekToPercent"
       }),
-      /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(Hotkey, {
+      /* @__PURE__ */ (0, import_jsx_runtime33.jsx)(Hotkey, {
         disabled,
         keys: "Home",
         action: "seekToPercent",
         value: 0
       }),
-      /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(Hotkey, {
+      /* @__PURE__ */ (0, import_jsx_runtime33.jsx)(Hotkey, {
         disabled,
         keys: "End",
         action: "seekToPercent",
         value: 100
       }),
-      /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(Hotkey, {
+      /* @__PURE__ */ (0, import_jsx_runtime33.jsx)(Hotkey, {
         disabled,
         keys: ">",
         action: "speedUp"
       }),
-      /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(Hotkey, {
+      /* @__PURE__ */ (0, import_jsx_runtime33.jsx)(Hotkey, {
         disabled,
         keys: "<",
         action: "speedDown"
@@ -35822,7 +35894,7 @@ function PlaybackHotkeys(t0) {
 
 // node_modules/@videojs/react/dist/default/internal/skins/shared/skins/shared/video/behaviors/hotkeys.js
 var import_react_compiler_runtime26 = __toESM(require_dist(), 1);
-var import_jsx_runtime33 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime34 = __toESM(require_jsx_runtime(), 1);
 function VideoHotkeys(t0) {
   const $ = (0, import_react_compiler_runtime26.c)(4);
   let t1;
@@ -35835,19 +35907,19 @@ function VideoHotkeys(t0) {
   const disabled = t2 === void 0 ? false : t2;
   let t3;
   if ($[2] !== disabled) {
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime33.jsxs)(import_jsx_runtime33.Fragment, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime33.jsx)(PlaybackHotkeys, { disabled }),
-      /* @__PURE__ */ (0, import_jsx_runtime33.jsx)(Hotkey, {
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime34.jsxs)(import_jsx_runtime34.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime34.jsx)(PlaybackHotkeys, { disabled }),
+      /* @__PURE__ */ (0, import_jsx_runtime34.jsx)(Hotkey, {
         disabled,
         keys: "f",
         action: "toggleFullscreen"
       }),
-      /* @__PURE__ */ (0, import_jsx_runtime33.jsx)(Hotkey, {
+      /* @__PURE__ */ (0, import_jsx_runtime34.jsx)(Hotkey, {
         disabled,
         keys: "c",
         action: "toggleSubtitles"
       }),
-      /* @__PURE__ */ (0, import_jsx_runtime33.jsx)(Hotkey, {
+      /* @__PURE__ */ (0, import_jsx_runtime34.jsx)(Hotkey, {
         disabled,
         keys: "i",
         action: "togglePictureInPicture"
@@ -35874,7 +35946,7 @@ function useOptionalControlsContext() {
 
 // node_modules/@videojs/react/dist/default/ui/controls/root.js
 var import_react100 = __toESM(require_react(), 1);
-var import_jsx_runtime34 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime35 = __toESM(require_jsx_runtime(), 1);
 function ControlsRoot({ children, visibility = ControlsCore.defaultProps.visibility }) {
   "use no memo";
   const controls = usePlayer(selectControls);
@@ -35885,7 +35957,7 @@ function ControlsRoot({ children, visibility = ControlsCore.defaultProps.visibil
   core.setPlayback(playback ?? null);
   const state = core.getState();
   if (!state) return null;
-  return /* @__PURE__ */ (0, import_jsx_runtime34.jsx)(ControlsContextProvider, {
+  return /* @__PURE__ */ (0, import_jsx_runtime35.jsx)(ControlsContextProvider, {
     value: {
       state,
       stateAttrMap: ControlsDataAttrs
@@ -36281,7 +36353,7 @@ function _temp8() {
 // node_modules/@videojs/react/dist/default/ui/tooltip/popup.js
 var import_react_compiler_runtime31 = __toESM(require_dist(), 1);
 var import_react108 = __toESM(require_react(), 1);
-var import_jsx_runtime35 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime36 = __toESM(require_jsx_runtime(), 1);
 var TooltipPopup = (0, import_react108.forwardRef)(function TooltipPopup2(t0, forwardedRef) {
   const $ = (0, import_react_compiler_runtime31.c)(15);
   const { render, className, style, children, ...elementProps } = t0;
@@ -36333,7 +36405,7 @@ var TooltipPopup = (0, import_react108.forwardRef)(function TooltipPopup2(t0, fo
   if (!state.open) return null;
   let t4;
   if ($[13] !== children) {
-    t4 = children !== void 0 ? children : /* @__PURE__ */ (0, import_jsx_runtime35.jsxs)(import_jsx_runtime35.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime35.jsx)(TooltipLabel, {}), /* @__PURE__ */ (0, import_jsx_runtime35.jsx)(TooltipShortcut, {})] });
+    t4 = children !== void 0 ? children : /* @__PURE__ */ (0, import_jsx_runtime36.jsxs)(import_jsx_runtime36.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime36.jsx)(TooltipLabel, {}), /* @__PURE__ */ (0, import_jsx_runtime36.jsx)(TooltipShortcut, {})] });
     $[13] = children;
     $[14] = t4;
   } else t4 = $[14];
@@ -36448,7 +36520,7 @@ function useTooltipGroup() {
 
 // node_modules/@videojs/react/dist/default/ui/tooltip/root.js
 var import_react112 = __toESM(require_react(), 1);
-var import_jsx_runtime36 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime37 = __toESM(require_jsx_runtime(), 1);
 init_predicate2();
 function TooltipRoot({ open: controlledOpen, defaultOpen = TooltipCore.defaultProps.defaultOpen, onOpenChange: onOpenChangeProp, onOpenChangeComplete: onOpenChangeCompleteProp, delay = TooltipCore.defaultProps.delay, closeDelay = TooltipCore.defaultProps.closeDelay, disableHoverablePopup = TooltipCore.defaultProps.disableHoverablePopup, disabled = TooltipCore.defaultProps.disabled, sticky = TooltipCore.defaultProps.sticky, boundary = "container", children, ...coreProps }) {
   const container = useOptionalContainer();
@@ -36506,7 +36578,7 @@ function TooltipRoot({ open: controlledOpen, defaultOpen = TooltipCore.defaultPr
   const input = useSnapshot(tooltip.input);
   core.setInput(input);
   const { state, preferredSide, setPositionedSide } = usePositionedState(core.getState());
-  return /* @__PURE__ */ (0, import_jsx_runtime36.jsx)(TooltipContextProvider, {
+  return /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(TooltipContextProvider, {
     value: {
       core,
       tooltip,
@@ -36616,7 +36688,7 @@ var ControlsGroup = (0, import_react116.forwardRef)(function ControlsGroup2(comp
 
 // node_modules/@videojs/react/dist/default/ui/time/value.js
 var import_react117 = __toESM(require_react(), 1);
-var import_jsx_runtime37 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime38 = __toESM(require_jsx_runtime(), 1);
 var Value = (0, import_react117.forwardRef)(function Value2(componentProps, forwardedRef) {
   const { render, className, style, type, negativeSign, label, toggle = false, ...elementProps } = componentProps;
   const time = usePlayer(selectTime);
@@ -36650,7 +36722,7 @@ var Value = (0, import_react117.forwardRef)(function Value2(componentProps, forw
     remaining: remainingSuffixText
   }[state.type];
   const resolvedLabelParams = labelParams ? { duration: translateText(suffixText, translator, { duration: formatTimeAsPhrase(Math.abs(state.seconds), { locale }) }) } : void 0;
-  const content = state.negative ? /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)(import_jsx_runtime37.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime37.jsx)("span", {
+  const content = state.negative ? /* @__PURE__ */ (0, import_jsx_runtime38.jsxs)(import_jsx_runtime38.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime38.jsx)("span", {
     "aria-hidden": "true",
     children: negativeSign ?? TimeCore.defaultProps.negativeSign
   }), state.text] }) : state.text;
@@ -36695,7 +36767,7 @@ var Value = (0, import_react117.forwardRef)(function Value2(componentProps, forw
 // node_modules/@videojs/react/dist/default/ui/tooltip/provider.js
 var import_react_compiler_runtime33 = __toESM(require_dist(), 1);
 var import_react118 = __toESM(require_react(), 1);
-var import_jsx_runtime38 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime39 = __toESM(require_jsx_runtime(), 1);
 function TooltipProvider(t0) {
   const $ = (0, import_react_compiler_runtime33.c)(9);
   const { delay, closeDelay, timeout, children } = t0;
@@ -36725,7 +36797,7 @@ function TooltipProvider(t0) {
   } else t2 = $[5];
   let t3;
   if ($[6] !== children || $[7] !== t2) {
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime38.jsx)(TooltipGroupContextProvider, {
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime39.jsx)(TooltipGroupContextProvider, {
       value: t2,
       children
     });
@@ -36738,7 +36810,7 @@ function TooltipProvider(t0) {
 
 // node_modules/@videojs/react/dist/default/i18n/text.js
 var import_react_compiler_runtime34 = __toESM(require_dist(), 1);
-var import_jsx_runtime39 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime40 = __toESM(require_jsx_runtime(), 1);
 function Text2(t0) {
   const $ = (0, import_react_compiler_runtime34.c)(12);
   let children;
@@ -36771,7 +36843,7 @@ function Text2(t0) {
   } else t1 = $[8];
   let t22;
   if ($[9] !== props || $[10] !== t1) {
-    t22 = /* @__PURE__ */ (0, import_jsx_runtime39.jsx)("span", {
+    t22 = /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("span", {
       ...props,
       children: t1
     });
@@ -36822,14 +36894,14 @@ function createContextPart(config) {
 // node_modules/@videojs/react/dist/default/ui/slider/context.js
 var import_react_compiler_runtime35 = __toESM(require_dist(), 1);
 var import_react120 = __toESM(require_react(), 1);
-var import_jsx_runtime40 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime41 = __toESM(require_jsx_runtime(), 1);
 var SliderContext = (0, import_react120.createContext)(null);
 function SliderProvider(t0) {
   const $ = (0, import_react_compiler_runtime35.c)(3);
   const { value, children } = t0;
   let t1;
   if ($[0] !== children || $[1] !== value) {
-    t1 = /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(SliderContext.Provider, {
+    t1 = /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(SliderContext.Provider, {
       value,
       children
     });
@@ -36948,14 +37020,14 @@ var SliderThumb = (0, import_react122.forwardRef)(function SliderThumb2(componen
 // node_modules/@videojs/react/dist/default/ui/thumbnail/context.js
 var import_react_compiler_runtime36 = __toESM(require_dist(), 1);
 var import_react123 = __toESM(require_react(), 1);
-var import_jsx_runtime41 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime42 = __toESM(require_jsx_runtime(), 1);
 var ThumbnailContext = (0, import_react123.createContext)(null);
 function ThumbnailProvider(t0) {
   const $ = (0, import_react_compiler_runtime36.c)(3);
   const { value, children } = t0;
   let t1;
   if ($[0] !== children || $[1] !== value) {
-    t1 = /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(ThumbnailContext.Provider, {
+    t1 = /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(ThumbnailContext.Provider, {
       value,
       children
     });
@@ -37004,7 +37076,7 @@ var ThumbnailImage = (0, import_react124.forwardRef)(function ThumbnailImage2(co
 
 // node_modules/@videojs/react/dist/default/ui/thumbnail/root.js
 var import_react125 = __toESM(require_react(), 1);
-var import_jsx_runtime42 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime43 = __toESM(require_jsx_runtime(), 1);
 var ThumbnailRoot = (0, import_react125.forwardRef)(function ThumbnailRoot2(componentProps, forwardedRef) {
   "use no memo";
   const { render, className, style, time = 0, thumbnails: externalThumbnails, ...elementProps } = componentProps;
@@ -37057,7 +37129,7 @@ var ThumbnailRoot = (0, import_react125.forwardRef)(function ThumbnailRoot2(comp
       };
     }
   }
-  return /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(ThumbnailProvider, {
+  return /* @__PURE__ */ (0, import_jsx_runtime43.jsx)(ThumbnailProvider, {
     value: {
       core,
       state,
@@ -37086,13 +37158,13 @@ var ThumbnailRoot = (0, import_react125.forwardRef)(function ThumbnailRoot2(comp
 // node_modules/@videojs/react/dist/default/ui/slider/thumbnail/root.js
 var import_react_compiler_runtime37 = __toESM(require_dist(), 1);
 var import_react126 = __toESM(require_react(), 1);
-var import_jsx_runtime43 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime44 = __toESM(require_jsx_runtime(), 1);
 var SliderThumbnailRoot = (0, import_react126.forwardRef)(function SliderThumbnailRoot2(componentProps, forwardedRef) {
   const $ = (0, import_react_compiler_runtime37.c)(4);
   const pointerValue = useSliderPointerValue();
   let t0;
   if ($[0] !== componentProps || $[1] !== forwardedRef || $[2] !== pointerValue) {
-    t0 = /* @__PURE__ */ (0, import_jsx_runtime43.jsx)(ThumbnailRoot, {
+    t0 = /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(ThumbnailRoot, {
       ref: forwardedRef,
       ...componentProps,
       time: pointerValue
@@ -37174,7 +37246,7 @@ var TimeSliderChapterTitle = (0, import_react128.forwardRef)(function TimeSlider
 
 // node_modules/@videojs/react/dist/default/ui/time-slider/segments.js
 var import_react129 = __toESM(require_react(), 1);
-var import_jsx_runtime44 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime45 = __toESM(require_jsx_runtime(), 1);
 var SliderSegments = (0, import_react129.forwardRef)(function SliderSegments2(componentProps, ref) {
   const { ranges, min, max, renderSegment, render, className, style, ...elementProps } = componentProps;
   const slider = useSliderContext();
@@ -37201,7 +37273,7 @@ var SliderSegments = (0, import_react129.forwardRef)(function SliderSegments2(co
       [TimeSliderChapterCSSVars.width]: state2.width ?? state2.height,
       [TimeSliderChapterCSSVars.fill]: `${state2.fillPercent}%`
     };
-    return /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(import_react129.Fragment, { children: renderSegment({
+    return /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_react129.Fragment, { children: renderSegment({
       ...sliderAttrs,
       style: segmentStyle
     }, state2) }, state2.key);
@@ -37227,7 +37299,7 @@ var SliderSegments = (0, import_react129.forwardRef)(function SliderSegments2(co
 // node_modules/@videojs/react/dist/default/ui/time-slider/chapters.js
 var import_react_compiler_runtime38 = __toESM(require_dist(), 1);
 var import_react130 = __toESM(require_react(), 1);
-var import_jsx_runtime45 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime46 = __toESM(require_jsx_runtime(), 1);
 init_predicate2();
 var TimeSliderChapters = (0, import_react130.forwardRef)(function TimeSliderChapters2(componentProps, ref) {
   const $ = (0, import_react_compiler_runtime38.c)(39);
@@ -37330,7 +37402,7 @@ var TimeSliderChapters = (0, import_react130.forwardRef)(function TimeSliderChap
   } else t6 = $[29];
   let t7;
   if ($[30] !== max || $[31] !== props || $[32] !== ranges || $[33] !== ref || $[34] !== t3 || $[35] !== t4 || $[36] !== t5 || $[37] !== t6) {
-    t7 = /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(SliderSegments, {
+    t7 = /* @__PURE__ */ (0, import_jsx_runtime46.jsx)(SliderSegments, {
       ref,
       ...props,
       className: t3,
@@ -37457,7 +37529,7 @@ function useSlider(options) {
 // node_modules/@videojs/react/dist/default/ui/time-slider/root.js
 var import_react_compiler_runtime39 = __toESM(require_dist(), 1);
 var import_react135 = __toESM(require_react(), 1);
-var import_jsx_runtime46 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime47 = __toESM(require_jsx_runtime(), 1);
 var noopSeek = () => Promise.resolve(0);
 var TimeSliderRoot = (0, import_react135.forwardRef)(function TimeSliderRoot2(componentProps, forwardedRef) {
   const $ = (0, import_react_compiler_runtime39.c)(73);
@@ -37767,7 +37839,7 @@ var TimeSliderRoot = (0, import_react135.forwardRef)(function TimeSliderRoot2(co
   });
   let t29;
   if ($[69] !== T0 || $[70] !== context || $[71] !== t28) {
-    t29 = /* @__PURE__ */ (0, import_jsx_runtime46.jsx)(T0, {
+    t29 = /* @__PURE__ */ (0, import_jsx_runtime47.jsx)(T0, {
       value: context,
       children: t28
     });
@@ -37883,7 +37955,7 @@ function useVolumePopoverContext() {
 // node_modules/@videojs/react/dist/default/ui/volume-popover/popup.js
 var import_react_compiler_runtime41 = __toESM(require_dist(), 1);
 var import_react139 = __toESM(require_react(), 1);
-var import_jsx_runtime47 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime48 = __toESM(require_jsx_runtime(), 1);
 var VolumePopoverPopup = (0, import_react139.forwardRef)(function VolumePopoverPopup2(props, forwardedRef) {
   const $ = (0, import_react_compiler_runtime41.c)(6);
   const { state } = useVolumePopoverContext();
@@ -37896,7 +37968,7 @@ var VolumePopoverPopup = (0, import_react139.forwardRef)(function VolumePopoverP
   } else t0 = $[1];
   let t1;
   if ($[2] !== forwardedRef || $[3] !== props || $[4] !== t0) {
-    t1 = /* @__PURE__ */ (0, import_jsx_runtime47.jsx)(PopoverPopup, {
+    t1 = /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(PopoverPopup, {
       ref: forwardedRef,
       ...t0,
       ...props
@@ -37911,7 +37983,7 @@ var VolumePopoverPopup = (0, import_react139.forwardRef)(function VolumePopoverP
 
 // node_modules/@videojs/react/dist/default/ui/popover/root.js
 var import_react141 = __toESM(require_react(), 1);
-var import_jsx_runtime48 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime49 = __toESM(require_jsx_runtime(), 1);
 init_predicate2();
 function PopoverRoot({ open: controlledOpen, defaultOpen = PopoverCore.defaultProps.defaultOpen, onOpenChange: onOpenChangeProp, onOpenChangeComplete: onOpenChangeCompleteProp, openOnHover = PopoverCore.defaultProps.openOnHover, delay = PopoverCore.defaultProps.delay, closeDelay = PopoverCore.defaultProps.closeDelay, boundary = "container", children, ...coreProps }) {
   const container = useOptionalContainer();
@@ -37965,7 +38037,7 @@ function PopoverRoot({ open: controlledOpen, defaultOpen = PopoverCore.defaultPr
   const input = useSnapshot(popover.input);
   core.setInput(input);
   const { state, preferredSide, setPositionedSide } = usePositionedState(core.getState());
-  return /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(PopoverContextProvider, {
+  return /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(PopoverContextProvider, {
     value: {
       core,
       popover,
@@ -37985,7 +38057,7 @@ function PopoverRoot({ open: controlledOpen, defaultOpen = PopoverCore.defaultPr
 // node_modules/@videojs/react/dist/default/ui/volume-popover/root.js
 var import_react_compiler_runtime42 = __toESM(require_dist(), 1);
 var import_react142 = __toESM(require_react(), 1);
-var import_jsx_runtime49 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime50 = __toESM(require_jsx_runtime(), 1);
 var unavailableVolume = {
   volume: 0,
   muted: false,
@@ -38009,7 +38081,7 @@ function VolumePopoverRoot(t0) {
   }
   let t1;
   if ($[3] !== children || $[4] !== props) {
-    t1 = /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(VolumePopoverState, {
+    t1 = /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(VolumePopoverState, {
       ...props,
       children
     });
@@ -38019,7 +38091,7 @@ function VolumePopoverRoot(t0) {
   } else t1 = $[5];
   let t2;
   if ($[6] !== props || $[7] !== t1) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(PopoverRoot, {
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(PopoverRoot, {
       ...props,
       children: t1
     });
@@ -38044,7 +38116,7 @@ function VolumePopoverState({ children, ...props }) {
   (0, import_react142.useEffect)(() => {
     if (state.hidden) popover.close("imperative-action");
   }, [popover, state.hidden]);
-  return /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(VolumePopoverContextProvider, {
+  return /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(VolumePopoverContextProvider, {
     value: { state },
     children
   });
@@ -38084,11 +38156,11 @@ var PopoverTrigger = (0, import_react143.forwardRef)(function PopoverTrigger2({ 
 
 // node_modules/@videojs/react/dist/default/ui/volume-popover/trigger.js
 var import_react144 = __toESM(require_react(), 1);
-var import_jsx_runtime50 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime51 = __toESM(require_jsx_runtime(), 1);
 var VolumePopoverTrigger = (0, import_react144.forwardRef)(function VolumePopoverTrigger2({ render, className, style, ...elementProps }, forwardedRef) {
   const { state: popoverState } = usePopoverContext();
   const { state } = useVolumePopoverContext();
-  if (!state.hidden) return /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(PopoverTrigger, {
+  if (!state.hidden) return /* @__PURE__ */ (0, import_jsx_runtime51.jsx)(PopoverTrigger, {
     ref: forwardedRef,
     render,
     className,
@@ -38108,7 +38180,7 @@ var VolumePopoverTrigger = (0, import_react144.forwardRef)(function VolumePopove
 
 // node_modules/@videojs/react/dist/default/ui/volume-slider/root.js
 var import_react145 = __toESM(require_react(), 1);
-var import_jsx_runtime51 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime52 = __toESM(require_jsx_runtime(), 1);
 var noopVolume = {
   volume: 0,
   muted: false,
@@ -38172,7 +38244,7 @@ var VolumeSliderRoot = (0, import_react145.forwardRef)(function VolumeSliderRoot
   }, [wheelHandler]);
   if (!volume) return null;
   if (state.hidden) return null;
-  return /* @__PURE__ */ (0, import_jsx_runtime51.jsx)(SliderProvider, {
+  return /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(SliderProvider, {
     value: {
       state,
       pointerValue: core.valueFromPercent(state.pointerPercent),
@@ -38331,7 +38403,7 @@ function useAudioTrackOptions(props) {
 // node_modules/@videojs/react/dist/default/ui/menu/use-menu-group.js
 var import_react_compiler_runtime43 = __toESM(require_dist(), 1);
 var import_react147 = __toESM(require_react(), 1);
-var import_jsx_runtime52 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime53 = __toESM(require_jsx_runtime(), 1);
 function hasExplicitLabel(elementProps) {
   return elementProps["aria-label"] !== void 0 || elementProps["aria-labelledby"] !== void 0;
 }
@@ -38371,7 +38443,7 @@ function MenuGroupProvider(t0) {
   } else t3 = $[4];
   let t4;
   if ($[5] !== t3) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(MenuGroupContextProvider, {
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(MenuGroupContextProvider, {
       value,
       children: t3
     });
@@ -38384,7 +38456,7 @@ function MenuGroupProvider(t0) {
 // node_modules/@videojs/react/dist/default/ui/menu/radio-group.js
 var import_react_compiler_runtime44 = __toESM(require_dist(), 1);
 var import_react148 = __toESM(require_react(), 1);
-var import_jsx_runtime53 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime54 = __toESM(require_jsx_runtime(), 1);
 var MenuRadioGroup = (0, import_react148.forwardRef)(function MenuRadioGroup2(t0, forwardedRef) {
   const $ = (0, import_react_compiler_runtime44.c)(16);
   let className;
@@ -38413,7 +38485,7 @@ var MenuRadioGroup = (0, import_react148.forwardRef)(function MenuRadioGroup2(t0
   const { state } = useMenuContext();
   let t1;
   if ($[7] !== className || $[8] !== elementProps || $[9] !== forwardedRef || $[10] !== onValueChange || $[11] !== render || $[12] !== state || $[13] !== style || $[14] !== value) {
-    t1 = /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(MenuGroupProvider, { children: (labelId) => /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(MenuRadioGroupContextProvider, {
+    t1 = /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(MenuGroupProvider, { children: (labelId) => /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(MenuRadioGroupContextProvider, {
       value: {
         value,
         onValueChange
@@ -38444,7 +38516,7 @@ var MenuRadioGroup = (0, import_react148.forwardRef)(function MenuRadioGroup2(t0
 // node_modules/@videojs/react/dist/default/ui/audio-track-radio-group/component.js
 var import_react_compiler_runtime45 = __toESM(require_dist(), 1);
 var import_react149 = __toESM(require_react(), 1);
-var import_jsx_runtime54 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime55 = __toESM(require_jsx_runtime(), 1);
 init_predicate2();
 var AudioTrackRadioGroupContext = (0, import_react149.createContext)(void 0);
 function AudioTrackRadioGroupRoot(t0) {
@@ -38470,7 +38542,7 @@ function AudioTrackRadioGroupRoot(t0) {
   useMenuOptionState(t1);
   let t2;
   if ($[5] !== audioTrack || $[6] !== children) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(AudioTrackRadioGroupContext.Provider, {
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime55.jsx)(AudioTrackRadioGroupContext.Provider, {
       value: audioTrack,
       children
     });
@@ -38563,7 +38635,7 @@ var AudioTrackRadioGroupOptions = (0, import_react149.forwardRef)(function Audio
           ...option,
           checked: option.value === value
         };
-        return /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react149.Fragment, { children: renderItem({
+        return /* @__PURE__ */ (0, import_jsx_runtime55.jsx)(import_react149.Fragment, { children: renderItem({
           value: option.value,
           disabled: option.disabled,
           "data-track": option.value,
@@ -38582,7 +38654,7 @@ var AudioTrackRadioGroupOptions = (0, import_react149.forwardRef)(function Audio
   } else t6 = $[22];
   let t7;
   if ($[26] !== ariaLabel || $[27] !== ariaLabelledBy || $[28] !== elementProps || $[29] !== forwardedRef || $[30] !== setValue || $[31] !== state.hidden || $[32] !== t0 || $[33] !== t1 || $[34] !== t2 || $[35] !== t3 || $[36] !== t4 || $[37] !== t6 || $[38] !== value) {
-    t7 = /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(MenuRadioGroup, {
+    t7 = /* @__PURE__ */ (0, import_jsx_runtime55.jsx)(MenuRadioGroup, {
       ...t0,
       ...elementProps,
       ref: forwardedRef,
@@ -38648,7 +38720,7 @@ function useCaptionsOptions(props) {
 // node_modules/@videojs/react/dist/default/ui/captions-radio-group/component.js
 var import_react_compiler_runtime46 = __toESM(require_dist(), 1);
 var import_react150 = __toESM(require_react(), 1);
-var import_jsx_runtime55 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime56 = __toESM(require_jsx_runtime(), 1);
 init_predicate2();
 var CaptionsRadioGroupContext = (0, import_react150.createContext)(void 0);
 function CaptionsRadioGroupRoot(t0) {
@@ -38674,7 +38746,7 @@ function CaptionsRadioGroupRoot(t0) {
   useMenuOptionState(t1);
   let t2;
   if ($[5] !== captions || $[6] !== children) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime55.jsx)(CaptionsRadioGroupContext.Provider, {
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(CaptionsRadioGroupContext.Provider, {
       value: captions,
       children
     });
@@ -38767,7 +38839,7 @@ var CaptionsRadioGroupOptions = (0, import_react150.forwardRef)(function Caption
           ...option,
           checked: option.value === value
         };
-        return /* @__PURE__ */ (0, import_jsx_runtime55.jsx)(import_react150.Fragment, { children: renderItem({
+        return /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react150.Fragment, { children: renderItem({
           value: option.value,
           disabled: option.disabled,
           "data-track": option.value,
@@ -38786,7 +38858,7 @@ var CaptionsRadioGroupOptions = (0, import_react150.forwardRef)(function Caption
   } else t6 = $[22];
   let t7;
   if ($[26] !== ariaLabel || $[27] !== ariaLabelledBy || $[28] !== elementProps || $[29] !== forwardedRef || $[30] !== setValue || $[31] !== state.hidden || $[32] !== t0 || $[33] !== t1 || $[34] !== t2 || $[35] !== t3 || $[36] !== t4 || $[37] !== t6 || $[38] !== value) {
-    t7 = /* @__PURE__ */ (0, import_jsx_runtime55.jsx)(MenuRadioGroup, {
+    t7 = /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(MenuRadioGroup, {
       ...t0,
       ...elementProps,
       ref: forwardedRef,
@@ -38980,7 +39052,7 @@ var MenuContent = (0, import_react151.forwardRef)(function MenuContent2(t0, forw
 // node_modules/@videojs/react/dist/default/ui/menu/item.js
 var import_react_compiler_runtime48 = __toESM(require_dist(), 1);
 var import_react152 = __toESM(require_react(), 1);
-var import_jsx_runtime56 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime57 = __toESM(require_jsx_runtime(), 1);
 var MenuItem = (0, import_react152.forwardRef)(function MenuItem2(t0, forwardedRef) {
   const $ = (0, import_react_compiler_runtime48.c)(29);
   let className;
@@ -39061,7 +39133,7 @@ var MenuItem = (0, import_react152.forwardRef)(function MenuItem2(t0, forwardedR
   const handlePointerEnter = t4;
   let t5;
   if ($[19] !== className || $[20] !== disabled || $[21] !== elementProps || $[22] !== forwardedRef || $[23] !== handleClick || $[24] !== handlePointerEnter || $[25] !== render || $[26] !== state || $[27] !== style) {
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(MenuItemContent, {
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(MenuItemContent, {
       disabled,
       elementProps,
       onClick: handleClick,
@@ -39106,7 +39178,7 @@ function MenuItemContent({ disabled, elementProps, onClick, onPointerEnter, rend
 // node_modules/@videojs/react/dist/default/ui/menu/popup.js
 var import_react_compiler_runtime49 = __toESM(require_dist(), 1);
 var import_react153 = __toESM(require_react(), 1);
-var import_jsx_runtime57 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime58 = __toESM(require_jsx_runtime(), 1);
 var MenuPopup = (0, import_react153.forwardRef)(function MenuPopup2(t0, forwardedRef) {
   const $ = (0, import_react_compiler_runtime49.c)(23);
   const { render, className, style, onBlur, keepMounted: t1, ...elementProps } = t0;
@@ -39205,7 +39277,7 @@ var MenuPopup = (0, import_react153.forwardRef)(function MenuPopup2(t0, forwarde
   } else t6 = $[19];
   let t7;
   if ($[20] !== popupNode || $[21] !== t6) {
-    t7 = /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(MenuPopupContextProvider, {
+    t7 = /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(MenuPopupContextProvider, {
       value: t6,
       children: popupNode
     });
@@ -39218,7 +39290,7 @@ var MenuPopup = (0, import_react153.forwardRef)(function MenuPopup2(t0, forwarde
 
 // node_modules/@videojs/react/dist/default/ui/menu/root.js
 var import_react155 = __toESM(require_react(), 1);
-var import_jsx_runtime58 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime59 = __toESM(require_jsx_runtime(), 1);
 function MenuRoot({ open: controlledOpen, defaultOpen = MenuCore.defaultProps.defaultOpen, onOpenChange: onOpenChangeProp, onOpenChangeComplete: onOpenChangeCompleteProp, boundary = "container", children, ...coreProps }) {
   const parentMenu = useOptionalMenuContext();
   const controls = useOptionalControlsContext();
@@ -39357,7 +39429,7 @@ function MenuRoot({ open: controlledOpen, defaultOpen = MenuCore.defaultProps.de
     optionState,
     setOptionState
   ]);
-  return /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(MenuContextProvider, {
+  return /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(MenuContextProvider, {
     value: contextValue,
     children
   });
@@ -39384,7 +39456,7 @@ var MenuSeparator = (0, import_react156.forwardRef)(function MenuSeparator2({ re
 // node_modules/@videojs/react/dist/default/ui/menu/trigger.js
 var import_react_compiler_runtime50 = __toESM(require_dist(), 1);
 var import_react157 = __toESM(require_react(), 1);
-var import_jsx_runtime59 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime60 = __toESM(require_jsx_runtime(), 1);
 var MenuTrigger = (0, import_react157.forwardRef)(function MenuTrigger2(t0, forwardedRef) {
   const $ = (0, import_react_compiler_runtime50.c)(37);
   const { render, className, style, disabled, onClick, onKeyDown, ...elementProps } = t0;
@@ -39534,7 +39606,7 @@ var MenuTrigger = (0, import_react157.forwardRef)(function MenuTrigger2(t0, forw
       $[32] = state;
       $[33] = t112;
     } else t112 = $[33];
-    return /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(MenuTriggerSubmenu, {
+    return /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(MenuTriggerSubmenu, {
       render,
       className,
       style,
@@ -39579,7 +39651,7 @@ var MenuTrigger = (0, import_react157.forwardRef)(function MenuTrigger2(t0, forw
   });
   let t13;
   if ($[34] !== T0 || $[35] !== t12) {
-    t13 = /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(T0, {
+    t13 = /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(T0, {
       value: t11,
       children: t12
     });
@@ -39641,7 +39713,7 @@ function usePlaybackRateOptions(props) {
 // node_modules/@videojs/react/dist/default/ui/playback-rate-radio-group/component.js
 var import_react_compiler_runtime51 = __toESM(require_dist(), 1);
 var import_react159 = __toESM(require_react(), 1);
-var import_jsx_runtime60 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime61 = __toESM(require_jsx_runtime(), 1);
 init_predicate2();
 var PlaybackRateRadioGroupContext = (0, import_react159.createContext)(void 0);
 function PlaybackRateRadioGroupRoot(t0) {
@@ -39667,7 +39739,7 @@ function PlaybackRateRadioGroupRoot(t0) {
   useMenuOptionState(t1);
   let t2;
   if ($[5] !== children || $[6] !== playbackRate) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(PlaybackRateRadioGroupContext.Provider, {
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(PlaybackRateRadioGroupContext.Provider, {
       value: playbackRate,
       children
     });
@@ -39760,7 +39832,7 @@ var PlaybackRateRadioGroupOptions = (0, import_react159.forwardRef)(function Pla
           ...option,
           checked: option.value === value
         };
-        return /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(import_react159.Fragment, { children: renderItem({
+        return /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(import_react159.Fragment, { children: renderItem({
           value: option.value,
           disabled: option.disabled,
           "data-rate": option.value,
@@ -39781,7 +39853,7 @@ var PlaybackRateRadioGroupOptions = (0, import_react159.forwardRef)(function Pla
   } else t6 = $[22];
   let t7;
   if ($[26] !== ariaLabel || $[27] !== ariaLabelledBy || $[28] !== elementProps || $[29] !== forwardedRef || $[30] !== setValue || $[31] !== state.hidden || $[32] !== t0 || $[33] !== t1 || $[34] !== t2 || $[35] !== t3 || $[36] !== t4 || $[37] !== t6 || $[38] !== value) {
-    t7 = /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(MenuRadioGroup, {
+    t7 = /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(MenuRadioGroup, {
       ...t0,
       ...elementProps,
       ref: forwardedRef,
@@ -39842,7 +39914,7 @@ function useQualityOptions(props) {
 // node_modules/@videojs/react/dist/default/ui/quality-radio-group/component.js
 var import_react_compiler_runtime52 = __toESM(require_dist(), 1);
 var import_react160 = __toESM(require_react(), 1);
-var import_jsx_runtime61 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime62 = __toESM(require_jsx_runtime(), 1);
 init_predicate2();
 var QualityRadioGroupContext = (0, import_react160.createContext)(void 0);
 function QualityRadioGroupRoot(t0) {
@@ -39868,7 +39940,7 @@ function QualityRadioGroupRoot(t0) {
   useMenuOptionState(t1);
   let t2;
   if ($[5] !== children || $[6] !== quality) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(QualityRadioGroupContext.Provider, {
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(QualityRadioGroupContext.Provider, {
       value: quality,
       children
     });
@@ -39961,7 +40033,7 @@ var QualityRadioGroupOptions = (0, import_react160.forwardRef)(function QualityR
           ...option,
           checked: option.value === value
         };
-        return /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(import_react160.Fragment, { children: renderItem({
+        return /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(import_react160.Fragment, { children: renderItem({
           value: option.value,
           disabled: option.disabled,
           "data-rendition": option.value,
@@ -39980,7 +40052,7 @@ var QualityRadioGroupOptions = (0, import_react160.forwardRef)(function QualityR
   } else t6 = $[22];
   let t7;
   if ($[26] !== ariaLabel || $[27] !== ariaLabelledBy || $[28] !== elementProps || $[29] !== forwardedRef || $[30] !== setValue || $[31] !== state.hidden || $[32] !== t0 || $[33] !== t1 || $[34] !== t2 || $[35] !== t3 || $[36] !== t4 || $[37] !== t6 || $[38] !== value) {
-    t7 = /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(MenuRadioGroup, {
+    t7 = /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(MenuRadioGroup, {
       ...t0,
       ...elementProps,
       ref: forwardedRef,
@@ -40046,7 +40118,7 @@ var MenuItemIndicator = (0, import_react161.forwardRef)(function MenuItemIndicat
 // node_modules/@videojs/react/dist/default/ui/menu/radio-item.js
 var import_react_compiler_runtime53 = __toESM(require_dist(), 1);
 var import_react162 = __toESM(require_react(), 1);
-var import_jsx_runtime62 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime63 = __toESM(require_jsx_runtime(), 1);
 var MenuRadioItem = (0, import_react162.forwardRef)(function MenuRadioItem2(t0, forwardedRef) {
   const $ = (0, import_react_compiler_runtime53.c)(16);
   const { render, className, style, value, disabled, onClick, ...elementProps } = t0;
@@ -40121,7 +40193,7 @@ var MenuRadioItem = (0, import_react162.forwardRef)(function MenuRadioItem2(t0, 
   });
   let t6;
   if ($[12] !== T0 || $[13] !== checked || $[14] !== t5) {
-    t6 = /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(T0, {
+    t6 = /* @__PURE__ */ (0, import_jsx_runtime63.jsx)(T0, {
       value: checked,
       children: t5
     });
@@ -40135,7 +40207,7 @@ var MenuRadioItem = (0, import_react162.forwardRef)(function MenuRadioItem2(t0, 
 
 // node_modules/@videojs/react/dist/default/internal/skins/shared/components/layout/container.js
 var import_react_compiler_runtime54 = __toESM(require_dist(), 1);
-var import_jsx_runtime63 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime64 = __toESM(require_jsx_runtime(), 1);
 function Container3(t0) {
   const $ = (0, import_react_compiler_runtime54.c)(10);
   let children;
@@ -40160,7 +40232,7 @@ function Container3(t0) {
   } else t1 = $[5];
   let t2;
   if ($[6] !== children || $[7] !== props || $[8] !== t1) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime63.jsx)(Container, {
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(Container, {
       className: t1,
       ...props,
       children
@@ -40175,7 +40247,7 @@ function Container3(t0) {
 
 // node_modules/@videojs/react/dist/default/internal/skins/shared/components/buttons/button.js
 var import_react_compiler_runtime55 = __toESM(require_dist(), 1);
-var import_jsx_runtime64 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime65 = __toESM(require_jsx_runtime(), 1);
 function Button2(t0) {
   const $ = (0, import_react_compiler_runtime55.c)(8);
   let className;
@@ -40197,7 +40269,7 @@ function Button2(t0) {
   } else t1 = $[4];
   let t2;
   if ($[5] !== props || $[6] !== t1) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("button", {
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("button", {
       className: t1,
       ...props
     });
@@ -40210,30 +40282,30 @@ function Button2(t0) {
 
 // node_modules/@videojs/react/dist/default/internal/skins/shared/components/dialogs/error-dialog.js
 var import_react_compiler_runtime56 = __toESM(require_dist(), 1);
-var import_jsx_runtime65 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime66 = __toESM(require_jsx_runtime(), 1);
 function ErrorDialog() {
   const $ = (0, import_react_compiler_runtime56.c)(3);
   let t0;
   if ($[0] === Symbol.for("react.memo_cache_sentinel")) {
-    t0 = /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(DialogBackdrop, { className: "media-dialog-backdrop" });
+    t0 = /* @__PURE__ */ (0, import_jsx_runtime66.jsx)(DialogBackdrop, { className: "media-dialog-backdrop" });
     $[0] = t0;
   } else t0 = $[0];
   let t1;
   if ($[1] === Symbol.for("react.memo_cache_sentinel")) {
-    t1 = /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("div", {
+    t1 = /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)("div", {
       className: "media-dialog-content",
-      children: [/* @__PURE__ */ (0, import_jsx_runtime65.jsx)(ErrorDialogTitle, { className: "media-dialog-title" }), /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(ErrorDialogDescription, { className: "media-dialog-description" })]
+      children: [/* @__PURE__ */ (0, import_jsx_runtime66.jsx)(ErrorDialogTitle, { className: "media-dialog-title" }), /* @__PURE__ */ (0, import_jsx_runtime66.jsx)(ErrorDialogDescription, { className: "media-dialog-description" })]
     });
     $[1] = t1;
   } else t1 = $[1];
   let t2;
   if ($[2] === Symbol.for("react.memo_cache_sentinel")) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)(ErrorDialogRoot, { children: [t0, /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)(DialogPopup, {
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)(ErrorDialogRoot, { children: [t0, /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)(DialogPopup, {
       className: "media-dialog-popup",
-      children: [t1, /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", {
+      children: [t1, /* @__PURE__ */ (0, import_jsx_runtime66.jsx)("div", {
         className: "media-dialog-actions",
-        children: /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(ErrorDialogClose, {
-          render: /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(Button2, {}),
+        children: /* @__PURE__ */ (0, import_jsx_runtime66.jsx)(ErrorDialogClose, {
+          render: /* @__PURE__ */ (0, import_jsx_runtime66.jsx)(Button2, {}),
           className: "media-dialog-close"
         })
       })]
@@ -40245,7 +40317,7 @@ function ErrorDialog() {
 
 // node_modules/@videojs/react/dist/default/internal/skins/shared/components/display/poster.js
 var import_react_compiler_runtime57 = __toESM(require_dist(), 1);
-var import_jsx_runtime66 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime67 = __toESM(require_jsx_runtime(), 1);
 function Poster(t0) {
   const $ = (0, import_react_compiler_runtime57.c)(16);
   let t1;
@@ -40279,7 +40351,7 @@ function Poster(t0) {
   } else t2 = $[8];
   let t3;
   if ($[9] !== props || $[10] !== renderImage) {
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime66.jsx)(PosterImage, {
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime67.jsx)(PosterImage, {
       render: renderImage,
       className: "media-poster-image",
       ...props
@@ -40290,7 +40362,7 @@ function Poster(t0) {
   } else t3 = $[11];
   let t4;
   if ($[12] !== children || $[13] !== t2 || $[14] !== t3) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)(PosterRoot, {
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime67.jsxs)(PosterRoot, {
       className: t2,
       children: [t3, children]
     });
@@ -40304,7 +40376,7 @@ function Poster(t0) {
 
 // node_modules/@videojs/react/dist/default/internal/skins/shared/components/display/title.js
 var import_react_compiler_runtime58 = __toESM(require_dist(), 1);
-var import_jsx_runtime67 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime68 = __toESM(require_jsx_runtime(), 1);
 function Title3(t0) {
   const $ = (0, import_react_compiler_runtime58.c)(10);
   let t1;
@@ -40332,7 +40404,7 @@ function Title3(t0) {
   } else t2 = $[6];
   let t3;
   if ($[7] !== props || $[8] !== t2) {
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime67.jsx)(Title, {
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime68.jsx)(Title, {
       className: t2,
       ...props
     });
@@ -40345,7 +40417,7 @@ function Title3(t0) {
 
 // node_modules/@videojs/react/dist/default/internal/skins/shared/components/buttons/button-tooltip.js
 var import_react_compiler_runtime59 = __toESM(require_dist(), 1);
-var import_jsx_runtime68 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime69 = __toESM(require_jsx_runtime(), 1);
 function ButtonTooltip(t0) {
   const $ = (0, import_react_compiler_runtime59.c)(18);
   let children;
@@ -40364,7 +40436,7 @@ function ButtonTooltip(t0) {
   }
   let t1;
   if ($[4] !== children) {
-    t1 = /* @__PURE__ */ (0, import_jsx_runtime68.jsx)(TooltipTrigger, { render: children });
+    t1 = /* @__PURE__ */ (0, import_jsx_runtime69.jsx)(TooltipTrigger, { render: children });
     $[4] = children;
     $[5] = t1;
   } else t1 = $[5];
@@ -40375,19 +40447,19 @@ function ButtonTooltip(t0) {
   } else t2 = $[6];
   let t3;
   if ($[7] !== label) {
-    t3 = label ?? /* @__PURE__ */ (0, import_jsx_runtime68.jsx)(TooltipLabel, {});
+    t3 = label ?? /* @__PURE__ */ (0, import_jsx_runtime69.jsx)(TooltipLabel, {});
     $[7] = label;
     $[8] = t3;
   } else t3 = $[8];
   let t4;
   if ($[9] !== label) {
-    t4 = !label && /* @__PURE__ */ (0, import_jsx_runtime68.jsx)(TooltipShortcut, { className: "media-tooltip-shortcut" });
+    t4 = !label && /* @__PURE__ */ (0, import_jsx_runtime69.jsx)(TooltipShortcut, { className: "media-tooltip-shortcut" });
     $[9] = label;
     $[10] = t4;
   } else t4 = $[10];
   let t5;
   if ($[11] !== t3 || $[12] !== t4) {
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime68.jsxs)(TooltipPopup, {
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime69.jsxs)(TooltipPopup, {
       className: t2,
       children: [t3, t4]
     });
@@ -40397,7 +40469,7 @@ function ButtonTooltip(t0) {
   } else t5 = $[13];
   let t6;
   if ($[14] !== props || $[15] !== t1 || $[16] !== t5) {
-    t6 = /* @__PURE__ */ (0, import_jsx_runtime68.jsxs)(TooltipRoot, {
+    t6 = /* @__PURE__ */ (0, import_jsx_runtime69.jsxs)(TooltipRoot, {
       ...props,
       children: [t1, t5]
     });
@@ -40411,7 +40483,7 @@ function ButtonTooltip(t0) {
 
 // node_modules/@videojs/react/dist/default/internal/skins/shared/components/sliders/slider.js
 var import_react_compiler_runtime60 = __toESM(require_dist(), 1);
-var import_jsx_runtime69 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime70 = __toESM(require_jsx_runtime(), 1);
 function SliderTrack2(t0) {
   const $ = (0, import_react_compiler_runtime60.c)(8);
   let className;
@@ -40433,7 +40505,7 @@ function SliderTrack2(t0) {
   } else t1 = $[4];
   let t2;
   if ($[5] !== props || $[6] !== t1) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("div", {
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("div", {
       className: t1,
       ...props
     });
@@ -40464,7 +40536,7 @@ function SliderFill2(t0) {
   } else t1 = $[4];
   let t2;
   if ($[5] !== props || $[6] !== t1) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("div", {
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("div", {
       className: t1,
       ...props
     });
@@ -40495,7 +40567,7 @@ function SliderBuffer2(t0) {
   } else t1 = $[4];
   let t2;
   if ($[5] !== props || $[6] !== t1) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("div", {
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("div", {
       className: t1,
       ...props
     });
@@ -40526,7 +40598,7 @@ function SliderThumb3(t0) {
   } else t1 = $[4];
   let t2;
   if ($[5] !== props || $[6] !== t1) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("div", {
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("div", {
       className: t1,
       ...props
     });
@@ -40539,7 +40611,7 @@ function SliderThumb3(t0) {
 
 // node_modules/@videojs/react/dist/default/internal/skins/shared/components/sliders/volume-slider.js
 var import_react_compiler_runtime61 = __toESM(require_dist(), 1);
-var import_jsx_runtime70 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime71 = __toESM(require_jsx_runtime(), 1);
 function VolumeSlider(t0) {
   const $ = (0, import_react_compiler_runtime61.c)(13);
   let t1;
@@ -40567,28 +40639,28 @@ function VolumeSlider(t0) {
   } else t2 = $[6];
   let t3;
   if ($[7] === Symbol.for("react.memo_cache_sentinel")) {
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime70.jsx)(SliderTrack2, {});
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime71.jsx)(SliderTrack2, {});
     $[7] = t3;
   } else t3 = $[7];
   let t4;
   if ($[8] === Symbol.for("react.memo_cache_sentinel")) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime70.jsx)(SliderTrack, {
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime71.jsx)(SliderTrack, {
       render: t3,
-      children: /* @__PURE__ */ (0, import_jsx_runtime70.jsx)(SliderFill, { render: /* @__PURE__ */ (0, import_jsx_runtime70.jsx)(SliderFill2, {}) })
+      children: /* @__PURE__ */ (0, import_jsx_runtime71.jsx)(SliderFill, { render: /* @__PURE__ */ (0, import_jsx_runtime71.jsx)(SliderFill2, {}) })
     });
     $[8] = t4;
   } else t4 = $[8];
   let t5;
   if ($[9] === Symbol.for("react.memo_cache_sentinel")) {
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime70.jsx)(SliderThumb, {
-      render: /* @__PURE__ */ (0, import_jsx_runtime70.jsx)(SliderThumb3, {}),
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime71.jsx)(SliderThumb, {
+      render: /* @__PURE__ */ (0, import_jsx_runtime71.jsx)(SliderThumb3, {}),
       className: "media-volume-slider-thumb"
     });
     $[9] = t5;
   } else t5 = $[9];
   let t6;
   if ($[10] !== props || $[11] !== t2) {
-    t6 = /* @__PURE__ */ (0, import_jsx_runtime70.jsxs)(VolumeSliderRoot, {
+    t6 = /* @__PURE__ */ (0, import_jsx_runtime71.jsxs)(VolumeSliderRoot, {
       className: t2,
       thumbAlignment: "edge",
       ...props,
@@ -40603,7 +40675,7 @@ function VolumeSlider(t0) {
 
 // node_modules/@videojs/react/dist/default/internal/skins/shared/components/behaviors/status-announcer.js
 var import_react_compiler_runtime62 = __toESM(require_dist(), 1);
-var import_jsx_runtime71 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime72 = __toESM(require_jsx_runtime(), 1);
 function StatusAnnouncer3(t0) {
   const $ = (0, import_react_compiler_runtime62.c)(10);
   let t1;
@@ -40631,7 +40703,7 @@ function StatusAnnouncer3(t0) {
   } else t2 = $[6];
   let t3;
   if ($[7] !== props || $[8] !== t2) {
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime71.jsx)(StatusAnnouncer, {
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime72.jsx)(StatusAnnouncer, {
       className: t2,
       ...props
     });
@@ -40644,7 +40716,7 @@ function StatusAnnouncer3(t0) {
 
 // node_modules/@videojs/react/dist/default/player/create-player.js
 var import_react164 = __toESM(require_react(), 1);
-var import_jsx_runtime72 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime73 = __toESM(require_jsx_runtime(), 1);
 init_object();
 function createPlayer(config) {
   const slice = combine(...config.features);
@@ -40736,7 +40808,7 @@ function createPlayer(config) {
       container,
       registerExtension
     ]);
-    return /* @__PURE__ */ (0, import_jsx_runtime72.jsx)(PlayerContextProvider, {
+    return /* @__PURE__ */ (0, import_jsx_runtime73.jsx)(PlayerContextProvider, {
       value,
       children
     });
@@ -40763,8 +40835,8 @@ var { Player: VideoPlayer, usePlayer: usePlayer2 } = createPlayer({
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/spinner.js
 var import_react165 = __toESM(require_react(), 1);
-var import_jsx_runtime73 = __toESM(require_jsx_runtime(), 1);
-var SpinnerIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime73.jsxs)("svg", {
+var import_jsx_runtime74 = __toESM(require_jsx_runtime(), 1);
+var SpinnerIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime74.jsxs)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -40777,50 +40849,50 @@ var SpinnerIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime73.jsxs)
   ref,
   ...props,
   children: [
-    /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("style", { children: "@keyframes media-spinner-fade{0%{opacity:1}to{opacity:0}}.media-spinner__segment{animation:var(--media-spinner-animation, media-spinner-fade 1s steps(8, end) infinite);animation-delay:var(--media-spinner-delay)}@media (prefers-reduced-motion:reduce){.media-spinner__segment{animation:none}}" }),
-    /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("path", {
+    /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("style", { children: "@keyframes media-spinner-fade{0%{opacity:1}to{opacity:0}}.media-spinner__segment{animation:var(--media-spinner-animation, media-spinner-fade 1s steps(8, end) infinite);animation-delay:var(--media-spinner-delay)}@media (prefers-reduced-motion:reduce){.media-spinner__segment{animation:none}}" }),
+    /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("path", {
       d: "M9 1.5v3",
       className: "media-spinner__segment",
       opacity: 0.5,
       style: { "--media-spinner-delay": "0s" }
     }),
-    /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("path", {
+    /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("path", {
       d: "m14.5 3.5-2 2",
       className: "media-spinner__segment",
       opacity: 0.45,
       style: { "--media-spinner-delay": "0.125s" }
     }),
-    /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("path", {
+    /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("path", {
       d: "M16.5 9h-3",
       className: "media-spinner__segment",
       opacity: 0.4,
       style: { "--media-spinner-delay": "0.25s" }
     }),
-    /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("path", {
+    /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("path", {
       d: "m14.5 14.5-2-2",
       className: "media-spinner__segment",
       opacity: 0.35,
       style: { "--media-spinner-delay": "0.375s" }
     }),
-    /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("path", {
+    /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("path", {
       d: "M9 16.5v-3",
       className: "media-spinner__segment",
       opacity: 0.3,
       style: { "--media-spinner-delay": "0.5s" }
     }),
-    /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("path", {
+    /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("path", {
       d: "m3.5 14.5 2-2",
       className: "media-spinner__segment",
       opacity: 0.25,
       style: { "--media-spinner-delay": "0.625s" }
     }),
-    /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("path", {
+    /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("path", {
       d: "M1.5 9h3",
       className: "media-spinner__segment",
       opacity: 0.15,
       style: { "--media-spinner-delay": "0.75s" }
     }),
-    /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("path", {
+    /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("path", {
       d: "m3.5 3.5 2 2",
       className: "media-spinner__segment",
       opacity: 0.1,
@@ -40832,7 +40904,7 @@ var ForwardRef = (0, import_react165.forwardRef)(SpinnerIcon);
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/components/display/buffering-indicator.js
 var import_react_compiler_runtime63 = __toESM(require_dist(), 1);
-var import_jsx_runtime74 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime75 = __toESM(require_jsx_runtime(), 1);
 function BufferingIndicator3(t0) {
   const $ = (0, import_react_compiler_runtime63.c)(11);
   let t1;
@@ -40860,12 +40932,12 @@ function BufferingIndicator3(t0) {
   } else t2 = $[6];
   let t3;
   if ($[7] === Symbol.for("react.memo_cache_sentinel")) {
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime74.jsx)(ForwardRef, { className: "media-buffering-indicator-spinner-icon" });
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime75.jsx)(ForwardRef, { className: "media-buffering-indicator-spinner-icon" });
     $[7] = t3;
   } else t3 = $[7];
   let t4;
   if ($[8] !== props || $[9] !== t2) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime74.jsx)(BufferingIndicator, {
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime75.jsx)(BufferingIndicator, {
       className: t2,
       ...props,
       children: t3
@@ -40879,8 +40951,8 @@ function BufferingIndicator3(t0) {
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/airplay-enter.js
 var import_react166 = __toESM(require_react(), 1);
-var import_jsx_runtime75 = __toESM(require_jsx_runtime(), 1);
-var AirPlayEnterIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime75.jsxs)("svg", {
+var import_jsx_runtime76 = __toESM(require_jsx_runtime(), 1);
+var AirPlayEnterIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime76.jsxs)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -40889,14 +40961,14 @@ var AirPlayEnterIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime75.
   viewBox: "0 0 18 18",
   ref,
   ...props,
-  children: [/* @__PURE__ */ (0, import_jsx_runtime75.jsx)("path", { d: "M14.5 2A3.5 3.5 0 0 1 18 5.5v5l-.005.18a3.5 3.5 0 0 1-3.027 3.288L13 12h1.5a1.5 1.5 0 0 0 1.5-1.5v-5A1.5 1.5 0 0 0 14.5 4h-11A1.5 1.5 0 0 0 2 5.5v5A1.5 1.5 0 0 0 3.5 12H5l-1.968 1.967A3.5 3.5 0 0 1 0 10.5v-5A3.5 3.5 0 0 1 3.5 2z" }), /* @__PURE__ */ (0, import_jsx_runtime75.jsx)("path", { d: "M8.631 10.902a.5.5 0 0 1 .738 0l4.363 4.76a.5.5 0 0 1-.369.838H4.637a.5.5 0 0 1-.369-.838z" })]
+  children: [/* @__PURE__ */ (0, import_jsx_runtime76.jsx)("path", { d: "M14.5 2A3.5 3.5 0 0 1 18 5.5v5l-.005.18a3.5 3.5 0 0 1-3.027 3.288L13 12h1.5a1.5 1.5 0 0 0 1.5-1.5v-5A1.5 1.5 0 0 0 14.5 4h-11A1.5 1.5 0 0 0 2 5.5v5A1.5 1.5 0 0 0 3.5 12H5l-1.968 1.967A3.5 3.5 0 0 1 0 10.5v-5A3.5 3.5 0 0 1 3.5 2z" }), /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("path", { d: "M8.631 10.902a.5.5 0 0 1 .738 0l4.363 4.76a.5.5 0 0 1-.369.838H4.637a.5.5 0 0 1-.369-.838z" })]
 });
 var ForwardRef2 = (0, import_react166.forwardRef)(AirPlayEnterIcon);
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/airplay-exit.js
 var import_react167 = __toESM(require_react(), 1);
-var import_jsx_runtime76 = __toESM(require_jsx_runtime(), 1);
-var AirPlayExitIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime76.jsxs)("svg", {
+var import_jsx_runtime77 = __toESM(require_jsx_runtime(), 1);
+var AirPlayExitIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -40906,13 +40978,13 @@ var AirPlayExitIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime76.j
   ref,
   ...props,
   children: [
-    /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("style", { children: "@keyframes media-icon-airplay-triangle{0%{translate:0 0}to{translate:0-2px}}@keyframes media-icon-airplay-fill{0%{opacity:0}to{opacity:.2}}@media (prefers-reduced-motion:reduce){:root{--media-icon-airplay-fill-animation:none;--media-icon-airplay-triangle-animation:none}}" }),
-    /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("path", {
+    /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("style", { children: "@keyframes media-icon-airplay-triangle{0%{translate:0 0}to{translate:0-2px}}@keyframes media-icon-airplay-fill{0%{opacity:0}to{opacity:.2}}@media (prefers-reduced-motion:reduce){:root{--media-icon-airplay-fill-animation:none;--media-icon-airplay-triangle-animation:none}}" }),
+    /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("path", {
       d: "M14.5 2A3.5 3.5 0 0 1 18 5.5v5a3.5 3.5 0 0 1-3.032 3.468L9.354 8.354a.5.5 0 0 0-.708 0l-5.615 5.614A3.5 3.5 0 0 1 0 10.5v-5A3.5 3.5 0 0 1 3.5 2z",
       style: { animation: "var(--media-icon-airplay-fill-animation, media-icon-airplay-fill 1s ease-in-out infinite alternate)" }
     }),
-    /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("path", { d: "M14.5 2A3.5 3.5 0 0 1 18 5.5v5l-.005.18a3.5 3.5 0 0 1-3.027 3.288L13 12h1.5a1.5 1.5 0 0 0 1.5-1.5v-5A1.5 1.5 0 0 0 14.5 4h-11A1.5 1.5 0 0 0 2 5.5v5A1.5 1.5 0 0 0 3.5 12H5l-1.968 1.967A3.5 3.5 0 0 1 0 10.5v-5A3.5 3.5 0 0 1 3.5 2z" }),
-    /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("path", {
+    /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("path", { d: "M14.5 2A3.5 3.5 0 0 1 18 5.5v5l-.005.18a3.5 3.5 0 0 1-3.027 3.288L13 12h1.5a1.5 1.5 0 0 0 1.5-1.5v-5A1.5 1.5 0 0 0 14.5 4h-11A1.5 1.5 0 0 0 2 5.5v5A1.5 1.5 0 0 0 3.5 12H5l-1.968 1.967A3.5 3.5 0 0 1 0 10.5v-5A3.5 3.5 0 0 1 3.5 2z" }),
+    /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("path", {
       d: "M8.631 10.902a.5.5 0 0 1 .738 0l4.363 4.76a.5.5 0 0 1-.369.838H4.637a.5.5 0 0 1-.369-.838z",
       style: { animation: "var(--media-icon-airplay-triangle-animation, media-icon-airplay-triangle 1s ease-in-out infinite alternate)" }
     })
@@ -40922,7 +40994,7 @@ var ForwardRef3 = (0, import_react167.forwardRef)(AirPlayExitIcon);
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/components/buttons/airplay-button.js
 var import_react_compiler_runtime64 = __toESM(require_dist(), 1);
-var import_jsx_runtime77 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime78 = __toESM(require_jsx_runtime(), 1);
 function AirPlayButton2(t0) {
   const $ = (0, import_react_compiler_runtime64.c)(13);
   let t1;
@@ -40944,7 +41016,7 @@ function AirPlayButton2(t0) {
   }
   let t2;
   if ($[5] === Symbol.for("react.memo_cache_sentinel")) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime77.jsx)(Button2, {});
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Button2, {});
     $[5] = t2;
   } else t2 = $[5];
   let t3;
@@ -40955,17 +41027,17 @@ function AirPlayButton2(t0) {
   } else t3 = $[7];
   let t4;
   if ($[8] === Symbol.for("react.memo_cache_sentinel")) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime77.jsx)(ForwardRef2, { className: cn("media-button-icon", "media-airplay-button-enter-icon") });
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(ForwardRef2, { className: cn("media-button-icon", "media-airplay-button-enter-icon") });
     $[8] = t4;
   } else t4 = $[8];
   let t5;
   if ($[9] === Symbol.for("react.memo_cache_sentinel")) {
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime77.jsx)(ForwardRef3, { className: cn("media-button-icon", "media-airplay-button-exit-icon") });
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(ForwardRef3, { className: cn("media-button-icon", "media-airplay-button-exit-icon") });
     $[9] = t5;
   } else t5 = $[9];
   let t6;
   if ($[10] !== props || $[11] !== t3) {
-    t6 = /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)(AirPlayButton, {
+    t6 = /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)(AirPlayButton, {
       render: t2,
       className: t3,
       ...props,
@@ -40980,8 +41052,8 @@ function AirPlayButton2(t0) {
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/captions-off.js
 var import_react168 = __toESM(require_react(), 1);
-var import_jsx_runtime78 = __toESM(require_jsx_runtime(), 1);
-var CaptionsOffIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("svg", {
+var import_jsx_runtime79 = __toESM(require_jsx_runtime(), 1);
+var CaptionsOffIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -40991,7 +41063,7 @@ var CaptionsOffIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime78.j
   ref,
   ...props,
   children: [
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("rect", {
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("rect", {
       width: 16,
       height: 12,
       x: 1,
@@ -41000,7 +41072,7 @@ var CaptionsOffIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime78.j
       strokeWidth: 2,
       rx: 3
     }),
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("rect", {
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("rect", {
       width: 3,
       height: 2,
       x: 3,
@@ -41009,7 +41081,7 @@ var CaptionsOffIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime78.j
       fillOpacity: 0.5,
       rx: 1
     }),
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("rect", {
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("rect", {
       width: 2,
       height: 2,
       x: 13,
@@ -41018,7 +41090,7 @@ var CaptionsOffIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime78.j
       fillOpacity: 0.5,
       rx: 1
     }),
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("rect", {
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("rect", {
       width: 4,
       height: 2,
       x: 11,
@@ -41027,7 +41099,7 @@ var CaptionsOffIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime78.j
       fillOpacity: 0.5,
       rx: 1
     }),
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("rect", {
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("rect", {
       width: 5,
       height: 2,
       x: 7,
@@ -41036,7 +41108,7 @@ var CaptionsOffIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime78.j
       fillOpacity: 0.5,
       rx: 1
     }),
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("rect", {
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("rect", {
       width: 7,
       height: 2,
       x: 3,
@@ -41051,8 +41123,8 @@ var ForwardRef4 = (0, import_react168.forwardRef)(CaptionsOffIcon);
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/captions-on.js
 var import_react169 = __toESM(require_react(), 1);
-var import_jsx_runtime79 = __toESM(require_jsx_runtime(), 1);
-var CaptionsOnIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("svg", {
+var import_jsx_runtime80 = __toESM(require_jsx_runtime(), 1);
+var CaptionsOnIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime80.jsx)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -41061,13 +41133,13 @@ var CaptionsOnIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime79.js
   viewBox: "0 0 18 18",
   ref,
   ...props,
-  children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("path", { d: "M15 2a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H3a3 3 0 0 1-3-3V5a3 3 0 0 1 3-3zM4 11a1 1 0 1 0 0 2h5a1 1 0 1 0 0-2zm8 0a1 1 0 1 0 0 2h2a1 1 0 1 0 0-2zM4 8a1 1 0 0 0 0 2h1a1 1 0 0 0 0-2zm4 0a1 1 0 0 0 0 2h3a1 1 0 1 0 0-2zm6 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2" })
+  children: /* @__PURE__ */ (0, import_jsx_runtime80.jsx)("path", { d: "M15 2a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H3a3 3 0 0 1-3-3V5a3 3 0 0 1 3-3zM4 11a1 1 0 1 0 0 2h5a1 1 0 1 0 0-2zm8 0a1 1 0 1 0 0 2h2a1 1 0 1 0 0-2zM4 8a1 1 0 0 0 0 2h1a1 1 0 0 0 0-2zm4 0a1 1 0 0 0 0 2h3a1 1 0 1 0 0-2zm6 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2" })
 });
 var ForwardRef5 = (0, import_react169.forwardRef)(CaptionsOnIcon);
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/components/buttons/captions-button.js
 var import_react_compiler_runtime65 = __toESM(require_dist(), 1);
-var import_jsx_runtime80 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime81 = __toESM(require_jsx_runtime(), 1);
 function CaptionsButton2(t0) {
   const $ = (0, import_react_compiler_runtime65.c)(13);
   let t1;
@@ -41089,7 +41161,7 @@ function CaptionsButton2(t0) {
   }
   let t2;
   if ($[5] === Symbol.for("react.memo_cache_sentinel")) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime80.jsx)(Button2, {});
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime81.jsx)(Button2, {});
     $[5] = t2;
   } else t2 = $[5];
   let t3;
@@ -41100,17 +41172,17 @@ function CaptionsButton2(t0) {
   } else t3 = $[7];
   let t4;
   if ($[8] === Symbol.for("react.memo_cache_sentinel")) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime80.jsx)(ForwardRef4, { className: cn("media-button-icon", "media-captions-button-off-icon") });
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime81.jsx)(ForwardRef4, { className: cn("media-button-icon", "media-captions-button-off-icon") });
     $[8] = t4;
   } else t4 = $[8];
   let t5;
   if ($[9] === Symbol.for("react.memo_cache_sentinel")) {
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime80.jsx)(ForwardRef5, { className: cn("media-button-icon", "media-captions-button-on-icon") });
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime81.jsx)(ForwardRef5, { className: cn("media-button-icon", "media-captions-button-on-icon") });
     $[9] = t5;
   } else t5 = $[9];
   let t6;
   if ($[10] !== props || $[11] !== t3) {
-    t6 = /* @__PURE__ */ (0, import_jsx_runtime80.jsxs)(CaptionsButton, {
+    t6 = /* @__PURE__ */ (0, import_jsx_runtime81.jsxs)(CaptionsButton, {
       render: t2,
       className: t3,
       ...props,
@@ -41125,8 +41197,8 @@ function CaptionsButton2(t0) {
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/cast-enter.js
 var import_react170 = __toESM(require_react(), 1);
-var import_jsx_runtime81 = __toESM(require_jsx_runtime(), 1);
-var CastEnterIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime81.jsxs)("svg", {
+var import_jsx_runtime82 = __toESM(require_jsx_runtime(), 1);
+var CastEnterIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime82.jsxs)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -41135,14 +41207,14 @@ var CastEnterIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime81.jsx
   viewBox: "0 0 18 18",
   ref,
   ...props,
-  children: [/* @__PURE__ */ (0, import_jsx_runtime81.jsx)("path", { d: "M14.5 2A3.5 3.5 0 0 1 18 5.5v7l-.005.18a3.5 3.5 0 0 1-3.315 3.315L14.5 16h-7c0-.693-.096-1.363-.271-2H14.5a1.5 1.5 0 0 0 1.5-1.5v-7A1.5 1.5 0 0 0 14.5 4h-11A1.5 1.5 0 0 0 2 5.5v3.271A7.5 7.5 0 0 0 0 8.5v-3A3.5 3.5 0 0 1 3.5 2zM0 12a4 4 0 0 1 4 4H2.5A2.5 2.5 0 0 0 0 13.5z" }), /* @__PURE__ */ (0, import_jsx_runtime81.jsx)("path", { d: "M0 9.5A6.5 6.5 0 0 1 6.5 16H5a5 5 0 0 0-5-5zm0 5A1.5 1.5 0 0 1 1.5 16h-1a.5.5 0 0 1-.5-.5z" })]
+  children: [/* @__PURE__ */ (0, import_jsx_runtime82.jsx)("path", { d: "M14.5 2A3.5 3.5 0 0 1 18 5.5v7l-.005.18a3.5 3.5 0 0 1-3.315 3.315L14.5 16h-7c0-.693-.096-1.363-.271-2H14.5a1.5 1.5 0 0 0 1.5-1.5v-7A1.5 1.5 0 0 0 14.5 4h-11A1.5 1.5 0 0 0 2 5.5v3.271A7.5 7.5 0 0 0 0 8.5v-3A3.5 3.5 0 0 1 3.5 2zM0 12a4 4 0 0 1 4 4H2.5A2.5 2.5 0 0 0 0 13.5z" }), /* @__PURE__ */ (0, import_jsx_runtime82.jsx)("path", { d: "M0 9.5A6.5 6.5 0 0 1 6.5 16H5a5 5 0 0 0-5-5zm0 5A1.5 1.5 0 0 1 1.5 16h-1a.5.5 0 0 1-.5-.5z" })]
 });
 var ForwardRef6 = (0, import_react170.forwardRef)(CastEnterIcon);
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/cast-exit.js
 var import_react171 = __toESM(require_react(), 1);
-var import_jsx_runtime82 = __toESM(require_jsx_runtime(), 1);
-var CastExitIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime82.jsxs)("svg", {
+var import_jsx_runtime83 = __toESM(require_jsx_runtime(), 1);
+var CastExitIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime83.jsxs)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -41152,16 +41224,16 @@ var CastExitIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime82.jsxs
   ref,
   ...props,
   children: [
-    /* @__PURE__ */ (0, import_jsx_runtime82.jsx)("path", { d: "M14.5 2A3.5 3.5 0 0 1 18 5.5v7a3.5 3.5 0 0 1-3.5 3.5h-7c0-.693-.096-1.363-.271-2H14.5a1.5 1.5 0 0 0 1.5-1.5v-7A1.5 1.5 0 0 0 14.5 4h-11A1.5 1.5 0 0 0 2 5.5v3.271A7.5 7.5 0 0 0 0 8.5v-3A3.5 3.5 0 0 1 3.5 2z" }),
-    /* @__PURE__ */ (0, import_jsx_runtime82.jsx)("path", { d: "M13.5 5.5a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H6.634A7.53 7.53 0 0 0 3.5 9.366V6.5a1 1 0 0 1 1-1zM0 12a4 4 0 0 1 4 4H2.5A2.5 2.5 0 0 0 0 13.5z" }),
-    /* @__PURE__ */ (0, import_jsx_runtime82.jsx)("path", { d: "M0 9.5A6.5 6.5 0 0 1 6.5 16H5a5 5 0 0 0-5-5zm0 5A1.5 1.5 0 0 1 1.5 16h-1a.5.5 0 0 1-.5-.5z" })
+    /* @__PURE__ */ (0, import_jsx_runtime83.jsx)("path", { d: "M14.5 2A3.5 3.5 0 0 1 18 5.5v7a3.5 3.5 0 0 1-3.5 3.5h-7c0-.693-.096-1.363-.271-2H14.5a1.5 1.5 0 0 0 1.5-1.5v-7A1.5 1.5 0 0 0 14.5 4h-11A1.5 1.5 0 0 0 2 5.5v3.271A7.5 7.5 0 0 0 0 8.5v-3A3.5 3.5 0 0 1 3.5 2z" }),
+    /* @__PURE__ */ (0, import_jsx_runtime83.jsx)("path", { d: "M13.5 5.5a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H6.634A7.53 7.53 0 0 0 3.5 9.366V6.5a1 1 0 0 1 1-1zM0 12a4 4 0 0 1 4 4H2.5A2.5 2.5 0 0 0 0 13.5z" }),
+    /* @__PURE__ */ (0, import_jsx_runtime83.jsx)("path", { d: "M0 9.5A6.5 6.5 0 0 1 6.5 16H5a5 5 0 0 0-5-5zm0 5A1.5 1.5 0 0 1 1.5 16h-1a.5.5 0 0 1-.5-.5z" })
   ]
 });
 var ForwardRef7 = (0, import_react171.forwardRef)(CastExitIcon);
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/components/buttons/cast-button.js
 var import_react_compiler_runtime66 = __toESM(require_dist(), 1);
-var import_jsx_runtime83 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime84 = __toESM(require_jsx_runtime(), 1);
 function CastButton2(t0) {
   const $ = (0, import_react_compiler_runtime66.c)(13);
   let t1;
@@ -41183,7 +41255,7 @@ function CastButton2(t0) {
   }
   let t2;
   if ($[5] === Symbol.for("react.memo_cache_sentinel")) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime83.jsx)(Button2, {});
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime84.jsx)(Button2, {});
     $[5] = t2;
   } else t2 = $[5];
   let t3;
@@ -41194,17 +41266,17 @@ function CastButton2(t0) {
   } else t3 = $[7];
   let t4;
   if ($[8] === Symbol.for("react.memo_cache_sentinel")) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime83.jsx)(ForwardRef6, { className: cn("media-button-icon", "media-cast-button-enter-icon") });
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime84.jsx)(ForwardRef6, { className: cn("media-button-icon", "media-cast-button-enter-icon") });
     $[8] = t4;
   } else t4 = $[8];
   let t5;
   if ($[9] === Symbol.for("react.memo_cache_sentinel")) {
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime83.jsx)(ForwardRef7, { className: cn("media-button-icon", "media-cast-button-exit-icon") });
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime84.jsx)(ForwardRef7, { className: cn("media-button-icon", "media-cast-button-exit-icon") });
     $[9] = t5;
   } else t5 = $[9];
   let t6;
   if ($[10] !== props || $[11] !== t3) {
-    t6 = /* @__PURE__ */ (0, import_jsx_runtime83.jsxs)(CastButton, {
+    t6 = /* @__PURE__ */ (0, import_jsx_runtime84.jsxs)(CastButton, {
       render: t2,
       className: t3,
       ...props,
@@ -41219,8 +41291,8 @@ function CastButton2(t0) {
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/fullscreen-enter.js
 var import_react172 = __toESM(require_react(), 1);
-var import_jsx_runtime84 = __toESM(require_jsx_runtime(), 1);
-var FullscreenEnterIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime84.jsx)("svg", {
+var import_jsx_runtime85 = __toESM(require_jsx_runtime(), 1);
+var FullscreenEnterIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime85.jsx)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -41229,14 +41301,14 @@ var FullscreenEnterIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime
   viewBox: "0 0 18 18",
   ref,
   ...props,
-  children: /* @__PURE__ */ (0, import_jsx_runtime84.jsx)("path", { d: "M9.57 3.617A1 1 0 0 0 8.646 3H4c-.552 0-1 .449-1 1v4.646a.996.996 0 0 0 1.001 1 1 1 0 0 0 .706-.293l4.647-4.647a1 1 0 0 0 .216-1.089m4.812 4.812a1 1 0 0 0-1.089.217l-4.647 4.647a.998.998 0 0 0 .708 1.706H14c.552 0 1-.449 1-1V9.353a1 1 0 0 0-.618-.924" })
+  children: /* @__PURE__ */ (0, import_jsx_runtime85.jsx)("path", { d: "M9.57 3.617A1 1 0 0 0 8.646 3H4c-.552 0-1 .449-1 1v4.646a.996.996 0 0 0 1.001 1 1 1 0 0 0 .706-.293l4.647-4.647a1 1 0 0 0 .216-1.089m4.812 4.812a1 1 0 0 0-1.089.217l-4.647 4.647a.998.998 0 0 0 .708 1.706H14c.552 0 1-.449 1-1V9.353a1 1 0 0 0-.618-.924" })
 });
 var ForwardRef8 = (0, import_react172.forwardRef)(FullscreenEnterIcon);
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/fullscreen-exit.js
 var import_react173 = __toESM(require_react(), 1);
-var import_jsx_runtime85 = __toESM(require_jsx_runtime(), 1);
-var FullscreenExitIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime85.jsx)("svg", {
+var import_jsx_runtime86 = __toESM(require_jsx_runtime(), 1);
+var FullscreenExitIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime86.jsx)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -41245,13 +41317,13 @@ var FullscreenExitIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime8
   viewBox: "0 0 18 18",
   ref,
   ...props,
-  children: /* @__PURE__ */ (0, import_jsx_runtime85.jsx)("path", { d: "M7.883 1.93a.99.99 0 0 0-1.09.217L2.146 6.793A.998.998 0 0 0 2.853 8.5H7.5c.551 0 1-.449 1-1V2.854a1 1 0 0 0-.617-.924m7.263 7.57H10.5c-.551 0-1 .449-1 1v4.646a.996.996 0 0 0 1.001 1.001 1 1 0 0 0 .706-.293l4.646-4.646a.998.998 0 0 0-.707-1.707z" })
+  children: /* @__PURE__ */ (0, import_jsx_runtime86.jsx)("path", { d: "M7.883 1.93a.99.99 0 0 0-1.09.217L2.146 6.793A.998.998 0 0 0 2.853 8.5H7.5c.551 0 1-.449 1-1V2.854a1 1 0 0 0-.617-.924m7.263 7.57H10.5c-.551 0-1 .449-1 1v4.646a.996.996 0 0 0 1.001 1.001 1 1 0 0 0 .706-.293l4.646-4.646a.998.998 0 0 0-.707-1.707z" })
 });
 var ForwardRef9 = (0, import_react173.forwardRef)(FullscreenExitIcon);
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/components/buttons/fullscreen-button.js
 var import_react_compiler_runtime67 = __toESM(require_dist(), 1);
-var import_jsx_runtime86 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime87 = __toESM(require_jsx_runtime(), 1);
 function FullscreenButton2(t0) {
   const $ = (0, import_react_compiler_runtime67.c)(13);
   let t1;
@@ -41273,7 +41345,7 @@ function FullscreenButton2(t0) {
   }
   let t2;
   if ($[5] === Symbol.for("react.memo_cache_sentinel")) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime86.jsx)(Button2, {});
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime87.jsx)(Button2, {});
     $[5] = t2;
   } else t2 = $[5];
   let t3;
@@ -41284,17 +41356,17 @@ function FullscreenButton2(t0) {
   } else t3 = $[7];
   let t4;
   if ($[8] === Symbol.for("react.memo_cache_sentinel")) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime86.jsx)(ForwardRef8, { className: cn("media-button-icon", "media-fullscreen-button-enter-icon") });
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime87.jsx)(ForwardRef8, { className: cn("media-button-icon", "media-fullscreen-button-enter-icon") });
     $[8] = t4;
   } else t4 = $[8];
   let t5;
   if ($[9] === Symbol.for("react.memo_cache_sentinel")) {
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime86.jsx)(ForwardRef9, { className: cn("media-button-icon", "media-fullscreen-button-exit-icon") });
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime87.jsx)(ForwardRef9, { className: cn("media-button-icon", "media-fullscreen-button-exit-icon") });
     $[9] = t5;
   } else t5 = $[9];
   let t6;
   if ($[10] !== props || $[11] !== t3) {
-    t6 = /* @__PURE__ */ (0, import_jsx_runtime86.jsxs)(FullscreenButton, {
+    t6 = /* @__PURE__ */ (0, import_jsx_runtime87.jsxs)(FullscreenButton, {
       render: t2,
       className: t3,
       ...props,
@@ -41309,34 +41381,8 @@ function FullscreenButton2(t0) {
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/pip-enter.js
 var import_react174 = __toESM(require_react(), 1);
-var import_jsx_runtime87 = __toESM(require_jsx_runtime(), 1);
-var PipEnterIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime87.jsxs)("svg", {
-  xmlns: "http://www.w3.org/2000/svg",
-  width: 18,
-  height: 18,
-  fill: "currentColor",
-  "aria-hidden": "true",
-  viewBox: "0 0 18 18",
-  ref,
-  ...props,
-  children: [
-    /* @__PURE__ */ (0, import_jsx_runtime87.jsx)("path", { d: "M13 2a4 4 0 0 1 4 4v2.036A3.5 3.5 0 0 0 16.5 8H15V6.273C15 5.018 13.96 4 12.679 4H4.32C3.04 4 2 5.018 2 6.273v5.454C2 12.982 3.04 14 4.321 14H6v1.5q0 .255.036.5H4a4 4 0 0 1-4-4V6a4 4 0 0 1 4-4z" }),
-    /* @__PURE__ */ (0, import_jsx_runtime87.jsx)("rect", {
-      width: 10,
-      height: 7,
-      x: 8,
-      y: 10,
-      rx: 2
-    }),
-    /* @__PURE__ */ (0, import_jsx_runtime87.jsx)("path", { d: "M7.129 5.547a.6.6 0 0 0-.656.13L3.677 8.473A.6.6 0 0 0 4.102 9.5h2.796c.332 0 .602-.27.602-.602V6.103a.6.6 0 0 0-.371-.556" })
-  ]
-});
-var ForwardRef10 = (0, import_react174.forwardRef)(PipEnterIcon);
-
-// node_modules/@videojs/react/dist/default/icons/dist/react/default/pip-exit.js
-var import_react175 = __toESM(require_react(), 1);
 var import_jsx_runtime88 = __toESM(require_jsx_runtime(), 1);
-var PipExitIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime88.jsxs)("svg", {
+var PipEnterIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime88.jsxs)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -41354,14 +41400,40 @@ var PipExitIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime88.jsxs)
       y: 10,
       rx: 2
     }),
-    /* @__PURE__ */ (0, import_jsx_runtime88.jsx)("path", { d: "M4.871 10.454a.6.6 0 0 0 .656-.131l2.796-2.796A.6.6 0 0 0 7.898 6.5H5.102a.603.603 0 0 0-.602.602v2.795a.6.6 0 0 0 .371.556" })
+    /* @__PURE__ */ (0, import_jsx_runtime88.jsx)("path", { d: "M7.129 5.547a.6.6 0 0 0-.656.13L3.677 8.473A.6.6 0 0 0 4.102 9.5h2.796c.332 0 .602-.27.602-.602V6.103a.6.6 0 0 0-.371-.556" })
+  ]
+});
+var ForwardRef10 = (0, import_react174.forwardRef)(PipEnterIcon);
+
+// node_modules/@videojs/react/dist/default/icons/dist/react/default/pip-exit.js
+var import_react175 = __toESM(require_react(), 1);
+var import_jsx_runtime89 = __toESM(require_jsx_runtime(), 1);
+var PipExitIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime89.jsxs)("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: 18,
+  height: 18,
+  fill: "currentColor",
+  "aria-hidden": "true",
+  viewBox: "0 0 18 18",
+  ref,
+  ...props,
+  children: [
+    /* @__PURE__ */ (0, import_jsx_runtime89.jsx)("path", { d: "M13 2a4 4 0 0 1 4 4v2.036A3.5 3.5 0 0 0 16.5 8H15V6.273C15 5.018 13.96 4 12.679 4H4.32C3.04 4 2 5.018 2 6.273v5.454C2 12.982 3.04 14 4.321 14H6v1.5q0 .255.036.5H4a4 4 0 0 1-4-4V6a4 4 0 0 1 4-4z" }),
+    /* @__PURE__ */ (0, import_jsx_runtime89.jsx)("rect", {
+      width: 10,
+      height: 7,
+      x: 8,
+      y: 10,
+      rx: 2
+    }),
+    /* @__PURE__ */ (0, import_jsx_runtime89.jsx)("path", { d: "M4.871 10.454a.6.6 0 0 0 .656-.131l2.796-2.796A.6.6 0 0 0 7.898 6.5H5.102a.603.603 0 0 0-.602.602v2.795a.6.6 0 0 0 .371.556" })
   ]
 });
 var ForwardRef11 = (0, import_react175.forwardRef)(PipExitIcon);
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/components/buttons/pip-button.js
 var import_react_compiler_runtime68 = __toESM(require_dist(), 1);
-var import_jsx_runtime89 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime90 = __toESM(require_jsx_runtime(), 1);
 function PiPButton2(t0) {
   const $ = (0, import_react_compiler_runtime68.c)(13);
   let t1;
@@ -41383,7 +41455,7 @@ function PiPButton2(t0) {
   }
   let t2;
   if ($[5] === Symbol.for("react.memo_cache_sentinel")) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime89.jsx)(Button2, {});
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime90.jsx)(Button2, {});
     $[5] = t2;
   } else t2 = $[5];
   let t3;
@@ -41394,17 +41466,17 @@ function PiPButton2(t0) {
   } else t3 = $[7];
   let t4;
   if ($[8] === Symbol.for("react.memo_cache_sentinel")) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime89.jsx)(ForwardRef10, { className: cn("media-button-icon", "media-pip-button-enter-icon") });
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime90.jsx)(ForwardRef10, { className: cn("media-button-icon", "media-pip-button-enter-icon") });
     $[8] = t4;
   } else t4 = $[8];
   let t5;
   if ($[9] === Symbol.for("react.memo_cache_sentinel")) {
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime89.jsx)(ForwardRef11, { className: cn("media-button-icon", "media-pip-button-exit-icon") });
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime90.jsx)(ForwardRef11, { className: cn("media-button-icon", "media-pip-button-exit-icon") });
     $[9] = t5;
   } else t5 = $[9];
   let t6;
   if ($[10] !== props || $[11] !== t3) {
-    t6 = /* @__PURE__ */ (0, import_jsx_runtime89.jsxs)(PiPButton, {
+    t6 = /* @__PURE__ */ (0, import_jsx_runtime90.jsxs)(PiPButton, {
       render: t2,
       className: t3,
       ...props,
@@ -41419,8 +41491,8 @@ function PiPButton2(t0) {
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/pause.js
 var import_react176 = __toESM(require_react(), 1);
-var import_jsx_runtime90 = __toESM(require_jsx_runtime(), 1);
-var PauseIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime90.jsxs)("svg", {
+var import_jsx_runtime91 = __toESM(require_jsx_runtime(), 1);
+var PauseIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime91.jsxs)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -41429,13 +41501,13 @@ var PauseIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime90.jsxs)("
   viewBox: "0 0 18 18",
   ref,
   ...props,
-  children: [/* @__PURE__ */ (0, import_jsx_runtime90.jsx)("rect", {
+  children: [/* @__PURE__ */ (0, import_jsx_runtime91.jsx)("rect", {
     width: 5,
     height: 14,
     x: 2,
     y: 2,
     rx: 1.75
-  }), /* @__PURE__ */ (0, import_jsx_runtime90.jsx)("rect", {
+  }), /* @__PURE__ */ (0, import_jsx_runtime91.jsx)("rect", {
     width: 5,
     height: 14,
     x: 11,
@@ -41447,8 +41519,8 @@ var ForwardRef12 = (0, import_react176.forwardRef)(PauseIcon);
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/play.js
 var import_react177 = __toESM(require_react(), 1);
-var import_jsx_runtime91 = __toESM(require_jsx_runtime(), 1);
-var PlayIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime91.jsx)("svg", {
+var import_jsx_runtime92 = __toESM(require_jsx_runtime(), 1);
+var PlayIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -41457,14 +41529,14 @@ var PlayIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime91.jsx)("sv
   viewBox: "0 0 18 18",
   ref,
   ...props,
-  children: /* @__PURE__ */ (0, import_jsx_runtime91.jsx)("path", { d: "m14.051 10.723-7.985 4.964a1.98 1.98 0 0 1-2.758-.638A2.06 2.06 0 0 1 3 13.964V4.036C3 2.91 3.895 2 5 2c.377 0 .747.109 1.066.313l7.985 4.964a2.057 2.057 0 0 1 .627 2.808c-.16.257-.373.475-.627.637" })
+  children: /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("path", { d: "m14.051 10.723-7.985 4.964a1.98 1.98 0 0 1-2.758-.638A2.06 2.06 0 0 1 3 13.964V4.036C3 2.91 3.895 2 5 2c.377 0 .747.109 1.066.313l7.985 4.964a2.057 2.057 0 0 1 .627 2.808c-.16.257-.373.475-.627.637" })
 });
 var ForwardRef13 = (0, import_react177.forwardRef)(PlayIcon);
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/restart.js
 var import_react178 = __toESM(require_react(), 1);
-var import_jsx_runtime92 = __toESM(require_jsx_runtime(), 1);
-var RestartIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("svg", {
+var import_jsx_runtime93 = __toESM(require_jsx_runtime(), 1);
+var RestartIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -41473,13 +41545,13 @@ var RestartIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)
   viewBox: "0 0 18 18",
   ref,
   ...props,
-  children: [/* @__PURE__ */ (0, import_jsx_runtime92.jsx)("path", { d: "M9 1a7.98 7.98 0 0 0-6.132 2.867l-1.441-1.44A.25.25 0 0 0 1 2.604V6.75c0 .138.112.25.25.25h4.146a.25.25 0 0 0 .177-.427L4.29 5.29A5.99 5.99 0 0 1 9 3a6 6 0 1 1-6 6H1a8 8 0 1 0 8-8" }), /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("path", { d: "m11.61 9.639-3.331 2.07a.826.826 0 0 1-1.15-.266.86.86 0 0 1-.129-.452V6.849C7 6.38 7.374 6 7.834 6c.158 0 .312.045.445.13l3.331 2.071a.858.858 0 0 1 0 1.438" })]
+  children: [/* @__PURE__ */ (0, import_jsx_runtime93.jsx)("path", { d: "M9 1a7.98 7.98 0 0 0-6.132 2.867l-1.441-1.44A.25.25 0 0 0 1 2.604V6.75c0 .138.112.25.25.25h4.146a.25.25 0 0 0 .177-.427L4.29 5.29A5.99 5.99 0 0 1 9 3a6 6 0 1 1-6 6H1a8 8 0 1 0 8-8" }), /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("path", { d: "m11.61 9.639-3.331 2.07a.826.826 0 0 1-1.15-.266.86.86 0 0 1-.129-.452V6.849C7 6.38 7.374 6 7.834 6c.158 0 .312.045.445.13l3.331 2.071a.858.858 0 0 1 0 1.438" })]
 });
 var ForwardRef14 = (0, import_react178.forwardRef)(RestartIcon);
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/components/buttons/play-button.js
 var import_react_compiler_runtime69 = __toESM(require_dist(), 1);
-var import_jsx_runtime93 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime94 = __toESM(require_jsx_runtime(), 1);
 function PlayButton2(t0) {
   const $ = (0, import_react_compiler_runtime69.c)(27);
   let t1;
@@ -41504,7 +41576,7 @@ function PlayButton2(t0) {
   }
   let t2;
   if ($[6] === Symbol.for("react.memo_cache_sentinel")) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Button2, {});
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(Button2, {});
     $[6] = t2;
   } else t2 = $[6];
   let t3;
@@ -41521,7 +41593,7 @@ function PlayButton2(t0) {
   } else t4 = $[10];
   let t5;
   if ($[11] !== t4) {
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(ForwardRef14, { className: t4 });
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(ForwardRef14, { className: t4 });
     $[11] = t4;
     $[12] = t5;
   } else t5 = $[12];
@@ -41533,7 +41605,7 @@ function PlayButton2(t0) {
   } else t6 = $[14];
   let t7;
   if ($[15] !== t6) {
-    t7 = /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(ForwardRef13, { className: t6 });
+    t7 = /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(ForwardRef13, { className: t6 });
     $[15] = t6;
     $[16] = t7;
   } else t7 = $[16];
@@ -41545,13 +41617,13 @@ function PlayButton2(t0) {
   } else t8 = $[18];
   let t9;
   if ($[19] !== t8) {
-    t9 = /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(ForwardRef12, { className: t8 });
+    t9 = /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(ForwardRef12, { className: t8 });
     $[19] = t8;
     $[20] = t9;
   } else t9 = $[20];
   let t10;
   if ($[21] !== props || $[22] !== t3 || $[23] !== t5 || $[24] !== t7 || $[25] !== t9) {
-    t10 = /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)(PlayButton, {
+    t10 = /* @__PURE__ */ (0, import_jsx_runtime94.jsxs)(PlayButton, {
       render: t2,
       className: t3,
       ...props,
@@ -41573,8 +41645,8 @@ function PlayButton2(t0) {
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/seek.js
 var import_react179 = __toESM(require_react(), 1);
-var import_jsx_runtime94 = __toESM(require_jsx_runtime(), 1);
-var SeekIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime94.jsx)("svg", {
+var import_jsx_runtime95 = __toESM(require_jsx_runtime(), 1);
+var SeekIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime95.jsx)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -41583,13 +41655,13 @@ var SeekIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime94.jsx)("sv
   viewBox: "0 0 18 18",
   ref,
   ...props,
-  children: /* @__PURE__ */ (0, import_jsx_runtime94.jsx)("path", { d: "M9 1a7.98 7.98 0 0 1 6.132 2.867l1.441-1.44a.25.25 0 0 1 .427.177V6.75a.25.25 0 0 1-.25.25h-4.146a.25.25 0 0 1-.177-.427L13.71 5.29A5.99 5.99 0 0 0 9 3a6 6 0 0 0-4.242 10.242l-1.415 1.415A8 8 0 0 1 9 1" })
+  children: /* @__PURE__ */ (0, import_jsx_runtime95.jsx)("path", { d: "M9 1a7.98 7.98 0 0 1 6.132 2.867l1.441-1.44a.25.25 0 0 1 .427.177V6.75a.25.25 0 0 1-.25.25h-4.146a.25.25 0 0 1-.177-.427L13.71 5.29A5.99 5.99 0 0 0 9 3a6 6 0 0 0-4.242 10.242l-1.415 1.415A8 8 0 0 1 9 1" })
 });
 var ForwardRef15 = (0, import_react179.forwardRef)(SeekIcon);
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/components/buttons/seek-button.js
 var import_react_compiler_runtime70 = __toESM(require_dist(), 1);
-var import_jsx_runtime95 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime96 = __toESM(require_jsx_runtime(), 1);
 function SeekButton2(t0) {
   const $ = (0, import_react_compiler_runtime70.c)(28);
   let t1;
@@ -41615,7 +41687,7 @@ function SeekButton2(t0) {
   const seconds = t2 === void 0 ? 10 : t2;
   let t3;
   if ($[6] === Symbol.for("react.memo_cache_sentinel")) {
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime95.jsx)(Button2, {});
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(Button2, {});
     $[6] = t3;
   } else t3 = $[6];
   let t4;
@@ -41633,7 +41705,7 @@ function SeekButton2(t0) {
   } else t6 = $[10];
   let t7;
   if ($[11] !== t6) {
-    t7 = /* @__PURE__ */ (0, import_jsx_runtime95.jsx)(ForwardRef15, { className: t6 });
+    t7 = /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(ForwardRef15, { className: t6 });
     $[11] = t6;
     $[12] = t7;
   } else t7 = $[12];
@@ -41652,7 +41724,7 @@ function SeekButton2(t0) {
   } else t10 = $[16];
   let t11;
   if ($[17] !== t10 || $[18] !== t9) {
-    t11 = /* @__PURE__ */ (0, import_jsx_runtime95.jsx)("span", {
+    t11 = /* @__PURE__ */ (0, import_jsx_runtime96.jsx)("span", {
       className: t9,
       children: t10
     });
@@ -41662,7 +41734,7 @@ function SeekButton2(t0) {
   } else t11 = $[19];
   let t12;
   if ($[20] !== t11 || $[21] !== t7) {
-    t12 = /* @__PURE__ */ (0, import_jsx_runtime95.jsxs)("div", {
+    t12 = /* @__PURE__ */ (0, import_jsx_runtime96.jsxs)("div", {
       className: "media-seek-button-content",
       children: [t7, t11]
     });
@@ -41672,7 +41744,7 @@ function SeekButton2(t0) {
   } else t12 = $[22];
   let t13;
   if ($[23] !== props || $[24] !== seconds || $[25] !== t12 || $[26] !== t4) {
-    t13 = /* @__PURE__ */ (0, import_jsx_runtime95.jsx)(SeekButton, {
+    t13 = /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(SeekButton, {
       render: t3,
       className: t4,
       seconds,
@@ -41690,8 +41762,8 @@ function SeekButton2(t0) {
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/volume-high.js
 var import_react180 = __toESM(require_react(), 1);
-var import_jsx_runtime96 = __toESM(require_jsx_runtime(), 1);
-var VolumeHighIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime96.jsxs)("svg", {
+var import_jsx_runtime97 = __toESM(require_jsx_runtime(), 1);
+var VolumeHighIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime97.jsxs)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -41700,14 +41772,14 @@ var VolumeHighIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime96.js
   viewBox: "0 0 18 18",
   ref,
   ...props,
-  children: [/* @__PURE__ */ (0, import_jsx_runtime96.jsx)("path", { d: "M15.6 3.3c-.4-.4-1-.4-1.4 0s-.4 1 0 1.4C15.4 5.9 16 7.4 16 9s-.6 3.1-1.8 4.3c-.4.4-.4 1 0 1.4.2.2.5.3.7.3.3 0 .5-.1.7-.3C17.1 13.2 18 11.2 18 9s-.9-4.2-2.4-5.7" }), /* @__PURE__ */ (0, import_jsx_runtime96.jsx)("path", { d: "M.714 6.008h3.072l4.071-3.857c.5-.376 1.143 0 1.143.601V15.28c0 .602-.643.903-1.143.602l-4.071-3.858H.714c-.428 0-.714-.3-.714-.752V6.76c0-.451.286-.752.714-.752m10.568.59a.91.91 0 0 1 0-1.316.91.91 0 0 1 1.316 0c1.203 1.203 1.47 2.216 1.522 3.208q.012.255.011.51c0 1.16-.358 2.733-1.533 3.803a.7.7 0 0 1-.298.156c-.382.106-.873-.011-1.018-.156a.91.91 0 0 1 0-1.316c.57-.57.995-1.551.995-2.487 0-.944-.26-1.667-.995-2.402" })]
+  children: [/* @__PURE__ */ (0, import_jsx_runtime97.jsx)("path", { d: "M15.6 3.3c-.4-.4-1-.4-1.4 0s-.4 1 0 1.4C15.4 5.9 16 7.4 16 9s-.6 3.1-1.8 4.3c-.4.4-.4 1 0 1.4.2.2.5.3.7.3.3 0 .5-.1.7-.3C17.1 13.2 18 11.2 18 9s-.9-4.2-2.4-5.7" }), /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("path", { d: "M.714 6.008h3.072l4.071-3.857c.5-.376 1.143 0 1.143.601V15.28c0 .602-.643.903-1.143.602l-4.071-3.858H.714c-.428 0-.714-.3-.714-.752V6.76c0-.451.286-.752.714-.752m10.568.59a.91.91 0 0 1 0-1.316.91.91 0 0 1 1.316 0c1.203 1.203 1.47 2.216 1.522 3.208q.012.255.011.51c0 1.16-.358 2.733-1.533 3.803a.7.7 0 0 1-.298.156c-.382.106-.873-.011-1.018-.156a.91.91 0 0 1 0-1.316c.57-.57.995-1.551.995-2.487 0-.944-.26-1.667-.995-2.402" })]
 });
 var ForwardRef16 = (0, import_react180.forwardRef)(VolumeHighIcon);
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/volume-low.js
 var import_react181 = __toESM(require_react(), 1);
-var import_jsx_runtime97 = __toESM(require_jsx_runtime(), 1);
-var VolumeLowIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("svg", {
+var import_jsx_runtime98 = __toESM(require_jsx_runtime(), 1);
+var VolumeLowIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime98.jsx)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -41716,14 +41788,14 @@ var VolumeLowIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime97.jsx
   viewBox: "0 0 18 18",
   ref,
   ...props,
-  children: /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("path", { d: "M.714 6.008h3.072l4.071-3.857c.5-.376 1.143 0 1.143.601V15.28c0 .602-.643.903-1.143.602l-4.071-3.858H.714c-.428 0-.714-.3-.714-.752V6.76c0-.451.286-.752.714-.752m10.568.59a.91.91 0 0 1 0-1.316.91.91 0 0 1 1.316 0c1.203 1.203 1.47 2.216 1.522 3.208q.012.255.011.51c0 1.16-.358 2.733-1.533 3.803a.7.7 0 0 1-.298.156c-.382.106-.873-.011-1.018-.156a.91.91 0 0 1 0-1.316c.57-.57.995-1.551.995-2.487 0-.944-.26-1.667-.995-2.402" })
+  children: /* @__PURE__ */ (0, import_jsx_runtime98.jsx)("path", { d: "M.714 6.008h3.072l4.071-3.857c.5-.376 1.143 0 1.143.601V15.28c0 .602-.643.903-1.143.602l-4.071-3.858H.714c-.428 0-.714-.3-.714-.752V6.76c0-.451.286-.752.714-.752m10.568.59a.91.91 0 0 1 0-1.316.91.91 0 0 1 1.316 0c1.203 1.203 1.47 2.216 1.522 3.208q.012.255.011.51c0 1.16-.358 2.733-1.533 3.803a.7.7 0 0 1-.298.156c-.382.106-.873-.011-1.018-.156a.91.91 0 0 1 0-1.316c.57-.57.995-1.551.995-2.487 0-.944-.26-1.667-.995-2.402" })
 });
 var ForwardRef17 = (0, import_react181.forwardRef)(VolumeLowIcon);
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/volume-off.js
 var import_react182 = __toESM(require_react(), 1);
-var import_jsx_runtime98 = __toESM(require_jsx_runtime(), 1);
-var VolumeOffIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime98.jsx)("svg", {
+var import_jsx_runtime99 = __toESM(require_jsx_runtime(), 1);
+var VolumeOffIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime99.jsx)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -41732,13 +41804,13 @@ var VolumeOffIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime98.jsx
   viewBox: "0 0 18 18",
   ref,
   ...props,
-  children: /* @__PURE__ */ (0, import_jsx_runtime98.jsx)("path", { d: "M.714 6.008h3.072l4.071-3.857c.5-.376 1.143 0 1.143.601V15.28c0 .602-.643.903-1.143.602l-4.071-3.858H.714c-.428 0-.714-.3-.714-.752V6.76c0-.451.286-.752.714-.752M14.5 7.586l-1.768-1.768a1 1 0 1 0-1.414 1.414L13.085 9l-1.767 1.768a1 1 0 0 0 1.414 1.414l1.768-1.768 1.768 1.768a1 1 0 0 0 1.414-1.414L15.914 9l1.768-1.768a1 1 0 0 0-1.414-1.414z" })
+  children: /* @__PURE__ */ (0, import_jsx_runtime99.jsx)("path", { d: "M.714 6.008h3.072l4.071-3.857c.5-.376 1.143 0 1.143.601V15.28c0 .602-.643.903-1.143.602l-4.071-3.858H.714c-.428 0-.714-.3-.714-.752V6.76c0-.451.286-.752.714-.752M14.5 7.586l-1.768-1.768a1 1 0 1 0-1.414 1.414L13.085 9l-1.767 1.768a1 1 0 0 0 1.414 1.414l1.768-1.768 1.768 1.768a1 1 0 0 0 1.414-1.414L15.914 9l1.768-1.768a1 1 0 0 0-1.414-1.414z" })
 });
 var ForwardRef18 = (0, import_react182.forwardRef)(VolumeOffIcon);
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/components/buttons/mute-button.js
 var import_react_compiler_runtime71 = __toESM(require_dist(), 1);
-var import_jsx_runtime99 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime100 = __toESM(require_jsx_runtime(), 1);
 function MuteButton2(t0) {
   const $ = (0, import_react_compiler_runtime71.c)(14);
   let t1;
@@ -41760,7 +41832,7 @@ function MuteButton2(t0) {
   }
   let t2;
   if ($[5] === Symbol.for("react.memo_cache_sentinel")) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime99.jsx)(Button2, {});
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime100.jsx)(Button2, {});
     $[5] = t2;
   } else t2 = $[5];
   let t3;
@@ -41771,22 +41843,22 @@ function MuteButton2(t0) {
   } else t3 = $[7];
   let t4;
   if ($[8] === Symbol.for("react.memo_cache_sentinel")) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime99.jsx)(ForwardRef18, { className: cn("media-button-icon", "media-mute-button-off-icon") });
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime100.jsx)(ForwardRef18, { className: cn("media-button-icon", "media-mute-button-off-icon") });
     $[8] = t4;
   } else t4 = $[8];
   let t5;
   if ($[9] === Symbol.for("react.memo_cache_sentinel")) {
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime99.jsx)(ForwardRef17, { className: cn("media-button-icon", "media-mute-button-low-icon") });
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime100.jsx)(ForwardRef17, { className: cn("media-button-icon", "media-mute-button-low-icon") });
     $[9] = t5;
   } else t5 = $[9];
   let t6;
   if ($[10] === Symbol.for("react.memo_cache_sentinel")) {
-    t6 = /* @__PURE__ */ (0, import_jsx_runtime99.jsx)(ForwardRef16, { className: cn("media-button-icon", "media-mute-button-high-icon") });
+    t6 = /* @__PURE__ */ (0, import_jsx_runtime100.jsx)(ForwardRef16, { className: cn("media-button-icon", "media-mute-button-high-icon") });
     $[10] = t6;
   } else t6 = $[10];
   let t7;
   if ($[11] !== props || $[12] !== t3) {
-    t7 = /* @__PURE__ */ (0, import_jsx_runtime99.jsxs)(MuteButton, {
+    t7 = /* @__PURE__ */ (0, import_jsx_runtime100.jsxs)(MuteButton, {
       render: t2,
       className: t3,
       ...props,
@@ -41805,7 +41877,7 @@ function MuteButton2(t0) {
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/components/menus/volume-popover.js
 var import_react_compiler_runtime72 = __toESM(require_dist(), 1);
-var import_jsx_runtime100 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime101 = __toESM(require_jsx_runtime(), 1);
 function VolumePopover(t0) {
   const $ = (0, import_react_compiler_runtime72.c)(23);
   let t1;
@@ -41846,13 +41918,13 @@ function VolumePopover(t0) {
   } else t6 = $[9];
   let t7;
   if ($[10] !== t6) {
-    t7 = /* @__PURE__ */ (0, import_jsx_runtime100.jsx)(VolumePopoverTrigger, { render: /* @__PURE__ */ (0, import_jsx_runtime100.jsx)(MuteButton2, { className: t6 }) });
+    t7 = /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(VolumePopoverTrigger, { render: /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(MuteButton2, { className: t6 }) });
     $[10] = t6;
     $[11] = t7;
   } else t7 = $[11];
   let t8;
   if ($[12] !== t5 || $[13] !== t7) {
-    t8 = /* @__PURE__ */ (0, import_jsx_runtime100.jsx)(ButtonTooltip, {
+    t8 = /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(ButtonTooltip, {
       delay: 0,
       disabled: t5,
       sticky: true,
@@ -41870,16 +41942,16 @@ function VolumePopover(t0) {
   } else t9 = $[15];
   let t10;
   if ($[16] !== orientation) {
-    t10 = /* @__PURE__ */ (0, import_jsx_runtime100.jsx)(VolumePopoverPopup, {
+    t10 = /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(VolumePopoverPopup, {
       className: t9,
-      children: /* @__PURE__ */ (0, import_jsx_runtime100.jsx)(VolumeSlider, { orientation })
+      children: /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(VolumeSlider, { orientation })
     });
     $[16] = orientation;
     $[17] = t10;
   } else t10 = $[17];
   let t11;
   if ($[18] !== props || $[19] !== side || $[20] !== t10 || $[21] !== t8) {
-    t11 = /* @__PURE__ */ (0, import_jsx_runtime100.jsxs)(VolumePopoverRoot, {
+    t11 = /* @__PURE__ */ (0, import_jsx_runtime101.jsxs)(VolumePopoverRoot, {
       openOnHover: true,
       delay: 200,
       closeDelay: 100,
@@ -41898,7 +41970,7 @@ function VolumePopover(t0) {
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/components/sliders/time-slider.js
 var import_react_compiler_runtime73 = __toESM(require_dist(), 1);
-var import_jsx_runtime101 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime102 = __toESM(require_jsx_runtime(), 1);
 function TimeSlider(t0) {
   const $ = (0, import_react_compiler_runtime73.c)(25);
   let t1;
@@ -41933,7 +42005,7 @@ function TimeSlider(t0) {
   } else t3 = $[8];
   let t4;
   if ($[9] === Symbol.for("react.memo_cache_sentinel")) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(TimeSliderChapters, {
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime102.jsx)(TimeSliderChapters, {
       className: "media-time-slider-chapters",
       renderChapter: _temp14
     });
@@ -41941,8 +42013,8 @@ function TimeSlider(t0) {
   } else t4 = $[9];
   let t5;
   if ($[10] === Symbol.for("react.memo_cache_sentinel")) {
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(SliderThumb, {
-      render: /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(SliderThumb3, {}),
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime102.jsx)(SliderThumb, {
+      render: /* @__PURE__ */ (0, import_jsx_runtime102.jsx)(SliderThumb3, {}),
       className: "media-time-slider-thumb"
     });
     $[10] = t5;
@@ -41954,7 +42026,7 @@ function TimeSlider(t0) {
   } else t6 = $[11];
   let t7;
   if ($[12] !== renderThumbnail) {
-    t7 = /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(ThumbnailImage, {
+    t7 = /* @__PURE__ */ (0, import_jsx_runtime102.jsx)(ThumbnailImage, {
       render: renderThumbnail,
       className: "media-slider-thumbnail-image"
     });
@@ -41963,12 +42035,12 @@ function TimeSlider(t0) {
   } else t7 = $[13];
   let t8;
   if ($[14] === Symbol.for("react.memo_cache_sentinel")) {
-    t8 = /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(ForwardRef, { className: "media-slider-thumbnail-spinner-icon" });
+    t8 = /* @__PURE__ */ (0, import_jsx_runtime102.jsx)(ForwardRef, { className: "media-slider-thumbnail-spinner-icon" });
     $[14] = t8;
   } else t8 = $[14];
   let t9;
   if ($[15] !== t7) {
-    t9 = /* @__PURE__ */ (0, import_jsx_runtime101.jsxs)(SliderThumbnailRoot, {
+    t9 = /* @__PURE__ */ (0, import_jsx_runtime102.jsxs)(SliderThumbnailRoot, {
       className: t6,
       children: [t7, t8]
     });
@@ -41977,9 +42049,9 @@ function TimeSlider(t0) {
   } else t9 = $[16];
   let t10;
   if ($[17] === Symbol.for("react.memo_cache_sentinel")) {
-    t10 = /* @__PURE__ */ (0, import_jsx_runtime101.jsxs)("div", {
+    t10 = /* @__PURE__ */ (0, import_jsx_runtime102.jsxs)("div", {
       className: cn("media-slider-preview-content", "media-time-slider-preview-content"),
-      children: [/* @__PURE__ */ (0, import_jsx_runtime101.jsx)(TimeSliderChapterTitle, { className: "media-time-slider-chapter-title" }), /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(SliderValue, {
+      children: [/* @__PURE__ */ (0, import_jsx_runtime102.jsx)(TimeSliderChapterTitle, { className: "media-time-slider-chapter-title" }), /* @__PURE__ */ (0, import_jsx_runtime102.jsx)(SliderValue, {
         className: "media-time-slider-value",
         type: "pointer"
       })]
@@ -41988,7 +42060,7 @@ function TimeSlider(t0) {
   } else t10 = $[17];
   let t11;
   if ($[18] !== previewOverflow || $[19] !== t9) {
-    t11 = /* @__PURE__ */ (0, import_jsx_runtime101.jsxs)(SliderPreview, {
+    t11 = /* @__PURE__ */ (0, import_jsx_runtime102.jsxs)(SliderPreview, {
       className: "media-slider-preview",
       overflow: previewOverflow,
       children: [t9, t10]
@@ -41999,7 +42071,7 @@ function TimeSlider(t0) {
   } else t11 = $[20];
   let t12;
   if ($[21] !== props || $[22] !== t11 || $[23] !== t3) {
-    t12 = /* @__PURE__ */ (0, import_jsx_runtime101.jsxs)(TimeSliderRoot, {
+    t12 = /* @__PURE__ */ (0, import_jsx_runtime102.jsxs)(TimeSliderRoot, {
       className: t3,
       ...props,
       children: [
@@ -42016,17 +42088,17 @@ function TimeSlider(t0) {
   return t12;
 }
 function _temp14(props_0) {
-  return /* @__PURE__ */ (0, import_jsx_runtime101.jsx)("div", {
+  return /* @__PURE__ */ (0, import_jsx_runtime102.jsx)("div", {
     className: "media-time-slider-chapter",
     ...props_0,
-    children: /* @__PURE__ */ (0, import_jsx_runtime101.jsxs)(SliderTrack, {
-      render: /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(SliderTrack2, {}),
+    children: /* @__PURE__ */ (0, import_jsx_runtime102.jsxs)(SliderTrack, {
+      render: /* @__PURE__ */ (0, import_jsx_runtime102.jsx)(SliderTrack2, {}),
       className: "media-time-slider-chapter-track",
-      children: [/* @__PURE__ */ (0, import_jsx_runtime101.jsx)(SliderBuffer, {
-        render: /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(SliderBuffer2, {}),
+      children: [/* @__PURE__ */ (0, import_jsx_runtime102.jsx)(SliderBuffer, {
+        render: /* @__PURE__ */ (0, import_jsx_runtime102.jsx)(SliderBuffer2, {}),
         className: "media-time-slider-chapter-layer"
-      }), /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(SliderFill, {
-        render: /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(SliderFill2, {}),
+      }), /* @__PURE__ */ (0, import_jsx_runtime102.jsx)(SliderFill, {
+        render: /* @__PURE__ */ (0, import_jsx_runtime102.jsx)(SliderFill2, {}),
         className: "media-time-slider-chapter-layer"
       })]
     })
@@ -42035,8 +42107,8 @@ function _temp14(props_0) {
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/speech.js
 var import_react183 = __toESM(require_react(), 1);
-var import_jsx_runtime102 = __toESM(require_jsx_runtime(), 1);
-var SpeechIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime102.jsxs)("svg", {
+var import_jsx_runtime103 = __toESM(require_jsx_runtime(), 1);
+var SpeechIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime103.jsxs)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -42045,7 +42117,7 @@ var SpeechIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime102.jsxs)
   viewBox: "0 0 18 18",
   ref,
   ...props,
-  children: [/* @__PURE__ */ (0, import_jsx_runtime102.jsx)("path", { d: "M6 12a5 5 0 0 1 4.511 2.843c.273.57-.203 1.157-.835 1.157H2.325c-.633 0-1.109-.587-.836-1.157A5 5 0 0 1 6.001 12M8.5 8.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0" }), /* @__PURE__ */ (0, import_jsx_runtime102.jsx)("path", {
+  children: [/* @__PURE__ */ (0, import_jsx_runtime103.jsx)("path", { d: "M6 12a5 5 0 0 1 4.511 2.843c.273.57-.203 1.157-.835 1.157H2.325c-.633 0-1.109-.587-.836-1.157A5 5 0 0 1 6.001 12M8.5 8.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0" }), /* @__PURE__ */ (0, import_jsx_runtime103.jsx)("path", {
     fillOpacity: 0.5,
     d: "M14.5 2A1.5 1.5 0 0 1 16 3.5v2A1.5 1.5 0 0 1 14.5 7H12l-1.146 1.146A.5.5 0 0 1 10 7.793v-.88A1.5 1.5 0 0 1 9 5.5v-2A1.5 1.5 0 0 1 10.5 2z"
   })]
@@ -42054,8 +42126,8 @@ var ForwardRef19 = (0, import_react183.forwardRef)(SpeechIcon);
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/chevron.js
 var import_react184 = __toESM(require_react(), 1);
-var import_jsx_runtime103 = __toESM(require_jsx_runtime(), 1);
-var ChevronIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime103.jsx)("svg", {
+var import_jsx_runtime104 = __toESM(require_jsx_runtime(), 1);
+var ChevronIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime104.jsx)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -42064,7 +42136,7 @@ var ChevronIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime103.jsx)
   viewBox: "0 0 18 18",
   ref,
   ...props,
-  children: /* @__PURE__ */ (0, import_jsx_runtime103.jsx)("path", {
+  children: /* @__PURE__ */ (0, import_jsx_runtime104.jsx)("path", {
     stroke: "currentColor",
     strokeLinecap: "round",
     strokeWidth: 2,
@@ -42075,7 +42147,7 @@ var ForwardRef20 = (0, import_react184.forwardRef)(ChevronIcon);
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/components/menus/menu-chevron.js
 var import_react_compiler_runtime74 = __toESM(require_dist(), 1);
-var import_jsx_runtime104 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime105 = __toESM(require_jsx_runtime(), 1);
 function MenuChevron(t0) {
   const $ = (0, import_react_compiler_runtime74.c)(7);
   let t1;
@@ -42095,7 +42167,7 @@ function MenuChevron(t0) {
   } else t4 = $[4];
   let t5;
   if ($[5] !== t4) {
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime104.jsx)(ForwardRef20, { className: t4 });
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime105.jsx)(ForwardRef20, { className: t4 });
     $[5] = t4;
     $[6] = t5;
   } else t5 = $[6];
@@ -42104,8 +42176,8 @@ function MenuChevron(t0) {
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/check.js
 var import_react185 = __toESM(require_react(), 1);
-var import_jsx_runtime105 = __toESM(require_jsx_runtime(), 1);
-var CheckIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime105.jsx)("svg", {
+var import_jsx_runtime106 = __toESM(require_jsx_runtime(), 1);
+var CheckIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime106.jsx)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -42114,7 +42186,7 @@ var CheckIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime105.jsx)("
   viewBox: "0 0 18 18",
   ref,
   ...props,
-  children: /* @__PURE__ */ (0, import_jsx_runtime105.jsx)("path", {
+  children: /* @__PURE__ */ (0, import_jsx_runtime106.jsx)("path", {
     stroke: "currentColor",
     strokeLinecap: "round",
     strokeLinejoin: "round",
@@ -42126,7 +42198,7 @@ var ForwardRef21 = (0, import_react185.forwardRef)(CheckIcon);
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/components/menus/radio-item.js
 var import_react_compiler_runtime75 = __toESM(require_dist(), 1);
-var import_jsx_runtime106 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime107 = __toESM(require_jsx_runtime(), 1);
 function RadioItem(t0) {
   const $ = (0, import_react_compiler_runtime75.c)(11);
   let children;
@@ -42151,16 +42223,16 @@ function RadioItem(t0) {
   } else t1 = $[5];
   let t2;
   if ($[6] === Symbol.for("react.memo_cache_sentinel")) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime106.jsx)(MenuItemIndicator, {
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime107.jsx)(MenuItemIndicator, {
       forceMount: true,
       className: "media-menu-item-indicator",
-      children: /* @__PURE__ */ (0, import_jsx_runtime106.jsx)(ForwardRef21, { className: "media-menu-radio-item-icon" })
+      children: /* @__PURE__ */ (0, import_jsx_runtime107.jsx)(ForwardRef21, { className: "media-menu-radio-item-icon" })
     });
     $[6] = t2;
   } else t2 = $[6];
   let t3;
   if ($[7] !== children || $[8] !== props || $[9] !== t1) {
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime106.jsxs)(MenuRadioItem, {
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime107.jsxs)(MenuRadioItem, {
       className: t1,
       ...props,
       children: [children, t2]
@@ -42175,7 +42247,7 @@ function RadioItem(t0) {
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/components/menus/audio-track-menu.js
 var import_react_compiler_runtime76 = __toESM(require_dist(), 1);
-var import_jsx_runtime107 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime108 = __toESM(require_jsx_runtime(), 1);
 function AudioTrackMenu(t0) {
   const $ = (0, import_react_compiler_runtime76.c)(10);
   let t1;
@@ -42193,8 +42265,8 @@ function AudioTrackMenu(t0) {
   let t2;
   let t3;
   if ($[4] === Symbol.for("react.memo_cache_sentinel")) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime107.jsx)(ForwardRef19, { className: "media-menu-trigger-item-icon" });
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime107.jsx)(Text2, {
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime108.jsx)(ForwardRef19, { className: "media-menu-trigger-item-icon" });
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime108.jsx)(Text2, {
       token: audioText.key,
       children: audioText.text
     });
@@ -42206,14 +42278,14 @@ function AudioTrackMenu(t0) {
   }
   let t4;
   if ($[6] === Symbol.for("react.memo_cache_sentinel")) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime107.jsxs)(MenuTrigger, {
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime108.jsxs)(MenuTrigger, {
       className: "media-menu-trigger-item",
       children: [
         t2,
         t3,
-        /* @__PURE__ */ (0, import_jsx_runtime107.jsxs)("span", {
+        /* @__PURE__ */ (0, import_jsx_runtime108.jsxs)("span", {
           className: "media-menu-hint",
-          children: [/* @__PURE__ */ (0, import_jsx_runtime107.jsx)(AudioTrackRadioGroupValue, { className: "media-menu-hint-label" }), /* @__PURE__ */ (0, import_jsx_runtime107.jsx)(MenuChevron, {})]
+          children: [/* @__PURE__ */ (0, import_jsx_runtime108.jsx)(AudioTrackRadioGroupValue, { className: "media-menu-hint-label" }), /* @__PURE__ */ (0, import_jsx_runtime108.jsx)(MenuChevron, {})]
         })
       ]
     });
@@ -42221,18 +42293,18 @@ function AudioTrackMenu(t0) {
   } else t4 = $[6];
   let t5;
   if ($[7] === Symbol.for("react.memo_cache_sentinel")) {
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime107.jsxs)(AudioTrackRadioGroupRoot, { children: [t4, /* @__PURE__ */ (0, import_jsx_runtime107.jsxs)(MenuContent, {
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime108.jsxs)(AudioTrackRadioGroupRoot, { children: [t4, /* @__PURE__ */ (0, import_jsx_runtime108.jsxs)(MenuContent, {
       className: "media-menu-content",
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime107.jsxs)(MenuItem, {
+        /* @__PURE__ */ (0, import_jsx_runtime108.jsxs)(MenuItem, {
           className: "media-menu-back-item",
-          children: [/* @__PURE__ */ (0, import_jsx_runtime107.jsx)(MenuChevron, { back: true }), /* @__PURE__ */ (0, import_jsx_runtime107.jsx)(Text2, {
+          children: [/* @__PURE__ */ (0, import_jsx_runtime108.jsx)(MenuChevron, { back: true }), /* @__PURE__ */ (0, import_jsx_runtime108.jsx)(Text2, {
             token: audioText.key,
             children: audioText.text
           })]
         }),
-        /* @__PURE__ */ (0, import_jsx_runtime107.jsx)(MenuSeparator, { className: "media-menu-separator" }),
-        /* @__PURE__ */ (0, import_jsx_runtime107.jsx)(AudioTrackRadioGroupOptions, {
+        /* @__PURE__ */ (0, import_jsx_runtime108.jsx)(MenuSeparator, { className: "media-menu-separator" }),
+        /* @__PURE__ */ (0, import_jsx_runtime108.jsx)(AudioTrackRadioGroupOptions, {
           className: "media-menu-radio-group",
           renderItem: _temp15
         })
@@ -42242,7 +42314,7 @@ function AudioTrackMenu(t0) {
   } else t5 = $[7];
   let t6;
   if ($[8] !== props) {
-    t6 = /* @__PURE__ */ (0, import_jsx_runtime107.jsx)(MenuRoot, {
+    t6 = /* @__PURE__ */ (0, import_jsx_runtime108.jsx)(MenuRoot, {
       ...props,
       children: t5
     });
@@ -42252,15 +42324,15 @@ function AudioTrackMenu(t0) {
   return t6;
 }
 function _temp15(props_0, item) {
-  return /* @__PURE__ */ (0, import_jsx_runtime107.jsx)(RadioItem, {
+  return /* @__PURE__ */ (0, import_jsx_runtime108.jsx)(RadioItem, {
     ...props_0,
-    children: /* @__PURE__ */ (0, import_jsx_runtime107.jsx)("span", { children: item.label })
+    children: /* @__PURE__ */ (0, import_jsx_runtime108.jsx)("span", { children: item.label })
   });
 }
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/components/menus/captions-submenu.js
 var import_react_compiler_runtime77 = __toESM(require_dist(), 1);
-var import_jsx_runtime108 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime109 = __toESM(require_jsx_runtime(), 1);
 function CaptionsSubmenu(t0) {
   const $ = (0, import_react_compiler_runtime77.c)(10);
   let t1;
@@ -42278,8 +42350,8 @@ function CaptionsSubmenu(t0) {
   let t2;
   let t3;
   if ($[4] === Symbol.for("react.memo_cache_sentinel")) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime108.jsx)(ForwardRef4, { className: "media-menu-trigger-item-icon" });
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime108.jsx)(Text2, {
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime109.jsx)(ForwardRef4, { className: "media-menu-trigger-item-icon" });
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime109.jsx)(Text2, {
       token: captionsText.key,
       children: captionsText.text
     });
@@ -42291,14 +42363,14 @@ function CaptionsSubmenu(t0) {
   }
   let t4;
   if ($[6] === Symbol.for("react.memo_cache_sentinel")) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime108.jsxs)(MenuTrigger, {
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime109.jsxs)(MenuTrigger, {
       className: "media-menu-trigger-item",
       children: [
         t2,
         t3,
-        /* @__PURE__ */ (0, import_jsx_runtime108.jsxs)("span", {
+        /* @__PURE__ */ (0, import_jsx_runtime109.jsxs)("span", {
           className: "media-menu-hint",
-          children: [/* @__PURE__ */ (0, import_jsx_runtime108.jsx)(CaptionsRadioGroupValue, { className: "media-menu-hint-label" }), /* @__PURE__ */ (0, import_jsx_runtime108.jsx)(MenuChevron, {})]
+          children: [/* @__PURE__ */ (0, import_jsx_runtime109.jsx)(CaptionsRadioGroupValue, { className: "media-menu-hint-label" }), /* @__PURE__ */ (0, import_jsx_runtime109.jsx)(MenuChevron, {})]
         })
       ]
     });
@@ -42306,18 +42378,18 @@ function CaptionsSubmenu(t0) {
   } else t4 = $[6];
   let t5;
   if ($[7] === Symbol.for("react.memo_cache_sentinel")) {
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime108.jsxs)(CaptionsRadioGroupRoot, { children: [t4, /* @__PURE__ */ (0, import_jsx_runtime108.jsxs)(MenuContent, {
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime109.jsxs)(CaptionsRadioGroupRoot, { children: [t4, /* @__PURE__ */ (0, import_jsx_runtime109.jsxs)(MenuContent, {
       className: "media-menu-content",
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime108.jsxs)(MenuItem, {
+        /* @__PURE__ */ (0, import_jsx_runtime109.jsxs)(MenuItem, {
           className: "media-menu-back-item",
-          children: [/* @__PURE__ */ (0, import_jsx_runtime108.jsx)(MenuChevron, { back: true }), /* @__PURE__ */ (0, import_jsx_runtime108.jsx)(Text2, {
+          children: [/* @__PURE__ */ (0, import_jsx_runtime109.jsx)(MenuChevron, { back: true }), /* @__PURE__ */ (0, import_jsx_runtime109.jsx)(Text2, {
             token: captionsText.key,
             children: captionsText.text
           })]
         }),
-        /* @__PURE__ */ (0, import_jsx_runtime108.jsx)(MenuSeparator, { className: "media-menu-separator" }),
-        /* @__PURE__ */ (0, import_jsx_runtime108.jsx)(CaptionsRadioGroupOptions, {
+        /* @__PURE__ */ (0, import_jsx_runtime109.jsx)(MenuSeparator, { className: "media-menu-separator" }),
+        /* @__PURE__ */ (0, import_jsx_runtime109.jsx)(CaptionsRadioGroupOptions, {
           className: "media-menu-radio-group",
           renderItem: _temp16
         })
@@ -42327,7 +42399,7 @@ function CaptionsSubmenu(t0) {
   } else t5 = $[7];
   let t6;
   if ($[8] !== props) {
-    t6 = /* @__PURE__ */ (0, import_jsx_runtime108.jsx)(MenuRoot, {
+    t6 = /* @__PURE__ */ (0, import_jsx_runtime109.jsx)(MenuRoot, {
       ...props,
       children: t5
     });
@@ -42337,9 +42409,9 @@ function CaptionsSubmenu(t0) {
   return t6;
 }
 function _temp16(props_0, item) {
-  return /* @__PURE__ */ (0, import_jsx_runtime108.jsxs)(RadioItem, {
+  return /* @__PURE__ */ (0, import_jsx_runtime109.jsxs)(RadioItem, {
     ...props_0,
-    children: [/* @__PURE__ */ (0, import_jsx_runtime108.jsx)("span", { children: item.label }), item.badge ? /* @__PURE__ */ (0, import_jsx_runtime108.jsx)("span", {
+    children: [/* @__PURE__ */ (0, import_jsx_runtime109.jsx)("span", { children: item.label }), item.badge ? /* @__PURE__ */ (0, import_jsx_runtime109.jsx)("span", {
       className: "media-menu-badge",
       children: item.badge
     }) : null]
@@ -42348,8 +42420,8 @@ function _temp16(props_0, item) {
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/speed.js
 var import_react186 = __toESM(require_react(), 1);
-var import_jsx_runtime109 = __toESM(require_jsx_runtime(), 1);
-var SpeedIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime109.jsxs)("svg", {
+var import_jsx_runtime110 = __toESM(require_jsx_runtime(), 1);
+var SpeedIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime110.jsxs)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -42359,8 +42431,8 @@ var SpeedIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime109.jsxs)(
   ref,
   ...props,
   children: [
-    /* @__PURE__ */ (0, import_jsx_runtime109.jsx)("path", { d: "M9 18q-.213 0-.424-.012h.85Q9.214 18 9 18M9 2a8 8 0 0 1 8 8c0 1.975-.719 3.78-1.905 5.175a.75.75 0 0 1-1.204.018l-1.509-1.971a.75.75 0 0 1 .596-1.206h1.674a6 6 0 1 0-11.304 0h1.68a.75.75 0 0 1 .596 1.206l-1.507 1.971a.75.75 0 0 1-1.133.07l-.003.004A8 8 0 0 1 9 2" }),
-    /* @__PURE__ */ (0, import_jsx_runtime109.jsx)("rect", {
+    /* @__PURE__ */ (0, import_jsx_runtime110.jsx)("path", { d: "M9 18q-.213 0-.424-.012h.85Q9.214 18 9 18M9 2a8 8 0 0 1 8 8c0 1.975-.719 3.78-1.905 5.175a.75.75 0 0 1-1.204.018l-1.509-1.971a.75.75 0 0 1 .596-1.206h1.674a6 6 0 1 0-11.304 0h1.68a.75.75 0 0 1 .596 1.206l-1.507 1.971a.75.75 0 0 1-1.133.07l-.003.004A8 8 0 0 1 9 2" }),
+    /* @__PURE__ */ (0, import_jsx_runtime110.jsx)("rect", {
       width: 6,
       height: 2,
       x: 6,
@@ -42368,26 +42440,26 @@ var SpeedIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime109.jsxs)(
       fillOpacity: 0.5,
       rx: 1
     }),
-    /* @__PURE__ */ (0, import_jsx_runtime109.jsx)("path", { d: "M8.3 6.318c.246-.64 1.154-.64 1.4 0L10.732 9h-.002a2 2 0 1 1-3.46 0h-.001z" }),
-    /* @__PURE__ */ (0, import_jsx_runtime109.jsxs)("g", {
+    /* @__PURE__ */ (0, import_jsx_runtime110.jsx)("path", { d: "M8.3 6.318c.246-.64 1.154-.64 1.4 0L10.732 9h-.002a2 2 0 1 1-3.46 0h-.001z" }),
+    /* @__PURE__ */ (0, import_jsx_runtime110.jsxs)("g", {
       fillOpacity: 0.5,
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime109.jsx)("circle", {
+        /* @__PURE__ */ (0, import_jsx_runtime110.jsx)("circle", {
           cx: 5,
           cy: 10.25,
           r: 0.75
         }),
-        /* @__PURE__ */ (0, import_jsx_runtime109.jsx)("circle", {
+        /* @__PURE__ */ (0, import_jsx_runtime110.jsx)("circle", {
           cx: 13,
           cy: 10.25,
           r: 0.75
         }),
-        /* @__PURE__ */ (0, import_jsx_runtime109.jsx)("circle", {
+        /* @__PURE__ */ (0, import_jsx_runtime110.jsx)("circle", {
           cx: 6,
           cy: 7.25,
           r: 0.75
         }),
-        /* @__PURE__ */ (0, import_jsx_runtime109.jsx)("circle", {
+        /* @__PURE__ */ (0, import_jsx_runtime110.jsx)("circle", {
           cx: 12,
           cy: 7.25,
           r: 0.75
@@ -42400,7 +42472,7 @@ var ForwardRef22 = (0, import_react186.forwardRef)(SpeedIcon);
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/components/menus/playback-rate-submenu.js
 var import_react_compiler_runtime78 = __toESM(require_dist(), 1);
-var import_jsx_runtime110 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime111 = __toESM(require_jsx_runtime(), 1);
 function PlaybackRateSubmenu(t0) {
   const $ = (0, import_react_compiler_runtime78.c)(10);
   let t1;
@@ -42418,8 +42490,8 @@ function PlaybackRateSubmenu(t0) {
   let t2;
   let t3;
   if ($[4] === Symbol.for("react.memo_cache_sentinel")) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime110.jsx)(ForwardRef22, { className: "media-menu-trigger-item-icon" });
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime110.jsx)(Text2, {
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime111.jsx)(ForwardRef22, { className: "media-menu-trigger-item-icon" });
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime111.jsx)(Text2, {
       token: speedText.key,
       children: speedText.text
     });
@@ -42431,14 +42503,14 @@ function PlaybackRateSubmenu(t0) {
   }
   let t4;
   if ($[6] === Symbol.for("react.memo_cache_sentinel")) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime110.jsxs)(MenuTrigger, {
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime111.jsxs)(MenuTrigger, {
       className: "media-menu-trigger-item",
       children: [
         t2,
         t3,
-        /* @__PURE__ */ (0, import_jsx_runtime110.jsxs)("span", {
+        /* @__PURE__ */ (0, import_jsx_runtime111.jsxs)("span", {
           className: "media-menu-hint",
-          children: [/* @__PURE__ */ (0, import_jsx_runtime110.jsx)(PlaybackRateRadioGroupValue, { className: "media-menu-hint-label" }), /* @__PURE__ */ (0, import_jsx_runtime110.jsx)(MenuChevron, {})]
+          children: [/* @__PURE__ */ (0, import_jsx_runtime111.jsx)(PlaybackRateRadioGroupValue, { className: "media-menu-hint-label" }), /* @__PURE__ */ (0, import_jsx_runtime111.jsx)(MenuChevron, {})]
         })
       ]
     });
@@ -42446,18 +42518,18 @@ function PlaybackRateSubmenu(t0) {
   } else t4 = $[6];
   let t5;
   if ($[7] === Symbol.for("react.memo_cache_sentinel")) {
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime110.jsxs)(PlaybackRateRadioGroupRoot, { children: [t4, /* @__PURE__ */ (0, import_jsx_runtime110.jsxs)(MenuContent, {
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime111.jsxs)(PlaybackRateRadioGroupRoot, { children: [t4, /* @__PURE__ */ (0, import_jsx_runtime111.jsxs)(MenuContent, {
       className: "media-menu-content",
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime110.jsxs)(MenuItem, {
+        /* @__PURE__ */ (0, import_jsx_runtime111.jsxs)(MenuItem, {
           className: "media-menu-back-item",
-          children: [/* @__PURE__ */ (0, import_jsx_runtime110.jsx)(MenuChevron, { back: true }), /* @__PURE__ */ (0, import_jsx_runtime110.jsx)(Text2, {
+          children: [/* @__PURE__ */ (0, import_jsx_runtime111.jsx)(MenuChevron, { back: true }), /* @__PURE__ */ (0, import_jsx_runtime111.jsx)(Text2, {
             token: speedText.key,
             children: speedText.text
           })]
         }),
-        /* @__PURE__ */ (0, import_jsx_runtime110.jsx)(MenuSeparator, { className: "media-menu-separator" }),
-        /* @__PURE__ */ (0, import_jsx_runtime110.jsx)(PlaybackRateRadioGroupOptions, {
+        /* @__PURE__ */ (0, import_jsx_runtime111.jsx)(MenuSeparator, { className: "media-menu-separator" }),
+        /* @__PURE__ */ (0, import_jsx_runtime111.jsx)(PlaybackRateRadioGroupOptions, {
           className: "media-menu-radio-group",
           renderItem: _temp17
         })
@@ -42467,7 +42539,7 @@ function PlaybackRateSubmenu(t0) {
   } else t5 = $[7];
   let t6;
   if ($[8] !== props) {
-    t6 = /* @__PURE__ */ (0, import_jsx_runtime110.jsx)(MenuRoot, {
+    t6 = /* @__PURE__ */ (0, import_jsx_runtime111.jsx)(MenuRoot, {
       ...props,
       children: t5
     });
@@ -42477,16 +42549,16 @@ function PlaybackRateSubmenu(t0) {
   return t6;
 }
 function _temp17(props_0, item) {
-  return /* @__PURE__ */ (0, import_jsx_runtime110.jsx)(RadioItem, {
+  return /* @__PURE__ */ (0, import_jsx_runtime111.jsx)(RadioItem, {
     ...props_0,
-    children: /* @__PURE__ */ (0, import_jsx_runtime110.jsx)("span", { children: item.label })
+    children: /* @__PURE__ */ (0, import_jsx_runtime111.jsx)("span", { children: item.label })
   });
 }
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/switches.js
 var import_react187 = __toESM(require_react(), 1);
-var import_jsx_runtime111 = __toESM(require_jsx_runtime(), 1);
-var SwitchesIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime111.jsxs)("svg", {
+var import_jsx_runtime112 = __toESM(require_jsx_runtime(), 1);
+var SwitchesIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime112.jsxs)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -42495,7 +42567,7 @@ var SwitchesIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime111.jsx
   viewBox: "0 0 18 18",
   ref,
   ...props,
-  children: [/* @__PURE__ */ (0, import_jsx_runtime111.jsx)("path", { d: "M12.5 9.5a3.5 3.5 0 1 1 0 7h-7a3.5 3.5 0 1 1 0-7zm-2 1.5a2 2 0 1 0 0 4h2a2 2 0 1 0 0-4z" }), /* @__PURE__ */ (0, import_jsx_runtime111.jsx)("path", {
+  children: [/* @__PURE__ */ (0, import_jsx_runtime112.jsx)("path", { d: "M12.5 9.5a3.5 3.5 0 1 1 0 7h-7a3.5 3.5 0 1 1 0-7zm-2 1.5a2 2 0 1 0 0 4h2a2 2 0 1 0 0-4z" }), /* @__PURE__ */ (0, import_jsx_runtime112.jsx)("path", {
     fillOpacity: 0.5,
     d: "M12.5 1.5a3.5 3.5 0 1 1 0 7h-7a3.5 3.5 0 1 1 0-7zM5.5 3a2 2 0 1 0 0 4h2a2 2 0 1 0 0-4z"
   })]
@@ -42504,7 +42576,7 @@ var ForwardRef23 = (0, import_react187.forwardRef)(SwitchesIcon);
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/components/menus/quality-menu.js
 var import_react_compiler_runtime79 = __toESM(require_dist(), 1);
-var import_jsx_runtime112 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime113 = __toESM(require_jsx_runtime(), 1);
 function QualityMenu(t0) {
   const $ = (0, import_react_compiler_runtime79.c)(10);
   let t1;
@@ -42522,8 +42594,8 @@ function QualityMenu(t0) {
   let t2;
   let t3;
   if ($[4] === Symbol.for("react.memo_cache_sentinel")) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime112.jsx)(ForwardRef23, { className: "media-menu-trigger-item-icon" });
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime112.jsx)(Text2, {
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime113.jsx)(ForwardRef23, { className: "media-menu-trigger-item-icon" });
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime113.jsx)(Text2, {
       token: qualityText.key,
       children: qualityText.text
     });
@@ -42535,14 +42607,14 @@ function QualityMenu(t0) {
   }
   let t4;
   if ($[6] === Symbol.for("react.memo_cache_sentinel")) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime112.jsxs)(MenuTrigger, {
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime113.jsxs)(MenuTrigger, {
       className: "media-menu-trigger-item",
       children: [
         t2,
         t3,
-        /* @__PURE__ */ (0, import_jsx_runtime112.jsxs)("span", {
+        /* @__PURE__ */ (0, import_jsx_runtime113.jsxs)("span", {
           className: "media-menu-hint",
-          children: [/* @__PURE__ */ (0, import_jsx_runtime112.jsx)(QualityRadioGroupValue, { className: "media-menu-hint-label" }), /* @__PURE__ */ (0, import_jsx_runtime112.jsx)(MenuChevron, {})]
+          children: [/* @__PURE__ */ (0, import_jsx_runtime113.jsx)(QualityRadioGroupValue, { className: "media-menu-hint-label" }), /* @__PURE__ */ (0, import_jsx_runtime113.jsx)(MenuChevron, {})]
         })
       ]
     });
@@ -42550,18 +42622,18 @@ function QualityMenu(t0) {
   } else t4 = $[6];
   let t5;
   if ($[7] === Symbol.for("react.memo_cache_sentinel")) {
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime112.jsxs)(QualityRadioGroupRoot, { children: [t4, /* @__PURE__ */ (0, import_jsx_runtime112.jsxs)(MenuContent, {
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime113.jsxs)(QualityRadioGroupRoot, { children: [t4, /* @__PURE__ */ (0, import_jsx_runtime113.jsxs)(MenuContent, {
       className: "media-menu-content",
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime112.jsxs)(MenuItem, {
+        /* @__PURE__ */ (0, import_jsx_runtime113.jsxs)(MenuItem, {
           className: "media-menu-back-item",
-          children: [/* @__PURE__ */ (0, import_jsx_runtime112.jsx)(MenuChevron, { back: true }), /* @__PURE__ */ (0, import_jsx_runtime112.jsx)(Text2, {
+          children: [/* @__PURE__ */ (0, import_jsx_runtime113.jsx)(MenuChevron, { back: true }), /* @__PURE__ */ (0, import_jsx_runtime113.jsx)(Text2, {
             token: qualityText.key,
             children: qualityText.text
           })]
         }),
-        /* @__PURE__ */ (0, import_jsx_runtime112.jsx)(MenuSeparator, { className: "media-menu-separator" }),
-        /* @__PURE__ */ (0, import_jsx_runtime112.jsx)(QualityRadioGroupOptions, {
+        /* @__PURE__ */ (0, import_jsx_runtime113.jsx)(MenuSeparator, { className: "media-menu-separator" }),
+        /* @__PURE__ */ (0, import_jsx_runtime113.jsx)(QualityRadioGroupOptions, {
           className: "media-menu-radio-group",
           renderItem: _temp18
         })
@@ -42571,7 +42643,7 @@ function QualityMenu(t0) {
   } else t5 = $[7];
   let t6;
   if ($[8] !== props) {
-    t6 = /* @__PURE__ */ (0, import_jsx_runtime112.jsx)(MenuRoot, {
+    t6 = /* @__PURE__ */ (0, import_jsx_runtime113.jsx)(MenuRoot, {
       ...props,
       children: t5
     });
@@ -42581,12 +42653,12 @@ function QualityMenu(t0) {
   return t6;
 }
 function _temp18(props_0, item) {
-  return /* @__PURE__ */ (0, import_jsx_runtime112.jsxs)(RadioItem, {
+  return /* @__PURE__ */ (0, import_jsx_runtime113.jsxs)(RadioItem, {
     ...props_0,
-    children: [/* @__PURE__ */ (0, import_jsx_runtime112.jsxs)("span", { children: [/* @__PURE__ */ (0, import_jsx_runtime112.jsx)("span", { children: item.label }), item.tier ? /* @__PURE__ */ (0, import_jsx_runtime112.jsx)("sup", {
+    children: [/* @__PURE__ */ (0, import_jsx_runtime113.jsxs)("span", { children: [/* @__PURE__ */ (0, import_jsx_runtime113.jsx)("span", { children: item.label }), item.tier ? /* @__PURE__ */ (0, import_jsx_runtime113.jsx)("sup", {
       className: "media-menu-tier",
       children: item.tier
-    }) : null] }), item.badge ? /* @__PURE__ */ (0, import_jsx_runtime112.jsx)("span", {
+    }) : null] }), item.badge ? /* @__PURE__ */ (0, import_jsx_runtime113.jsx)("span", {
       className: "media-menu-badge",
       children: item.badge
     }) : null]
@@ -42595,8 +42667,8 @@ function _temp18(props_0, item) {
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/gear.js
 var import_react188 = __toESM(require_react(), 1);
-var import_jsx_runtime113 = __toESM(require_jsx_runtime(), 1);
-var GearIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime113.jsx)("svg", {
+var import_jsx_runtime114 = __toESM(require_jsx_runtime(), 1);
+var GearIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime114.jsx)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -42605,13 +42677,13 @@ var GearIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime113.jsx)("s
   viewBox: "0 0 18 18",
   ref,
   ...props,
-  children: /* @__PURE__ */ (0, import_jsx_runtime113.jsx)("path", { d: "M7.519 2.184c.357-1.578 2.605-1.579 2.962 0a1.518 1.518 0 0 0 2.292.949c1.368-.864 2.957.727 2.094 2.096-.56.886-.074 2.06.949 2.292 1.579.356 1.578 2.606 0 2.962a1.52 1.52 0 0 0-.95 2.293c.864 1.369-.725 2.96-2.093 2.095a1.52 1.52 0 0 0-2.292.95c-.357 1.578-2.606 1.578-2.962 0a1.52 1.52 0 0 0-2.292-.95c-1.368.864-2.957-.726-2.094-2.095a1.52 1.52 0 0 0-.949-2.293c-1.579-.356-1.579-2.606 0-2.962a1.52 1.52 0 0 0 .95-2.292c-.864-1.369.725-2.96 2.093-2.096.887.56 2.061.074 2.292-.95m1.48 3.474a3.343 3.343 0 1 0 .002 6.687 3.343 3.343 0 0 0-.002-6.687" })
+  children: /* @__PURE__ */ (0, import_jsx_runtime114.jsx)("path", { d: "M7.519 2.184c.357-1.578 2.605-1.579 2.962 0a1.518 1.518 0 0 0 2.292.949c1.368-.864 2.957.727 2.094 2.096-.56.886-.074 2.06.949 2.292 1.579.356 1.578 2.606 0 2.962a1.52 1.52 0 0 0-.95 2.293c.864 1.369-.725 2.96-2.093 2.095a1.52 1.52 0 0 0-2.292.95c-.357 1.578-2.606 1.578-2.962 0a1.52 1.52 0 0 0-2.292-.95c-1.368.864-2.957-.726-2.094-2.095a1.52 1.52 0 0 0-.949-2.293c-1.579-.356-1.579-2.606 0-2.962a1.52 1.52 0 0 0 .95-2.292c-.864-1.369.725-2.96 2.093-2.096.887.56 2.061.074 2.292-.95m1.48 3.474a3.343 3.343 0 1 0 .002 6.687 3.343 3.343 0 0 0-.002-6.687" })
 });
 var ForwardRef24 = (0, import_react188.forwardRef)(GearIcon);
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/components/menus/settings-menu.js
 var import_react_compiler_runtime80 = __toESM(require_dist(), 1);
-var import_jsx_runtime114 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime115 = __toESM(require_jsx_runtime(), 1);
 function SettingsMenu(t0) {
   const $ = (0, import_react_compiler_runtime80.c)(19);
   let children;
@@ -42630,7 +42702,7 @@ function SettingsMenu(t0) {
   }
   let t1;
   if ($[4] === Symbol.for("react.memo_cache_sentinel")) {
-    t1 = /* @__PURE__ */ (0, import_jsx_runtime114.jsx)(Text2, {
+    t1 = /* @__PURE__ */ (0, import_jsx_runtime115.jsx)(Text2, {
       token: settingsText.key,
       children: settingsText.text
     });
@@ -42638,7 +42710,7 @@ function SettingsMenu(t0) {
   } else t1 = $[4];
   let t2;
   if ($[5] === Symbol.for("react.memo_cache_sentinel")) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime114.jsx)(Button2, {});
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime115.jsx)(Button2, {});
     $[5] = t2;
   } else t2 = $[5];
   let t3;
@@ -42650,8 +42722,8 @@ function SettingsMenu(t0) {
   let t4;
   let t5;
   if ($[8] === Symbol.for("react.memo_cache_sentinel")) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime114.jsx)(ForwardRef24, { className: cn("media-button-icon-base", "media-settings-menu-trigger-icon") });
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime114.jsx)(Text2, {
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime115.jsx)(ForwardRef24, { className: cn("media-button-icon-base", "media-settings-menu-trigger-icon") });
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime115.jsx)(Text2, {
       className: "media-settings-menu-trigger-label",
       token: settingsText.key,
       children: settingsText.text
@@ -42664,10 +42736,10 @@ function SettingsMenu(t0) {
   }
   let t6;
   if ($[10] !== t3) {
-    t6 = /* @__PURE__ */ (0, import_jsx_runtime114.jsx)(ButtonTooltip, {
+    t6 = /* @__PURE__ */ (0, import_jsx_runtime115.jsx)(ButtonTooltip, {
       label: t1,
       side: "top",
-      children: /* @__PURE__ */ (0, import_jsx_runtime114.jsxs)(MenuTrigger, {
+      children: /* @__PURE__ */ (0, import_jsx_runtime115.jsxs)(MenuTrigger, {
         render: t2,
         className: t3,
         children: [t4, t5]
@@ -42683,10 +42755,10 @@ function SettingsMenu(t0) {
   } else t7 = $[12];
   let t8;
   if ($[13] !== children) {
-    t8 = /* @__PURE__ */ (0, import_jsx_runtime114.jsx)(MenuPopup, {
+    t8 = /* @__PURE__ */ (0, import_jsx_runtime115.jsx)(MenuPopup, {
       keepMounted: true,
       className: t7,
-      children: /* @__PURE__ */ (0, import_jsx_runtime114.jsx)(MenuContent, {
+      children: /* @__PURE__ */ (0, import_jsx_runtime115.jsx)(MenuContent, {
         className: "media-menu-content",
         children
       })
@@ -42696,7 +42768,7 @@ function SettingsMenu(t0) {
   } else t8 = $[14];
   let t9;
   if ($[15] !== props || $[16] !== t6 || $[17] !== t8) {
-    t9 = /* @__PURE__ */ (0, import_jsx_runtime114.jsxs)(MenuRoot, {
+    t9 = /* @__PURE__ */ (0, import_jsx_runtime115.jsxs)(MenuRoot, {
       side: "top",
       align: "center",
       ...props,
@@ -42712,7 +42784,7 @@ function SettingsMenu(t0) {
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/skins/shared/video/menus/settings-menu.js
 var import_react_compiler_runtime81 = __toESM(require_dist(), 1);
-var import_jsx_runtime115 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime116 = __toESM(require_jsx_runtime(), 1);
 function VideoSettingsMenu(t0) {
   const $ = (0, import_react_compiler_runtime81.c)(8);
   let t1;
@@ -42727,10 +42799,10 @@ function VideoSettingsMenu(t0) {
   let t4;
   let t5;
   if ($[2] === Symbol.for("react.memo_cache_sentinel")) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime115.jsx)(QualityMenu, {});
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime115.jsx)(AudioTrackMenu, {});
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime115.jsx)(PlaybackRateSubmenu, {});
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime115.jsx)(CaptionsSubmenu, {});
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(QualityMenu, {});
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(AudioTrackMenu, {});
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(PlaybackRateSubmenu, {});
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(CaptionsSubmenu, {});
     $[2] = t2;
     $[3] = t3;
     $[4] = t4;
@@ -42743,7 +42815,7 @@ function VideoSettingsMenu(t0) {
   }
   let t6;
   if ($[6] !== props) {
-    t6 = /* @__PURE__ */ (0, import_jsx_runtime115.jsxs)(SettingsMenu, {
+    t6 = /* @__PURE__ */ (0, import_jsx_runtime116.jsxs)(SettingsMenu, {
       ...props,
       children: [
         t2,
@@ -42760,7 +42832,7 @@ function VideoSettingsMenu(t0) {
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/layout/controls.js
 var import_react_compiler_runtime82 = __toESM(require_dist(), 1);
-var import_jsx_runtime116 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime117 = __toESM(require_jsx_runtime(), 1);
 function DefaultVideoControls(t0) {
   const $ = (0, import_react_compiler_runtime82.c)(27);
   let t1;
@@ -42772,7 +42844,7 @@ function DefaultVideoControls(t0) {
   const { renderThumbnail } = t1;
   let t2;
   if ($[2] === Symbol.for("react.memo_cache_sentinel")) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(SeekButton2, {
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime117.jsx)(SeekButton2, {
       className: cn("video-controls-center-button", "video-controls-center-seek"),
       seconds: -10
     });
@@ -42780,7 +42852,7 @@ function DefaultVideoControls(t0) {
   } else t2 = $[2];
   let t3;
   if ($[3] === Symbol.for("react.memo_cache_sentinel")) {
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(PlayButton2, {
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime117.jsx)(PlayButton2, {
       className: cn("video-controls-center-button", "video-controls-center-play"),
       iconClassName: "video-controls-center-play-icon"
     });
@@ -42789,21 +42861,21 @@ function DefaultVideoControls(t0) {
   let t4;
   let t5;
   if ($[4] === Symbol.for("react.memo_cache_sentinel")) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(BufferingIndicator, {
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime117.jsx)(BufferingIndicator, {
       className: "video-controls-center-buffering",
-      children: /* @__PURE__ */ (0, import_jsx_runtime116.jsxs)(ControlsGroup, {
+      children: /* @__PURE__ */ (0, import_jsx_runtime117.jsxs)(ControlsGroup, {
         className: "video-controls-center",
         children: [
           t2,
           t3,
-          /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(SeekButton2, {
+          /* @__PURE__ */ (0, import_jsx_runtime117.jsx)(SeekButton2, {
             className: cn("video-controls-center-button", "video-controls-center-seek"),
             seconds: 10
           })
         ]
       })
     });
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(ControlsBackdrop, { className: "video-controls-backdrop" });
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime117.jsx)(ControlsBackdrop, { className: "video-controls-backdrop" });
     $[4] = t4;
     $[5] = t5;
   } else {
@@ -42823,11 +42895,11 @@ function DefaultVideoControls(t0) {
   let t8;
   let t9;
   if ($[8] === Symbol.for("react.memo_cache_sentinel")) {
-    t8 = /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(ButtonTooltip, {
+    t8 = /* @__PURE__ */ (0, import_jsx_runtime117.jsx)(ButtonTooltip, {
       side: "top",
-      children: /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(PlayButton2, {})
+      children: /* @__PURE__ */ (0, import_jsx_runtime117.jsx)(PlayButton2, {})
     });
-    t9 = /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(VolumePopover, { className: "video-controls-volume-button" });
+    t9 = /* @__PURE__ */ (0, import_jsx_runtime117.jsx)(VolumePopover, { className: "video-controls-volume-button" });
     $[8] = t8;
     $[9] = t9;
   } else {
@@ -42836,7 +42908,7 @@ function DefaultVideoControls(t0) {
   }
   let t10;
   if ($[10] === Symbol.for("react.memo_cache_sentinel")) {
-    t10 = /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(Value, {
+    t10 = /* @__PURE__ */ (0, import_jsx_runtime117.jsx)(Value, {
       className: cn("media-time-value", "video-controls-current-time-value"),
       type: "current"
     });
@@ -42844,7 +42916,7 @@ function DefaultVideoControls(t0) {
   } else t10 = $[10];
   let t11;
   if ($[11] !== renderThumbnail) {
-    t11 = /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(TimeSlider, {
+    t11 = /* @__PURE__ */ (0, import_jsx_runtime117.jsx)(TimeSlider, {
       className: "video-controls-time-slider",
       renderThumbnail
     });
@@ -42853,7 +42925,7 @@ function DefaultVideoControls(t0) {
   } else t11 = $[12];
   let t12;
   if ($[13] === Symbol.for("react.memo_cache_sentinel")) {
-    t12 = /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(Value, {
+    t12 = /* @__PURE__ */ (0, import_jsx_runtime117.jsx)(Value, {
       className: cn("media-time-toggle", "video-controls-remaining-time-value"),
       type: "remaining",
       toggle: true
@@ -42862,7 +42934,7 @@ function DefaultVideoControls(t0) {
   } else t12 = $[13];
   let t13;
   if ($[14] !== t11) {
-    t13 = /* @__PURE__ */ (0, import_jsx_runtime116.jsxs)(ControlsGroup, {
+    t13 = /* @__PURE__ */ (0, import_jsx_runtime117.jsxs)(ControlsGroup, {
       className: "video-time-slider-group",
       children: [
         t10,
@@ -42876,11 +42948,11 @@ function DefaultVideoControls(t0) {
   let t14;
   let t15;
   if ($[16] === Symbol.for("react.memo_cache_sentinel")) {
-    t14 = /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(ButtonTooltip, {
+    t14 = /* @__PURE__ */ (0, import_jsx_runtime117.jsx)(ButtonTooltip, {
       side: "top",
-      children: /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(CaptionsButton2, { className: "video-controls-captions-button" })
+      children: /* @__PURE__ */ (0, import_jsx_runtime117.jsx)(CaptionsButton2, { className: "video-controls-captions-button" })
     });
-    t15 = /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(VideoSettingsMenu, { className: "video-controls-settings-button" });
+    t15 = /* @__PURE__ */ (0, import_jsx_runtime117.jsx)(VideoSettingsMenu, { className: "video-controls-settings-button" });
     $[16] = t14;
     $[17] = t15;
   } else {
@@ -42889,7 +42961,7 @@ function DefaultVideoControls(t0) {
   }
   let t16;
   if ($[18] !== t13) {
-    t16 = /* @__PURE__ */ (0, import_jsx_runtime116.jsxs)(ControlsGroup, {
+    t16 = /* @__PURE__ */ (0, import_jsx_runtime117.jsxs)(ControlsGroup, {
       className: t7,
       children: [
         t8,
@@ -42909,39 +42981,39 @@ function DefaultVideoControls(t0) {
   } else t17 = $[20];
   let t18;
   if ($[21] === Symbol.for("react.memo_cache_sentinel")) {
-    t18 = /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(ButtonTooltip, {
+    t18 = /* @__PURE__ */ (0, import_jsx_runtime117.jsx)(ButtonTooltip, {
       side: "top",
-      children: /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(CastButton2, {})
+      children: /* @__PURE__ */ (0, import_jsx_runtime117.jsx)(CastButton2, {})
     });
     $[21] = t18;
   } else t18 = $[21];
   let t19;
   if ($[22] === Symbol.for("react.memo_cache_sentinel")) {
-    t19 = /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(ButtonTooltip, {
+    t19 = /* @__PURE__ */ (0, import_jsx_runtime117.jsx)(ButtonTooltip, {
       side: "top",
-      children: /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(AirPlayButton2, {})
+      children: /* @__PURE__ */ (0, import_jsx_runtime117.jsx)(AirPlayButton2, {})
     });
     $[22] = t19;
   } else t19 = $[22];
   let t20;
   if ($[23] === Symbol.for("react.memo_cache_sentinel")) {
-    t20 = /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(ButtonTooltip, {
+    t20 = /* @__PURE__ */ (0, import_jsx_runtime117.jsx)(ButtonTooltip, {
       side: "top",
-      children: /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(PiPButton2, {})
+      children: /* @__PURE__ */ (0, import_jsx_runtime117.jsx)(PiPButton2, {})
     });
     $[23] = t20;
   } else t20 = $[23];
   let t21;
   if ($[24] === Symbol.for("react.memo_cache_sentinel")) {
-    t21 = /* @__PURE__ */ (0, import_jsx_runtime116.jsxs)(ControlsGroup, {
+    t21 = /* @__PURE__ */ (0, import_jsx_runtime117.jsxs)(ControlsGroup, {
       className: t17,
       children: [
         t18,
         t19,
         t20,
-        /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(ButtonTooltip, {
+        /* @__PURE__ */ (0, import_jsx_runtime117.jsx)(ButtonTooltip, {
           side: "top",
-          children: /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(FullscreenButton2, {})
+          children: /* @__PURE__ */ (0, import_jsx_runtime117.jsx)(FullscreenButton2, {})
         })
       ]
     });
@@ -42949,12 +43021,12 @@ function DefaultVideoControls(t0) {
   } else t21 = $[24];
   let t22;
   if ($[25] !== t16) {
-    t22 = /* @__PURE__ */ (0, import_jsx_runtime116.jsxs)(ControlsRoot, { children: [
+    t22 = /* @__PURE__ */ (0, import_jsx_runtime117.jsxs)(ControlsRoot, { children: [
       t4,
       t5,
-      /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(ControlsContent, {
+      /* @__PURE__ */ (0, import_jsx_runtime117.jsx)(ControlsContent, {
         className: t6,
-        children: /* @__PURE__ */ (0, import_jsx_runtime116.jsxs)(TooltipProvider, { children: [t16, t21] })
+        children: /* @__PURE__ */ (0, import_jsx_runtime117.jsxs)(TooltipProvider, { children: [t16, t21] })
       })
     ] });
     $[25] = t16;
@@ -42965,7 +43037,7 @@ function DefaultVideoControls(t0) {
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/components/display/seek-indicator.js
 var import_react_compiler_runtime83 = __toESM(require_dist(), 1);
-var import_jsx_runtime117 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime118 = __toESM(require_jsx_runtime(), 1);
 function SeekIndicator(t0) {
   const $ = (0, import_react_compiler_runtime83.c)(12);
   let t1;
@@ -42994,8 +43066,8 @@ function SeekIndicator(t0) {
   let t3;
   let t4;
   if ($[7] === Symbol.for("react.memo_cache_sentinel")) {
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime117.jsx)(ForwardRef20, { className: "media-seek-indicator-icon" });
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime117.jsx)(SeekIndicatorValue, { className: "media-seek-indicator-value" });
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(ForwardRef20, { className: "media-seek-indicator-icon" });
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(SeekIndicatorValue, { className: "media-seek-indicator-value" });
     $[7] = t3;
     $[8] = t4;
   } else {
@@ -43004,7 +43076,7 @@ function SeekIndicator(t0) {
   }
   let t5;
   if ($[9] !== props || $[10] !== t2) {
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime117.jsxs)(SeekIndicatorRoot, {
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime118.jsxs)(SeekIndicatorRoot, {
       className: t2,
       ...props,
       children: [t3, t4]
@@ -43018,7 +43090,7 @@ function SeekIndicator(t0) {
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/components/display/status-indicator.js
 var import_react_compiler_runtime84 = __toESM(require_dist(), 1);
-var import_jsx_runtime118 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime119 = __toESM(require_jsx_runtime(), 1);
 var TOP_STATUS_ACTIONS = [
   "toggleSubtitles",
   "toggleFullscreen",
@@ -43052,23 +43124,23 @@ function StatusIndicator(t0) {
   } else t2 = $[6];
   let t3;
   if ($[7] === Symbol.for("react.memo_cache_sentinel")) {
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime118.jsxs)("div", {
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime119.jsxs)("div", {
       className: cn("media-indicator-content", "media-status-indicator-content"),
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(ForwardRef5, { className: "media-status-indicator-captions-on-icon" }),
-        /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(ForwardRef4, { className: "media-status-indicator-captions-off-icon" }),
-        /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(ForwardRef8, { className: "media-status-indicator-fullscreen-enter-icon" }),
-        /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(ForwardRef9, { className: "media-status-indicator-fullscreen-exit-icon" }),
-        /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(ForwardRef10, { className: "media-status-indicator-pip-enter-icon" }),
-        /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(ForwardRef11, { className: "media-status-indicator-pip-exit-icon" }),
-        /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(StatusIndicatorValue, { className: "media-status-indicator-value" })
+        /* @__PURE__ */ (0, import_jsx_runtime119.jsx)(ForwardRef5, { className: "media-status-indicator-captions-on-icon" }),
+        /* @__PURE__ */ (0, import_jsx_runtime119.jsx)(ForwardRef4, { className: "media-status-indicator-captions-off-icon" }),
+        /* @__PURE__ */ (0, import_jsx_runtime119.jsx)(ForwardRef8, { className: "media-status-indicator-fullscreen-enter-icon" }),
+        /* @__PURE__ */ (0, import_jsx_runtime119.jsx)(ForwardRef9, { className: "media-status-indicator-fullscreen-exit-icon" }),
+        /* @__PURE__ */ (0, import_jsx_runtime119.jsx)(ForwardRef10, { className: "media-status-indicator-pip-enter-icon" }),
+        /* @__PURE__ */ (0, import_jsx_runtime119.jsx)(ForwardRef11, { className: "media-status-indicator-pip-exit-icon" }),
+        /* @__PURE__ */ (0, import_jsx_runtime119.jsx)(StatusIndicatorValue, { className: "media-status-indicator-value" })
       ]
     });
     $[7] = t3;
   } else t3 = $[7];
   let t4;
   if ($[8] !== props || $[9] !== t2) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(StatusIndicatorRoot, {
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime119.jsx)(StatusIndicatorRoot, {
       actions: TOP_STATUS_ACTIONS,
       className: t2,
       ...props,
@@ -43108,8 +43180,8 @@ function PlaybackStatusIndicator(t0) {
   let t3;
   let t4;
   if ($[7] === Symbol.for("react.memo_cache_sentinel")) {
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(ForwardRef13, { className: "media-playback-status-indicator-play-icon" });
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(ForwardRef12, { className: "media-playback-status-indicator-pause-icon" });
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime119.jsx)(ForwardRef13, { className: "media-playback-status-indicator-play-icon" });
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime119.jsx)(ForwardRef12, { className: "media-playback-status-indicator-pause-icon" });
     $[7] = t3;
     $[8] = t4;
   } else {
@@ -43118,7 +43190,7 @@ function PlaybackStatusIndicator(t0) {
   }
   let t5;
   if ($[9] !== props || $[10] !== t2) {
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime118.jsxs)(StatusIndicatorRoot, {
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime119.jsxs)(StatusIndicatorRoot, {
       actions: PLAYBACK_STATUS_ACTIONS,
       className: t2,
       ...props,
@@ -43133,7 +43205,7 @@ function PlaybackStatusIndicator(t0) {
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/components/display/volume-indicator.js
 var import_react_compiler_runtime85 = __toESM(require_dist(), 1);
-var import_jsx_runtime119 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime120 = __toESM(require_jsx_runtime(), 1);
 function VolumeIndicator(t0) {
   const $ = (0, import_react_compiler_runtime85.c)(11);
   let t1;
@@ -43161,20 +43233,20 @@ function VolumeIndicator(t0) {
   } else t2 = $[6];
   let t3;
   if ($[7] === Symbol.for("react.memo_cache_sentinel")) {
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime119.jsxs)(VolumeIndicatorFill, {
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime120.jsxs)(VolumeIndicatorFill, {
       className: cn("media-indicator-content", "media-volume-indicator-fill"),
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime119.jsx)(ForwardRef16, { className: "media-volume-indicator-high-icon" }),
-        /* @__PURE__ */ (0, import_jsx_runtime119.jsx)(ForwardRef17, { className: "media-volume-indicator-low-icon" }),
-        /* @__PURE__ */ (0, import_jsx_runtime119.jsx)(ForwardRef18, { className: "media-volume-indicator-off-icon" }),
-        /* @__PURE__ */ (0, import_jsx_runtime119.jsx)(VolumeIndicatorValue, { className: "media-volume-indicator-value" })
+        /* @__PURE__ */ (0, import_jsx_runtime120.jsx)(ForwardRef16, { className: "media-volume-indicator-high-icon" }),
+        /* @__PURE__ */ (0, import_jsx_runtime120.jsx)(ForwardRef17, { className: "media-volume-indicator-low-icon" }),
+        /* @__PURE__ */ (0, import_jsx_runtime120.jsx)(ForwardRef18, { className: "media-volume-indicator-off-icon" }),
+        /* @__PURE__ */ (0, import_jsx_runtime120.jsx)(VolumeIndicatorValue, { className: "media-volume-indicator-value" })
       ]
     });
     $[7] = t3;
   } else t3 = $[7];
   let t4;
   if ($[8] !== props || $[9] !== t2) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime119.jsx)(VolumeIndicatorRoot, {
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime120.jsx)(VolumeIndicatorRoot, {
       className: t2,
       ...props,
       children: t3
@@ -43188,7 +43260,7 @@ function VolumeIndicator(t0) {
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/skins/shared/video/display/status-indicators.js
 var import_react_compiler_runtime86 = __toESM(require_dist(), 1);
-var import_jsx_runtime120 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime121 = __toESM(require_jsx_runtime(), 1);
 function VideoStatusIndicators(t0) {
   const $ = (0, import_react_compiler_runtime86.c)(15);
   let t1;
@@ -43210,7 +43282,7 @@ function VideoStatusIndicators(t0) {
   }
   let t2;
   if ($[5] === Symbol.for("react.memo_cache_sentinel")) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime120.jsx)(StatusAnnouncer3, {});
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime121.jsx)(StatusAnnouncer3, {});
     $[5] = t2;
   } else t2 = $[5];
   let t3;
@@ -43224,10 +43296,10 @@ function VideoStatusIndicators(t0) {
   let t6;
   let t7;
   if ($[8] === Symbol.for("react.memo_cache_sentinel")) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime120.jsx)(VolumeIndicator, {});
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime120.jsx)(StatusIndicator, {});
-    t6 = /* @__PURE__ */ (0, import_jsx_runtime120.jsx)(SeekIndicator, {});
-    t7 = /* @__PURE__ */ (0, import_jsx_runtime120.jsx)(PlaybackStatusIndicator, {});
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime121.jsx)(VolumeIndicator, {});
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime121.jsx)(StatusIndicator, {});
+    t6 = /* @__PURE__ */ (0, import_jsx_runtime121.jsx)(SeekIndicator, {});
+    t7 = /* @__PURE__ */ (0, import_jsx_runtime121.jsx)(PlaybackStatusIndicator, {});
     $[8] = t4;
     $[9] = t5;
     $[10] = t6;
@@ -43240,7 +43312,7 @@ function VideoStatusIndicators(t0) {
   }
   let t8;
   if ($[12] !== props || $[13] !== t3) {
-    t8 = /* @__PURE__ */ (0, import_jsx_runtime120.jsxs)(import_jsx_runtime120.Fragment, { children: [t2, /* @__PURE__ */ (0, import_jsx_runtime120.jsxs)("div", {
+    t8 = /* @__PURE__ */ (0, import_jsx_runtime121.jsxs)(import_jsx_runtime121.Fragment, { children: [t2, /* @__PURE__ */ (0, import_jsx_runtime121.jsxs)("div", {
       className: t3,
       ...props,
       children: [
@@ -43259,7 +43331,7 @@ function VideoStatusIndicators(t0) {
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/skin.js
 var import_react_compiler_runtime87 = __toESM(require_dist(), 1);
-var import_jsx_runtime121 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime122 = __toESM(require_jsx_runtime(), 1);
 function VideoSkin(t0) {
   const $ = (0, import_react_compiler_runtime87.c)(26);
   let t1;
@@ -43296,7 +43368,7 @@ function VideoSkin(t0) {
   } else t2 = $[9];
   let t3;
   if ($[10] !== renderPoster) {
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime121.jsx)(Poster, { renderImage: renderPoster });
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime122.jsx)(Poster, { renderImage: renderPoster });
     $[10] = renderPoster;
     $[11] = t3;
   } else t3 = $[11];
@@ -43304,9 +43376,9 @@ function VideoSkin(t0) {
   let t5;
   let t6;
   if ($[12] === Symbol.for("react.memo_cache_sentinel")) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime121.jsx)(BufferingIndicator3, {});
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime121.jsx)(ErrorDialog, {});
-    t6 = /* @__PURE__ */ (0, import_jsx_runtime121.jsx)(Title3, {});
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime122.jsx)(BufferingIndicator3, {});
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime122.jsx)(ErrorDialog, {});
+    t6 = /* @__PURE__ */ (0, import_jsx_runtime122.jsx)(Title3, {});
     $[12] = t4;
     $[13] = t5;
     $[14] = t6;
@@ -43317,7 +43389,7 @@ function VideoSkin(t0) {
   }
   let t7;
   if ($[15] !== renderThumbnail) {
-    t7 = /* @__PURE__ */ (0, import_jsx_runtime121.jsx)(DefaultVideoControls, { renderThumbnail });
+    t7 = /* @__PURE__ */ (0, import_jsx_runtime122.jsx)(DefaultVideoControls, { renderThumbnail });
     $[15] = renderThumbnail;
     $[16] = t7;
   } else t7 = $[16];
@@ -43325,9 +43397,9 @@ function VideoSkin(t0) {
   let t8;
   let t9;
   if ($[17] === Symbol.for("react.memo_cache_sentinel")) {
-    t8 = /* @__PURE__ */ (0, import_jsx_runtime121.jsx)(VideoHotkeys, {});
-    t9 = /* @__PURE__ */ (0, import_jsx_runtime121.jsx)(VideoGestures, {});
-    t10 = /* @__PURE__ */ (0, import_jsx_runtime121.jsx)(VideoStatusIndicators, {});
+    t8 = /* @__PURE__ */ (0, import_jsx_runtime122.jsx)(VideoHotkeys, {});
+    t9 = /* @__PURE__ */ (0, import_jsx_runtime122.jsx)(VideoGestures, {});
+    t10 = /* @__PURE__ */ (0, import_jsx_runtime122.jsx)(VideoStatusIndicators, {});
     $[17] = t10;
     $[18] = t8;
     $[19] = t9;
@@ -43338,7 +43410,7 @@ function VideoSkin(t0) {
   }
   let t11;
   if ($[20] !== children || $[21] !== props || $[22] !== t2 || $[23] !== t3 || $[24] !== t7) {
-    t11 = /* @__PURE__ */ (0, import_jsx_runtime121.jsxs)(Container3, {
+    t11 = /* @__PURE__ */ (0, import_jsx_runtime122.jsxs)(Container3, {
       className: t2,
       "data-theme": "default",
       "data-preset": "video",
@@ -43367,12 +43439,12 @@ function VideoSkin(t0) {
 
 // node_modules/@videojs/react/dist/default/presets/video/skin.js
 var import_react_compiler_runtime88 = __toESM(require_dist(), 1);
-var import_jsx_runtime122 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime123 = __toESM(require_jsx_runtime(), 1);
 function VideoSkin2(props) {
   const $ = (0, import_react_compiler_runtime88.c)(2);
   let t0;
   if ($[0] !== props) {
-    t0 = /* @__PURE__ */ (0, import_jsx_runtime122.jsx)(VideoSkin, { ...props });
+    t0 = /* @__PURE__ */ (0, import_jsx_runtime123.jsx)(VideoSkin, { ...props });
     $[0] = props;
     $[1] = t0;
   } else t0 = $[1];
@@ -43380,7 +43452,7 @@ function VideoSkin2(props) {
 }
 
 // src/react/VideoJs10Player.tsx
-var import_jsx_runtime123 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime124 = __toESM(require_jsx_runtime(), 1);
 var DEFAULT_STORAGE_KEY = "dtv_resume_history";
 function getStoredResume(episodeId, storageKey = DEFAULT_STORAGE_KEY) {
   if (typeof localStorage === "undefined" || !episodeId) return null;
@@ -43516,7 +43588,7 @@ var VideoJs10Player = ({
     }
     setResumedNotice(null);
   }, [episodeId, storageKey]);
-  return /* @__PURE__ */ (0, import_jsx_runtime123.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)(
     "div",
     {
       className: `vjs10-player-container ${className}`,
@@ -43531,7 +43603,7 @@ var VideoJs10Player = ({
         ...style
       },
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime123.jsx)(VideoPlayer, { title, poster, children: /* @__PURE__ */ (0, import_jsx_runtime123.jsx)(VideoSkin2, { style: { width: "100%", height: "100%", aspectRatio: "16 / 9" }, children: /* @__PURE__ */ (0, import_jsx_runtime123.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(VideoPlayer, { title, poster, children: /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(VideoSkin2, { style: { width: "100%", height: "100%", aspectRatio: "16 / 9" }, children: /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(
           Video,
           {
             ref: videoRef,
@@ -43546,10 +43618,10 @@ var VideoJs10Player = ({
             onPlay,
             onPause,
             onError,
-            children: /* @__PURE__ */ (0, import_jsx_runtime123.jsx)("a", { href: "https://videojs.org/help", target: "_blank", rel: "noopener noreferrer", children: "Video player not working?" })
+            children: /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("a", { href: "https://videojs.org/help", target: "_blank", rel: "noopener noreferrer", children: "Video player not working?" })
           }
         ) }) }),
-        resumedNotice && /* @__PURE__ */ (0, import_jsx_runtime123.jsxs)(
+        resumedNotice && /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)(
           "div",
           {
             role: "status",
@@ -43571,8 +43643,8 @@ var VideoJs10Player = ({
               boxShadow: "0 6px 16px rgba(0, 0, 0, 0.6)"
             },
             children: [
-              /* @__PURE__ */ (0, import_jsx_runtime123.jsx)("span", { children: resumedNotice }),
-              /* @__PURE__ */ (0, import_jsx_runtime123.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("span", { children: resumedNotice }),
+              /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(
                 "button",
                 {
                   onClick: handleRestart,
@@ -43597,24 +43669,244 @@ var VideoJs10Player = ({
   );
 };
 
-// src/react/demo.tsx
-var import_jsx_runtime124 = __toESM(require_jsx_runtime(), 1);
-var FALLBACK_EPISODES = [
+// src/react/channels.ts
+var LATEST_APK_RELEASE_URL = "https://github.com/dylansalim3/dTVSteams/releases/latest";
+var YEAR_OPTIONS = [
+  "\u5168\u90E8",
+  "2026",
+  "2025",
+  "2024",
+  "2023",
+  "2022",
+  "\u7D93\u5178\u61F7\u820A"
+];
+var SHOW_CHANNELS = [
   {
-    id: "ep1",
-    title: "\u7D9C\u85DD\u73A9\u5F88\u5927 2026-11-08 \u53F0\u5317 \u6417\u86CB\u9B3C\u5230\u4F60\u5BB6",
-    date: "2026-11-08",
-    url: "https://srgoideas.com/ep1/",
-    duration: "1\u5C0F\u6642 48\u5206",
-    parts: [
-      { label: "Part 1", streamUrl: "./media/sample-part1.mp4", duration: "35\u5206" },
-      { label: "Part 2", streamUrl: "./media/sample-part2.mp4", duration: "35\u5206" },
-      { label: "Part 3", streamUrl: "./media/sample-part3.mp4", duration: "38\u5206" }
+    id: "mr_player",
+    name: "\u7D9C\u85DD\u73A9\u5F88\u5927",
+    englishName: "Mr. Player",
+    emoji: "\u{1F525}",
+    tagline: "\u61B2\u54E5\u9818\u8ECD\u30FB\u9EC3\u9ED1\u5169\u968A\u547D\u904B\u5C0D\u6C7A",
+    fallbackEpisodes: [
+      {
+        id: "https://srgoideas.com/%e7%b6%9c%e8%97%9d%e7%8e%a9%e5%be%88%e5%a4%a7-2026-11-08-%e5%8f%b0%e5%8c%97-%e6%90%97%e8%9b%8b%e9%ac%bc%e5%88%b0%e4%bd%a0%e5%ae%b6/",
+        title: "\u7D9C\u85DD\u73A9\u5F88\u5927 2026-11-08 \u53F0\u5317 \u6417\u86CB\u9B3C\u5230\u4F60\u5BB6",
+        date: "2026-11-08",
+        url: "https://srgoideas.com/%e7%b6%9c%e8%97%9d%e7%8e%a9%e5%be%88%e5%a4%a7-2026-11-08-%e5%8f%b0%e5%8c%97-%e6%90%97%e8%9b%8b%e9%ac%bc%e5%88%b0%e4%bd%a0%e5%ae%b6/",
+        showId: "mr_player",
+        showName: "\u7D9C\u85DD\u73A9\u5F88\u5927",
+        duration: "1\u5C0F\u6642 48\u5206",
+        parts: [
+          { label: "Part 1", streamUrl: "./media/sample-part1.mp4", duration: "35\u5206" },
+          { label: "Part 2", streamUrl: "./media/sample-part2.mp4", duration: "35\u5206" },
+          { label: "Part 3", streamUrl: "./media/sample-part3.mp4", duration: "38\u5206" }
+        ]
+      }
+    ]
+  },
+  {
+    id: "hunger_games",
+    name: "\u98E2\u9913\u904A\u6232",
+    englishName: "The Hunger Games",
+    emoji: "\u26A1",
+    tagline: "\u98E2\u9913\u6307\u6578\u5C0D\u6C7A\u30FB\u722D\u596A\u5145\u98E2\u7F8E\u98DF\u8207\u734E\u91D1",
+    fallbackEpisodes: [
+      {
+        id: "https://srgoideas.com/%e9%a3%a2%e9%a4%93%e9%81%8a%e6%88%b2-2026-11-22-%e9%a3%a2%e9%a4%93%e6%8c%87%e6%95%b8%e7%89%b9%e5%88%a5%e4%bc%81%e5%8a%83/",
+        title: "\u98E2\u9913\u904A\u6232 2026-11-22 \u98E2\u9913\u6307\u6578\u7279\u5225\u4F01\u5283",
+        date: "2026-11-22",
+        url: "https://srgoideas.com/%e9%a3%a2%e9%a4%93%e9%81%8a%e6%88%b2-2026-11-22-%e9%a3%a2%e9%a4%93%e6%8c%87%e6%95%b8%e7%89%b9%e5%88%a5%e4%bc%81%e5%8a%83/",
+        showId: "hunger_games",
+        showName: "\u98E2\u9913\u904A\u6232",
+        duration: "1\u5C0F\u6642 50\u5206",
+        parts: [
+          { label: "Part 1", url: "https://srgoideas.com/%e9%a3%a2%e9%a4%93%e9%81%8a%e6%88%b2-2026-11-22-%e9%a3%a2%e9%a4%93%e6%8c%87%e6%95%b8%e7%89%b9%e5%88%a5%e4%bc%81%e5%8a%83/" },
+          { label: "Part 2", url: "https://srgoideas.com/%e9%a3%a2%e9%a4%93%e9%81%8a%e6%88%b2-2026-11-22-%e9%a3%a2%e9%a4%93%e6%8c%87%e6%95%b8%e7%89%b9%e5%88%a5%e4%bc%81%e5%8a%83/2/" },
+          { label: "Part 3", url: "https://srgoideas.com/%e9%a3%a2%e9%a4%93%e9%81%8a%e6%88%b2-2026-11-22-%e9%a3%a2%e9%a4%93%e6%8c%87%e6%95%b8%e7%89%b9%e5%88%a5%e4%bc%81%e5%8a%83/3/" }
+        ]
+      }
+    ]
+  },
+  {
+    id: "all_stars",
+    name: "\u5168\u660E\u661F\u904B\u52D5\u6703",
+    englishName: "All Star Sports Day",
+    emoji: "\u{1F3C6}",
+    tagline: "\u7D05\u85CD\u5DD4\u5CF0\u5C0D\u6C7A\u30FB\u6311\u6230\u9AD4\u80B2\u7AF6\u6280\u6975\u9650",
+    fallbackEpisodes: [
+      {
+        id: "https://srgoideas.com/%e5%85%a8%e6%98%8e%e6%98%9f%e9%81%8b%e5%8b%95%e6%9c%83-2023-01-08/",
+        title: "\u5168\u660E\u661F\u904B\u52D5\u6703 2023-01-08 \u7E3D\u51A0\u8ECD\u8CFD\u6B8A\u6B7B\u6230",
+        date: "2023-01-08",
+        url: "https://srgoideas.com/%e5%85%a8%e6%98%8e%e6%98%9f%e9%81%8b%e5%8b%95%e6%9c%83-2023-01-08/",
+        showId: "all_stars",
+        showName: "\u5168\u660E\u661F\u904B\u52D5\u6703",
+        duration: "1\u5C0F\u6642 55\u5206",
+        parts: [
+          { label: "Part 1", url: "https://srgoideas.com/%e5%85%a8%e6%98%8e%e6%98%9f%e9%81%8b%e5%8b%95%e6%9c%83-2023-01-08/" },
+          { label: "Part 2", url: "https://srgoideas.com/%e5%85%a8%e6%98%8e%e6%98%9f%e9%81%8b%e5%8b%95%e6%9c%83-2023-01-08/2/" },
+          { label: "Part 3", url: "https://srgoideas.com/%e5%85%a8%e6%98%8e%e6%98%9f%e9%81%8b%e5%8b%95%e6%9c%83-2023-01-08/3/" }
+        ]
+      }
+    ]
+  },
+  {
+    id: "super_ent",
+    name: "\u5C0F\u660E\u661F\u5927\u8DDF\u73ED",
+    englishName: "Super Ent.",
+    emoji: "\u2B50",
+    tagline: "\u61B2\u54E5\u8207Sandy\u30FB\u9EBB\u8FA3\u7206\u7B11\u5A1B\u6A02\u8A71\u984C",
+    fallbackEpisodes: [
+      {
+        id: "https://srgoideas.com/%e5%b0%8f%e6%98%8e%e6%98%9f%e5%a4%a7%e8%b7%9f%e7%8f%ad-2026-11-20/",
+        title: "\u5C0F\u660E\u661F\u5927\u8DDF\u73ED 2026-11-20 \u6F14\u85DD\u5708\u771F\u5FC3\u8A71\u5927\u5192\u96AA",
+        date: "2026-11-20",
+        url: "https://srgoideas.com/%e5%b0%8f%e6%98%8e%e6%98%9f%e5%a4%a7%e8%b7%9f%e7%8f%ad-2026-11-20/",
+        showId: "super_ent",
+        showName: "\u5C0F\u660E\u661F\u5927\u8DDF\u73ED",
+        duration: "45\u5206",
+        parts: [
+          { label: "Part 1", url: "https://srgoideas.com/%e5%b0%8f%e6%98%8e%e6%98%9f%e5%a4%a7%e8%b7%9f%e7%8f%ad-2026-11-20/" },
+          { label: "Part 2", url: "https://srgoideas.com/%e5%b0%8f%e6%98%8e%e6%98%9f%e5%a4%a7%e8%b7%9f%e7%8f%ad-2026-11-20/2/" }
+        ]
+      }
+    ]
+  },
+  {
+    id: "hot_shop",
+    name: "11\u9EDE\u71B1\u5435\u5E97",
+    englishName: "11 O'Clock Hot Shop",
+    emoji: "\u{1F336}\uFE0F",
+    tagline: "\u6C88\u7389\u7433\u8207Melody\u30FB\u751F\u6D3B\u8F9B\u8FA3\u8A71\u984C\u7206\u7B11\u958B\u8B1B",
+    fallbackEpisodes: [
+      {
+        id: "https://srgoideas.com/11%e9%bb%9e%e7%86%b1%e5%90%b5%e5%ba%97-2026-11-19/",
+        title: "11\u9EDE\u71B1\u5435\u5E97 2026-11-19 \u8352\u8B2C\u65E5\u5E38\u5927\u5410\u69FD",
+        date: "2026-11-19",
+        url: "https://srgoideas.com/11%e9%bb%9e%e7%86%b1%e5%90%b5%e5%ba%97-2026-11-19/",
+        showId: "hot_shop",
+        showName: "11\u9EDE\u71B1\u5435\u5E97",
+        duration: "45\u5206",
+        parts: [
+          { label: "Part 1", url: "https://srgoideas.com/11%e9%bb%9e%e7%86%b1%e5%90%b5%e5%ba%97-2026-11-19/" },
+          { label: "Part 2", url: "https://srgoideas.com/11%e9%bb%9e%e7%86%b1%e5%90%b5%e5%ba%97-2026-11-19/2/" }
+        ]
+      }
     ]
   }
 ];
+var KNOWN_LOCATIONS = [
+  "\u53F0\u5317",
+  "\u65B0\u5317",
+  "\u57FA\u9686",
+  "\u6843\u5712",
+  "\u65B0\u7AF9",
+  "\u82D7\u6817",
+  "\u53F0\u4E2D",
+  "\u5F70\u5316",
+  "\u5357\u6295",
+  "\u96F2\u6797",
+  "\u5609\u7FA9",
+  "\u53F0\u5357",
+  "\u9AD8\u96C4",
+  "\u5C4F\u6771",
+  "\u5B9C\u862D",
+  "\u82B1\u84EE",
+  "\u53F0\u6771",
+  "\u6F8E\u6E56",
+  "\u91D1\u9580",
+  "\u99AC\u7956",
+  "\u7DA0\u5CF6",
+  "\u862D\u5DBC",
+  "\u5C0F\u7409\u7403",
+  "\u65E5\u672C",
+  "\u97D3\u570B",
+  "\u6CF0\u570B",
+  "\u8D8A\u5357",
+  "\u99AC\u4F86\u897F\u4E9E",
+  "\u65B0\u52A0\u5761",
+  "\u5CC7\u91CC\u5CF6",
+  "\u6C96\u7E69",
+  "\u5317\u6D77\u9053",
+  "\u6771\u4EAC",
+  "\u5927\u962A",
+  "\u4EAC\u90FD",
+  "\u9996\u723E",
+  "\u66FC\u8C37",
+  "\u95DC\u897F",
+  "\u7D10\u897F\u862D"
+];
+function extractLocation(title) {
+  for (const loc of KNOWN_LOCATIONS) {
+    if (title.includes(loc)) return loc;
+  }
+  return "";
+}
+function detectShowChannel(episode) {
+  if (episode.showId) {
+    const byId = SHOW_CHANNELS.find((c89) => c89.id === episode.showId);
+    if (byId) return byId;
+  }
+  const haystack = `${episode.showName || ""} ${episode.title || ""} ${episode.id || ""}`;
+  return SHOW_CHANNELS.find((c89) => haystack.includes(c89.name)) || SHOW_CHANNELS[0];
+}
+function stripShowNameFromTitle(title, showName) {
+  let clean = (title || "").trim();
+  if (!clean) return "";
+  if (showName) {
+    clean = clean.replace(new RegExp(`^[\u3010\\[]?\\s*${showName}\\s*[\u3011\\]]?\\s*[-\xB7|:]?\\s*`), "").trim();
+  }
+  return clean || title;
+}
+function matchesYearFilter(ep, year) {
+  if (!year || year === "\u5168\u90E8") return true;
+  const date = (ep.date || "").trim();
+  const title = (ep.title || "").trim();
+  if (year === "\u7D93\u5178\u61F7\u820A") {
+    const m = date.match(/(20\d\d)/) || title.match(/(20\d\d)/);
+    if (m) return parseInt(m[1], 10) <= 2021;
+    return false;
+  }
+  return date.startsWith(year) || title.includes(year);
+}
+
+// src/react/demo.tsx
+var import_jsx_runtime125 = __toESM(require_jsx_runtime(), 1);
+var FAVORITES_STORAGE_KEY = "dtv_favorites";
+var RESUME_STORAGE_KEY = "dtv_resume_history";
+function readFavorites() {
+  try {
+    const raw = localStorage.getItem(FAVORITES_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+function writeFavorites(list) {
+  try {
+    localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(list));
+  } catch {
+  }
+}
+function readHistoryList() {
+  try {
+    const raw = localStorage.getItem(RESUME_STORAGE_KEY);
+    if (!raw) return [];
+    const map = JSON.parse(raw);
+    return Object.values(map).sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+  } catch {
+    return [];
+  }
+}
+function formatSeconds(sec) {
+  if (!sec || Number.isNaN(sec) || sec < 0) return "00:00";
+  const s = Math.floor(sec);
+  const m = Math.floor(s / 60);
+  const r3 = s % 60;
+  return `${String(m).padStart(2, "0")}:${String(r3).padStart(2, "0")}`;
+}
 function resolveStreamUrl(part) {
-  if (!part) return "./media/sample-part1.mp4";
+  if (!part) return "../media/sample-part1.mp4";
   const pageUrl = part.url || "";
   let streamUrl = part.streamUrl || "";
   if (streamUrl.includes("sample-part")) {
@@ -43626,348 +43918,848 @@ function resolveStreamUrl(part) {
     if (pageUrl) params.set("pageUrl", pageUrl);
     return `/api/stream?${params.toString()}`;
   }
-  return streamUrl || "./media/sample-part1.mp4";
+  return streamUrl || "../media/sample-part1.mp4";
 }
-function resolveEpisodeThumb(ep) {
-  if (ep.poster && !ep.poster.includes("tmdb.org") && !ep.poster.includes("preview.png")) {
-    return ep.poster.startsWith("./") ? `../${ep.poster.slice(2)}` : ep.poster;
-  }
-  const dateSlug = (ep.date || "").replace(/-/g, "");
-  if (dateSlug) {
-    return `../media/thumbnails/ep-${dateSlug}.svg`;
-  }
-  return "../media/thumb-default.svg";
+function buildShareUrl(ep, partIdx) {
+  const origin = typeof window !== "undefined" && window.location.origin && !window.location.origin.startsWith("null") ? window.location.origin : "https://dtvsteams.pages.dev";
+  const params = new URLSearchParams();
+  if (ep.id) params.set("ep", ep.id);
+  if (partIdx > 0) params.set("part", String(partIdx + 1));
+  return `${origin}/?${params.toString()}`;
 }
 function App() {
+  const [currentChannel, setCurrentChannel] = (0, import_react190.useState)(SHOW_CHANNELS[0]);
   const [episodes, setEpisodes] = (0, import_react190.useState)([]);
   const [selectedEpId, setSelectedEpId] = (0, import_react190.useState)("");
   const [partIndex, setPartIndex] = (0, import_react190.useState)(0);
   const [currentPage, setCurrentPage] = (0, import_react190.useState)(1);
+  const [pageCache, setPageCache] = (0, import_react190.useState)({});
   const [searchQuery, setSearchQuery] = (0, import_react190.useState)("");
+  const [selectedYear, setSelectedYear] = (0, import_react190.useState)("\u5168\u90E8");
+  const [isSortAscending, setIsSortAscending] = (0, import_react190.useState)(false);
   const [isInitialLoading, setIsInitialLoading] = (0, import_react190.useState)(true);
+  const [isLoadingPage, setIsLoadingPage] = (0, import_react190.useState)(false);
   const [catalogError, setCatalogError] = (0, import_react190.useState)(null);
-  const [loadMoreError, setLoadMoreError] = (0, import_react190.useState)(null);
-  const [isLoadingMore, setIsLoadingMore] = (0, import_react190.useState)(false);
-  const loadCatalog = async () => {
-    setIsInitialLoading(true);
+  const [statusMessage, setStatusMessage] = (0, import_react190.useState)(null);
+  const [isPlayerCollapsed, setIsPlayerCollapsed] = (0, import_react190.useState)(false);
+  const [isChannelModalOpen, setIsChannelModalOpen] = (0, import_react190.useState)(false);
+  const [isLibraryModalOpen, setIsLibraryModalOpen] = (0, import_react190.useState)(false);
+  const [libraryTab, setLibraryTab] = (0, import_react190.useState)("favorites");
+  const [isShareModalOpen, setIsShareModalOpen] = (0, import_react190.useState)(false);
+  const [copiedShareUrl, setCopiedShareUrl] = (0, import_react190.useState)(false);
+  const [favorites, setFavorites] = (0, import_react190.useState)(() => readFavorites());
+  const [historyEntries, setHistoryEntries] = (0, import_react190.useState)(() => readHistoryList());
+  const loadChannelPage = async (channel, page = 1) => {
+    const cacheKey = `${channel.id}:${page}`;
+    if (pageCache[cacheKey]) {
+      setEpisodes(pageCache[cacheKey]);
+      setCurrentPage(page);
+      setIsInitialLoading(false);
+      return;
+    }
+    if (page === 1) setIsInitialLoading(true);
+    setIsLoadingPage(true);
     setCatalogError(null);
     try {
-      const res = await fetch("../catalog.json");
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      const loaded = data.episodes && data.episodes.length > 0 ? data.episodes : FALLBACK_EPISODES;
+      let loaded = [];
+      if (page === 1 && channel.id === "mr_player") {
+        try {
+          const res = await fetch(`../catalog.json?_t=${Date.now()}`, { cache: "no-store" });
+          if (res.ok) {
+            const data = await res.json();
+            loaded = data.episodes || [];
+          }
+        } catch {
+        }
+      }
+      if (!loaded.length) {
+        const res = await fetch(
+          `/api/episodes?page=${page}&show=${encodeURIComponent(channel.id)}`
+        );
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        loaded = data.episodes || [];
+      }
+      if (!loaded.length) throw new Error("\u7A7A\u96C6\u6578\u6E05\u55AE");
+      setPageCache((prev) => ({ ...prev, [cacheKey]: loaded }));
       setEpisodes(loaded);
-      setSelectedEpId((prev) => prev || loaded[0]?.id || "");
+      setCurrentPage(page);
+      if (page === 1) {
+        setSelectedEpId((prev) => prev || loaded[0]?.id || "");
+      }
+      setStatusMessage(`\u5DF2\u540C\u6B65 (${loaded.length} \u96C6)`);
     } catch {
-      setEpisodes(FALLBACK_EPISODES);
-      setSelectedEpId((prev) => prev || FALLBACK_EPISODES[0].id);
-      setCatalogError("\u7121\u6CD5\u8F09\u5165\u5B8C\u6574\u9060\u7AEF\u76EE\u9304\uFF0C\u5DF2\u5207\u63DB\u70BA\u96E2\u7DDA\u7CBE\u9078\u96C6\u6578\u3002");
+      const fallback = page === 1 ? channel.fallbackEpisodes : episodes;
+      setEpisodes(fallback);
+      if (page === 1) {
+        setSelectedEpId(fallback[0]?.id || "");
+      }
+      setCatalogError("\u66AB\u6642\u7121\u6CD5\u9023\u7DDA\u81F3\u9060\u7AEF\u76EE\u9304\uFF0C\u5DF2\u986F\u793A\u96E2\u7DDA\u9810\u8A2D\u6E05\u55AE\u3002");
     } finally {
       setIsInitialLoading(false);
+      setIsLoadingPage(false);
     }
   };
   (0, import_react190.useEffect)(() => {
-    void loadCatalog();
+    void loadChannelPage(SHOW_CHANNELS[0], 1);
+  }, []);
+  (0, import_react190.useEffect)(() => {
+    const onKeyDown = (e) => {
+      if (e.key === "Escape") {
+        setIsChannelModalOpen(false);
+        setIsLibraryModalOpen(false);
+        setIsShareModalOpen(false);
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
   const filteredEpisodes = (0, import_react190.useMemo)(() => {
     const q = searchQuery.trim().toLowerCase();
-    if (!q) return episodes;
-    return episodes.filter(
-      (ep) => ep.title.toLowerCase().includes(q) || ep.date && ep.date.toLowerCase().includes(q)
-    );
-  }, [episodes, searchQuery]);
+    const list = episodes.filter((ep) => {
+      const matchQuery = !q || ep.title.toLowerCase().includes(q) || ep.date && ep.date.toLowerCase().includes(q);
+      const matchYear = matchesYearFilter(ep, selectedYear);
+      return matchQuery && matchYear;
+    });
+    return [...list].sort((a, b) => {
+      const cmp = (b.date || "").localeCompare(a.date || "");
+      return isSortAscending ? -cmp : cmp;
+    });
+  }, [episodes, searchQuery, selectedYear, isSortAscending]);
   const activeEp = (0, import_react190.useMemo)(
-    () => episodes.find((ep) => ep.id === selectedEpId) || episodes[0] || FALLBACK_EPISODES[0],
-    [episodes, selectedEpId]
+    () => episodes.find((ep) => ep.id === selectedEpId) || episodes[0] || currentChannel.fallbackEpisodes[0],
+    [episodes, selectedEpId, currentChannel]
   );
-  const parts = activeEp.parts?.length ? activeEp.parts : FALLBACK_EPISODES[0].parts;
+  const parts = activeEp.parts?.length ? activeEp.parts : currentChannel.fallbackEpisodes[0].parts;
   const safePartIndex = partIndex < parts.length ? partIndex : 0;
   const activePart = parts[safePartIndex] || parts[0];
-  const handleLoadMore = async () => {
-    if (isLoadingMore || currentPage >= 64) return;
-    setIsLoadingMore(true);
-    setLoadMoreError(null);
-    const nextPage = currentPage + 1;
+  const handleToggleFavorite = (ep) => {
+    const exists = favorites.some((f) => f.id === ep.id);
+    const next = exists ? favorites.filter((f) => f.id !== ep.id) : [ep, ...favorites];
+    setFavorites(next);
+    writeFavorites(next);
+  };
+  const handleSelectChannel = (ch) => {
+    setIsChannelModalOpen(false);
+    if (ch.id === currentChannel.id) return;
+    setCurrentChannel(ch);
+    setSelectedYear("\u5168\u90E8");
+    setSearchQuery("");
+    setSelectedEpId("");
+    setPartIndex(0);
+    void loadChannelPage(ch, 1);
+  };
+  const handleDownloadPart = (ep, idx = 0) => {
+    const p = ep.parts?.[idx] || ep.parts?.[0];
+    if (!p?.url) return;
+    const href = `/api/stream?pageUrl=${encodeURIComponent(p.url)}&download=true`;
+    const a = document.createElement("a");
+    a.href = href;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+  const shareUrl = (0, import_react190.useMemo)(() => buildShareUrl(activeEp, safePartIndex), [activeEp, safePartIndex]);
+  const handleCopyShareUrl = async () => {
     try {
-      const res = await fetch(`/api/episodes?page=${nextPage}`);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      if (data.ok && data.episodes) {
-        setEpisodes((prev) => {
-          const seen = new Set(prev.map((e) => e.id));
-          const newItems = data.episodes.filter((e) => !seen.has(e.id));
-          return [...prev, ...newItems];
-        });
-        setCurrentPage(nextPage);
-      }
+      await navigator.clipboard.writeText(shareUrl);
+      setCopiedShareUrl(true);
+      setTimeout(() => setCopiedShareUrl(false), 2e3);
     } catch {
-      setLoadMoreError(`\u7B2C ${nextPage} \u9801\u96C6\u6578\u8F09\u5165\u5931\u6557\uFF0C\u8ACB\u6AA2\u67E5\u9023\u7DDA\u5F8C\u91CD\u8A66\u3002`);
-    } finally {
-      setIsLoadingMore(false);
     }
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(DirectionProvider, { locale: "zh-Hant", children: /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("div", { className: "min-h-screen bg-background-full text-text-primary", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("header", { className: "sticky top-0 z-30 border-b border-separator-border bg-background-secondary-default/90 backdrop-blur-md", children: /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("div", { className: "mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3.5 sm:px-6", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("div", { className: "flex items-center gap-3", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("div", { className: "flex size-9 items-center justify-center rounded-2lg bg-accent-500 text-white shadow-card", children: /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(tf, { className: "size-5", "aria-hidden": "true" }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("div", { className: "min-w-0", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("div", { className: "flex items-center gap-2", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("h1", { className: "text-title-3-semibold tracking-tight text-text-primary", children: "dTVSteams Studio" }),
-            /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(Counter, { color: "primary", className: "tabular-nums", children: "v10" })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("p", { className: "text-caption-1-regular text-text-secondary", children: "Video.js 10 React \u64AD\u653E\u5DE5\u4F5C\u53F0\u8207\u591A\u6BB5\u5287\u96C6\u700F\u89BD" })
-        ] })
+  const totalPages = Math.max(10, currentPage + 4);
+  const startPage = Math.max(1, Math.min(currentPage - 2, totalPages - 4));
+  const endPage = Math.min(totalPages, startPage + 4);
+  const visiblePages = Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
+  return /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(DirectionProvider, { locale: "zh-Hant", children: /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)("div", { className: "min-h-screen bg-background-full text-text-primary", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("header", { className: "sticky top-0 z-30 border-b border-separator-border bg-background-secondary-default/95 backdrop-blur-md", children: /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)("div", { className: "mx-auto flex h-14 max-w-3xl items-center justify-between gap-2 px-3", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)("div", { className: "flex min-w-0 items-center gap-2", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)(
+          "a",
+          {
+            href: "./",
+            className: "flex shrink-0 items-center gap-1.5 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-border-focus-ring",
+            children: [
+              /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("span", { className: "rounded-md bg-accent-500 px-1.5 py-0.5 text-sm font-extrabold tracking-wide text-white", children: "dTV" }),
+              /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("span", { className: "hidden text-caption-1-semibold tracking-widest text-text-secondary sm:inline", children: "STEAMS" })
+            ]
+          }
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)(
+          "button",
+          {
+            type: "button",
+            onClick: () => setIsChannelModalOpen(true),
+            "aria-label": "\u5207\u63DB\u7BC0\u76EE\u983B\u9053",
+            className: cx(
+              "flex min-w-0 max-w-[165px] cursor-pointer items-center gap-1 rounded-2lg border border-border-button-default bg-background-tertiary-default px-2.5 py-1.5 shadow-card",
+              "outline-none transition-colors hover:border-border-button-hover focus-visible:ring-2 focus-visible:ring-border-focus-ring"
+            ),
+            children: [
+              /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("span", { className: "shrink-0 text-xs", "aria-hidden": "true", children: currentChannel.emoji }),
+              /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("span", { className: "truncate text-caption-1-semibold text-text-primary", children: currentChannel.name }),
+              /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(f1, { className: "size-4 shrink-0 text-foreground-icon-secondary", "aria-hidden": "true" })
+            ]
+          }
+        )
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("div", { className: "flex items-center gap-3", children: /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(
-        LinkButton,
-        {
-          href: "../index.html",
-          variant: "secondary",
-          size: "small",
-          leadingIcon: K1,
-          children: "\u8FD4\u56DE\u4E00\u822C\u7DB2\u9801\u7248"
-        }
-      ) })
+      /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)("div", { className: "flex shrink-0 items-center gap-1", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(
+          IconButton,
+          {
+            size: "small",
+            icon: Ms,
+            "aria-label": "\u6211\u7684\u6536\u85CF\u8207\u89C0\u770B\u7D00\u9304",
+            title: "\u6536\u85CF\u8207\u89C0\u770B\u7D00\u9304",
+            onClick: () => {
+              setHistoryEntries(readHistoryList());
+              setIsLibraryModalOpen(true);
+            }
+          }
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(
+          IconButton,
+          {
+            size: "small",
+            icon: dZ,
+            "aria-label": "\u5237\u65B0\u96C6\u6578\u6E05\u55AE",
+            title: "\u5237\u65B0\u96C6\u6578",
+            disabled: isLoadingPage,
+            onClick: () => {
+              setPageCache((prev) => {
+                const copy = { ...prev };
+                delete copy[`${currentChannel.id}:${currentPage}`];
+                return copy;
+              });
+              void loadChannelPage(currentChannel, currentPage);
+            }
+          }
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(
+          IconButton,
+          {
+            size: "small",
+            icon: Ld,
+            "aria-label": "\u5206\u4EAB\u76EE\u524D\u96C6\u6578",
+            title: "\u5206\u4EAB\u96C6\u6578\u8207\u9023\u7D50",
+            onClick: () => setIsShareModalOpen(true)
+          }
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(
+          IconLinkButton,
+          {
+            href: LATEST_APK_RELEASE_URL,
+            target: "_blank",
+            rel: "noopener noreferrer",
+            size: "small",
+            icon: Ov,
+            "aria-label": "\u524D\u5F80 GitHub \u4E0B\u8F09\u6700\u65B0 Android APK",
+            title: "\u4E0B\u8F09\u6700\u65B0 Android APK (GitHub Releases)"
+          }
+        )
+      ] })
     ] }) }),
-    /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("main", { className: "mx-auto max-w-7xl px-4 py-6 sm:px-6", children: [
-      catalogError ? /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("div", { className: "mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border-button-default bg-background-secondary-default px-4 py-3", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("span", { className: "text-body-2-regular text-text-secondary", children: catalogError }),
-        /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)("main", { className: "mx-auto flex max-w-3xl flex-col gap-3 px-3 py-3 pb-10", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(
+        SearchField2,
+        {
+          "aria-label": "\u641C\u5C0B\u96C6\u6578\u3001\u65E5\u671F\u6216\u5730\u9EDE",
+          placeholder: "\u641C\u5C0B\u96C6\u6578\u3001\u65E5\u671F (\u5982 2026-11-08) \u6216\u5730\u9EDE (\u53F0\u5317\u3001\u5B9C\u862D)...",
+          shape: "rounded",
+          size: "medium",
+          value: searchQuery,
+          onChange: setSearchQuery
+        }
+      ),
+      /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)("div", { className: "flex items-center gap-2", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("div", { className: "flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto py-0.5 [scrollbar-width:none]", children: YEAR_OPTIONS.map((year) => {
+          const isSelected = selectedYear === year;
+          return /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(
+            "button",
+            {
+              type: "button",
+              onClick: () => setSelectedYear(year),
+              className: cx(
+                "shrink-0 cursor-pointer rounded-md border px-3 py-1.5 text-caption-1-medium tabular-nums transition-colors",
+                "outline-none focus-visible:ring-2 focus-visible:ring-border-focus-ring",
+                isSelected ? "border-accent-500 bg-accent-500 font-semibold text-white" : "border-separator-border bg-background-secondary-default text-text-secondary hover:bg-background-tertiary-default hover:text-text-primary"
+              ),
+              children: year
+            },
+            year
+          );
+        }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)(
+          "button",
+          {
+            type: "button",
+            onClick: () => setIsSortAscending((v) => !v),
+            "aria-label": "\u5207\u63DB\u96C6\u6578\u6392\u5E8F",
+            className: cx(
+              "flex shrink-0 cursor-pointer items-center gap-1 rounded-2lg border px-2.5 py-1.5 text-caption-1-semibold transition-colors",
+              "outline-none focus-visible:ring-2 focus-visible:ring-border-focus-ring",
+              isSortAscending ? "border-accent-500 bg-accent-500 text-white" : "border-separator-border bg-background-secondary-default text-text-primary hover:bg-background-tertiary-default"
+            ),
+            children: [
+              isSortAscending ? /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(h2, { className: "size-3.5", "aria-hidden": "true" }) : /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(u1, { className: "size-3.5", "aria-hidden": "true" }),
+              /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("span", { children: isSortAscending ? "\u820A\u5230\u65B0" : "\u65B0\u5230\u820A" })
+            ]
+          }
+        )
+      ] }),
+      catalogError ? /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)("div", { className: "flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-border-button-default bg-background-secondary-default px-3.5 py-2.5", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("span", { className: "text-caption-1-regular text-text-secondary", children: catalogError }),
+        /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(
           Button,
           {
             variant: "secondary",
             size: "small",
             leadingIcon: dZ,
-            onClick: () => void loadCatalog(),
-            children: "\u91CD\u65B0\u9023\u7DDA\u76EE\u9304"
+            onClick: () => void loadChannelPage(currentChannel, currentPage),
+            children: "\u91CD\u8A66\u9023\u7DDA"
           }
         )
       ] }) : null,
-      /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("section", { className: "grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_320px]", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("div", { className: "overflow-hidden rounded-3xl border border-separator-border bg-background-secondary-default p-2 shadow-card", children: /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("div", { className: "overflow-hidden rounded-2xl bg-black", children: /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(
-          VideoJs10Player,
-          {
-            src: resolveStreamUrl(activePart),
-            poster: "../preview.png",
-            title: `${activeEp.title} \xB7 ${activePart.label}`,
-            episodeId: activeEp.id,
-            partIndex: safePartIndex,
-            autoPlay: false,
-            onEnded: () => {
-              if (safePartIndex < parts.length - 1) {
-                setPartIndex(safePartIndex + 1);
+      /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)("section", { className: "rounded-2xl border border-separator-border bg-background-secondary-default p-3 shadow-card", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)("div", { className: "flex items-center justify-between gap-2", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)("div", { className: "flex min-w-0 flex-wrap items-center gap-2", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(Chip, { variant: "caption", color: "rose", className: "tabular-nums", children: activePart.label }),
+            /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("span", { className: "truncate text-caption-1-semibold text-text-primary", children: activeEp.title })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(
+            Button,
+            {
+              variant: "secondary",
+              size: "xs",
+              onClick: () => setIsPlayerCollapsed((c89) => !c89),
+              children: isPlayerCollapsed ? "\u5C55\u958B\u64AD\u653E\u5668" : "\u6536\u5408\u64AD\u653E\u5668"
+            }
+          )
+        ] }),
+        !isPlayerCollapsed ? /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)("div", { className: "mt-3 flex flex-col gap-3", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("div", { className: "overflow-hidden rounded-xl border border-separator-border bg-black", children: /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(
+            VideoJs10Player,
+            {
+              src: resolveStreamUrl(activePart),
+              poster: "../preview.png",
+              title: `${activeEp.title} \xB7 ${activePart.label}`,
+              episodeId: activeEp.id,
+              partIndex: safePartIndex,
+              autoPlay: false,
+              onTimeUpdate: () => setHistoryEntries(readHistoryList()),
+              onEnded: () => {
+                if (safePartIndex < parts.length - 1) {
+                  setPartIndex(safePartIndex + 1);
+                }
               }
             }
-          }
-        ) }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("aside", { className: "flex flex-col justify-between gap-4 rounded-3xl border border-separator-border bg-background-secondary-default p-5 shadow-card", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("div", { className: "flex flex-col gap-3", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("div", { className: "flex items-center justify-between gap-2", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(Chip, { variant: "caption", color: "rose", children: "\u6B63\u5728\u64AD\u653E" }),
-              /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("span", { className: "inline-flex items-center gap-1 text-caption-1-medium tabular-nums text-text-secondary", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(R5, { className: "size-3.5 text-foreground-icon-secondary", "aria-hidden": "true" }),
-                activeEp.date || "\u6700\u65B0\u96C6\u6578"
-              ] })
-            ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("h2", { className: "text-title-2-medium text-balance tracking-tight text-text-primary", children: activeEp.title }),
-            /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("div", { className: "flex flex-wrap items-center gap-2", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(Chip, { variant: "caption", color: "soft", className: "tabular-nums", children: activeEp.duration || "1\u5C0F\u6642 48\u5206" }),
-              /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)(Chip, { variant: "caption", color: "neutral", className: "tabular-nums", children: [
-                parts.length,
-                " \u500B\u5206\u6BB5"
-              ] })
-            ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(Divider, { className: "my-1" }),
-            /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("div", { className: "flex flex-col gap-2", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("div", { className: "flex items-center justify-between", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("span", { className: "text-caption-1-semibold text-text-secondary", children: "\u5206\u6BB5\u5207\u63DB" }),
-                /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("span", { className: "text-caption-1-medium tabular-nums text-text-tertiary", children: [
-                  activePart.label,
-                  " / ",
-                  parts.length
-                ] })
-              ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(
-                SegmentedControl,
+          ) }),
+          /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(
+            SegmentedControl,
+            {
+              "aria-label": "\u64AD\u653E\u5206\u6BB5\u5207\u63DB",
+              selectedKeys: [String(safePartIndex)],
+              onSelectionChange: (keys) => {
+                const next = Number(Array.from(keys)[0] ?? 0);
+                if (!Number.isNaN(next)) setPartIndex(next);
+              },
+              className: "w-full",
+              children: parts.map((part, idx) => /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(
+                SegmentedControlItem,
                 {
-                  "aria-label": "\u64AD\u653E\u5206\u6BB5\u5207\u63DB",
-                  selectedKeys: [String(safePartIndex)],
-                  onSelectionChange: (keys) => {
-                    const next = Number(Array.from(keys)[0] ?? 0);
-                    if (!Number.isNaN(next)) setPartIndex(next);
-                  },
-                  className: "w-full",
-                  children: parts.map((part, idx) => /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(
-                    SegmentedControlItem,
-                    {
-                      id: String(idx),
-                      className: "flex-1",
-                      children: part.label
-                    },
-                    part.label + idx
-                  ))
-                }
-              )
+                  id: String(idx),
+                  className: "flex-1",
+                  children: part.label
+                },
+                part.label + idx
+              ))
+            }
+          )
+        ] }) : null
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)("section", { className: "flex flex-col gap-2.5 pt-1", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)("div", { className: "flex items-center justify-between gap-2 px-0.5", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)("div", { className: "flex items-center gap-2", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("h1", { className: "text-headline-medium tracking-tight text-text-primary", children: "\u6700\u65B0\u5287\u96C6\u8207\u7BC0\u76EE (Episodes)" }),
+            /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)(Counter, { color: "neutral", className: "tabular-nums", children: [
+              filteredEpisodes.length,
+              " \u96C6"
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("div", { className: "flex flex-col gap-2 pt-2", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)(
-              Button,
-              {
-                variant: "primary",
-                size: "medium",
-                leadingIcon: Ug,
-                onClick: () => {
-                  const nextIdx = (safePartIndex + 1) % parts.length;
-                  setPartIndex(nextIdx);
-                },
-                children: [
-                  "\u5207\u63DB\u4E0B\u4E00\u6BB5 (",
-                  parts[(safePartIndex + 1) % parts.length]?.label || "Part 1",
-                  ")"
-                ]
-              }
-            ),
-            /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("span", { className: "text-caption-1-regular text-text-tertiary", children: "\u652F\u63F4\u81EA\u52D5\u7E8C\u64AD\u8207\u700F\u89BD\u5668\u672C\u6A5F\u65B7\u9EDE\u7D00\u9304" })
-          ] })
-        ] })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("section", { className: "mt-8 flex flex-col gap-5", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("div", { className: "flex flex-col justify-between gap-3 sm:flex-row sm:items-end", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("div", { className: "flex items-center gap-2.5", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("h2", { className: "text-title-2-medium tracking-tight text-text-primary", children: "\u96C6\u6578\u76EE\u9304" }),
-            /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(Counter, { color: "neutral", className: "tabular-nums", children: filteredEpisodes.length })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("div", { className: "flex w-full items-center gap-3 sm:w-80", children: /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(
-            SearchField2,
-            {
-              "aria-label": "\u641C\u5C0B\u96C6\u6578\u6216\u65E5\u671F",
-              placeholder: "\u641C\u5C0B\u96C6\u6578\u6A19\u984C\u3001\u5730\u9EDE\u6216\u65E5\u671F...",
-              shape: "rounded",
-              size: "medium",
-              value: searchQuery,
-              onChange: setSearchQuery
-            }
-          ) })
+          statusMessage ? /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("span", { className: "text-caption-1-regular text-text-secondary", children: statusMessage }) : null
         ] }),
-        isInitialLoading ? /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("div", { className: "grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4", children: Array.from({ length: 8 }).map((_, idx) => /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)(
+        isInitialLoading ? /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("div", { className: "flex flex-col gap-2.5", children: Array.from({ length: 5 }).map((_, idx) => /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)(
           "div",
           {
-            className: "flex flex-col gap-3 rounded-2xl border border-separator-border bg-background-secondary-default p-3",
+            className: "flex flex-col gap-2.5 rounded-2xl border border-separator-border bg-background-secondary-default p-3",
             children: [
-              /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(Skeleton, { className: "aspect-video w-full" }),
-              /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(Skeleton, { shape: "text", className: "h-4 w-4/5" }),
-              /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(Skeleton, { shape: "text", className: "h-3.5 w-1/2" })
+              /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)("div", { className: "flex items-start gap-3", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(Skeleton, { className: "size-9 rounded-full" }),
+                /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)("div", { className: "flex-1 space-y-2", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(Skeleton, { shape: "text", className: "h-4 w-4/5" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(Skeleton, { shape: "text", className: "h-3 w-1/2" })
+                ] })
+              ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)("div", { className: "flex gap-2", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(Skeleton, { className: "h-7 w-16 rounded-lg" }),
+                /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(Skeleton, { className: "h-7 w-16 rounded-lg" }),
+                /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(Skeleton, { className: "h-7 w-16 rounded-lg" })
+              ] })
             ]
           },
           idx
-        )) }) : filteredEpisodes.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("div", { className: "flex flex-col items-center justify-center gap-3 rounded-3xl border border-separator-border bg-background-secondary-default px-6 py-12 text-center", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("div", { className: "flex size-12 items-center justify-center rounded-2xl bg-background-tertiary-default text-foreground-icon-secondary", children: /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(Xl, { className: "size-6", "aria-hidden": "true" }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("div", { className: "flex flex-col gap-1", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("h3", { className: "text-headline-medium text-text-primary", children: "\u627E\u4E0D\u5230\u7B26\u5408\u689D\u4EF6\u7684\u96C6\u6578" }),
-            /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("p", { className: "text-body-regular text-text-secondary", children: "\u8ACB\u5617\u8A66\u6E05\u9664\u641C\u5C0B\u95DC\u9375\u5B57\u6216\u8F09\u5165\u66F4\u591A\u6B77\u53F2\u96C6\u6578\u3002" })
+        )) }) : filteredEpisodes.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)("div", { className: "flex flex-col items-center justify-center gap-3 rounded-2xl border border-separator-border bg-background-secondary-default px-6 py-12 text-center", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("div", { className: "flex size-12 items-center justify-center rounded-2xl bg-background-tertiary-default text-foreground-icon-secondary", children: /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(Xl, { className: "size-6", "aria-hidden": "true" }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)("div", { className: "flex flex-col gap-1", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("h2", { className: "text-headline-medium text-text-primary", children: "\u627E\u4E0D\u5230\u7B26\u5408\u689D\u4EF6\u7684\u96C6\u6578" }),
+            /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("p", { className: "text-body-2-regular text-text-secondary", children: "\u8ACB\u5617\u8A66\u91CD\u8A2D\u641C\u5C0B\u95DC\u9375\u5B57\u6216\u5207\u63DB\u5E74\u4EFD\u7BE9\u9078\u3002" })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(Button, { variant: "secondary", size: "small", onClick: () => setSearchQuery(""), children: "\u6E05\u9664\u641C\u5C0B" })
-        ] }) : /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("div", { className: "grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4", children: filteredEpisodes.map((ep, idx) => {
-          const isSelected = ep.id === activeEp.id;
-          return /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)(
-            "button",
+          /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(
+            Button,
             {
-              type: "button",
+              variant: "secondary",
+              size: "small",
+              onClick: () => {
+                setSearchQuery("");
+                setSelectedYear("\u5168\u90E8");
+              },
+              children: "\u91CD\u8A2D\u7BE9\u9078\u689D\u4EF6"
+            }
+          )
+        ] }) : /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("div", { className: "flex flex-col gap-2.5", children: filteredEpisodes.map((ep, idx) => {
+          const showMeta = detectShowChannel(ep);
+          const displayTitle = stripShowNameFromTitle(ep.title, showMeta.name);
+          const location2 = extractLocation(ep.title);
+          const resume = getStoredResume(ep.id);
+          const isCompleted = Boolean(resume?.completed);
+          const isFav = favorites.some((f) => f.id === ep.id);
+          const isSelected = ep.id === activeEp.id;
+          return /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)(
+            "article",
+            {
+              className: cx(
+                "flex cursor-pointer flex-col gap-2 rounded-2xl border bg-background-secondary-default p-3 shadow-card transition-colors",
+                isSelected ? "border-accent-500" : "border-separator-border hover:border-border-button-hover"
+              ),
               onClick: () => {
                 setSelectedEpId(ep.id);
                 setPartIndex(0);
+                setIsPlayerCollapsed(false);
+                window.scrollTo({ top: 0, behavior: "smooth" });
               },
-              className: cx(
-                "group flex cursor-pointer flex-col gap-3 rounded-2xl border p-3 text-left transition-[background-color,border-color,box-shadow] duration-150 ease-out",
-                "outline-none focus-visible:ring-2 focus-visible:ring-border-focus-ring",
-                isSelected ? "border-accent-500 bg-background-primary-default shadow-card" : "border-separator-border bg-background-secondary-default hover:border-border-button-hover hover:bg-background-primary-default"
-              ),
               children: [
-                /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("div", { className: "relative aspect-video w-full overflow-hidden rounded-xl bg-black", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(
-                    "img",
+                /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)("div", { className: "flex items-start gap-2.5", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(
+                    "button",
                     {
-                      src: resolveEpisodeThumb(ep),
-                      alt: ep.title,
-                      loading: "lazy",
-                      onError: (e) => {
-                        e.currentTarget.src = "../media/thumb-default.svg";
+                      type: "button",
+                      "aria-label": "\u64AD\u653E\u7BC0\u76EE",
+                      className: "flex size-10 shrink-0 items-center justify-center",
+                      onClick: (e) => {
+                        e.stopPropagation();
+                        setSelectedEpId(ep.id);
+                        setPartIndex(0);
+                        setIsPlayerCollapsed(false);
+                        window.scrollTo({ top: 0, behavior: "smooth" });
                       },
-                      className: "size-full object-cover transition-transform duration-300 ease-out group-hover:scale-[1.02]"
+                      children: /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(
+                        "span",
+                        {
+                          className: cx(
+                            "flex size-9 items-center justify-center rounded-full border",
+                            isCompleted ? "border-border-button-default bg-background-tertiary-default text-text-primary" : "border-accent-500/40 bg-accent-500/15 text-accent-500"
+                          ),
+                          children: /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(Ug, { className: "size-4.5", "aria-hidden": "true" })
+                        }
+                      )
                     }
                   ),
-                  /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(
-                    Chip,
-                    {
-                      variant: "caption",
-                      color: "gray",
-                      className: "absolute right-2 bottom-2 bg-black/75 tabular-nums text-white",
-                      children: ep.duration || "1\u5C0F\u6642 48\u5206"
-                    }
-                  )
-                ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("div", { className: "flex min-w-0 flex-1 flex-col justify-between gap-2 px-0.5", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("h3", { className: "line-clamp-2 text-body-medium text-text-primary", children: ep.title }),
-                  /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("div", { className: "flex items-center justify-between gap-2 text-caption-1-regular tabular-nums text-text-secondary", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("span", { children: ep.date || "\u6700\u65B0" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("span", { children: [
-                      ep.parts?.length || 3,
-                      " \u500B\u5206\u6BB5"
+                  /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)("div", { className: "min-w-0 flex-1", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(
+                      "h3",
+                      {
+                        title: ep.title,
+                        className: "line-clamp-2 text-body-medium font-bold text-text-primary",
+                        children: displayTitle
+                      }
+                    ),
+                    /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)("div", { className: "mt-1 flex flex-wrap items-center gap-1.5", children: [
+                      ep.date ? /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("span", { className: "text-caption-1-medium tabular-nums text-text-secondary", children: ep.date }) : null,
+                      /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)("span", { className: "rounded-md border border-accent-500/40 bg-accent-500/15 px-1.5 py-0.5 text-[10px] font-bold text-text-primary", children: [
+                        showMeta.emoji,
+                        " ",
+                        showMeta.name
+                      ] }),
+                      location2 ? /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)("span", { className: "inline-flex items-center gap-0.5 text-[11px] font-semibold text-accent-500", children: [
+                        /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(nL, { className: "size-3", "aria-hidden": "true" }),
+                        location2
+                      ] }) : null,
+                      isCompleted ? /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(Chip, { variant: "caption", color: "lime", children: "\u2713 \u5DF2\u770B\u5B8C" }) : null
                     ] })
+                  ] }),
+                  /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)("div", { className: "flex shrink-0 items-center", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(
+                      "button",
+                      {
+                        type: "button",
+                        "aria-label": isFav ? "\u53D6\u6D88\u6536\u85CF" : "\u52A0\u5165\u6536\u85CF",
+                        title: isFav ? "\u5DF2\u6536\u85CF" : "\u52A0\u5165\u6536\u85CF",
+                        className: "flex size-10 cursor-pointer items-center justify-center rounded-full",
+                        onClick: (e) => {
+                          e.stopPropagation();
+                          handleToggleFavorite(ep);
+                        },
+                        children: /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("span", { className: "flex size-9 items-center justify-center rounded-full bg-background-tertiary-default text-foreground-icon-secondary hover:text-text-primary", children: isFav ? /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(Vo, { className: "size-4 text-accent-500", "aria-hidden": "true" }) : /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(go, { className: "size-4", "aria-hidden": "true" }) })
+                      }
+                    ),
+                    /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(
+                      "button",
+                      {
+                        type: "button",
+                        "aria-label": "\u4E0B\u8F09\u6B64\u96C6\u5206\u6BB5",
+                        title: "\u4E0B\u8F09\u6B64\u96C6",
+                        className: "flex size-10 cursor-pointer items-center justify-center rounded-full",
+                        onClick: (e) => {
+                          e.stopPropagation();
+                          handleDownloadPart(ep, 0);
+                        },
+                        children: /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("span", { className: "flex size-9 items-center justify-center rounded-full bg-background-tertiary-default text-foreground-icon-secondary hover:text-text-primary", children: /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(we, { className: "size-4", "aria-hidden": "true" }) })
+                      }
+                    )
                   ] })
-                ] })
+                ] }),
+                /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("div", { className: "flex flex-wrap gap-2", children: (ep.parts || []).map((part, pIdx) => {
+                  const isPlayingPart = isSelected && safePartIndex === pIdx;
+                  return /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)(
+                    "button",
+                    {
+                      type: "button",
+                      onClick: (e) => {
+                        e.stopPropagation();
+                        setSelectedEpId(ep.id);
+                        setPartIndex(pIdx);
+                        setIsPlayerCollapsed(false);
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      },
+                      className: cx(
+                        "inline-flex cursor-pointer items-center gap-1 rounded-lg border px-2.5 py-1.5 text-[11px] font-bold tabular-nums transition-colors",
+                        isPlayingPart ? "border-accent-500 bg-accent-500 text-white" : "border-separator-border bg-background-primary-default text-text-primary hover:border-border-button-hover"
+                      ),
+                      children: [
+                        /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(Ug, { className: "size-3", "aria-hidden": "true" }),
+                        /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("span", { children: part.label })
+                      ]
+                    },
+                    part.label + pIdx
+                  );
+                }) }),
+                resume && resume.percentage > 2 ? /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("div", { className: "h-0.5 w-full overflow-hidden rounded-full bg-separator-border", children: /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(
+                  "div",
+                  {
+                    className: "h-full bg-accent-500",
+                    style: { width: `${resume.percentage}%` }
+                  }
+                ) }) : null
               ]
             },
             ep.id + idx
           );
         }) }),
-        loadMoreError ? /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("div", { className: "flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border-error-default bg-background-tertiary-error px-4 py-3", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("span", { className: "text-body-2-regular text-text-error-primary", children: loadMoreError }),
-          /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(
-            Button,
+        /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)("nav", { "aria-label": "\u5206\u9801\u5C0E\u89BD", className: "flex w-full items-center gap-1.5 pt-3", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)(
+            "button",
             {
-              variant: "secondary",
-              size: "small",
-              leadingIcon: dZ,
-              onClick: () => void handleLoadMore(),
-              children: "\u91CD\u8A66\u8F09\u5165"
+              type: "button",
+              disabled: currentPage <= 1 || isLoadingPage,
+              onClick: () => void loadChannelPage(currentChannel, currentPage - 1),
+              className: cx(
+                "flex h-10 flex-[3] items-center justify-center gap-1 rounded-lg border text-caption-1-semibold transition-colors",
+                currentPage > 1 ? "cursor-pointer border-border-button-default bg-background-secondary-default text-text-primary hover:bg-background-tertiary-default" : "cursor-not-allowed border-separator-border bg-background-full text-text-tertiary"
+              ),
+              children: [
+                /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(J1, { className: "size-3.5", "aria-hidden": "true" }),
+                /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("span", { children: "\u4E0A\u4E00\u9801" })
+              ]
+            }
+          ),
+          visiblePages.map((p) => {
+            const isCurr = p === currentPage;
+            return /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(
+              "button",
+              {
+                type: "button",
+                disabled: isLoadingPage,
+                onClick: () => void loadChannelPage(currentChannel, p),
+                className: cx(
+                  "flex h-10 flex-[2] cursor-pointer items-center justify-center rounded-lg border text-body-medium tabular-nums transition-colors",
+                  isCurr ? "border-accent-500 bg-accent-500 font-bold text-white" : "border-separator-border bg-background-secondary-default text-text-secondary hover:bg-background-tertiary-default hover:text-text-primary"
+                ),
+                children: p
+              },
+              p
+            );
+          }),
+          /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)(
+            "button",
+            {
+              type: "button",
+              disabled: isLoadingPage,
+              onClick: () => void loadChannelPage(currentChannel, currentPage + 1),
+              className: "flex h-10 flex-[3] cursor-pointer items-center justify-center gap-1 rounded-lg border border-border-button-default bg-background-secondary-default text-caption-1-semibold text-text-primary transition-colors hover:bg-background-tertiary-default",
+              children: [
+                /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("span", { children: "\u4E0B\u4E00\u9801" }),
+                /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(r2, { className: "size-3.5", "aria-hidden": "true" })
+              ]
             }
           )
-        ] }) : null,
-        currentPage < 64 && !searchQuery.trim() ? /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("div", { className: "flex justify-center pt-2", children: /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(
-          Button,
-          {
-            variant: "secondary",
-            size: "medium",
-            leadingIcon: f1,
-            disabled: isLoadingMore,
-            onClick: () => void handleLoadMore(),
-            children: isLoadingMore ? "\u6B63\u5728\u8F09\u5165\u6B77\u53F2\u96C6\u6578..." : `\u8F09\u5165\u66F4\u591A\u96C6\u6578 (\u7B2C ${currentPage + 1} / 64 \u9801)`
-          }
-        ) }) : null
+        ] })
       ] })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("footer", { className: "mt-10 border-t border-separator-border bg-background-secondary-default/40", children: /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("div", { className: "mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-5 text-caption-1-regular text-text-secondary sm:px-6", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("span", { children: "dTVSteams \u2022 Video.js 10 + BoardUI Design System" }),
-      /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("footer", { className: "mt-6 border-t border-separator-border bg-background-secondary-default/40", children: /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)("div", { className: "mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-3 px-3 py-4 text-caption-1-regular text-text-secondary", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("span", { children: "dTVSteams \u2022 Video.js 10 + BoardUI Design System" }),
+      /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(
         LinkButton,
         {
-          href: "https://videojs.org/",
-          target: "_blank",
-          rel: "noreferrer",
+          href: "../index.html",
           variant: "secondary",
           size: "xs",
-          trailingIcon: Wt,
-          children: "videojs.org"
+          leadingIcon: K1,
+          children: "\u8FD4\u56DE\u7D93\u5178\u7DB2\u9801\u7248"
         }
       )
-    ] }) })
+    ] }) }),
+    isChannelModalOpen ? /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(
+      "dialog",
+      {
+        open: true,
+        "aria-modal": "true",
+        "aria-label": "\u5207\u63DB\u7BC0\u76EE\u983B\u9053",
+        className: "fixed inset-0 z-50 m-0 flex size-full max-h-none max-w-none items-end justify-center border-0 bg-black/75 p-3 backdrop-blur-xs sm:items-center",
+        onClick: () => setIsChannelModalOpen(false),
+        children: /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)(
+          "div",
+          {
+            className: "w-full max-w-md rounded-3xl border border-border-button-default bg-background-secondary-default p-5 shadow-xl",
+            onClick: (e) => e.stopPropagation(),
+            children: [
+              /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)("div", { className: "mb-3 flex items-center justify-between gap-2", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)("div", { className: "flex items-center gap-2.5", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("div", { className: "flex size-8 items-center justify-center rounded-lg border border-accent-500/35 bg-accent-500/15 text-accent-500", children: /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(tf, { className: "size-4.5", "aria-hidden": "true" }) }),
+                  /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("h2", { className: "text-title-3-semibold text-text-primary", children: "\u5207\u63DB\u7BC0\u76EE\u983B\u9053 (Channels)" })
+                ] }),
+                /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(CloseButton, { onClick: () => setIsChannelModalOpen(false), "aria-label": "\u95DC\u9589\u983B\u9053\u9078\u55AE" })
+              ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("p", { className: "mb-4 text-caption-1-regular text-text-secondary", children: "\u9078\u64C7\u60A8\u60F3\u89C0\u8CDE\u7684\u7D9C\u85DD\u7BC0\u76EE\uFF0C\u5404\u983B\u9053\u5177\u5099\u7368\u7ACB\u96C6\u6578\u6E05\u55AE\u8207\u5206\u9801\u5FEB\u53D6" }),
+              /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("div", { className: "flex flex-col gap-2", children: SHOW_CHANNELS.map((ch) => {
+                const isSelected = ch.id === currentChannel.id;
+                return /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)(
+                  "button",
+                  {
+                    type: "button",
+                    onClick: () => handleSelectChannel(ch),
+                    className: cx(
+                      "flex w-full cursor-pointer items-center gap-3 rounded-xl border p-3 text-left transition-colors",
+                      isSelected ? "border-accent-500 bg-accent-500/15" : "border-separator-border bg-background-primary-default hover:border-border-button-hover"
+                    ),
+                    children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("span", { className: "flex size-9 shrink-0 items-center justify-center rounded-2lg border border-separator-border bg-background-tertiary-default text-lg", children: ch.emoji }),
+                      /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)("div", { className: "min-w-0 flex-1", children: [
+                        /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)("div", { className: "flex items-center gap-2", children: [
+                          /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("span", { className: "text-body-medium font-semibold text-text-primary", children: ch.name }),
+                          /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("span", { className: "text-caption-1-regular text-text-secondary", children: ch.englishName })
+                        ] }),
+                        /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("p", { className: "truncate text-caption-1-regular text-text-secondary", children: ch.tagline })
+                      ] }),
+                      isSelected ? /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(s7, { className: "size-5 shrink-0 text-accent-50", "aria-hidden": "true" }) : null
+                    ]
+                  },
+                  ch.id
+                );
+              }) })
+            ]
+          }
+        )
+      }
+    ) : null,
+    isLibraryModalOpen ? /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(
+      "dialog",
+      {
+        open: true,
+        "aria-modal": "true",
+        "aria-label": "\u6211\u7684\u6536\u85CF\u8207\u89C0\u770B\u7D00\u9304",
+        className: "fixed inset-0 z-50 m-0 flex size-full max-h-none max-w-none items-end justify-center border-0 bg-black/75 p-3 backdrop-blur-xs sm:items-center",
+        onClick: () => setIsLibraryModalOpen(false),
+        children: /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)(
+          "div",
+          {
+            className: "flex max-h-[82vh] w-full max-w-lg flex-col rounded-3xl border border-border-button-default bg-background-secondary-default p-5 shadow-xl",
+            onClick: (e) => e.stopPropagation(),
+            children: [
+              /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)("div", { className: "mb-3 flex items-center justify-between gap-2", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)("div", { className: "flex items-center gap-2", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(uo, { className: "size-5 text-accent-500", "aria-hidden": "true" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("h2", { className: "text-title-3-semibold text-text-primary", children: "\u6536\u85CF\u8207\u89C0\u770B\u7D00\u9304" })
+                ] }),
+                /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(CloseButton, { onClick: () => setIsLibraryModalOpen(false), "aria-label": "\u95DC\u9589\u6536\u85CF\u8207\u7D00\u9304\u8996\u7A97" })
+              ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)(
+                SegmentedControl,
+                {
+                  "aria-label": "\u5EAB\u5207\u63DB",
+                  selectedKeys: [libraryTab],
+                  onSelectionChange: (keys) => {
+                    const k = Array.from(keys)[0];
+                    if (k) setLibraryTab(k);
+                  },
+                  className: "mb-4 w-full",
+                  children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)(SegmentedControlItem, { id: "favorites", className: "flex-1", children: [
+                      "\u6211\u7684\u6536\u85CF (",
+                      favorites.length,
+                      ")"
+                    ] }),
+                    /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)(SegmentedControlItem, { id: "history", className: "flex-1", children: [
+                      "\u89C0\u770B\u7D00\u9304 (",
+                      historyEntries.length,
+                      ")"
+                    ] })
+                  ]
+                }
+              ),
+              /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("div", { className: "flex-1 overflow-y-auto pr-1", children: libraryTab === "favorites" ? favorites.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("p", { className: "py-10 text-center text-body-2-regular text-text-secondary", children: "\u5C1A\u672A\u52A0\u5165\u4EFB\u4F55\u6536\u85CF\uFF0C\u9EDE\u64CA\u7BC0\u76EE\u5361\u7247\u611B\u5FC3\u5373\u53EF\u6536\u85CF\u3002" }) : /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("div", { className: "flex flex-col gap-2", children: favorites.map((fav) => /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)(
+                "div",
+                {
+                  className: "flex items-center justify-between gap-2 rounded-xl border border-separator-border bg-background-primary-default p-3",
+                  children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)(
+                      "button",
+                      {
+                        type: "button",
+                        className: "min-w-0 flex-1 cursor-pointer text-left",
+                        onClick: () => {
+                          setSelectedEpId(fav.id);
+                          setPartIndex(0);
+                          setIsLibraryModalOpen(false);
+                          setIsPlayerCollapsed(false);
+                        },
+                        children: [
+                          /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("div", { className: "line-clamp-1 text-body-2-medium text-text-primary", children: fav.title }),
+                          /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("div", { className: "text-caption-1-regular tabular-nums text-text-secondary", children: fav.date })
+                        ]
+                      }
+                    ),
+                    /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(
+                      IconButton,
+                      {
+                        size: "small",
+                        icon: P7,
+                        "aria-label": "\u79FB\u9664\u6536\u85CF",
+                        onClick: () => handleToggleFavorite(fav)
+                      }
+                    )
+                  ]
+                },
+                fav.id
+              )) }) : historyEntries.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("p", { className: "py-10 text-center text-body-2-regular text-text-secondary", children: "\u5C1A\u7121\u89C0\u770B\u7D00\u9304\uFF0C\u958B\u59CB\u64AD\u653E\u5F8C\u5C07\u81EA\u52D5\u5132\u5B58\u9032\u5EA6\u3002" }) : /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("div", { className: "flex flex-col gap-2", children: historyEntries.map((rec) => /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(
+                "div",
+                {
+                  className: "flex items-center justify-between gap-2 rounded-xl border border-separator-border bg-background-primary-default p-3",
+                  children: /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)("div", { className: "min-w-0 flex-1", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("div", { className: "line-clamp-1 text-body-2-medium text-text-primary", children: rec.title || rec.episodeId }),
+                    /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)("div", { className: "text-caption-1-regular tabular-nums text-text-secondary", children: [
+                      rec.partLabel || `Part ${rec.partIndex + 1}`,
+                      " \xB7 ",
+                      formatSeconds(rec.currentTime),
+                      " / ",
+                      formatSeconds(rec.duration),
+                      " (",
+                      rec.percentage,
+                      "%)"
+                    ] })
+                  ] })
+                },
+                rec.episodeId + rec.partIndex
+              )) }) })
+            ]
+          }
+        )
+      }
+    ) : null,
+    isShareModalOpen ? /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(
+      "dialog",
+      {
+        open: true,
+        "aria-modal": "true",
+        "aria-label": "\u5206\u4EAB\u7BC0\u76EE\u5F71\u7247",
+        className: "fixed inset-0 z-50 m-0 flex size-full max-h-none max-w-none items-end justify-center border-0 bg-black/75 p-3 backdrop-blur-xs sm:items-center",
+        onClick: () => setIsShareModalOpen(false),
+        children: /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)(
+          "div",
+          {
+            className: "w-full max-w-md rounded-3xl border border-border-button-default bg-background-secondary-default p-5 shadow-xl",
+            onClick: (e) => e.stopPropagation(),
+            children: [
+              /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)("div", { className: "mb-3 flex items-start justify-between gap-2", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)("div", { className: "flex items-center gap-2.5", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("div", { className: "flex size-9 items-center justify-center rounded-2lg border border-accent-500/35 bg-accent-500/15 text-accent-500", children: /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(Ld, { className: "size-4.5", "aria-hidden": "true" }) }),
+                  /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)("div", { className: "min-w-0", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("h2", { className: "line-clamp-1 text-title-3-semibold text-text-primary", children: activeEp.title }),
+                    /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)("p", { className: "text-caption-1-regular text-text-secondary", children: [
+                      activePart.label,
+                      " \xB7 \u8907\u88FD\u9023\u7D50\u5373\u958B\u5373\u64AD"
+                    ] })
+                  ] })
+                ] }),
+                /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(CloseButton, { onClick: () => setIsShareModalOpen(false), "aria-label": "\u95DC\u9589\u5206\u4EAB\u8996\u7A97" })
+              ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(Divider, { className: "my-3" }),
+              /* @__PURE__ */ (0, import_jsx_runtime125.jsxs)("div", { className: "flex items-center gap-2", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(
+                  "input",
+                  {
+                    type: "text",
+                    readOnly: true,
+                    value: shareUrl,
+                    "aria-label": "\u5206\u4EAB\u9023\u7D50\u7DB2\u5740",
+                    className: "min-w-0 flex-1 rounded-2lg border border-border-button-default bg-background-tertiary-default px-3 py-2 font-mono text-caption-1-regular text-text-primary outline-none focus-visible:ring-2 focus-visible:ring-border-focus-ring"
+                  }
+                ),
+                /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(
+                  Button,
+                  {
+                    variant: "primary",
+                    size: "small",
+                    leadingIcon: BC,
+                    onClick: () => void handleCopyShareUrl(),
+                    children: copiedShareUrl ? "\u5DF2\u8907\u88FD\uFF01" : "\u8907\u88FD"
+                  }
+                )
+              ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime125.jsx)("div", { className: "mt-4 flex justify-end", children: /* @__PURE__ */ (0, import_jsx_runtime125.jsx)(
+                LinkButton,
+                {
+                  href: LATEST_APK_RELEASE_URL,
+                  target: "_blank",
+                  rel: "noopener noreferrer",
+                  variant: "secondary",
+                  size: "xs",
+                  trailingIcon: Wt,
+                  children: "\u4E0B\u8F09\u6700\u65B0 Android APK"
+                }
+              ) })
+            ]
+          }
+        )
+      }
+    ) : null
   ] }) });
 }
 var rootEl = document.getElementById("root");
 if (rootEl) {
-  (0, import_client.createRoot)(rootEl).render(/* @__PURE__ */ (0, import_jsx_runtime124.jsx)(App, {}));
+  (0, import_client.createRoot)(rootEl).render(/* @__PURE__ */ (0, import_jsx_runtime125.jsx)(App, {}));
 }
 /*! Bundled license information:
 

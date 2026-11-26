@@ -16,42 +16,57 @@ describe("YouTube Web App UI & Video.js Compliance", () => {
     expect(fs.existsSync(catalogPath)).toBe(true);
   });
 
-  it("contains YouTube-style brand header and search navigation", () => {
+  it("contains mobile-matched brand header, channel picker, share button, and APK settings link", () => {
     const html = fs.readFileSync(htmlPath, "utf-8");
     const dom = new JSDOM(html);
     const doc = dom.window.document;
 
-    // YouTube Header
+    // Mobile-Mirrored Top Header
     const header = doc.querySelector("header.yt-header");
     expect(header).not.toBeNull();
 
-    // YouTube brand logo and title
     expect(doc.querySelector(".yt-brand-title")?.textContent).toBe("dTVStream");
     expect(doc.querySelector(".yt-brand-sub")?.textContent).toBe("綜藝玩很大");
-    expect(doc.querySelector(".yt-logo-badge")).not.toBeNull();
+    expect(doc.querySelector(".yt-logo-badge")?.textContent?.trim()).toBe("dTV");
+    expect(doc.querySelector("#channel-picker-btn")).not.toBeNull();
 
-    // YouTube search bar
+    // Share button moved into header right next to Settings APK link
+    const headerShareBtn = header?.querySelector("#share-btn");
+    expect(headerShareBtn).not.toBeNull();
+
+    const settingsApkLink = header?.querySelector("#settings-apk-btn");
+    expect(settingsApkLink).not.toBeNull();
+    expect(settingsApkLink?.getAttribute("href")).toBe(
+      "https://github.com/dylansalim3/dTVSteams/releases/latest"
+    );
+
+    // Search, filters, refresh, status
     expect(doc.querySelector("#q")).not.toBeNull();
     expect(doc.querySelector("#search-clear-btn")).not.toBeNull();
     expect(doc.querySelector("#refresh-btn")).not.toBeNull();
     expect(doc.querySelector("#catalog-status")).not.toBeNull();
   });
 
-  it("contains Theater Video.js Player section and Part selector", () => {
+  it("contains clean collapsible Video.js Player section without 1080p references", () => {
     const html = fs.readFileSync(htmlPath, "utf-8");
+    const js = fs.readFileSync(jsPath, "utf-8");
     const dom = new JSDOM(html);
     const doc = dom.window.document;
 
-    // Theater Player
+    expect(html.toLowerCase()).not.toContain("1080p");
+    expect(js.toLowerCase()).not.toContain("1080p");
+
+    // Inline Player Section
     const playerSection = doc.querySelector(".yt-player-section");
     expect(playerSection).not.toBeNull();
+    expect(doc.querySelector("#player-collapse-btn")).not.toBeNull();
 
     const video = doc.querySelector("video#main-player");
     expect(video).not.toBeNull();
     expect(video?.classList.contains("video-js")).toBe(true);
     expect(video?.classList.contains("vjs-theme-yt")).toBe(true);
 
-    // Metadata & Badges under player
+    // Metadata & actions under player (Share moved to header, no share inside .yt-video-actions)
     expect(doc.querySelector("#player-title")).not.toBeNull();
     expect(doc.querySelector("#player-part-badge")).not.toBeNull();
     expect(doc.querySelector("#player-date-badge")).not.toBeNull();
@@ -60,46 +75,44 @@ describe("YouTube Web App UI & Video.js Compliance", () => {
     expect(doc.querySelector("#open-source-btn")).not.toBeNull();
     expect(doc.querySelector("#download-btn")).not.toBeNull();
     expect(doc.querySelector("#download-menu")).not.toBeNull();
-    expect(doc.querySelector("#share-btn")).not.toBeNull();
+    expect(doc.querySelector(".yt-video-actions #share-btn")).toBeNull();
     expect(doc.querySelector("#share-modal")).not.toBeNull();
     expect(doc.querySelector("#share-qr-container")).not.toBeNull();
     expect(doc.querySelector("#share-copy-btn")).not.toBeNull();
     expect(doc.querySelector("#player-resume-toast")).not.toBeNull();
   });
 
-  it("contains Simple YouTube Episode List Grid (no Netflix fake recommendations)", () => {
+  it("contains Mobile 1-by-1 Episode Feed & Google Pagination Bar", () => {
     const html = fs.readFileSync(htmlPath, "utf-8");
     const dom = new JSDOM(html);
     const doc = dom.window.document;
 
     const listSection = doc.querySelector("#episodes-section");
     expect(listSection).not.toBeNull();
-
-    const grid = doc.querySelector("#episodes-grid");
-    expect(grid).not.toBeNull();
-
+    expect(doc.querySelector("#episodes-grid")).not.toBeNull();
+    expect(doc.querySelector("#google-pagination-bar")).not.toBeNull();
     expect(doc.querySelector("#episode-count-badge")).not.toBeNull();
 
-    // Netflix fake elements should be eliminated
     expect(doc.querySelector("#billboard")).toBeNull();
     expect(doc.querySelector("#moviemodal")).toBeNull();
     expect(doc.querySelector(".n-series-badge")).toBeNull();
   });
 
-  it("verifies YouTube CSS tokens and styling in app.css", () => {
+  it("verifies BoardUI Mobile-Matched CSS tokens and single-column feed styling in app.css", () => {
     const css = fs.readFileSync(cssPath, "utf-8");
-    expect(css).toContain("--yt-bg: #0f0f0f");
-    expect(css).toContain("--yt-red: #ff0000");
-    expect(css).toContain("--yt-surface: #181818");
-    expect(css).toContain("--yt-card-bg: #212121");
+    expect(css).toContain("--yt-bg: #121212");
+    expect(css).toContain("--yt-red: #e50914");
+    expect(css).toContain("--yt-surface: #171717");
+    expect(css).toContain("--yt-card-bg: #171717");
     expect(css).toContain(".yt-episodes-grid");
     expect(css).toContain(".yt-card");
     expect(css).toContain(".yt-card-part-btn");
     expect(css).toContain(".yt-thumb-progress");
     expect(css).toContain(".yt-resume-toast");
+    expect(css).toContain(".google-pagination-bar");
   });
 
-  it("verifies YouTube Footer and keyboard shortcuts guide", () => {
+  it("verifies Mobile-Matched Footer and keyboard shortcuts guide", () => {
     const html = fs.readFileSync(htmlPath, "utf-8");
     const dom = new JSDOM(html);
     const doc = dom.window.document;

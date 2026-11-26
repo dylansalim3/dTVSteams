@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'app_themes.dart';
 
-/// Primitive palette values aligned with BoardUI's Tailwind v4 neutral/red scale
-/// (`src/react/styles/theme.css`).
+/// Primitive palette values aligned with BoardUI's Tailwind v4 neutral/red scale.
 abstract final class AppPrimitives {
   static const Color neutral50 = Color(0xFFFAFAFA);
   static const Color neutral300 = Color(0xFFD4D4D4);
@@ -16,7 +16,6 @@ abstract final class AppPrimitives {
   static const Color neutral925 = Color(0xFF121212);
   static const Color neutral950 = Color(0xFF0A0A0A);
 
-  // Backwards-compatible gray aliases
   static const Color gray950 = neutral950;
   static const Color gray900 = neutral925;
   static const Color gray850 = neutral900;
@@ -28,41 +27,68 @@ abstract final class AppPrimitives {
   static const Color red400 = Color(0xFFF87171);
   static const Color red500 = Color(0xFFE50914);
   static const Color red600 = Color(0xFFB80710);
-  static const Color red950 = Color(0xFF450A0A);
   static const Color green500 = Color(0xFF46D369);
-  static const Color lime500 = Color(0xFF84CC16);
 }
 
-/// Semantic color roles matching BoardUI `.dark` tokens.
+/// Semantic color roles dynamically backed by the active [AppThemePalette].
 abstract final class AppColors {
-  static const Color canvas = AppPrimitives.neutral925; // bg-background-full
-  static const Color surfaceSecondary = AppPrimitives.neutral900; // bg-background-secondary-default
-  static const Color surfacePrimary = AppPrimitives.neutral800; // bg-background-primary-default
-  static const Color surfaceRaised = Color(0xFF1B1B1B);
-  static const Color surfaceOverlay = AppPrimitives.neutral900;
-  static const Color surfaceInteractive = AppPrimitives.neutral800;
-  static const Color surfaceSunken = Color(0xFF0E0E0E);
-  static const Color cardBg = surfaceRaised;
+  static AppThemePalette _active = AppThemes.boardUiDefault;
 
-  static const Color accent = AppPrimitives.red500;
-  static const Color accentHover = AppPrimitives.red600;
-  static const Color accentSoft = Color(0x24E50914);
-  static const Color success = AppPrimitives.green500;
-  static const Color successSurface = Color(0xFF132E19);
-  static const Color successMutedSurface = Color(0xFF19241B);
-  static const Color dangerSurface = Color(0xFF2E1212);
-  static const Color warning = Color(0xFFFFB300);
-  static const Color warningSurface = Color(0xFF2E230B);
+  static AppThemePalette get activeTheme => _active;
+  static void setThemeById(String? id) {
+    _active = AppThemes.byId(id);
+  }
 
-  static const Color textPrimary = AppPrimitives.neutral50; // text-text-primary
-  static const Color textSecondary = AppPrimitives.neutral400; // text-text-secondary
-  static const Color textTertiary = AppPrimitives.neutral500; // text-text-tertiary
-  static const Color textMuted = AppPrimitives.neutral500;
-  static const Color borderSeparator = AppPrimitives.neutral800; // border-separator-border
-  static const Color borderDefault = AppPrimitives.neutral700; // border-border-button-default
-  static const Color borderSubtle = Color(0x14FFFFFF);
-  static const Color borderHover = Color(0x28FFFFFF);
-  static Color actionCircleBg = Colors.white.withValues(alpha: 0.05);
+  static Brightness get brightness => _active.brightness;
+  static Color get canvas => _active.canvas;
+  static Color get surfaceSecondary => _active.surfaceSecondary;
+  static Color get surfacePrimary => _active.surfacePrimary;
+  static Color get surfaceRaised => _active.surfaceRaised;
+  static Color get surfaceOverlay => _active.surfaceSecondary;
+  static Color get surfaceInteractive => _active.surfacePrimary;
+  static Color get surfaceSunken => _active.surfaceSunken;
+  static Color get cardBg => _active.surfaceRaised;
+
+  static Color get accent => _active.accent;
+  static Color get onAccent => _active.onAccent;
+  static Color get accentHover => _active.accentHover;
+  static Color get accentSoft => _active.accentSoft;
+
+  static Color get success => _active.brightness == Brightness.light
+      ? const Color(0xFF15803D)
+      : AppPrimitives.green500;
+  static Color get onSuccess => _active.brightness == Brightness.light
+      ? const Color(0xFFFFFFFF)
+      : const Color(0xFF08220E);
+  static Color get successSurface => _active.brightness == Brightness.light
+      ? const Color(0xFFDCFCE7)
+      : const Color(0xFF132E19);
+  static Color get successMutedSurface => _active.brightness == Brightness.light
+      ? const Color(0xFFECFDF5)
+      : const Color(0xFF19241B);
+  static Color get dangerSurface => _active.brightness == Brightness.light
+      ? const Color(0xFFFEE2E2)
+      : const Color(0xFF2E1212);
+  static Color get warning => _active.brightness == Brightness.light
+      ? const Color(0xFFB45309)
+      : const Color(0xFFFFB300);
+  static Color get onWarning => _active.brightness == Brightness.light
+      ? const Color(0xFFFFFFFF)
+      : const Color(0xFF181202);
+  static Color get warningSurface => _active.brightness == Brightness.light
+      ? const Color(0xFFFEF3C7)
+      : const Color(0xFF2E230B);
+
+  static Color get textPrimary => _active.textPrimary;
+  static Color get textSecondary => _active.textSecondary;
+  static Color get textTertiary => _active.textTertiary;
+  static Color get textMuted => _active.textSecondary;
+
+  static Color get borderSeparator => _active.borderSeparator;
+  static Color get borderDefault => _active.borderDefault;
+  static Color get borderSubtle => _active.borderSubtle;
+  static Color get borderHover => _active.borderHover;
+  static Color get actionCircleBg => _active.actionCircleBg;
 }
 
 /// 4px base spacing scale matching BoardUI spacing utilities & `.ui-craft/tokens.md`.
@@ -77,101 +103,102 @@ abstract final class AppSpacing {
 
 /// Varied BoardUI border-radius scale by element role.
 abstract final class AppRadius {
-  static const double xs = 4.0; // Counter / tiny indicators
-  static const double badge = 6.0; // Chip / Badge / segmented thumb
-  static const double sm = 8.0; // Small buttons
-  static const double control = 10.0; // BoardUI radius-2lg (buttons, inputs, segmented track)
+  static const double xs = 4.0;
+  static const double badge = 6.0;
+  static const double sm = 8.0;
+  static const double control = 10.0;
   static const double chip = 10.0;
-  static const double card = 16.0; // Cards & media frames
-  static const double panel = 20.0; // BoardUI radius-2-5xl
-  static const double modal = 24.0; // Bottom sheets & modals (rounded-3xl)
+  static const double card = 16.0;
+  static const double panel = 20.0;
+  static const double modal = 24.0;
   static const double pill = 9999.0;
 }
 
-/// Composite typography utilities aligned to BoardUI `styles/typography.css`.
+/// Composite typography utilities aligned to BoardUI `styles/typography.css`
+/// resolving colors dynamically from the active theme.
 abstract final class AppType {
   static const List<FontFeature> tabular = [FontFeature.tabularFigures()];
 
-  static const TextStyle title1Medium = TextStyle(
-    fontSize: 24,
-    height: 32 / 24,
-    fontWeight: FontWeight.w500,
-    letterSpacing: -0.48,
-    color: AppColors.textPrimary,
-  );
+  static TextStyle get title1Medium => TextStyle(
+        fontSize: 24,
+        height: 32 / 24,
+        fontWeight: FontWeight.w500,
+        letterSpacing: -0.48,
+        color: AppColors.textPrimary,
+      );
 
-  static const TextStyle title2Medium = TextStyle(
-    fontSize: 20,
-    height: 28 / 20,
-    fontWeight: FontWeight.w500,
-    letterSpacing: -0.4,
-    color: AppColors.textPrimary,
-  );
+  static TextStyle get title2Medium => TextStyle(
+        fontSize: 20,
+        height: 28 / 20,
+        fontWeight: FontWeight.w500,
+        letterSpacing: -0.4,
+        color: AppColors.textPrimary,
+      );
 
-  static const TextStyle title3Semibold = TextStyle(
-    fontSize: 18,
-    height: 26 / 18,
-    fontWeight: FontWeight.w600,
-    letterSpacing: -0.27,
-    color: AppColors.textPrimary,
-  );
+  static TextStyle get title3Semibold => TextStyle(
+        fontSize: 18,
+        height: 26 / 18,
+        fontWeight: FontWeight.w600,
+        letterSpacing: -0.27,
+        color: AppColors.textPrimary,
+      );
 
-  static const TextStyle headlineMedium = TextStyle(
-    fontSize: 16,
-    height: 24 / 16,
-    fontWeight: FontWeight.w500,
-    letterSpacing: -0.16,
-    color: AppColors.textPrimary,
-  );
+  static TextStyle get headlineMedium => TextStyle(
+        fontSize: 16,
+        height: 24 / 16,
+        fontWeight: FontWeight.w500,
+        letterSpacing: -0.16,
+        color: AppColors.textPrimary,
+      );
 
-  static const TextStyle bodyMedium = TextStyle(
-    fontSize: 14,
-    height: 20 / 14,
-    fontWeight: FontWeight.w500,
-    color: AppColors.textPrimary,
-  );
+  static TextStyle get bodyMedium => TextStyle(
+        fontSize: 14,
+        height: 20 / 14,
+        fontWeight: FontWeight.w500,
+        color: AppColors.textPrimary,
+      );
 
-  static const TextStyle bodyRegular = TextStyle(
-    fontSize: 14,
-    height: 20 / 14,
-    fontWeight: FontWeight.w400,
-    color: AppColors.textSecondary,
-  );
+  static TextStyle get bodyRegular => TextStyle(
+        fontSize: 14,
+        height: 20 / 14,
+        fontWeight: FontWeight.w400,
+        color: AppColors.textSecondary,
+      );
 
-  static const TextStyle body2Medium = TextStyle(
-    fontSize: 13,
-    height: 18 / 13,
-    fontWeight: FontWeight.w500,
-    color: AppColors.textPrimary,
-  );
+  static TextStyle get body2Medium => TextStyle(
+        fontSize: 13,
+        height: 18 / 13,
+        fontWeight: FontWeight.w500,
+        color: AppColors.textPrimary,
+      );
 
-  static const TextStyle caption1Semibold = TextStyle(
-    fontSize: 12,
-    height: 16 / 12,
-    fontWeight: FontWeight.w600,
-    color: AppColors.textPrimary,
-  );
+  static TextStyle get caption1Semibold => TextStyle(
+        fontSize: 12,
+        height: 16 / 12,
+        fontWeight: FontWeight.w600,
+        color: AppColors.textPrimary,
+      );
 
-  static const TextStyle caption1Medium = TextStyle(
-    fontSize: 12,
-    height: 16 / 12,
-    fontWeight: FontWeight.w500,
-    color: AppColors.textSecondary,
-  );
+  static TextStyle get caption1Medium => TextStyle(
+        fontSize: 12,
+        height: 16 / 12,
+        fontWeight: FontWeight.w500,
+        color: AppColors.textSecondary,
+      );
 
-  static const TextStyle caption1Regular = TextStyle(
-    fontSize: 12,
-    height: 16 / 12,
-    fontWeight: FontWeight.w400,
-    color: AppColors.textSecondary,
-  );
+  static TextStyle get caption1Regular => TextStyle(
+        fontSize: 12,
+        height: 16 / 12,
+        fontWeight: FontWeight.w400,
+        color: AppColors.textSecondary,
+      );
 
-  static const TextStyle caption2Medium = TextStyle(
-    fontSize: 11,
-    height: 14 / 11,
-    fontWeight: FontWeight.w500,
-    color: AppColors.textSecondary,
-  );
+  static TextStyle get caption2Medium => TextStyle(
+        fontSize: 11,
+        height: 14 / 11,
+        fontWeight: FontWeight.w500,
+        color: AppColors.textSecondary,
+      );
 }
 
 /// BoardUI dark-mode layered shadows.
@@ -203,14 +230,17 @@ abstract final class AppCardTokens {
 /// Shared Android/iOS system chrome helpers so exiting fullscreen playback
 /// reliably restores native top status and bottom navigation bars.
 abstract final class AppSystemUi {
-  static const SystemUiOverlayStyle normalOverlayStyle = SystemUiOverlayStyle(
-    statusBarColor: AppColors.canvas,
-    statusBarIconBrightness: Brightness.light,
-    statusBarBrightness: Brightness.dark,
-    systemNavigationBarColor: AppColors.canvas,
-    systemNavigationBarIconBrightness: Brightness.light,
-    systemNavigationBarDividerColor: AppColors.borderSeparator,
-  );
+  static SystemUiOverlayStyle get normalOverlayStyle {
+    final isDark = AppColors.brightness == Brightness.dark;
+    return SystemUiOverlayStyle(
+      statusBarColor: AppColors.canvas,
+      statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+      statusBarBrightness: AppColors.brightness,
+      systemNavigationBarColor: AppColors.canvas,
+      systemNavigationBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+      systemNavigationBarDividerColor: AppColors.borderSeparator,
+    );
+  }
 
   static void restoreNormalChrome() {
     SystemChrome.setEnabledSystemUIMode(
@@ -218,5 +248,75 @@ abstract final class AppSystemUi {
       overlays: SystemUiOverlay.values,
     );
     SystemChrome.setSystemUIOverlayStyle(normalOverlayStyle);
+  }
+}
+
+/// Sleek, compact toggle row replacing bulky Material 3 default switches.
+class CompactSwitchTile extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+  final Color? titleColor;
+  final Color? subtitleColor;
+
+  const CompactSwitchTile({
+    super.key,
+    required this.title,
+    required this.subtitle,
+    required this.value,
+    required this.onChanged,
+    this.titleColor,
+    this.subtitleColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final activeTrack = AppColors.accent;
+    final activeThumb = AppColors.onAccent;
+    final inactiveTrack = AppColors.surfaceInteractive;
+    final inactiveThumb = AppColors.textSecondary;
+
+    return ListTile(
+      dense: true,
+      visualDensity: VisualDensity.compact,
+      contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 2),
+      onTap: () => onChanged(!value),
+      title: Text(
+        title,
+        style: TextStyle(
+          color: titleColor ?? AppColors.textPrimary,
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      subtitle: Text(
+        subtitle,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+          color: subtitleColor ?? AppColors.textMuted,
+          fontSize: 11,
+        ),
+      ),
+      trailing: Transform.scale(
+        scale: 0.72,
+        alignment: AlignmentDirectional.centerEnd,
+        child: Switch(
+          value: value,
+          onChanged: onChanged,
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          activeThumbColor: activeThumb,
+          activeTrackColor: activeTrack,
+          inactiveThumbColor: inactiveThumb,
+          inactiveTrackColor: inactiveTrack,
+          trackOutlineColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) return activeTrack;
+            return AppColors.borderDefault;
+          }),
+          trackOutlineWidth: const WidgetStatePropertyAll(1.0),
+        ),
+      ),
+    );
   }
 }

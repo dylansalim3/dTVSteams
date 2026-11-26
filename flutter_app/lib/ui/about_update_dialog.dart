@@ -3,9 +3,11 @@ import '../services/download_manager.dart';
 import '../services/settings_manager.dart';
 import '../services/sleep_timer_manager.dart';
 import '../services/update_manager.dart';
+import 'app_themes.dart';
 import 'app_tokens.dart';
 import 'sleep_timer_sheet.dart';
 import 'storage_location_sheet.dart';
+import 'theme_picker_sheet.dart';
 
 class AboutUpdateDialog {
   /// Shows the full "About & System Updates" modal dialog
@@ -37,28 +39,28 @@ class AboutUpdateDialog {
         backgroundColor: AppColors.surfaceOverlay,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.modal)),
         title: Row(
-          children: const [
+          children: [
             Icon(Icons.security, color: AppColors.accent, size: 24),
-            SizedBox(width: AppSpacing.sm),
+            const SizedBox(width: AppSpacing.sm),
             Text(
               '需要安裝應用權限',
               style: TextStyle(color: AppColors.textPrimary, fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ],
         ),
-        content: const Text(
+        content: Text(
           '為讓應用程式能自動完成更新安裝，Android 系統要求為 dTVSteams 開啟「允許安裝未知應用程式」權限。\n\n點選下方按鈕前往系統設定開啟後，即可繼續安裝。',
           style: TextStyle(color: AppColors.textSecondary, fontSize: 14, height: 1.5),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('稍後再說', style: TextStyle(color: AppColors.textMuted)),
+            child: Text('稍後再說', style: TextStyle(color: AppColors.textMuted)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.accent,
-              foregroundColor: AppColors.textPrimary,
+              foregroundColor: AppColors.onAccent,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.card)),
             ),
             onPressed: () async {
@@ -121,9 +123,9 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
     return ConstrainedBox(
       constraints: BoxConstraints(maxHeight: maxSheetHeight),
       child: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: AppColors.surfaceOverlay,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.modal)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.modal)),
           border: Border(top: BorderSide(color: AppColors.borderSubtle, width: 1)),
         ),
         child: SafeArea(
@@ -148,7 +150,7 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                     height: 4,
                     margin: const EdgeInsets.only(bottom: AppSpacing.sm),
                     decoration: BoxDecoration(
-                      color: Colors.white24,
+                      color: AppColors.borderDefault,
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -165,17 +167,17 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                             color: AppColors.accent,
                             borderRadius: BorderRadius.circular(AppRadius.badge),
                           ),
-                          child: const Text(
+                          child: Text(
                             'dTV',
                             style: TextStyle(
-                              color: AppColors.textPrimary,
+                              color: AppColors.onAccent,
                               fontWeight: FontWeight.w900,
                               fontSize: 13,
                             ),
                           ),
                         ),
                         const SizedBox(width: AppSpacing.sm),
-                        const Text(
+                        Text(
                           '關於與版本更新',
                           style: TextStyle(
                             color: AppColors.textPrimary,
@@ -189,7 +191,7 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                       constraints: const BoxConstraints.tightFor(width: 44, height: 44),
                       style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
                       tooltip: '關閉設定',
-                      icon: const Icon(Icons.close, color: AppColors.textSecondary),
+                      icon: Icon(Icons.close, color: AppColors.textSecondary),
                       onPressed: () => Navigator.of(context).pop(),
                     ),
                   ],
@@ -211,13 +213,13 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.info_outline, color: AppColors.textSecondary, size: 22),
+                              Icon(Icons.info_outline, color: AppColors.textSecondary, size: 22),
                               const SizedBox(width: AppSpacing.sm),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
+                                    Text(
                                       'dTVSteams 綜藝影音串流平台',
                                       style: TextStyle(
                                         color: AppColors.textPrimary,
@@ -228,10 +230,10 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                                     const SizedBox(height: 2),
                                     Text(
                                       '目前安裝版本: v${UpdateManager.currentAppVersion}',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         color: AppColors.textMuted,
                                         fontSize: 12,
-                                        fontFeatures: [FontFeature.tabularFigures()],
+                                        fontFeatures: const [FontFeature.tabularFigures()],
                                       ),
                                     ),
                                   ],
@@ -240,7 +242,7 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                               ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppColors.accent,
-                                  foregroundColor: AppColors.textPrimary,
+                                  foregroundColor: AppColors.onAccent,
                                   padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
                                   minimumSize: const Size(0, 44),
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -249,10 +251,10 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                                     ? null
                                     : () => mgr.checkForUpdate(manual: true),
                                 icon: mgr.isChecking
-                                    ? const SizedBox(
+                                    ? SizedBox(
                                         width: 14,
                                         height: 14,
-                                        child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.textPrimary),
+                                        child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.onAccent),
                                       )
                                     : const Icon(Icons.sync, size: 15),
                                 label: Text(mgr.isChecking ? '檢查中...' : '檢查更新', style: const TextStyle(fontSize: 12)),
@@ -266,18 +268,18 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                           Container(
                             padding: const EdgeInsets.all(AppSpacing.sm),
                             decoration: BoxDecoration(
-                              color: Colors.red.withValues(alpha: 0.15),
+                              color: AppColors.dangerSurface,
                               borderRadius: BorderRadius.circular(AppRadius.chip),
-                              border: Border.all(color: Colors.red.withValues(alpha: 0.4)),
+                              border: Border.all(color: AppColors.accent.withValues(alpha: 0.45)),
                             ),
                             child: Row(
                               children: [
-                                const Icon(Icons.error_outline, color: Colors.redAccent, size: 16),
+                                Icon(Icons.error_outline, color: AppColors.accent, size: 16),
                                 const SizedBox(width: AppSpacing.sm),
                                 Expanded(
                                   child: Text(
                                     mgr.errorMessage!,
-                                    style: const TextStyle(color: Colors.redAccent, fontSize: 12),
+                                    style: TextStyle(color: AppColors.textPrimary, fontSize: 12),
                                   ),
                                 ),
                               ],
@@ -287,10 +289,36 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
 
                         const SizedBox(height: AppSpacing.md),
 
+                        // Theme Selection Section (21st.dev Themes)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              '外觀主題 (Theme)',
+                              style: TextStyle(
+                                color: AppColors.textPrimary,
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              '${AppThemes.twentyFirstDevThemes.length} 款 21st.dev 主題',
+                              style: TextStyle(
+                                color: AppColors.textMuted,
+                                fontSize: 11,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        _buildThemeSelectionCard(context),
+
+                        const SizedBox(height: AppSpacing.md),
+
                         // Playback Preferences Settings Section (with declared autosave indicator)
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: const [
+                          children: [
                             Text(
                               '播放偏好設定 (Settings)',
                               style: TextStyle(
@@ -313,56 +341,32 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                           color: AppColors.cardBg,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(AppRadius.card),
-                            side: const BorderSide(color: AppColors.borderSubtle),
+                            side: BorderSide(color: AppColors.borderSubtle),
                           ),
                           clipBehavior: Clip.antiAlias,
                           child: Column(
                             children: [
-                              SwitchListTile(
-                                dense: true,
-                                visualDensity: VisualDensity.compact,
-                                contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 2),
-                                activeColor: AppColors.accent,
-                                title: const Text('背景播放 (鎖定螢幕繼續播放音訊)',
-                                    style: TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w600)),
-                                subtitle: const Text('螢幕關閉鎖定或切換應用時，背景繼續播放節目聲音',
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(color: AppColors.textMuted, fontSize: 11)),
+                              CompactSwitchTile(
+                                title: '背景播放 (鎖定螢幕繼續播放音訊)',
+                                subtitle: '螢幕關閉鎖定或切換應用時，背景繼續播放節目聲音',
                                 value: _settingsManager.backgroundPlay,
                                 onChanged: (val) => _settingsManager.setBackgroundPlay(val),
                               ),
-                              const Divider(color: AppColors.borderSubtle, height: 1),
-                              SwitchListTile(
-                                dense: true,
-                                visualDensity: VisualDensity.compact,
-                                contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 2),
-                                activeColor: AppColors.accent,
-                                title: const Text('播放時保持螢幕常亮 (防止休眠)',
-                                    style: TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w600)),
-                                subtitle: const Text('影片播放中螢幕不會因逾時自動變暗或關閉',
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(color: AppColors.textMuted, fontSize: 11)),
+                              Divider(color: AppColors.borderSubtle, height: 1),
+                              CompactSwitchTile(
+                                title: '播放時保持螢幕常亮 (防止休眠)',
+                                subtitle: '影片播放中螢幕不會因逾時自動變暗或關閉',
                                 value: _settingsManager.keepScreenAwake,
                                 onChanged: (val) => _settingsManager.setKeepScreenAwake(val),
                               ),
-                              const Divider(color: AppColors.borderSubtle, height: 1),
-                              SwitchListTile(
-                                dense: true,
-                                visualDensity: VisualDensity.compact,
-                                contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 2),
-                                activeColor: AppColors.accent,
-                                title: const Text('自動連續播放下一段 / 下一集',
-                                    style: TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w600)),
-                                subtitle: const Text('分段或整集播畢前浮現 5 秒倒數並自動續播',
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(color: AppColors.textMuted, fontSize: 11)),
+                              Divider(color: AppColors.borderSubtle, height: 1),
+                              CompactSwitchTile(
+                                title: '自動連續播放下一段 / 下一集',
+                                subtitle: '分段或整集播畢前浮現 5 秒倒數並自動續播',
                                 value: _settingsManager.autoPlayNext,
                                 onChanged: (val) => _settingsManager.setAutoPlayNext(val),
                               ),
-                              const Divider(color: AppColors.borderSubtle, height: 1),
+                              Divider(color: AppColors.borderSubtle, height: 1),
                               ListTile(
                                 dense: true,
                                 visualDensity: VisualDensity.compact,
@@ -372,7 +376,7 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                                   size: 20,
                                   color: _sleepTimerManager.isActive ? AppColors.accent : AppColors.textSecondary,
                                 ),
-                                title: const Text('睡眠定時器 (Sleep Timer)',
+                                title: Text('睡眠定時器 (Sleep Timer)',
                                     style: TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w600)),
                                 subtitle: Text(
                                   _sleepTimerManager.isActive
@@ -386,7 +390,7 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                                     fontFeatures: const [FontFeature.tabularFigures()],
                                   ),
                                 ),
-                                trailing: const Icon(Icons.chevron_right, color: Colors.white38, size: 18),
+                                trailing: Icon(Icons.chevron_right, color: AppColors.textTertiary, size: 18),
                                 onTap: () {
                                   Navigator.of(context).pop();
                                   showSleepTimerSheet(context);
@@ -399,7 +403,7 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                         const SizedBox(height: AppSpacing.md),
 
                         // Download Storage Location Section
-                        const Text(
+                        Text(
                           '下載儲存位置 (Download Storage)',
                           style: TextStyle(
                             color: AppColors.textPrimary,
@@ -426,9 +430,9 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
-                              children: const [
+                              children: [
                                 Icon(Icons.check_circle, color: AppColors.success, size: 18),
-                                SizedBox(width: AppSpacing.sm),
+                                const SizedBox(width: AppSpacing.sm),
                                 Text(
                                   '目前已是最新版本，無需更新',
                                   style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
@@ -439,19 +443,19 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                         ],
 
                         const SizedBox(height: 10),
-                        const Divider(color: Colors.white12, height: 1),
+                        Divider(color: AppColors.borderSeparator, height: 1),
                         const SizedBox(height: 4),
 
                         // Safety Fallback Row
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Flexible(
+                            Flexible(
                               child: Text(
                                 '遇到下載問題？可直接使用瀏覽器',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: TextStyle(color: Colors.white38, fontSize: 11),
+                                style: TextStyle(color: AppColors.textTertiary, fontSize: 11),
                               ),
                             ),
                             TextButton.icon(
@@ -460,8 +464,8 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                               ),
                               onPressed: () => mgr.openBrowserFallback(),
-                              icon: const Icon(Icons.open_in_browser, size: 15, color: Colors.white70),
-                              label: const Text('開啟 GitHub 發布頁', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                              icon: Icon(Icons.open_in_browser, size: 15, color: AppColors.textSecondary),
+                              label: Text('開啟 GitHub 發布頁', style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
                             ),
                           ],
                         ),
@@ -477,6 +481,84 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
     );
   }
 
+  Widget _buildThemeSelectionCard(BuildContext context) {
+    final activeTheme = _settingsManager.activeTheme;
+    return Material(
+      color: AppColors.cardBg,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadius.card),
+        side: BorderSide(color: AppColors.borderSubtle),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: ListTile(
+        key: const ValueKey('settings_theme_picker_tile'),
+        dense: true,
+        contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
+        leading: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _themeDot(activeTheme.canvas),
+            const SizedBox(width: 3),
+            _themeDot(activeTheme.surfaceSecondary),
+            const SizedBox(width: 3),
+            _themeDot(activeTheme.accent),
+          ],
+        ),
+        title: Text(
+          activeTheme.name,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            color: AppColors.textPrimary,
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        subtitle: Text(
+          '點擊從 ${AppThemes.all.length} 款主題即時切換',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(color: AppColors.textMuted, fontSize: 11),
+        ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: AppColors.accent,
+                borderRadius: BorderRadius.circular(AppRadius.badge),
+              ),
+              child: Text(
+                '更換主題',
+                style: TextStyle(
+                  color: AppColors.onAccent,
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const SizedBox(width: 4),
+            Icon(Icons.chevron_right, color: AppColors.textTertiary, size: 18),
+          ],
+        ),
+        onTap: () => showThemePickerSheet(context, _settingsManager),
+      ),
+    );
+  }
+
+  Widget _themeDot(Color color) {
+    return Container(
+      width: 12,
+      height: 12,
+      decoration: BoxDecoration(
+        color: color,
+        shape: BoxShape.circle,
+        border: Border.all(color: AppColors.borderDefault, width: 1),
+      ),
+    );
+  }
+
   Widget _buildStorageLocationCard(BuildContext context) {
     final isCustom = _downloadManager.isUsingCustomDirectory;
     final currentPath = _downloadManager.downloadDirectoryPath;
@@ -485,7 +567,7 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
       color: AppColors.cardBg,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppRadius.card),
-        side: const BorderSide(color: AppColors.borderSubtle),
+        side: BorderSide(color: AppColors.borderSubtle),
       ),
       clipBehavior: Clip.antiAlias,
       child: Padding(
@@ -510,7 +592,7 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                         children: [
                           Text(
                             isCustom ? '自訂儲存目錄' : '預設內部儲存空間',
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: AppColors.textPrimary,
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
@@ -522,12 +604,12 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                             decoration: BoxDecoration(
                               color: isCustom
                                   ? AppColors.success.withValues(alpha: 0.16)
-                                  : Colors.white12,
+                                  : AppColors.surfaceInteractive,
                               borderRadius: BorderRadius.circular(AppRadius.badge),
                               border: Border.all(
                                 color: isCustom
                                     ? AppColors.success.withValues(alpha: 0.45)
-                                    : Colors.white24,
+                                    : AppColors.borderDefault,
                               ),
                             ),
                             child: Text(
@@ -546,7 +628,7 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                         message: currentPath,
                         child: Text(
                           currentPath.isEmpty ? '載入中...' : currentPath,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: AppColors.textMuted,
                             fontSize: 12,
                             fontFamily: 'monospace',
@@ -583,7 +665,7 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                 ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.accent,
-                    foregroundColor: AppColors.textPrimary,
+                    foregroundColor: AppColors.onAccent,
                     padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
                     minimumSize: const Size(0, 44),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.chip)),
@@ -623,21 +705,21 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                 ),
                 child: Text(
                   '發現新版本 v${update.latestVersion}',
-                  style: const TextStyle(
-                    color: AppColors.textPrimary,
+                  style: TextStyle(
+                    color: AppColors.onAccent,
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
-                    fontFeatures: [FontFeature.tabularFigures()],
+                    fontFeatures: const [FontFeature.tabularFigures()],
                   ),
                 ),
               ),
               const SizedBox(width: AppSpacing.sm),
               Text(
                 '安裝包大小: ${update.formattedSize}',
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppColors.textMuted,
                   fontSize: 12,
-                  fontFeatures: [FontFeature.tabularFigures()],
+                  fontFeatures: const [FontFeature.tabularFigures()],
                 ),
               ),
             ],
@@ -645,7 +727,7 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
           const SizedBox(height: AppSpacing.sm),
           Text(
             update.releaseTitle,
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.textPrimary,
               fontSize: 15,
               fontWeight: FontWeight.bold,
@@ -665,7 +747,7 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
             child: SingleChildScrollView(
               child: Text(
                 update.releaseNotes,
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppColors.textSecondary,
                   fontSize: 12,
                   height: 1.4,
@@ -686,19 +768,19 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                   children: [
                     Text(
                       '背景下載中... ${(mgr.downloadProgress * 100).toInt()}%',
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.accent,
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
-                        fontFeatures: [FontFeature.tabularFigures()],
+                        fontFeatures: const [FontFeature.tabularFigures()],
                       ),
                     ),
                     Text(
                       '${(mgr.downloadedBytes / (1024 * 1024)).toStringAsFixed(1)} MB / ${(mgr.totalBytes / (1024 * 1024)).toStringAsFixed(1)} MB',
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.textMuted,
                         fontSize: 11,
-                        fontFeatures: [FontFeature.tabularFigures()],
+                        fontFeatures: const [FontFeature.tabularFigures()],
                       ),
                     ),
                   ],
@@ -710,13 +792,13 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                     value: mgr.downloadProgress > 0 ? mgr.downloadProgress : null,
                     minHeight: 6,
                     backgroundColor: AppColors.borderSubtle,
-                    valueColor: const AlwaysStoppedAnimation<Color>(AppColors.accent),
+                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.accent),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.sm),
-                const Text(
+                Text(
                   '下載於背景進行中，您可以關閉此視窗繼續觀看劇集',
-                  style: TextStyle(color: Colors.white38, fontSize: 11),
+                  style: TextStyle(color: AppColors.textTertiary, fontSize: 11),
                 ),
               ],
             ),
@@ -729,7 +811,7 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                     child: ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.success,
-                        foregroundColor: AppColors.textPrimary,
+                        foregroundColor: AppColors.onSuccess,
                         minimumSize: const Size(0, 44),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.chip)),
                       ),
@@ -746,7 +828,7 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                     child: ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.accent,
-                        foregroundColor: AppColors.textPrimary,
+                        foregroundColor: AppColors.onAccent,
                         minimumSize: const Size(0, 44),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.chip)),
                       ),
@@ -770,15 +852,15 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.sm),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.05),
+                color: AppColors.surfaceSunken,
                 borderRadius: BorderRadius.circular(AppRadius.chip),
                 border: Border.all(color: AppColors.borderSubtle),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Icon(Icons.info_outline, color: Colors.amberAccent, size: 16),
-                  SizedBox(width: AppSpacing.sm),
+                children: [
+                  Icon(Icons.info_outline, color: AppColors.warning, size: 16),
+                  const SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: Text(
                       '提示：若系統提示「安裝套件無效」或「套件與現有套件衝突」，代表手機現有版本與本次正式版簽名不相容。請先手動解除安裝舊版後再安裝，之後的版本即可直接覆蓋更新。',
@@ -824,17 +906,17 @@ class _NewVersionDialog extends StatelessWidget {
               color: AppColors.accent.withValues(alpha: 0.2),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.system_update_alt, color: AppColors.accent, size: 22),
+            child: Icon(Icons.system_update_alt, color: AppColors.accent, size: 22),
           ),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Text(
               '發現新版本 v${update.latestVersion}',
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.textPrimary,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                fontFeatures: [FontFeature.tabularFigures()],
+                fontFeatures: const [FontFeature.tabularFigures()],
               ),
             ),
           ),
@@ -846,7 +928,7 @@ class _NewVersionDialog extends StatelessWidget {
         children: [
           Text(
             update.releaseTitle,
-            style: const TextStyle(color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.bold),
+            style: TextStyle(color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: AppSpacing.sm),
           Container(
@@ -860,17 +942,17 @@ class _NewVersionDialog extends StatelessWidget {
             child: SingleChildScrollView(
               child: Text(
                 update.releaseNotes,
-                style: const TextStyle(color: AppColors.textSecondary, fontSize: 12, height: 1.4),
+                style: TextStyle(color: AppColors.textSecondary, fontSize: 12, height: 1.4),
               ),
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(
             '檔案大小: ${update.formattedSize}',
-            style: const TextStyle(
-              color: Colors.white38,
+            style: TextStyle(
+              color: AppColors.textTertiary,
               fontSize: 11,
-              fontFeatures: [FontFeature.tabularFigures()],
+              fontFeatures: const [FontFeature.tabularFigures()],
             ),
           ),
         ],
@@ -881,12 +963,12 @@ class _NewVersionDialog extends StatelessWidget {
             updateManager.dismissVersion(update.latestVersion);
             Navigator.of(context).pop();
           },
-          child: const Text('稍後再說', style: TextStyle(color: AppColors.textMuted)),
+          child: Text('稍後再說', style: TextStyle(color: AppColors.textMuted)),
         ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.accent,
-            foregroundColor: AppColors.textPrimary,
+            foregroundColor: AppColors.onAccent,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.chip)),
           ),
           onPressed: () {

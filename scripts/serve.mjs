@@ -69,26 +69,42 @@ async function resolveFreshStreamUrl(pageUrl, bypassCache = false) {
   return null;
 }
 
-async function fetchEpisodesPage(page = 1) {
-  if (pageCache.has(page)) {
-    return pageCache.get(page);
+const SHOW_SLUGS = {
+  mr_player: "綜藝玩很大",
+  hunger_games: "飢餓遊戲",
+  all_stars: "全明星運動會",
+  super_ent: "小明星大跟班",
+  hot_shop: "11點熱吵店",
+};
+
+async function fetchEpisodesPage(page = 1, rawShow = "mr_player") {
+  const showId = SHOW_SLUGS[rawShow] ? rawShow : "mr_player";
+  const showName = SHOW_SLUGS[showId];
+  const cacheKey = `${showId}:${page}`;
+  if (pageCache.has(cacheKey)) {
+    return pageCache.get(cacheKey);
   }
 
-  // Page 1 can return local catalog.json if available
-  if (page === 1) {
+  // Page 1 of default channel can return local catalog.json if available
+  if (page === 1 && showId === "mr_player") {
     const localCatalog = path.join(dir, "catalog.json");
     if (fs.existsSync(localCatalog)) {
       try {
         const data = JSON.parse(fs.readFileSync(localCatalog, "utf-8"));
         if (data.episodes && data.episodes.length > 0) {
-          pageCache.set(1, data.episodes);
+          pageCache.set(cacheKey, data.episodes);
           return data.episodes;
         }
       } catch {}
     }
   }
 
-  const upstreamUrl = `https://srgoideas.com/%e7%b6%9c%e8%97%9d%e7%8e%a9%e5%be%88%e5%a4%a7-2026-11-08-%e5%8f%b0%e5%8c%97-%e6%90%97%e8%9b%8b%e9%ac%bc%e5%88%b0%e4%bd%a0%e5%ae%b6/?lcp_page0=${page}#lcp_instance_0`;
+  const upstreamUrl = showId === "mr_player"
+    ? `https://srgoideas.com/%e7%b6%9c%e8%97%9d%e7%8e%a9%e5%be%88%e5%a4%a7-2026-11-08-%e5%8f%b0%e5%8c%97-%e6%90%97%e8%9b%8b%e9%ac%bc%e5%88%b0%e4%bd%a0%e5%ae%b6/?lcp_page0=${page}#lcp_instance_0`
+    : (page <= 1
+        ? `https://srgoideas.com/category/variety-show/${encodeURIComponent(showName)}/`
+        : `https://srgoideas.com/category/variety-show/${encodeURIComponent(showName)}/page/${page}/`);
+
   const res = await fetch(upstreamUrl, {
     headers: { "User-Agent": USER_AGENT }
   });
@@ -98,17 +114,24 @@ async function fetchEpisodesPage(page = 1) {
   const html = await res.text();
 
   const lcpMatch = html.match(/<ul\s+class=["'][^"']*lcp_catlist[^"']*["'][^>]*>([\s\S]*?)<\/ul>/i);
-  const targetHtml = lcpMatch ? lcpMatch[1] : html;
+  const articleMatches = !lcpMatch
+    ? html.match(/<(?:h2|h3)[^>]*class=["'][^"']*entry-title[^"']*["'][^>]*>[\s\S]*?<\/(?:h2|h3)>/gi)
+    : null;
+  const targetHtml = lcpMatch
+    ? lcpMatch[1]
+    : (articleMatches && articleMatches.length ? articleMatches.join("\n") : html);
 
   const linkRegex = /<a\s+[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi;
   const episodes = [];
   const seen = new Set();
   let match;
+  const filterKeyword = showId === "mr_player" ? "玩很大" : showName;
 
   while ((match = linkRegex.exec(targetHtml)) !== null) {
     const rawUrl = match[1];
     const rawTitle = match[2].replace(/<[^>]+>/g, "").trim();
-    if (!rawTitle.includes("玩很大") || seen.has(rawUrl)) continue;
+    if (!rawUrl.startsWith("http") || !rawTitle || seen.has(rawUrl)) continue;
+    if (filterKeyword && !rawTitle.includes(filterKeyword)) continue;
     seen.add(rawUrl);
 
     const dateMatch = rawTitle.match(/\d{4}-\d{2}-\d{2}/);
@@ -122,6 +145,8 @@ async function fetchEpisodesPage(page = 1) {
       title: rawTitle,
       date,
       url: rawUrl,
+      showId,
+      showName,
       duration: "1小時 48分",
       backdrop: thumbUrl,
       poster: thumbUrl,
@@ -133,7 +158,7 @@ async function fetchEpisodesPage(page = 1) {
     });
   }
 
-  pageCache.set(page, episodes);
+  pageCache.set(cacheKey, episodes);
   return episodes;
 }
 
@@ -170,11 +195,12 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // Dynamic pagination endpoint: /api/episodes?page=1..64
+  // Dynamic pagination endpoint: /api/episodes?page=1..64&show=mr_player
   if (urlPath === "/api/episodes") {
     const page = Math.max(1, parseInt(parsedUrl.searchParams.get("page") || "1", 10));
+    const show = parsedUrl.searchParams.get("show") || "mr_player";
     try {
-      const episodes = await fetchEpisodesPage(page);
+      const episodes = await fetchEpisodesPage(page, show);
       res.writeHead(200, {
         "Content-Type": "application/json; charset=utf-8",
         "Access-Control-Allow-Origin": "*",

@@ -45,15 +45,15 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         appBar: AppBar(
         backgroundColor: AppColors.surfaceSecondary,
         elevation: 0,
-        bottom: const PreferredSize(
-          preferredSize: Size.fromHeight(1),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
           child: Divider(color: AppColors.borderSeparator, height: 1),
         ),
         title: Row(
           children: [
-            const Icon(Icons.favorite, color: AppColors.accent, size: 20),
+            Icon(Icons.favorite, color: AppColors.accent, size: 20),
             const SizedBox(width: AppSpacing.sm),
-            const Text('我的收藏 (Favorites)', style: AppType.title3Semibold),
+            Text('我的收藏 (Favorites)', style: AppType.title3Semibold),
             if (favorites.isNotEmpty) ...[
               const SizedBox(width: AppSpacing.sm),
               Container(
@@ -77,7 +77,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         actions: [
           if (favorites.isNotEmpty)
             IconButton(
-              icon: const Icon(Icons.delete_sweep_outlined, color: AppColors.textSecondary),
+              icon: Icon(Icons.delete_sweep_outlined, color: AppColors.textSecondary),
               tooltip: '清空所有收藏',
               onPressed: () => FavoritesBody.confirmClearAll(context, _favoritesManager),
             ),
@@ -102,14 +102,14 @@ class FavoritesBody extends StatefulWidget {
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surfaceOverlay,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.modal)),
-        title: const Row(
+        title: Row(
           children: [
             Icon(Icons.warning_amber_rounded, color: AppColors.accent, size: 24),
-            SizedBox(width: AppSpacing.sm),
+            const SizedBox(width: AppSpacing.sm),
             Text('清空所有收藏？', style: TextStyle(color: AppColors.textPrimary, fontSize: 18)),
           ],
         ),
-        content: const Text(
+        content: Text(
           '確定要清空所有收藏的節目嗎？此操作將移除全部收藏項目。',
           style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
         ),
@@ -125,7 +125,7 @@ class FavoritesBody extends StatefulWidget {
           OutlinedButton(
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.accent,
-              side: const BorderSide(color: AppColors.accent),
+              side: BorderSide(color: AppColors.accent),
             ),
             onPressed: () {
               Navigator.of(ctx).pop();
@@ -200,14 +200,14 @@ class _FavoritesBodyState extends State<FavoritesBody> {
                   borderRadius: BorderRadius.circular(AppRadius.card),
                   border: Border.all(color: AppColors.borderSeparator),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.favorite_border,
                   size: 28,
                   color: AppColors.accent,
                 ),
               ),
               const SizedBox(height: AppSpacing.lg),
-              const Text('尚未加入任何收藏', style: AppType.title3Semibold),
+              Text('尚未加入任何收藏', style: AppType.title3Semibold),
               const SizedBox(height: AppSpacing.sm),
               Text(
                 '在首頁或播放器點擊收藏按鈕，即可集中整理喜愛的集數！',
@@ -221,14 +221,14 @@ class _FavoritesBodyState extends State<FavoritesBody> {
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.accent,
-                  foregroundColor: AppColors.textPrimary,
+                  foregroundColor: AppColors.onAccent,
                   elevation: 0,
                   padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
                   minimumSize: const Size(0, 44),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.control)),
                 ),
                 icon: const Icon(Icons.explore_outlined, size: 18),
-                label: const Text('瀏覽節目清單', style: AppType.bodyMedium),
+                label: Text('瀏覽節目清單', style: AppType.bodyMedium.copyWith(color: AppColors.onAccent)),
                 onPressed: () => Navigator.of(context).pop(),
               ),
             ],

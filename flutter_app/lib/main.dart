@@ -7,6 +7,7 @@ import 'catalog/show_channel.dart';
 import 'services/download_manager.dart';
 import 'services/favorites_manager.dart';
 import 'services/playback_history_manager.dart';
+import 'services/settings_manager.dart';
 import 'services/update_manager.dart';
 import 'ui/about_update_dialog.dart';
 import 'ui/app_tokens.dart';
@@ -28,21 +29,34 @@ class DTVSteamsApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'dTVSteams',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        scaffoldBackgroundColor: AppColors.canvas,
-        primaryColor: AppColors.accent,
-        dividerColor: AppColors.borderSeparator,
-        colorScheme: const ColorScheme.dark(
-          primary: AppColors.accent,
-          surface: AppColors.surfaceSecondary,
-          onSurface: AppColors.textPrimary,
-        ),
-      ),
-      home: const HomeScreen(),
+    final settings = SettingsManager();
+    return ListenableBuilder(
+      listenable: settings,
+      builder: (context, _) {
+        AppColors.setThemeById(settings.themeId);
+        return MaterialApp(
+          title: 'dTVSteams',
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            brightness: AppColors.brightness,
+            scaffoldBackgroundColor: AppColors.canvas,
+            primaryColor: AppColors.accent,
+            dividerColor: AppColors.borderSeparator,
+            colorScheme: ColorScheme(
+              brightness: AppColors.brightness,
+              primary: AppColors.accent,
+              onPrimary: AppColors.onAccent,
+              secondary: AppColors.accent,
+              onSecondary: AppColors.onAccent,
+              error: AppPrimitives.red500,
+              onError: Colors.white,
+              surface: AppColors.surfaceSecondary,
+              onSurface: AppColors.textPrimary,
+            ),
+          ),
+          home: const HomeScreen(),
+        );
+      },
     );
   }
 }
@@ -266,9 +280,9 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (ctx) {
         final bottomInset = MediaQuery.of(ctx).padding.bottom;
         return Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             color: AppColors.surfaceSecondary,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.modal)),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.modal)),
             border: Border(
               top: BorderSide(color: AppColors.borderSubtle),
             ),
@@ -303,34 +317,43 @@ class _HomeScreenState extends State<HomeScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        children: [
-                          Container(
-                            width: 32,
-                            height: 32,
-                            decoration: BoxDecoration(
-                              color: AppColors.accentSoft,
-                              borderRadius: BorderRadius.circular(AppRadius.sm),
-                              border: Border.all(
-                                color: AppColors.accent.withValues(alpha: 0.35),
+                      Expanded(
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 32,
+                              height: 32,
+                              decoration: BoxDecoration(
+                                color: AppColors.accentSoft,
+                                borderRadius: BorderRadius.circular(AppRadius.sm),
+                                border: Border.all(
+                                  color: AppColors.accent.withValues(alpha: 0.35),
+                                ),
+                              ),
+                              child: Icon(Icons.tv_rounded, color: AppColors.accent, size: 18),
+                            ),
+                            const SizedBox(width: AppSpacing.md - 2),
+                            Flexible(
+                              child: Text(
+                                '切換節目頻道 (Channels)',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: AppType.title3Semibold,
                               ),
                             ),
-                            child: const Icon(Icons.tv_rounded, color: AppColors.accent, size: 18),
-                          ),
-                          const SizedBox(width: AppSpacing.md - 2),
-                          const Text('切換節目頻道 (Channels)', style: AppType.title3Semibold),
-                        ],
+                          ],
+                        ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.close_rounded, color: AppColors.textSecondary, size: 20),
+                        icon: Icon(Icons.close_rounded, color: AppColors.textSecondary, size: 20),
                         onPressed: () => Navigator.pop(ctx),
                       ),
                     ],
                   ),
                   const SizedBox(height: AppSpacing.xs + 2),
-                  const Text(
+                  Text(
                     '選擇您想觀賞的綜藝節目，各頻道具備獨立集數清單與分頁快取',
-                    style: AppType.body2Medium,
+                    style: AppType.bodyRegular.copyWith(fontSize: 13),
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   // Channel List
@@ -385,17 +408,25 @@ class _HomeScreenState extends State<HomeScreen> {
                                     children: [
                                       Row(
                                         children: [
-                                          Text(
-                                            ch.name,
-                                            style: AppType.headlineMedium.copyWith(
-                                              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                                          Flexible(
+                                            child: Text(
+                                              ch.name,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: AppType.headlineMedium.copyWith(
+                                                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                                              ),
                                             ),
                                           ),
                                           const SizedBox(width: AppSpacing.sm),
-                                          Text(
-                                            ch.englishName,
-                                            style: AppType.caption1Regular.copyWith(
-                                              color: AppColors.textTertiary,
+                                          Flexible(
+                                            child: Text(
+                                              ch.englishName,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: AppType.caption1Regular.copyWith(
+                                                color: AppColors.textSecondary,
+                                              ),
                                             ),
                                           ),
                                         ],
@@ -403,17 +434,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                       const SizedBox(height: 2),
                                       Text(
                                         ch.tagline,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                         style: AppType.caption1Regular.copyWith(
-                                          color: isSelected
-                                              ? AppColors.textSecondary
-                                              : AppColors.textTertiary,
+                                          color: AppColors.textSecondary,
                                         ),
                                       ),
                                     ],
                                   ),
                                 ),
                                 if (isSelected)
-                                  const Icon(Icons.check_circle_rounded, color: AppColors.accent, size: 20),
+                                  Icon(Icons.check_circle_rounded, color: AppColors.accent, size: 20),
                               ],
                             ),
                           ),
@@ -654,9 +685,9 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const Scaffold(
+      return Scaffold(
         body: Center(
-          child: CircularProgressIndicator(color: Color(0xFFE50914)),
+          child: CircularProgressIndicator(color: AppColors.accent),
         ),
       );
     }
@@ -688,7 +719,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
 
                   return Container(
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       color: AppColors.surfaceSecondary,
                       border: Border(
                         bottom: BorderSide(color: AppColors.borderSeparator),
@@ -712,10 +743,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                   color: AppColors.accent,
                                   borderRadius: BorderRadius.circular(AppRadius.badge),
                                 ),
-                                child: const Text(
+                                child: Text(
                                   'dTV',
                                   style: TextStyle(
-                                    color: Colors.white,
+                                    color: AppColors.onAccent,
                                     fontWeight: FontWeight.w800,
                                     fontSize: 14,
                                     letterSpacing: 0.6,
@@ -762,7 +793,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             ),
                                           ),
                                           const SizedBox(width: 2),
-                                          const Icon(
+                                          Icon(
                                             Icons.arrow_drop_down,
                                             color: AppColors.textSecondary,
                                             size: 16,
@@ -805,7 +836,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 padding: btnPadding,
                                 constraints: btnConstraints,
                                 icon: isRefreshing
-                                    ? const SizedBox(
+                                    ? SizedBox(
                                         width: 18,
                                         height: 18,
                                         child: CircularProgressIndicator(
@@ -813,7 +844,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           color: AppColors.accent,
                                         ),
                                       )
-                                    : const Icon(Icons.refresh, size: 20, color: AppColors.textSecondary),
+                                    : Icon(Icons.refresh, size: 20, color: AppColors.textSecondary),
                                 tooltip: '刷新',
                                 onPressed: () => refreshCatalog(),
                               ),
@@ -863,7 +894,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
                   child: Row(
                     children: [
-                      const Icon(Icons.search_rounded, size: 19, color: AppColors.textSecondary),
+                      Icon(Icons.search_rounded, size: 19, color: AppColors.textSecondary),
                       const SizedBox(width: AppSpacing.sm),
                       Expanded(
                         child: TextField(
@@ -896,11 +927,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           },
                           child: Container(
                             padding: const EdgeInsets.all(4),
-                            decoration: const BoxDecoration(
+                            decoration: BoxDecoration(
                               color: AppColors.surfacePrimary,
                               shape: BoxShape.circle,
                             ),
-                            child: const Icon(Icons.close, size: 14, color: AppColors.textSecondary),
+                            child: Icon(Icons.close, size: 14, color: AppColors.textSecondary),
                           ),
                         ),
                     ],
@@ -928,13 +959,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                   year,
                                   style: (isSelected ? AppType.caption1Semibold : AppType.caption1Medium).copyWith(
                                     fontFeatures: AppType.tabular,
-                                    color: isSelected ? Colors.white : AppColors.textSecondary,
+                                    color: isSelected ? AppColors.onAccent : AppColors.textSecondary,
                                   ),
                                 ),
                                 selected: isSelected,
                                 selectedColor: AppColors.accent,
                                 backgroundColor: AppColors.surfaceSecondary,
-                                checkmarkColor: Colors.white,
+                                checkmarkColor: AppColors.onAccent,
                                 showCheckmark: false,
                                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                 shape: RoundedRectangleBorder(
@@ -966,7 +997,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
                         decoration: BoxDecoration(
-                          color: isSortAscending ? AppColors.accentSoft : AppColors.surfaceSecondary,
+                          color: isSortAscending ? AppColors.accent : AppColors.surfaceSecondary,
                           borderRadius: BorderRadius.circular(AppRadius.control),
                           border: Border.all(
                             color: isSortAscending ? AppColors.accent : AppColors.borderSubtle,
@@ -978,13 +1009,13 @@ class _HomeScreenState extends State<HomeScreen> {
                             Icon(
                               isSortAscending ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded,
                               size: 14,
-                              color: isSortAscending ? AppColors.accent : AppColors.textSecondary,
+                              color: isSortAscending ? AppColors.onAccent : AppColors.textSecondary,
                             ),
                             const SizedBox(width: 4),
                             Text(
                               isSortAscending ? '舊到新' : '新到舊',
                               style: AppType.caption1Semibold.copyWith(
-                                color: isSortAscending ? AppColors.accent : AppColors.textPrimary,
+                                color: isSortAscending ? AppColors.onAccent : AppColors.textPrimary,
                               ),
                             ),
                           ],
@@ -1004,7 +1035,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.xs),
                 child: Row(
                   children: [
-                    const Flexible(
+                    Flexible(
                       child: Text(
                         '最新劇集與節目 (Episodes)',
                         maxLines: 1,
@@ -1048,14 +1079,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
             // 1-by-1 Vertical Feed
             if (isLoadingPage && currentDisplayEpisodes.isEmpty)
-              const SliverFillRemaining(
+              SliverFillRemaining(
                 hasScrollBody: false,
                 child: Center(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       CircularProgressIndicator(color: AppColors.accent),
-                      SizedBox(height: AppSpacing.lg),
+                      const SizedBox(height: AppSpacing.lg),
                       Text('載入最新集數中...', style: AppType.bodyRegular),
                     ],
                   ),
@@ -1090,14 +1121,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                 color: AppColors.surfacePrimary,
                                 borderRadius: BorderRadius.circular(AppRadius.control),
                               ),
-                              child: const Icon(
+                              child: Icon(
                                 Icons.movie_filter_outlined,
                                 color: AppColors.textSecondary,
                                 size: 22,
                               ),
                             ),
                             const SizedBox(height: AppSpacing.md),
-                            const Text('無符合篩選條件之集數', style: AppType.bodyMedium),
+                            Text('無符合篩選條件之集數', style: AppType.bodyMedium),
                             if (searchQuery.isNotEmpty || selectedYear != '全部') ...[
                               const SizedBox(height: AppSpacing.md),
                               OutlinedButton(
@@ -1111,12 +1142,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                 },
                                 style: OutlinedButton.styleFrom(
                                   foregroundColor: AppColors.textPrimary,
-                                  side: const BorderSide(color: AppColors.borderDefault),
+                                  side: BorderSide(color: AppColors.borderDefault),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(AppRadius.control),
                                   ),
                                 ),
-                                child: const Text('重設篩選條件', style: AppType.body2Medium),
+                                child: Text('重設篩選條件', style: AppType.body2Medium),
                               ),
                             ],
                           ],
@@ -1266,12 +1297,12 @@ class GooglePaginationBar extends StatelessWidget {
                       ),
                     ),
                     child: (isLoading && p == currentPage)
-                        ? const SizedBox(
+                        ? SizedBox(
                             width: 14,
                             height: 14,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              color: Colors.white,
+                              color: AppColors.onAccent,
                             ),
                           )
                         : Text(
@@ -1279,7 +1310,7 @@ class GooglePaginationBar extends StatelessWidget {
                             style: AppType.bodyMedium.copyWith(
                               fontFeatures: AppType.tabular,
                               fontWeight: p == currentPage ? FontWeight.w700 : FontWeight.w500,
-                              color: p == currentPage ? Colors.white : AppColors.textSecondary,
+                              color: p == currentPage ? AppColors.onAccent : AppColors.textSecondary,
                             ),
                           ),
                   ),

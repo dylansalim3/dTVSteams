@@ -1,3 +1,5 @@
+import fs from "node:fs";
+import path from "node:path";
 // @vitest-environment jsdom
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import React from "react";
@@ -8,6 +10,12 @@ import {
   saveStoredResume,
   clearStoredResume,
 } from "../src/react/VideoJs10Player.js";
+import {
+  LATEST_APK_RELEASE_URL,
+  SHOW_CHANNELS,
+  detectShowChannel,
+  stripShowNameFromTitle,
+} from "../src/react/channels.js";
 
 describe("Video.js v10 React Implementation (https://videojs.org/docs/guides/installation/react)", () => {
   beforeEach(() => {
@@ -103,5 +111,27 @@ describe("Video.js v10 React Implementation (https://videojs.org/docs/guides/ins
       fireEvent.ended(videoEl);
       expect(onEndedMock).toHaveBeenCalled();
     }
+  });
+
+  it("matches mobile channel helpers and routes React settings to GitHub latest APK", () => {
+    expect(SHOW_CHANNELS.length).toBe(5);
+    expect(LATEST_APK_RELEASE_URL).toBe(
+      "https://github.com/dylansalim3/dTVSteams/releases/latest"
+    );
+
+    const detected = detectShowChannel({ title: "綜藝玩很大 2026-11-08 台北" });
+    expect(detected.id).toBe("mr_player");
+    expect(stripShowNameFromTitle("綜藝玩很大 2026-11-08 台北", "綜藝玩很大")).toBe(
+      "2026-11-08 台北"
+    );
+
+    const demoSource = fs.readFileSync(
+      path.resolve(__dirname, "../src/react/demo.tsx"),
+      "utf-8"
+    );
+    expect(demoSource).toContain("LATEST_APK_RELEASE_URL");
+    expect(demoSource).toContain("RiShareForwardLine");
+    expect(demoSource).toContain("RiSettings3Line");
+    expect(demoSource.toLowerCase()).not.toContain("1080p");
   });
 });

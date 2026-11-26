@@ -2,215 +2,320 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>dTVStream - 綜藝玩很大線上看</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>dTVSteams - 綜藝影音串流平台</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap">
   <link rel="stylesheet" href="./vendor/video-js.min.css">
   <link rel="stylesheet" href="./app.css">
 </head>
 <body>
-  <a href="#episodes-section" class="skip-link">跳到影片清單</a>
+  <a href="#episodes-section" class="skip-link">跳到節目清單</a>
 
-  <!-- YouTube-Style Header -->
-  <header class="yt-header" role="banner">
-    <div class="yt-header-left">
-      <a href="./" class="yt-brand" aria-label="dTVStream 首頁">
-        <div class="yt-logo-badge">
-          <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
-            <path d="M10 15l5.19-3L10 9v6m11.56-7.83c.13.47.22 1.1.28 1.9.07.8.1 1.49.1 2.09L22 12c0 2.19-.16 3.8-.44 4.83-.25.9-.83 1.48-1.73 1.73-.47.13-1.33.22-2.65.28-1.3.07-2.49.1-3.59.1L12 22c-4.19 0-6.8-.16-7.83-.44-.9-.25-1.48-.83-1.73-1.73-.13-.47-.22-1.1-.28-1.9-.07-.8-.1-1.49-.1-2.09L2 12c0-2.19.16-3.8.44-4.83.25-.9.83-1.48 1.73-1.73.47-.13 1.33-.22 2.65-.28 1.3-.07 2.49-.1 3.59-.1L12 2c4.19 0 6.8.16 7.83.44.9.25 1.48.83 1.73 1.73z"/>
+  <!-- Mobile-Mirrored Top App Bar -->
+  <header class="yt-header app-header" role="banner">
+    <div class="app-header-inner">
+      <div class="yt-header-left">
+        <a href="./" class="yt-brand" aria-label="dTVSteams 首頁">
+          <span class="yt-logo-badge dtv-logo-badge">dTV</span>
+          <span class="yt-brand-title" aria-label="dTVStream">dTVStream</span>
+          <span class="dtv-wordmark">STEAMS</span>
+        </a>
+
+        <!-- Channel Switcher Selector Pill -->
+        <button
+          type="button"
+          id="channel-picker-btn"
+          class="channel-pill"
+          aria-haspopup="dialog"
+          aria-expanded="false"
+          aria-label="切換節目頻道"
+          title="切換節目頻道"
+        >
+          <span id="channel-emoji" aria-hidden="true">🔥</span>
+          <span id="channel-name" class="yt-brand-sub">綜藝玩很大</span>
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+            <path d="M7 10l5 5 5-5z"/>
           </svg>
-        </div>
-        <span class="yt-brand-title">dTVStream</span>
-        <span class="yt-brand-sub">綜藝玩很大</span>
-      </a>
-    </div>
+        </button>
+      </div>
 
-    <div class="yt-header-center">
+      <div class="yt-header-right">
+        <button class="yt-icon-btn" id="fav-filter-btn" aria-label="我的收藏清單" title="我的收藏 (Favorites)">
+          <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+          </svg>
+          <span id="fav-badge" class="yt-timer-badge" style="display:none;">0</span>
+        </button>
+
+        <button class="yt-icon-btn" id="history-btn" aria-label="觀看歷史紀錄" title="觀看歷史 (History)">
+          <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+          <span id="history-badge" class="yt-timer-badge" style="display:none;">0</span>
+        </button>
+
+        <button class="yt-icon-btn" id="refresh-btn" aria-label="重新整理集數清單" title="刷新集數清單">
+          <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M23 4v6h-6M1 20v-6h6"/>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+          </svg>
+        </button>
+
+        <!-- Share button moved to header beside Settings -->
+        <button class="yt-icon-btn" id="share-btn" aria-label="分享目前集數" title="分享集數與 QR Code">
+          <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="18" cy="5" r="3"/>
+            <circle cx="6" cy="12" r="3"/>
+            <circle cx="18" cy="19" r="3"/>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+          </svg>
+        </button>
+
+        <!-- Settings button links directly to GitHub Latest Release APK page -->
+        <a
+          href="https://github.com/dylansalim3/dTVSteams/releases/latest"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="yt-icon-btn"
+          id="settings-apk-btn"
+          aria-label="前往 GitHub 下載最新 Android APK"
+          title="設定 / 下載最新 Android APK (GitHub Releases)"
+        >
+          <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Single-Column Mobile-App Shell -->
+  <main class="yt-main mobile-shell" role="main">
+    <!-- BoardUI Search Bar (identical to Flutter HomeScreen search field) -->
+    <section class="search-section" aria-label="搜尋節目">
       <div class="yt-search-box">
-        <input type="search" id="q" placeholder="搜尋集數、日期、地名 (例如: 嘉義, 11-08)..." aria-label="搜尋集數" autocomplete="off">
-        <button id="search-clear-btn" class="yt-search-clear" aria-label="清除搜尋" style="display:none;">✕</button>
+        <svg class="search-leading-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input
+          type="search"
+          id="q"
+          placeholder="搜尋集數、日期 (如 2026-11-08) 或地點 (台北、宜蘭)..."
+          aria-label="搜尋集數"
+          autocomplete="off"
+        >
+        <button type="button" id="search-clear-btn" class="yt-search-clear" aria-label="清除搜尋" style="display:none;">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+
         <!-- Search Suggestions & History Dropdown -->
         <div id="search-dropdown" class="yt-search-dropdown" style="display:none;" role="region" aria-label="搜尋建議與歷史">
           <div class="yt-dropdown-section" id="search-history-section">
             <div class="yt-dropdown-header">
-              <span>🕒 最近搜尋</span>
+              <span>最近搜尋</span>
               <button type="button" id="clear-all-history-btn" class="yt-clear-link">全部清除</button>
             </div>
             <div class="yt-chips-wrap" id="search-history-chips"></div>
           </div>
           <div class="yt-dropdown-section" id="hot-tags-section">
             <div class="yt-dropdown-header">
-              <span>🔥 熱門推薦標籤</span>
+              <span>熱門搜尋標籤</span>
             </div>
             <div class="yt-chips-wrap" id="hot-tags-chips"></div>
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="yt-header-right">
-      <a href="./react/" class="yt-btn yt-btn-secondary" style="font-size:0.85rem; padding: 6px 14px; text-decoration: none; border-radius: 20px;" title="切換至 Video.js 10 React 官方組件版">React v10 版</a>
-      <span class="yt-status-badge" id="catalog-status">載入中...</span>
-      <button class="yt-icon-btn" id="fav-filter-btn" aria-label="我的收藏清單" title="我的收藏 (Favorites)">
-        <span class="yt-fav-icon">❤️</span>
-        <span id="fav-badge" class="yt-timer-badge" style="display:none;">0</span>
-      </button>
-      <button class="yt-icon-btn" id="history-btn" aria-label="觀看歷史紀錄" title="觀看歷史 (History)">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="10"/>
-          <polyline points="12 6 12 12 16 14"/>
-        </svg>
-        <span id="history-badge" class="yt-timer-badge" style="display:none;">0</span>
-      </button>
-      <button class="yt-icon-btn" id="refresh-btn" aria-label="重新整理集數清單" title="重新整理">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M23 4v6h-6M1 20v-6h6"/>
-          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
-        </svg>
-      </button>
-    </div>
-  </header>
-
-  <!-- Main Content Layout -->
-  <main class="yt-main" role="main">
-    <!-- Theater / Active Video Player Section -->
-    <section class="yt-player-section" aria-label="目前播放影片">
-      <div class="yt-player-container" id="player-container">
-        <video
-          id="main-player"
-          class="yt-native-player video-js vjs-theme-yt"
-          controls
-          preload="auto"
-          playsinline
-          webkit-playsinline
-          poster="./media/thumb-default.svg"
-        >
-          <source src="./media/sample-part1.mp4" type="video/mp4">
-          您的瀏覽器不支援 HTML5 影片播放。
-        </video>
-        <!-- Double-Tap/Click Seek Ripples -->
-        <div id="seek-overlay-left" class="yt-seek-overlay yt-seek-left" style="display:none;" aria-hidden="true">
-          <div class="yt-seek-icon">⏪</div>
-          <div class="yt-seek-text" id="seek-text-left">-10秒</div>
-        </div>
-        <div id="seek-overlay-right" class="yt-seek-overlay yt-seek-right" style="display:none;" aria-hidden="true">
-          <div class="yt-seek-icon">⏩</div>
-          <div class="yt-seek-text" id="seek-text-right">+10秒</div>
-        </div>
-        <!-- Vertical Gesture Capsule HUDs (Brightness & Volume) -->
-        <div id="hud-brightness" class="yt-vertical-hud yt-hud-left" style="opacity:0;" aria-hidden="true">
-          <span class="yt-hud-icon" id="hud-brightness-icon">🔆</span>
-          <div class="yt-hud-bar">
-            <div class="yt-hud-bar-fill" id="hud-brightness-fill" style="height: 100%;"></div>
-          </div>
-          <span class="yt-hud-text" id="hud-brightness-text">100%</span>
-        </div>
-        <div id="hud-volume" class="yt-vertical-hud yt-hud-right" style="opacity:0;" aria-hidden="true">
-          <span class="yt-hud-icon" id="hud-volume-icon">🔊</span>
-          <div class="yt-hud-bar">
-            <div class="yt-hud-bar-fill" id="hud-volume-fill" style="height: 100%;"></div>
-          </div>
-          <span class="yt-hud-text" id="hud-volume-text">100%</span>
-        </div>
-        <!-- Fast-Forward 2x Capsule HUD -->
-        <div id="hud-speed-2x" class="yt-speed-2x-hud" style="display:none;" aria-hidden="true">
-          <span class="yt-speed-icon">⚡</span>
-          <span class="yt-speed-text">2X 快進中</span>
-          <span class="yt-speed-icon">▶▶</span>
-        </div>
-        <!-- Screen Lock Unlock HUD Overlay -->
-        <div id="screen-unlock-overlay" class="yt-unlock-overlay" style="display:none;" aria-hidden="true">
-          <button id="screen-unlock-btn" class="yt-unlock-btn" aria-label="解除螢幕鎖定">
-            <span class="yt-unlock-icon">🔓</span>
-            <span>點擊解鎖螢幕</span>
-          </button>
-        </div>
-        <!-- Auto-Play Next Part/Episode Countdown Card Overlay -->
-        <div id="autoplay-next-card" class="yt-autoplay-card" style="display:none;" role="dialog" aria-label="即將自動播放下一段">
-          <div class="ap-countdown-circle">
-            <svg viewBox="0 0 36 36" class="ap-circular-chart">
-              <path class="ap-circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-              <path id="ap-circle-progress" class="ap-circle" stroke-dasharray="100, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-            </svg>
-            <span id="ap-countdown-num" class="ap-countdown-num">5</span>
-          </div>
-          <div class="ap-info">
-            <span class="ap-badge-label">⚡ 即將自動播放</span>
-            <span id="ap-next-title" class="ap-title">下一段：Part 2</span>
-          </div>
-          <div class="ap-actions">
-            <button id="ap-play-btn" class="ap-btn primary" title="立即播放">立即播放 ▶</button>
-            <button id="ap-cancel-btn" class="ap-btn cancel" title="取消">取消 ✕</button>
-          </div>
+      <!-- Year Filter Chips Bar + Chronological Sort Switch (inline row matching Flutter) -->
+      <div class="yt-year-bar" id="year-bar" role="toolbar" aria-label="年份篩選與排序">
+        <div class="yt-year-chips" id="year-chips-bar" role="group" aria-label="依年份篩選">
+          <button type="button" class="yt-year-chip active" data-year="all">全部</button>
+          <button type="button" class="yt-year-chip" data-year="2026">2026</button>
+          <button type="button" class="yt-year-chip" data-year="2025">2025</button>
+          <button type="button" class="yt-year-chip" data-year="2024">2024</button>
+          <button type="button" class="yt-year-chip" data-year="2023">2023</button>
+          <button type="button" class="yt-year-chip" data-year="2022">2022</button>
+          <button type="button" class="yt-year-chip" data-year="classic">經典懷舊</button>
         </div>
 
-        <!-- Audio-Only Radio Mode Overlay (Feature 11) -->
-        <div id="radio-mode-overlay" class="yt-radio-overlay" style="display:none;" role="region" aria-label="純音頻聽劇模式">
-          <div class="yt-radio-content">
-            <div class="yt-radio-badge">
-              <span>🎧 純音頻聽劇模式 · 70%+ 極致省電</span>
-            </div>
-            <div class="yt-vinyl-disc" id="radio-vinyl-disc">
-              <div class="yt-vinyl-inner">
-                <img id="radio-cover-img" src="./media/thumb-default.svg" alt="節目封面" class="yt-vinyl-cover">
-              </div>
-            </div>
-            <div class="yt-waveform-bars" id="radio-waveform-bars" aria-hidden="true">
-              <span class="yt-bar"></span>
-              <span class="yt-bar"></span>
-              <span class="yt-bar"></span>
-              <span class="yt-bar"></span>
-              <span class="yt-bar"></span>
-              <span class="yt-bar"></span>
-              <span class="yt-bar"></span>
-              <span class="yt-bar"></span>
-              <span class="yt-bar"></span>
-            </div>
-            <div class="yt-radio-info">
-              <h2 id="radio-ep-title" class="yt-radio-title">綜藝玩很大</h2>
-              <p id="radio-ep-sub" class="yt-radio-sub">2026 · Part 1</p>
-            </div>
-            <div class="yt-radio-controls">
-              <button class="yt-radio-ctrl-btn" id="radio-back-15" aria-label="快退 15 秒">⏪ 15s</button>
-              <button class="yt-radio-play-btn" id="radio-play-btn" aria-label="播放或暫停">▶</button>
-              <button class="yt-radio-ctrl-btn" id="radio-fwd-15" aria-label="快進 15 秒">⏩ 15s</button>
-            </div>
-            <button class="yt-btn yt-btn-secondary" id="radio-return-btn" style="border-radius: 20px; font-size: 0.82rem; margin-top: 10px;">
-              <span>📺 返回視訊模式</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Skip Intro Pill (Feature 12) -->
-        <button id="skip-intro-btn" class="yt-skip-intro-btn" style="display:none;" aria-label="跳過片頭 30 秒">
-          <span>跳過片頭 (30s)</span>
-          <span style="color:#e50914;">⏩</span>
+        <button type="button" class="yt-sort-btn" id="sort-order-btn" aria-label="切換集數排序" title="切換新到舊或舊到新">
+          <span id="sort-icon" aria-hidden="true">⬇</span>
+          <span id="sort-label">新到舊</span>
         </button>
+      </div>
+    </section>
 
-        <!-- Smart Buffering Stall / CDN Fallback Card (Feature 12) -->
-        <div id="stall-fallback-card" class="yt-stall-fallback" style="display:none;" role="alert">
-          <span class="yt-stall-icon">⚠️</span>
-          <span class="yt-stall-text">網路卡頓緩衝中...</span>
-          <button id="stall-reload-btn" class="yt-stall-btn" title="切換備用線路">⚡ 換線重試</button>
-          <button id="stall-close-btn" class="yt-stall-close" aria-label="關閉提示">✕</button>
+    <!-- Collapsible Mobile-Styled Video Player Card -->
+    <section class="yt-player-section" id="player-section" aria-label="目前播放影片">
+      <div class="player-card-topbar">
+        <div class="player-topbar-meta">
+          <span class="yt-meta-pill yt-badge-red" id="player-part-badge">Part 1</span>
+          <span class="yt-meta-pill" id="player-date-badge">2026</span>
+          <span class="yt-meta-pill yt-speed-pill" id="player-speed-badge">1.0x</span>
+          <span class="yt-stream-source" id="player-stream-status">串流狀態：準備中</span>
         </div>
+        <button type="button" id="player-collapse-btn" class="player-collapse-btn" aria-expanded="true" aria-label="收合或展開播放器">
+          收合播放器
+        </button>
       </div>
 
-      <!-- Video Details & Part Selector Under Player -->
-      <div class="yt-player-details">
-        <div class="yt-details-header">
+      <div id="player-collapsible-body">
+        <div class="yt-player-container" id="player-container">
+          <video
+            id="main-player"
+            class="yt-native-player video-js vjs-theme-yt"
+            controls
+            preload="auto"
+            playsinline
+            webkit-playsinline
+            poster="./media/thumb-default.svg"
+          >
+            <source src="./media/sample-part1.mp4" type="video/mp4">
+            您的瀏覽器不支援 HTML5 影片播放。
+          </video>
+
+          <!-- Double-Tap/Click Seek Ripples -->
+          <div id="seek-overlay-left" class="yt-seek-overlay yt-seek-left" style="display:none;" aria-hidden="true">
+            <div class="yt-seek-icon">⏪</div>
+            <div class="yt-seek-text" id="seek-text-left">-10秒</div>
+          </div>
+          <div id="seek-overlay-right" class="yt-seek-overlay yt-seek-right" style="display:none;" aria-hidden="true">
+            <div class="yt-seek-icon">⏩</div>
+            <div class="yt-seek-text" id="seek-text-right">+10秒</div>
+          </div>
+
+          <!-- Vertical Gesture Capsule HUDs (Brightness & Volume) -->
+          <div id="hud-brightness" class="yt-vertical-hud yt-hud-left" style="opacity:0;" aria-hidden="true">
+            <span class="yt-hud-icon" id="hud-brightness-icon">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/></svg>
+            </span>
+            <div class="yt-hud-bar">
+              <div class="yt-hud-bar-fill" id="hud-brightness-fill" style="height: 100%;"></div>
+            </div>
+            <span class="yt-hud-text" id="hud-brightness-text">100%</span>
+          </div>
+          <div id="hud-volume" class="yt-vertical-hud yt-hud-right" style="opacity:0;" aria-hidden="true">
+            <span class="yt-hud-icon" id="hud-volume-icon">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+            </span>
+            <div class="yt-hud-bar">
+              <div class="yt-hud-bar-fill" id="hud-volume-fill" style="height: 100%;"></div>
+            </div>
+            <span class="yt-hud-text" id="hud-volume-text">100%</span>
+          </div>
+
+          <!-- Fast-Forward 2x Capsule HUD -->
+          <div id="hud-speed-2x" class="yt-speed-2x-hud" style="display:none;" aria-hidden="true">
+            <span class="yt-speed-text">2X 快進中</span>
+          </div>
+
+          <!-- Screen Lock Unlock HUD Overlay -->
+          <div id="screen-unlock-overlay" class="yt-unlock-overlay" style="display:none;" aria-hidden="true">
+            <button type="button" id="screen-unlock-btn" class="yt-unlock-btn" aria-label="解除螢幕鎖定">
+              <span>點擊解鎖螢幕</span>
+            </button>
+          </div>
+
+          <!-- Auto-Play Next Part/Episode Countdown Card Overlay -->
+          <div id="autoplay-next-card" class="yt-autoplay-card" style="display:none;" role="dialog" aria-label="即將自動播放下一段">
+            <div class="ap-countdown-circle">
+              <svg viewBox="0 0 36 36" class="ap-circular-chart">
+                <path class="ap-circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                <path id="ap-circle-progress" class="ap-circle" stroke-dasharray="100, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+              </svg>
+              <span id="ap-countdown-num" class="ap-countdown-num">5</span>
+            </div>
+            <div class="ap-info">
+              <span class="ap-badge-label">即將自動播放</span>
+              <span id="ap-next-title" class="ap-title">下一段：Part 2</span>
+            </div>
+            <div class="ap-actions">
+              <button type="button" id="ap-play-btn" class="ap-btn primary" title="立即播放">立即播放</button>
+              <button type="button" id="ap-cancel-btn" class="ap-btn cancel" title="取消">取消</button>
+            </div>
+          </div>
+
+          <!-- Audio-Only Radio Mode Overlay -->
+          <div id="radio-mode-overlay" class="yt-radio-overlay" style="display:none;" role="region" aria-label="純音頻聽劇模式">
+            <div class="yt-radio-content">
+              <div class="yt-radio-badge">
+                <span>純音頻聽劇模式</span>
+              </div>
+              <div class="yt-vinyl-disc" id="radio-vinyl-disc">
+                <div class="yt-vinyl-inner">
+                  <img id="radio-cover-img" src="./media/thumb-default.svg" alt="節目封面" width="84" height="84" class="yt-vinyl-cover">
+                </div>
+              </div>
+              <div class="yt-waveform-bars" id="radio-waveform-bars" aria-hidden="true">
+                <span class="yt-bar"></span>
+                <span class="yt-bar"></span>
+                <span class="yt-bar"></span>
+                <span class="yt-bar"></span>
+                <span class="yt-bar"></span>
+                <span class="yt-bar"></span>
+                <span class="yt-bar"></span>
+                <span class="yt-bar"></span>
+                <span class="yt-bar"></span>
+              </div>
+              <div class="yt-radio-info">
+                <h2 id="radio-ep-title" class="yt-radio-title">綜藝玩很大</h2>
+                <p id="radio-ep-sub" class="yt-radio-sub">2026 · Part 1</p>
+              </div>
+              <div class="yt-radio-controls">
+                <button type="button" class="yt-radio-ctrl-btn" id="radio-back-15" aria-label="快退 15 秒">-15s</button>
+                <button type="button" class="yt-radio-play-btn" id="radio-play-btn" aria-label="播放或暫停">▶</button>
+                <button type="button" class="yt-radio-ctrl-btn" id="radio-fwd-15" aria-label="快進 15 秒">+15s</button>
+              </div>
+              <button type="button" class="yt-btn yt-btn-secondary" id="radio-return-btn" style="border-radius: 20px; font-size: 0.82rem; margin-top: 10px;">
+                <span>返回視訊模式</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Skip Intro Pill -->
+          <button type="button" id="skip-intro-btn" class="yt-skip-intro-btn" style="display:none;" aria-label="跳過片頭 30 秒">
+            <span>跳過片頭 (30s)</span>
+            <span style="color:#e50914;" aria-hidden="true">⏩</span>
+          </button>
+
+          <!-- Smart Buffering Stall / CDN Fallback Card -->
+          <div id="stall-fallback-card" class="yt-stall-fallback" style="display:none;" role="alert">
+            <span class="yt-stall-text">網路卡頓緩衝中...</span>
+            <button type="button" id="stall-reload-btn" class="yt-stall-btn" title="切換備用線路">換線重試</button>
+            <button type="button" id="stall-close-btn" class="yt-stall-close" aria-label="關閉提示">✕</button>
+          </div>
+        </div>
+
+        <!-- Video Details & Controls Under Player (clean metadata, Share lives in Header) -->
+        <div class="yt-player-details">
           <h1 class="yt-video-title" id="player-title">請選擇下方集數開始播放</h1>
+
+          <!-- Part Picker Pills (Part 1, Part 2, Part 3) -->
+          <div class="yt-parts-picker" id="player-parts-nav" role="group" aria-label="集數分段切換"></div>
+
+          <!-- Action Row -->
           <div class="yt-video-actions">
-            <button class="yt-btn yt-btn-secondary" id="open-source-btn" aria-label="在外部新視窗開啟來源網頁">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <button type="button" class="yt-btn yt-btn-secondary" id="open-source-btn" aria-label="在外部新視窗開啟來源網頁">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                 <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
                 <polyline points="15 3 21 3 21 9"/>
                 <line x1="10" y1="14" x2="21" y2="3"/>
               </svg>
               <span>來源網頁</span>
             </button>
+
             <div class="yt-download-wrapper" id="download-wrapper">
-              <button class="yt-btn yt-btn-secondary" id="download-btn" aria-label="下載影片" title="下載影片">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <button type="button" class="yt-btn yt-btn-secondary" id="download-btn" aria-label="下載影片" title="下載影片">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                   <polyline points="7 10 12 15 17 10"/>
                   <line x1="12" y1="15" x2="12" y2="3"/>
@@ -219,132 +324,134 @@
               </button>
               <div id="download-menu" class="yt-download-menu" style="display: none;" role="menu" aria-label="選擇下載分段"></div>
             </div>
-            <button class="yt-btn yt-btn-secondary" id="sleep-timer-btn" aria-label="設定睡眠定時器" title="睡眠定時器 (Sleep Timer)">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+
+            <button type="button" class="yt-btn yt-btn-secondary" id="sleep-timer-btn" aria-label="設定睡眠定時器" title="睡眠定時器 (Sleep Timer)">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                 <circle cx="12" cy="12" r="10"/>
                 <polyline points="12 6 12 12 16 14"/>
               </svg>
               <span>定時</span>
               <span id="sleep-timer-badge" class="yt-timer-badge" style="display:none;"></span>
             </button>
-            <button class="yt-btn yt-btn-secondary" id="scale-mode-btn" aria-label="切換畫面比例" title="切換畫面比例 (適應 Fit / 填滿 Fill / 拉伸 Stretch)">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+
+            <button type="button" class="yt-btn yt-btn-secondary" id="scale-mode-btn" aria-label="切換畫面比例" title="切換畫面比例 (適應 Fit / 填滿 Fill / 拉伸 Stretch)">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                 <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
               </svg>
               <span id="scale-mode-label">適應 (Fit)</span>
             </button>
-            <button class="yt-btn yt-btn-secondary" id="share-btn" aria-label="分享此集影片" title="分享此集影片">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="18" cy="5" r="3"/>
-                <circle cx="6" cy="12" r="3"/>
-                <circle cx="18" cy="19" r="3"/>
-                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
-                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-              </svg>
-              <span>分享</span>
-            </button>
-            <button class="yt-btn yt-btn-secondary" id="fav-btn" aria-label="收藏此集影片" title="加入收藏 (Favorites)">
-              <span id="fav-btn-icon" style="font-size: 14px;">🤍</span>
+
+            <button type="button" class="yt-btn yt-btn-secondary" id="fav-btn" aria-label="收藏此集影片" title="加入收藏 (Favorites)">
+              <span id="fav-btn-icon" aria-hidden="true">♡</span>
               <span id="fav-btn-text">收藏</span>
             </button>
-            <button class="yt-btn yt-btn-secondary" id="screen-lock-btn" aria-label="螢幕鎖定防誤觸" title="螢幕鎖定防誤觸 (Screen Lock)">
-              <span id="screen-lock-icon" style="font-size: 14px;">🔒</span>
+
+            <button type="button" class="yt-btn yt-btn-secondary" id="screen-lock-btn" aria-label="螢幕鎖定防誤觸" title="螢幕鎖定防誤觸">
+              <span id="screen-lock-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              </span>
               <span id="screen-lock-label">鎖定</span>
             </button>
-            <button class="yt-btn yt-btn-secondary" id="radio-mode-btn" aria-label="切換純音頻聽劇模式" title="純音頻聽劇模式 (Audio-Only Radio Mode)">
-              <span id="radio-mode-icon" style="font-size: 14px;">🎧</span>
+
+            <button type="button" class="yt-btn yt-btn-secondary" id="radio-mode-btn" aria-label="切換純音頻聽劇模式" title="純音頻聽劇模式">
+              <span id="radio-mode-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
+              </span>
               <span id="radio-mode-label">聽劇模式</span>
             </button>
-            <button class="yt-btn yt-btn-secondary" id="autoplay-toggle-btn" aria-label="自動連續播放切換" title="自動連續播放切換 (Auto-play Next)">
-              <span id="autoplay-toggle-icon" style="font-size: 14px;">⚡</span>
+
+            <button type="button" class="yt-btn yt-btn-secondary" id="autoplay-toggle-btn" aria-label="自動連續播放切換" title="自動連續播放切換">
+              <span id="autoplay-toggle-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              </span>
               <span id="autoplay-toggle-label">連播: 開</span>
             </button>
           </div>
+
+          <!-- Compact Seek & Playback Speed Row -->
+          <div class="yt-quick-actions" role="group" aria-label="快進快退控制">
+            <button type="button" class="yt-skip-btn" id="skip-back-10" aria-label="快退 10 秒">-10s</button>
+            <button type="button" class="yt-skip-btn" id="skip-fwd-10" aria-label="快進 10 秒">+10s</button>
+            <button type="button" class="yt-skip-btn" id="skip-fwd-30" aria-label="快進 30 秒">+30s</button>
+            <button type="button" class="yt-skip-btn" id="skip-fwd-60" aria-label="快進 60 秒">+60s</button>
+          </div>
+
+          <div class="yt-speed-picker" id="player-speed-picker" role="group" aria-label="播放速度調整">
+            <span class="yt-speed-label">倍速：</span>
+            <button type="button" class="yt-speed-chip" data-speed="0.75">0.75x</button>
+            <button type="button" class="yt-speed-chip active" data-speed="1.0">1.0x</button>
+            <button type="button" class="yt-speed-chip" data-speed="1.25">1.25x</button>
+            <button type="button" class="yt-speed-chip" data-speed="1.5">1.5x</button>
+            <button type="button" class="yt-speed-chip" data-speed="1.75">1.75x</button>
+            <button type="button" class="yt-speed-chip" data-speed="2.0">2.0x</button>
+          </div>
+
+          <!-- Resume Notice Banner -->
+          <div id="player-resume-toast" class="yt-resume-toast" style="display:none;" role="status" aria-live="polite"></div>
         </div>
-
-        <div class="yt-meta-row">
-          <span class="yt-meta-pill yt-badge-red" id="player-part-badge">Part 1</span>
-          <span class="yt-meta-pill" id="player-date-badge">2026</span>
-          <span class="yt-meta-pill">1080p HD</span>
-          <span class="yt-meta-pill">自動連續播放</span>
-          <span class="yt-meta-pill yt-speed-pill" id="player-speed-badge">⚡ 1.0x</span>
-          <span class="yt-stream-source" id="player-stream-status">串流狀態：準備中</span>
-        </div>
-
-        <!-- Part Picker Pills (Part 1, Part 2, Part 3) -->
-        <div class="yt-parts-picker" id="player-parts-nav" role="group" aria-label="集數分段切換"></div>
-
-        <!-- Quick Skip Action Buttons (Debounced Fast-forward & Rewind) -->
-        <div class="yt-quick-actions" role="group" aria-label="快進快退控制">
-          <button class="yt-skip-btn" id="skip-back-10" aria-label="快退 10 秒">⏪ 10秒</button>
-          <button class="yt-skip-btn" id="skip-fwd-10" aria-label="快進 10 秒">⏩ 10秒</button>
-          <button class="yt-skip-btn" id="skip-fwd-30" aria-label="快進 30 秒">⏩ 30秒</button>
-          <button class="yt-skip-btn" id="skip-fwd-60" aria-label="快進 60 秒">⏩ 60秒</button>
-        </div>
-
-        <!-- Playback Speed Picker (0.75x, 1.0x, 1.25x, 1.5x, 1.75x, 2.0x) -->
-        <div class="yt-speed-picker" id="player-speed-picker" role="group" aria-label="播放速度調整">
-          <span class="yt-speed-label">播放速度：</span>
-          <button class="yt-speed-chip" data-speed="0.75" aria-label="切換至 0.75 倍速">0.75x</button>
-          <button class="yt-speed-chip active" data-speed="1.0" aria-label="切換至 1.0 倍速">1.0x (正常)</button>
-          <button class="yt-speed-chip" data-speed="1.25" aria-label="切換至 1.25 倍速">1.25x (推薦)</button>
-          <button class="yt-speed-chip" data-speed="1.5" aria-label="切換至 1.5 倍速">1.5x (快看)</button>
-          <button class="yt-speed-chip" data-speed="1.75" aria-label="切換至 1.75 倍速">1.75x</button>
-          <button class="yt-speed-chip" data-speed="2.0" aria-label="切換至 2.0 倍速">2.0x (超快)</button>
-        </div>
-
-        <!-- Resume Notice Banner -->
-        <div id="player-resume-toast" class="yt-resume-toast" style="display:none;" role="status"></div>
       </div>
     </section>
 
-    <!-- Simple Episode List Section (YouTube Grid) -->
-    <section class="yt-list-section" id="episodes-section" aria-label="集數列表">
+    <!-- Section Header Strip (identical to Flutter "最新劇集與節目 (Episodes) (N 集)") -->
+    <section class="yt-list-section" id="episodes-section" aria-label="最新劇集與節目">
       <div class="yt-section-header">
         <div class="yt-title-group">
-          <h2 class="yt-section-title">全部集數列表</h2>
-          <span class="yt-item-count" id="episode-count-badge">共 10 集</span>
+          <h2 class="yt-section-title">最新劇集與節目 (Episodes)</h2>
+          <span class="yt-item-count" id="episode-count-badge">(0 集)</span>
         </div>
-        <div class="yt-filter-controls">
-          <button class="yt-sort-btn" id="sort-order-btn" aria-label="切換集數排序" title="切換新到舊或舊到新">
-            <span id="sort-icon">⬇</span>
-            <span id="sort-label">新到舊</span>
-          </button>
-        </div>
+        <span class="yt-status-badge" id="catalog-status">同步中...</span>
       </div>
 
-      <!-- Year Filter Chips Bar -->
-      <div class="yt-year-bar" id="year-bar" role="toolbar" aria-label="年份速查">
-        <div class="yt-year-chips" id="year-chips-bar" role="group" aria-label="依年份速查">
-          <button class="yt-year-chip active" data-year="all">全部</button>
-          <button class="yt-year-chip" data-year="2026">2026</button>
-          <button class="yt-year-chip" data-year="2025">2025</button>
-          <button class="yt-year-chip" data-year="2024">2024</button>
-          <button class="yt-year-chip" data-year="2023">2023</button>
-          <button class="yt-year-chip" data-year="2022">2022</button>
-          <button class="yt-year-chip" data-year="classic">經典懷舊</button>
-        </div>
-      </div>
-
+      <!-- 1-by-1 Vertical Mobile Feed of Cards -->
       <div class="yt-episodes-grid" id="episodes-grid">
-        <!-- Rendered dynamically -->
+        <!-- Rendered dynamically matching Flutter YouTubeEpisodeCard -->
       </div>
 
-      <!-- Load More / Pagination Bar -->
-      <div class="yt-pagination-bar" id="pagination-bar">
-        <button class="yt-btn yt-btn-load-more" id="load-more-btn" aria-label="載入更多歷史集數">
-          <span class="yt-load-icon">▼</span>
-          <span id="load-more-text">載入更多歷史集數 (第 2 頁 / 共 64 頁)</span>
+      <!-- Mobile Numbered Pagination Bar (< 上一頁 [1] [2] [3] [4] [5] 下一頁 >) -->
+      <nav class="google-pagination-bar" id="google-pagination-bar" aria-label="分頁導覽">
+        <!-- Rendered dynamically matching Flutter GooglePaginationBar -->
+      </nav>
+
+      <div class="yt-pagination-bar" id="pagination-bar" style="display:none;">
+        <button type="button" class="yt-btn yt-btn-load-more" id="load-more-btn" aria-label="載入更多歷史集數">
+          <span id="load-more-text">載入更多歷史集數</span>
         </button>
-        <span class="yt-pagination-info" id="pagination-info">已顯示 10 集 / 全劇 640+ 集</span>
+        <span class="yt-pagination-info" id="pagination-info"></span>
       </div>
     </section>
   </main>
 
-  <!-- YouTube Footer -->
+  <!-- Minimal BoardUI Footer -->
   <footer class="yt-footer" role="contentinfo">
-    <p>dTVStream 個人播放平台 · 快捷鍵支援：<code>Space / Enter</code> (播放/暫停)、<code>← / →</code> (快退/快進 10s)、<code>1 / 2 / 3</code> (切換分段)、<code>&gt; / &lt;</code> (倍速調整)、<code>F</code> (全螢幕)</p>
+    <p>
+      dTVSteams • 快捷鍵：<code>Space / Enter</code> 播放、<code>← / →</code> 10s、<code>1 / 2 / 3</code> 分段、<code>&lt; / &gt;</code> 倍速、<code>F</code> 全螢幕 ·
+      <a href="./react/" class="footer-mode-link">React BoardUI 版</a>
+    </p>
   </footer>
+
+  <!-- Channel Picker Sheet Modal (matching Flutter _showChannelPicker) -->
+  <div id="channel-modal" class="yt-modal" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="channel-modal-title">
+    <div class="yt-modal-backdrop" id="channel-modal-backdrop"></div>
+    <div class="yt-modal-content yt-sheet-modal">
+      <div class="sheet-drag-handle" aria-hidden="true"></div>
+      <div class="yt-modal-header">
+        <div class="yt-modal-title-row">
+          <div class="yt-modal-icon">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <rect x="2" y="7" width="20" height="15" rx="2" ry="2"/>
+              <polyline points="17 2 12 7 7 2"/>
+            </svg>
+          </div>
+          <div>
+            <h2 class="yt-modal-title" id="channel-modal-title">切換節目頻道 (Channels)</h2>
+            <p class="yt-modal-subtitle">選擇您想觀賞的綜藝節目，各頻道具備獨立集數清單</p>
+          </div>
+        </div>
+        <button type="button" class="yt-modal-close" id="channel-modal-close" aria-label="關閉頻道視窗">✕</button>
+      </div>
+      <div class="yt-modal-body" id="channel-list-container"></div>
+    </div>
+  </div>
 
   <!-- Share Link & QR Code Modal Dialog -->
   <div id="share-modal" class="yt-modal" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="share-modal-title">
@@ -353,7 +460,7 @@
       <div class="yt-modal-header">
         <div class="yt-modal-title-row">
           <div class="yt-share-icon-badge">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
               <circle cx="18" cy="5" r="3"/>
               <circle cx="6" cy="12" r="3"/>
               <circle cx="18" cy="19" r="3"/>
@@ -366,19 +473,17 @@
             <p class="yt-modal-subtitle" id="share-modal-subtitle">掃描 QR Code 或複製網址即開即播</p>
           </div>
         </div>
-        <button class="yt-modal-close" id="share-modal-close" aria-label="關閉分享視窗">✕</button>
+        <button type="button" class="yt-modal-close" id="share-modal-close" aria-label="關閉分享視窗">✕</button>
       </div>
 
       <div class="yt-modal-body">
-        <!-- QR Code Container -->
         <div class="yt-qr-wrapper" id="share-qr-container"></div>
         <p class="yt-qr-hint">使用手機相機或平板掃描，即可直接於瀏覽器開播</p>
 
-        <!-- Copy URL Input Bar -->
         <div class="yt-copy-bar">
           <input type="text" id="share-url-input" class="yt-copy-input" readonly aria-label="分享連結網址">
-          <button id="share-copy-btn" class="yt-btn yt-btn-primary" aria-label="複製分享連結">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <button type="button" id="share-copy-btn" class="yt-btn yt-btn-primary" aria-label="複製分享連結">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
               <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
               <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
             </svg>
@@ -386,16 +491,8 @@
           </button>
         </div>
 
-        <!-- Web Share API Button -->
         <div class="yt-modal-footer">
-          <button id="share-native-btn" class="yt-btn yt-btn-secondary yt-btn-block" style="display:none;" aria-label="呼叫系統分享">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="18" cy="5" r="3"/>
-              <circle cx="6" cy="12" r="3"/>
-              <circle cx="18" cy="19" r="3"/>
-              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
-              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-            </svg>
+          <button type="button" id="share-native-btn" class="yt-btn yt-btn-secondary yt-btn-block" style="display:none;" aria-label="呼叫系統分享">
             <span>使用系統分享傳送</span>
           </button>
         </div>
@@ -408,9 +505,9 @@
     <div class="yt-modal-backdrop" id="history-modal-backdrop"></div>
     <div class="yt-modal-content yt-history-modal-content">
       <div class="yt-modal-header">
-        <div style="display:flex; align-items:center; gap:8px;">
+        <div class="yt-modal-title-row">
           <div class="yt-modal-icon">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
               <circle cx="12" cy="12" r="10"/>
               <polyline points="12 6 12 12 16 14"/>
             </svg>
@@ -421,14 +518,12 @@
           </div>
         </div>
         <div style="display:flex; align-items:center; gap:8px;">
-          <button id="history-clear-all-btn" class="yt-btn yt-btn-secondary" style="font-size:0.8rem; padding:4px 10px; border-radius:14px;" title="清空所有歷史紀錄">清空歷史</button>
-          <button class="yt-modal-close" id="history-modal-close" aria-label="關閉歷史視窗">✕</button>
+          <button type="button" id="history-clear-all-btn" class="yt-btn yt-btn-secondary" style="font-size:0.8rem; padding:4px 10px; border-radius:10px;" title="清空所有歷史紀錄">清空歷史</button>
+          <button type="button" class="yt-modal-close" id="history-modal-close" aria-label="關閉歷史視窗">✕</button>
         </div>
       </div>
 
-      <div class="yt-modal-body yt-history-body" id="history-list-container">
-        <!-- Rendered by app.js -->
-      </div>
+      <div class="yt-modal-body yt-history-body" id="history-list-container"></div>
     </div>
   </div>
 
@@ -437,9 +532,9 @@
     <div class="yt-modal-backdrop" id="sleep-timer-modal-backdrop"></div>
     <div class="yt-modal-content yt-modal-sm">
       <div class="yt-modal-header">
-        <div style="display:flex; align-items:center; gap:8px;">
+        <div class="yt-modal-title-row">
           <div class="yt-modal-icon">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
               <circle cx="12" cy="12" r="10"/>
               <polyline points="12 6 12 12 16 14"/>
             </svg>
@@ -449,17 +544,17 @@
             <p class="yt-modal-subtitle" id="sleep-timer-modal-subtitle">時間到達自動暫停播放</p>
           </div>
         </div>
-        <button class="yt-modal-close" id="sleep-timer-modal-close" aria-label="關閉定時器視窗">✕</button>
+        <button type="button" class="yt-modal-close" id="sleep-timer-modal-close" aria-label="關閉定時器視窗">✕</button>
       </div>
 
       <div class="yt-modal-body">
         <div class="yt-timer-options" id="sleep-timer-options">
-          <button class="yt-timer-opt active" data-minutes="0">關閉定時器</button>
-          <button class="yt-timer-opt" data-minutes="15">15 分鐘</button>
-          <button class="yt-timer-opt" data-minutes="30">30 分鐘</button>
-          <button class="yt-timer-opt" data-minutes="45">45 分鐘</button>
-          <button class="yt-timer-opt" data-minutes="60">60 分鐘</button>
-          <button class="yt-timer-opt" data-minutes="end">播完當前分段後停止</button>
+          <button type="button" class="yt-timer-opt active" data-minutes="0">關閉定時器</button>
+          <button type="button" class="yt-timer-opt" data-minutes="15">15 分鐘</button>
+          <button type="button" class="yt-timer-opt" data-minutes="30">30 分鐘</button>
+          <button type="button" class="yt-timer-opt" data-minutes="45">45 分鐘</button>
+          <button type="button" class="yt-timer-opt" data-minutes="60">60 分鐘</button>
+          <button type="button" class="yt-timer-opt" data-minutes="end">播完當前分段後停止</button>
         </div>
       </div>
     </div>

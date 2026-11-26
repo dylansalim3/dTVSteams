@@ -11,8 +11,8 @@ void showSleepTimerSheet(BuildContext context, {VoidCallback? onTimerChanged}) {
     isScrollControlled: true,
     useSafeArea: true,
     backgroundColor: AppColors.surfaceSecondary,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.modal)),
+    shape: RoundedRectangleBorder(
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.modal)),
       side: BorderSide(color: AppColors.borderSeparator),
     ),
     builder: (ctx) {
@@ -50,41 +50,52 @@ void showSleepTimerSheet(BuildContext context, {VoidCallback? onTimerChanged}) {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        children: [
-                          Container(
-                            width: 38,
-                            height: 38,
-                            decoration: BoxDecoration(
-                              color: AppColors.accentSoft,
-                              borderRadius: BorderRadius.circular(AppRadius.control),
-                              border: Border.all(
-                                color: AppColors.accent.withValues(alpha: 0.35),
+                      Expanded(
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 38,
+                              height: 38,
+                              decoration: BoxDecoration(
+                                color: AppColors.accentSoft,
+                                borderRadius: BorderRadius.circular(AppRadius.control),
+                                border: Border.all(
+                                  color: AppColors.accent.withValues(alpha: 0.35),
+                                ),
+                              ),
+                              child: Icon(Icons.timer_outlined, color: AppColors.accent, size: 20),
+                            ),
+                            const SizedBox(width: AppSpacing.md - 2),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '睡眠定時器 (Sleep Timer)',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: AppType.title3Semibold,
+                                  ),
+                                  if (manager.isActive) ...[
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      '倒數中：${manager.formattedTime}',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: AppType.caption1Semibold.copyWith(
+                                        color: AppColors.accent,
+                                        fontFeatures: AppType.tabular,
+                                      ),
+                                    ),
+                                  ],
+                                ],
                               ),
                             ),
-                            child: const Icon(Icons.timer_outlined, color: AppColors.accent, size: 20),
-                          ),
-                          const SizedBox(width: AppSpacing.md - 2),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text('睡眠定時器 (Sleep Timer)', style: AppType.title3Semibold),
-                              if (manager.isActive) ...[
-                                const SizedBox(height: 2),
-                                Text(
-                                  '倒數中：${manager.formattedTime}',
-                                  style: AppType.caption1Semibold.copyWith(
-                                    color: AppColors.accent,
-                                    fontFeatures: AppType.tabular,
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.close, color: AppColors.textSecondary, size: 20),
+                        icon: Icon(Icons.close, color: AppColors.textSecondary, size: 20),
                         constraints: const BoxConstraints.tightFor(width: 44, height: 44),
                         style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
                         onPressed: () => Navigator.of(ctx).pop(),
@@ -98,7 +109,7 @@ void showSleepTimerSheet(BuildContext context, {VoidCallback? onTimerChanged}) {
                     color: AppColors.surfaceRaised,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(AppRadius.card),
-                      side: const BorderSide(color: AppColors.borderSeparator),
+                      side: BorderSide(color: AppColors.borderSeparator),
                     ),
                     clipBehavior: Clip.antiAlias,
                     child: Column(
@@ -115,6 +126,7 @@ void showSleepTimerSheet(BuildContext context, {VoidCallback? onTimerChanged}) {
                                   mode == SleepTimerMode.off
                                       ? '已關閉睡眠定時器'
                                       : '已設定睡眠定時：${mode.label}',
+                                  style: TextStyle(color: AppColors.textPrimary),
                                 ),
                                 duration: const Duration(seconds: 2),
                                 backgroundColor: AppColors.surfacePrimary,
@@ -130,7 +142,7 @@ void showSleepTimerSheet(BuildContext context, {VoidCallback? onTimerChanged}) {
                               color: isSelected ? AppColors.accentSoft : Colors.transparent,
                               border: Border(
                                 bottom: mode != SleepTimerMode.values.last
-                                    ? const BorderSide(color: AppColors.borderSeparator, width: 1)
+                                    ? BorderSide(color: AppColors.borderSeparator, width: 1)
                                     : BorderSide.none,
                               ),
                             ),

@@ -77,22 +77,22 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
         backgroundColor: AppColors.surfaceOverlay,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.modal),
-          side: const BorderSide(color: AppColors.borderSubtle, width: 1),
+          side: BorderSide(color: AppColors.borderSubtle, width: 1),
         ),
-        title: const Text('刪除此集離線檔案', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold)),
+        title: Text('刪除此集離線檔案', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold)),
         content: Text(
           '確定要刪除「${ep.title}」的所有已下載分段檔案嗎？',
-          style: const TextStyle(color: AppColors.textSecondary, height: 1.4),
+          style: TextStyle(color: AppColors.textSecondary, height: 1.4),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('取消', style: TextStyle(color: AppColors.textMuted)),
+            child: Text('取消', style: TextStyle(color: AppColors.textMuted)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.accent,
-              foregroundColor: AppColors.textPrimary,
+              foregroundColor: AppColors.onAccent,
               minimumSize: const Size(0, 44),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.chip)),
             ),
@@ -216,8 +216,8 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
       appBar: AppBar(
         backgroundColor: AppColors.surfaceSecondary,
         elevation: 0,
-        bottom: const PreferredSize(
-          preferredSize: Size.fromHeight(1),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
           child: Divider(color: AppColors.borderSeparator, height: 1),
         ),
         title: Row(
@@ -269,7 +269,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
         actions: [
           if (_currentTabIndex == 0) ...[
             IconButton(
-              icon: const Icon(Icons.drive_file_move_outlined, color: AppColors.textSecondary),
+              icon: Icon(Icons.drive_file_move_outlined, color: AppColors.textSecondary),
               tooltip: '變更下載儲存位置',
               onPressed: () => StorageLocationHelper.showStoragePickerSheet(
                 context,
@@ -280,7 +280,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
             ),
             if (totalItemCount > 0)
               IconButton(
-                icon: const Icon(Icons.delete_sweep, color: AppColors.textSecondary),
+                icon: Icon(Icons.delete_sweep, color: AppColors.textSecondary),
                 tooltip: '清空所有下載檔案',
                 onPressed: () {
                   showDialog(
@@ -288,10 +288,10 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                     builder: (ctx) => AlertDialog(
                       backgroundColor: AppColors.surfaceOverlay,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.modal)),
-                      title: const Text('清空所有下載檔案', style: TextStyle(color: AppColors.textPrimary)),
+                      title: Text('清空所有下載檔案', style: TextStyle(color: AppColors.textPrimary)),
                       content: Text(
                         '確定要刪除全部 $totalItemCount 個下載紀錄與離線檔案嗎？\n將釋出 $totalSize 儲存空間。',
-                        style: const TextStyle(color: AppColors.textSecondary),
+                        style: TextStyle(color: AppColors.textSecondary),
                       ),
                       actions: [
                         ElevatedButton(
@@ -305,7 +305,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                         OutlinedButton(
                           style: OutlinedButton.styleFrom(
                             foregroundColor: AppColors.accent,
-                            side: const BorderSide(color: AppColors.accent),
+                            side: BorderSide(color: AppColors.accent),
                           ),
                           onPressed: () async {
                             Navigator.of(ctx).pop();
@@ -331,13 +331,13 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
               ),
           ] else if (_currentTabIndex == 1 && favoritesCount > 0) ...[
             IconButton(
-              icon: const Icon(Icons.delete_sweep_outlined, color: AppColors.textSecondary),
+              icon: Icon(Icons.delete_sweep_outlined, color: AppColors.textSecondary),
               tooltip: '清空所有收藏',
               onPressed: () => FavoritesBody.confirmClearAll(context, _favoritesManager),
             ),
           ] else if (_currentTabIndex == 2 && historyRecords.isNotEmpty) ...[
             IconButton(
-              icon: const Icon(Icons.delete_sweep_outlined, color: AppColors.textSecondary),
+              icon: Icon(Icons.delete_sweep_outlined, color: AppColors.textSecondary),
               tooltip: '清空歷史紀錄',
               onPressed: () => HistoryBody.confirmClearAll(context, _historyManager),
             ),
@@ -377,7 +377,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                           borderRadius: BorderRadius.circular(AppRadius.control),
                           border: Border.all(color: AppColors.borderSubtle),
                         ),
-                        child: const Icon(Icons.storage, color: AppColors.textSecondary, size: 20),
+                        child: Icon(Icons.storage, color: AppColors.textSecondary, size: 20),
                       ),
                       const SizedBox(width: AppSpacing.md),
                       Expanded(
@@ -399,13 +399,13 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                     ],
                   ),
                   const SizedBox(height: AppSpacing.md),
-                  const Divider(color: AppColors.borderSeparator, height: 1),
+                  Divider(color: AppColors.borderSeparator, height: 1),
                   const SizedBox(height: AppSpacing.sm),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Padding(
-                        padding: EdgeInsets.only(top: 1),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 1),
                         child: Icon(Icons.folder_open, size: 14, color: AppColors.textTertiary),
                       ),
                       const SizedBox(width: AppSpacing.xs),
@@ -444,14 +444,14 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                             },
                           ),
                           icon: const Icon(Icons.restore, size: 15),
-                          label: const Text('還原預設', style: AppType.caption1Medium),
+                          label: Text('還原預設', style: AppType.caption1Medium),
                         ),
                         const SizedBox(width: AppSpacing.sm),
                       ],
                       ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.accent,
-                          foregroundColor: AppColors.textPrimary,
+                          foregroundColor: AppColors.onAccent,
                           elevation: 0,
                           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
                           minimumSize: const Size(0, 44),
@@ -464,7 +464,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                           },
                         ),
                         icon: const Icon(Icons.drive_file_move_outlined, size: 15),
-                        label: Text('變更位置', style: AppType.caption1Semibold.copyWith(color: Colors.white)),
+                        label: Text('變更位置', style: AppType.caption1Semibold.copyWith(color: AppColors.onAccent)),
                       ),
                     ],
                   ),
@@ -480,18 +480,18 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.xs),
                 child: Row(
                   children: [
-                    const Icon(Icons.check_circle_outline, size: 16, color: AppColors.success),
+                    Icon(Icons.check_circle_outline, size: 16, color: AppColors.success),
                     const SizedBox(width: AppSpacing.sm),
                     Flexible(
                       child: Text(
                         '已下載節目清單 (${episodes.length})',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
                           color: AppColors.textPrimary,
-                          fontFeatures: [FontFeature.tabularFigures()],
+                          fontFeatures: const [FontFeature.tabularFigures()],
                         ),
                       ),
                     ),
@@ -518,10 +518,10 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                           borderRadius: BorderRadius.circular(AppRadius.card),
                           border: Border.all(color: AppColors.borderSeparator),
                         ),
-                        child: const Icon(Icons.download_for_offline_outlined, size: 28, color: AppColors.textSecondary),
+                        child: Icon(Icons.download_for_offline_outlined, size: 28, color: AppColors.textSecondary),
                       ),
                       const SizedBox(height: AppSpacing.lg),
-                      const Text('尚無已下載的離線影片', style: AppType.title3Semibold),
+                      Text('尚無已下載的離線影片', style: AppType.title3Semibold),
                       const SizedBox(height: AppSpacing.sm),
                       Text(
                         '在首頁或播放器中點擊「下載」按鈕，即可將節目儲存至本機資料夾隨時離線觀看。',
@@ -535,14 +535,14 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                       ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.accent,
-                          foregroundColor: AppColors.textPrimary,
+                          foregroundColor: AppColors.onAccent,
                           elevation: 0,
                           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
                           minimumSize: const Size(0, 44),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.control)),
                         ),
                         icon: const Icon(Icons.explore_outlined, size: 18),
-                        label: const Text('瀏覽節目清單', style: AppType.bodyMedium),
+                        label: Text('瀏覽節目清單', style: AppType.bodyMedium.copyWith(color: AppColors.onAccent)),
                         onPressed: () => Navigator.of(context).pop(),
                       ),
                     ],
@@ -578,7 +578,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
       ),
       ),
       bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           border: Border(top: BorderSide(color: AppColors.borderSubtle, width: 1)),
         ),
         child: BottomNavigationBar(
@@ -586,7 +586,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
           onTap: (idx) => setState(() => _currentTabIndex = idx),
           backgroundColor: AppColors.surfaceOverlay,
           selectedItemColor: AppColors.accent,
-          unselectedItemColor: AppColors.textMuted,
+          unselectedItemColor: AppColors.textSecondary,
           selectedFontSize: 12,
           unselectedFontSize: 11,
           type: BottomNavigationBarType.fixed,

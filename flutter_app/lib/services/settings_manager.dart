@@ -2,8 +2,10 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
+import '../ui/app_themes.dart';
+import '../ui/app_tokens.dart';
 
-/// Manages application-wide playback preferences, persisting to local disk.
+/// Manages application-wide playback and appearance preferences, persisting to disk.
 class SettingsManager extends ChangeNotifier {
   static final SettingsManager _instance = SettingsManager._internal();
   factory SettingsManager() => _instance;
@@ -13,11 +15,14 @@ class SettingsManager extends ChangeNotifier {
   bool _keepScreenAwake = true; // Default ON: Prevent sleep during playback
   bool _autoPlayNext = true; // Default ON: Auto-play next part/episode countdown
   String? _customDownloadPath; // Null means default app storage
+  String _themeId = AppThemes.defaultThemeId;
 
   bool get backgroundPlay => _backgroundPlay;
   bool get keepScreenAwake => _keepScreenAwake;
   bool get autoPlayNext => _autoPlayNext;
   String? get customDownloadPath => _customDownloadPath;
+  String get themeId => _themeId;
+  AppThemePalette get activeTheme => AppThemes.byId(_themeId);
 
   File? _settingsFile;
   bool _initialized = false;
@@ -42,6 +47,11 @@ class SettingsManager extends ChangeNotifier {
         }
         if (json.containsKey('customDownloadPath')) {
           _customDownloadPath = json['customDownloadPath'] as String?;
+        }
+        if (json.containsKey('themeId')) {
+          final loadedId = json['themeId'] as String?;
+          _themeId = AppThemes.byId(loadedId).id;
+          AppColors.setThemeById(_themeId);
         }
       }
     } catch (e) {
@@ -79,6 +89,16 @@ class SettingsManager extends ChangeNotifier {
     await _persist();
   }
 
+  Future<void> setThemeId(String id) async {
+    final normalized = AppThemes.byId(id).id;
+    if (_themeId == normalized) return;
+    _themeId = normalized;
+    AppColors.setThemeById(_themeId);
+    AppSystemUi.restoreNormalChrome();
+    notifyListeners();
+    await _persist();
+  }
+
   Future<void> _persist() async {
     try {
       if (_settingsFile == null) {
@@ -90,6 +110,7 @@ class SettingsManager extends ChangeNotifier {
         'keepScreenAwake': _keepScreenAwake,
         'autoPlayNext': _autoPlayNext,
         'customDownloadPath': _customDownloadPath,
+        'themeId': _themeId,
       };
       await _settingsFile!.writeAsString(jsonEncode(data));
     } catch (e) {
@@ -103,11 +124,15 @@ class SettingsManager extends ChangeNotifier {
     bool keepScreenAwake = true,
     bool autoPlayNext = true,
     String? customDownloadPath,
+    String themeId = AppThemes.defaultThemeId,
   }) {
     _backgroundPlay = backgroundPlay;
     _keepScreenAwake = keepScreenAwake;
     _autoPlayNext = autoPlayNext;
     _customDownloadPath = customDownloadPath;
+    _themeId = AppThemes.byId(themeId).id;
+    AppColors.setThemeById(_themeId);
     _initialized = true;
+    notifyListeners();
   }
 }

@@ -43,15 +43,15 @@ class _HistoryScreenState extends State<HistoryScreen> {
         appBar: AppBar(
         backgroundColor: AppColors.surfaceSecondary,
         elevation: 0,
-        bottom: const PreferredSize(
-          preferredSize: Size.fromHeight(1),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
           child: Divider(color: AppColors.borderSeparator, height: 1),
         ),
         title: Row(
           children: [
-            const Icon(Icons.history, color: AppColors.accent, size: 20),
+            Icon(Icons.history, color: AppColors.accent, size: 20),
             const SizedBox(width: AppSpacing.sm),
-            const Text('觀看紀錄', style: AppType.title3Semibold),
+            Text('觀看紀錄', style: AppType.title3Semibold),
             if (records.isNotEmpty) ...[
               const SizedBox(width: AppSpacing.sm),
               Container(
@@ -74,7 +74,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         actions: [
           if (records.isNotEmpty)
             IconButton(
-              icon: const Icon(Icons.delete_sweep_outlined, color: AppColors.textSecondary),
+              icon: Icon(Icons.delete_sweep_outlined, color: AppColors.textSecondary),
               tooltip: '清空歷史紀錄',
               onPressed: () => HistoryBody.confirmClearAll(context, _historyManager),
             ),
@@ -99,14 +99,14 @@ class HistoryBody extends StatefulWidget {
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surfaceOverlay,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.modal)),
-        title: const Row(
+        title: Row(
           children: [
             Icon(Icons.warning_amber_rounded, color: AppColors.accent, size: 24),
-            SizedBox(width: AppSpacing.sm),
+            const SizedBox(width: AppSpacing.sm),
             Text('清空所有歷史紀錄？', style: TextStyle(color: AppColors.textPrimary, fontSize: 18)),
           ],
         ),
-        content: const Text(
+        content: Text(
           '確定要清空所有的觀看紀錄嗎？此操作將清除所有集數的播放進度與暫存時間戳。',
           style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
         ),
@@ -122,7 +122,7 @@ class HistoryBody extends StatefulWidget {
           OutlinedButton(
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.accent,
-              side: const BorderSide(color: AppColors.accent),
+              side: BorderSide(color: AppColors.accent),
             ),
             onPressed: () {
               Navigator.of(ctx).pop();
@@ -266,14 +266,14 @@ class _HistoryBodyState extends State<HistoryBody> {
                 borderRadius: BorderRadius.circular(AppRadius.card),
                 border: Border.all(color: AppColors.borderSeparator),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.history_toggle_off_rounded,
                 size: 28,
                 color: AppColors.textSecondary,
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
-            const Text('尚無觀看歷史紀錄', style: AppType.title3Semibold),
+            Text('尚無觀看歷史紀錄', style: AppType.title3Semibold),
             const SizedBox(height: AppSpacing.sm),
             Text(
               '您播放過的任何精彩節目與分段都會自動記錄在這裡，隨時隨地一鍵續播。',
@@ -287,7 +287,7 @@ class _HistoryBodyState extends State<HistoryBody> {
             ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.accent,
-                foregroundColor: AppColors.textPrimary,
+                foregroundColor: AppColors.onAccent,
                 elevation: 0,
                 minimumSize: const Size(0, 44),
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
@@ -296,7 +296,7 @@ class _HistoryBodyState extends State<HistoryBody> {
                 ),
               ),
               icon: const Icon(Icons.explore_outlined, size: 18),
-              label: const Text('開始探索節目', style: AppType.bodyMedium),
+              label: Text('開始探索節目', style: AppType.bodyMedium.copyWith(color: AppColors.onAccent)),
               onPressed: () => Navigator.of(context).pop(),
             ),
           ],
@@ -329,7 +329,7 @@ class _HistoryBodyState extends State<HistoryBody> {
                   const SizedBox(width: AppSpacing.sm),
                   Text(
                     groupName,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.textPrimary,
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
@@ -339,10 +339,10 @@ class _HistoryBodyState extends State<HistoryBody> {
                   const SizedBox(width: AppSpacing.xs),
                   Text(
                     '(${groups[groupName]!.length})',
-                    style: const TextStyle(
-                      color: Colors.white38,
+                    style: TextStyle(
+                      color: AppColors.textTertiary,
                       fontSize: 12,
-                      fontFeatures: [FontFeature.tabularFigures()],
+                      fontFeatures: const [FontFeature.tabularFigures()],
                     ),
                   ),
                 ],
@@ -370,14 +370,14 @@ class _HistoryBodyState extends State<HistoryBody> {
           color: AppColors.accent,
           borderRadius: BorderRadius.circular(AppRadius.card),
         ),
-        child: const Row(
+        child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.delete_outline, color: Colors.white, size: 24),
-            SizedBox(width: 6),
+            Icon(Icons.delete_outline, color: AppColors.onAccent, size: 24),
+            const SizedBox(width: 6),
             Text(
               '刪除',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              style: TextStyle(color: AppColors.onAccent, fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -399,7 +399,7 @@ class _HistoryBodyState extends State<HistoryBody> {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.card),
-          side: const BorderSide(color: AppColors.borderSeparator, width: 1),
+          side: BorderSide(color: AppColors.borderSeparator, width: 1),
         ),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
@@ -427,13 +427,13 @@ class _HistoryBodyState extends State<HistoryBody> {
                               if (progress == null) return child;
                               return Container(color: AppColors.surfaceInteractive);
                             },
-                            errorBuilder: (ctx, err, stack) => const Center(
-                              child: Icon(Icons.movie_creation_outlined, color: Colors.white24, size: 30),
+                            errorBuilder: (ctx, err, stack) => Center(
+                              child: Icon(Icons.movie_creation_outlined, color: AppColors.textTertiary, size: 30),
                             ),
                           )
                         else
-                          const Center(
-                            child: Icon(Icons.movie_creation_outlined, color: Colors.white24, size: 30),
+                          Center(
+                            child: Icon(Icons.movie_creation_outlined, color: AppColors.textTertiary, size: 30),
                           ),
 
                         // Completed status badge
@@ -448,7 +448,7 @@ class _HistoryBodyState extends State<HistoryBody> {
                                 borderRadius: BorderRadius.circular(AppRadius.badge),
                                 border: Border.all(color: AppColors.success.withValues(alpha: 0.7)),
                               ),
-                              child: const Text(
+                              child: Text(
                                 '✓ 已看完',
                                 style: TextStyle(color: AppColors.success, fontSize: 9, fontWeight: FontWeight.bold),
                               ),
@@ -466,7 +466,7 @@ class _HistoryBodyState extends State<HistoryBody> {
                             ),
                             child: const Icon(
                               Icons.play_arrow_rounded,
-                              color: AppColors.textPrimary,
+                              color: Colors.white,
                               size: 18,
                             ),
                           ),
@@ -507,7 +507,7 @@ class _HistoryBodyState extends State<HistoryBody> {
                               record.effectiveShowName,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: AppColors.accent,
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
@@ -517,10 +517,10 @@ class _HistoryBodyState extends State<HistoryBody> {
                           const SizedBox(width: AppSpacing.xs),
                           Text(
                             _formatRelativeDate(record.updatedAt),
-                            style: const TextStyle(
-                              color: Colors.white38,
+                            style: TextStyle(
+                              color: AppColors.textTertiary,
                               fontSize: 10,
-                              fontFeatures: [FontFeature.tabularFigures()],
+                              fontFeatures: const [FontFeature.tabularFigures()],
                             ),
                           ),
                         ],
@@ -539,7 +539,7 @@ class _HistoryBodyState extends State<HistoryBody> {
                               : record.effectiveTitle,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: AppColors.textPrimary,
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
@@ -560,11 +560,11 @@ class _HistoryBodyState extends State<HistoryBody> {
                             ),
                             child: Text(
                               record.partLabel,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: AppColors.textSecondary,
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
-                                fontFeatures: [FontFeature.tabularFigures()],
+                                fontFeatures: const [FontFeature.tabularFigures()],
                               ),
                             ),
                           ),
@@ -574,10 +574,10 @@ class _HistoryBodyState extends State<HistoryBody> {
                               '${record.positionFormatted} / ${record.durationFormatted} ($progressPct%)',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: AppColors.textMuted,
                                 fontSize: 11,
-                                fontFeatures: [FontFeature.tabularFigures()],
+                                fontFeatures: const [FontFeature.tabularFigures()],
                               ),
                             ),
                           ),
@@ -597,7 +597,7 @@ class _HistoryBodyState extends State<HistoryBody> {
                       color: AppColors.actionCircleBg,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.close, color: Colors.white38, size: AppCardTokens.actionIconSize),
+                    child: Icon(Icons.close, color: AppColors.textTertiary, size: AppCardTokens.actionIconSize),
                   ),
                   tooltip: '刪除紀錄',
                   padding: EdgeInsets.zero,
