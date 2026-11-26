@@ -749,6 +749,18 @@ function getShareUrl(episode, partIndex = 0) {
   return `${origin}/?${params.toString()}`;
 }
 
+function setDialogState(el, isOpen, displayValue = "flex") {
+  if (!el) return;
+  el.style.display = isOpen ? displayValue : "none";
+  if (el.tagName === "DIALOG") {
+    if (isOpen) {
+      el.setAttribute("open", "");
+    } else {
+      el.removeAttribute("open");
+    }
+  }
+}
+
 function openShareModal(episode, partIndex = 0) {
   if (!shareModal || !episode) return;
   const shareUrl = getShareUrl(episode, partIndex);
@@ -786,11 +798,11 @@ function openShareModal(episode, partIndex = 0) {
     }
   }
 
-  shareModal.style.display = "flex";
+  setDialogState(shareModal, true, "flex");
 }
 
 function closeShareModal() {
-  if (shareModal) shareModal.style.display = "none";
+  setDialogState(shareModal, false);
 }
 
 function setupShareModal() {
@@ -1279,7 +1291,7 @@ function setupChannelPicker() {
       btn.addEventListener("click", () => {
         const id = btn.getAttribute("data-channel-id");
         const ch = WEB_SHOW_CHANNELS.find((c) => c.id === id);
-        modal.style.display = "none";
+        setDialogState(modal, false);
         pickerBtn.setAttribute("aria-expanded", "false");
         if (ch) switchChannel(ch);
       });
@@ -1287,13 +1299,13 @@ function setupChannelPicker() {
   }
 
   function closeModal() {
-    modal.style.display = "none";
+    setDialogState(modal, false);
     pickerBtn.setAttribute("aria-expanded", "false");
   }
 
   pickerBtn.addEventListener("click", () => {
     renderChannelOptions();
-    modal.style.display = "flex";
+    setDialogState(modal, true, "flex");
     pickerBtn.setAttribute("aria-expanded", "true");
   });
   if (backdrop) backdrop.addEventListener("click", closeModal);
@@ -1306,7 +1318,7 @@ async function switchChannel(ch) {
   currentCatalogPage = 1;
   const emojiEl = document.getElementById("channel-emoji");
   const nameEl = document.getElementById("channel-name");
-  if (emojiEl) emojiEl.textContent = ch.emoji;
+  if (emojiEl) emojiEl.dataset.channelEmoji = ch.emoji;
   if (nameEl) nameEl.textContent = ch.name;
 
   const cacheKey = `${ch.id}:1`;
@@ -2220,10 +2232,10 @@ function setupSleepTimerModal() {
   const options = document.querySelectorAll(".yt-timer-opt");
 
   function openModal() {
-    if (modal) modal.style.display = "flex";
+    setDialogState(modal, true, "flex");
   }
   function closeModal() {
-    if (modal) modal.style.display = "none";
+    setDialogState(modal, false);
   }
 
   if (btn) btn.addEventListener("click", openModal);
@@ -2416,7 +2428,7 @@ function openHistoryModal() {
   const modal = document.getElementById("history-modal");
   if (!modal) return;
   renderHistoryModal();
-  modal.style.display = "flex";
+  setDialogState(modal, true, "flex");
   modal.setAttribute("aria-hidden", "false");
 }
 
@@ -2424,7 +2436,7 @@ function closeHistoryModal() {
   if (typeof document === "undefined") return;
   const modal = document.getElementById("history-modal");
   if (!modal) return;
-  modal.style.display = "none";
+  setDialogState(modal, false);
   modal.setAttribute("aria-hidden", "true");
 }
 
@@ -2464,7 +2476,7 @@ function renderHistoryModal() {
     return `
       <div class="yt-history-item" data-episode-id="${rec.episodeId}" data-part-index="${rec.partIndex || 0}">
         <div class="yt-history-thumb-wrapper">
-          <img src="${thumb}" alt="${title}" onerror="this.src='./placeholder.jpg'">
+          <img src="${thumb}" alt="${title}" width="112" height="63" loading="lazy" onerror="this.src='./placeholder.jpg'">
           <div class="yt-history-progress-fill" style="width: ${progress}%;"></div>
         </div>
         <div class="yt-history-info">
@@ -2668,7 +2680,7 @@ function startAutoPlayCountdown() {
   autoPlayCountdown = 5;
   if (numEl) numEl.textContent = "5";
   if (circleEl) circleEl.setAttribute("stroke-dasharray", "100, 100");
-  card.style.display = "flex";
+  setDialogState(card, true, "flex");
 
   if (autoPlayTimer) clearInterval(autoPlayTimer);
   autoPlayTimer = setInterval(() => {
@@ -2693,7 +2705,7 @@ function cancelAutoPlay(permanent = true) {
     autoPlayTimer = null;
   }
   const card = document.getElementById("autoplay-next-card");
-  if (card) card.style.display = "none";
+  setDialogState(card, false);
   if (permanent) {
     autoPlayDismissed = true;
   }

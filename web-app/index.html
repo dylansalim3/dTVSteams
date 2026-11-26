@@ -33,7 +33,12 @@
           aria-label="切換節目頻道"
           title="切換節目頻道"
         >
-          <span id="channel-emoji" aria-hidden="true">🔥</span>
+          <span id="channel-emoji" class="channel-pill-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <rect x="2" y="7" width="20" height="15" rx="2" ry="2"/>
+              <polyline points="17 2 12 7 7 2"/>
+            </svg>
+          </span>
           <span id="channel-name" class="yt-brand-sub">綜藝玩很大</span>
           <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
             <path d="M7 10l5 5 5-5z"/>
@@ -185,11 +190,15 @@
 
           <!-- Double-Tap/Click Seek Ripples -->
           <div id="seek-overlay-left" class="yt-seek-overlay yt-seek-left" style="display:none;" aria-hidden="true">
-            <div class="yt-seek-icon">⏪</div>
+            <div class="yt-seek-icon">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="11 19 2 12 11 5 11 19"/><polygon points="22 19 13 12 22 5 22 19"/></svg>
+            </div>
             <div class="yt-seek-text" id="seek-text-left">-10秒</div>
           </div>
           <div id="seek-overlay-right" class="yt-seek-overlay yt-seek-right" style="display:none;" aria-hidden="true">
-            <div class="yt-seek-icon">⏩</div>
+            <div class="yt-seek-icon">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="13 19 22 12 13 5 13 19"/><polygon points="2 19 11 12 2 5 2 19"/></svg>
+            </div>
             <div class="yt-seek-text" id="seek-text-right">+10秒</div>
           </div>
 
@@ -226,7 +235,7 @@
           </div>
 
           <!-- Auto-Play Next Part/Episode Countdown Card Overlay -->
-          <div id="autoplay-next-card" class="yt-autoplay-card" style="display:none;" role="dialog" aria-label="即將自動播放下一段">
+          <dialog id="autoplay-next-card" class="yt-autoplay-card" style="display:none;" aria-label="即將自動播放下一段">
             <div class="ap-countdown-circle">
               <svg viewBox="0 0 36 36" class="ap-circular-chart">
                 <path class="ap-circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
@@ -242,7 +251,7 @@
               <button type="button" id="ap-play-btn" class="ap-btn primary" title="立即播放">立即播放</button>
               <button type="button" id="ap-cancel-btn" class="ap-btn cancel" title="取消">取消</button>
             </div>
-          </div>
+          </dialog>
 
           <!-- Audio-Only Radio Mode Overlay -->
           <div id="radio-mode-overlay" class="yt-radio-overlay" style="display:none;" role="region" aria-label="純音頻聽劇模式">
@@ -284,7 +293,7 @@
           <!-- Skip Intro Pill -->
           <button type="button" id="skip-intro-btn" class="yt-skip-intro-btn" style="display:none;" aria-label="跳過片頭 30 秒">
             <span>跳過片頭 (30s)</span>
-            <span style="color: var(--yt-red);" aria-hidden="true">⏩</span>
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--yt-red);" aria-hidden="true"><polygon points="13 19 22 12 13 5 13 19"/><polygon points="2 19 11 12 2 5 2 19"/></svg>
           </button>
 
           <!-- Smart Buffering Stall / CDN Fallback Card -->
@@ -430,7 +439,7 @@
   </footer>
 
   <!-- Channel Picker Sheet Modal (matching Flutter _showChannelPicker) -->
-  <div id="channel-modal" class="yt-modal" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="channel-modal-title">
+  <dialog id="channel-modal" class="yt-modal" style="display:none;" aria-modal="true" aria-labelledby="channel-modal-title">
     <div class="yt-modal-backdrop" id="channel-modal-backdrop"></div>
     <div class="yt-modal-content yt-sheet-modal">
       <div class="sheet-drag-handle" aria-hidden="true"></div>
@@ -451,10 +460,10 @@
       </div>
       <div class="yt-modal-body" id="channel-list-container"></div>
     </div>
-  </div>
+  </dialog>
 
   <!-- Share Link & QR Code Modal Dialog -->
-  <div id="share-modal" class="yt-modal" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="share-modal-title">
+  <dialog id="share-modal" class="yt-modal" style="display:none;" aria-modal="true" aria-labelledby="share-modal-title">
     <div class="yt-modal-backdrop" id="share-modal-backdrop"></div>
     <div class="yt-modal-content">
       <div class="yt-modal-header">
@@ -498,10 +507,10 @@
         </div>
       </div>
     </div>
-  </div>
+  </dialog>
 
   <!-- History Modal Dialog -->
-  <div id="history-modal" class="yt-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="history-modal-title">
+  <dialog id="history-modal" class="yt-modal" style="display: none;" aria-modal="true" aria-labelledby="history-modal-title">
     <div class="yt-modal-backdrop" id="history-modal-backdrop"></div>
     <div class="yt-modal-content yt-history-modal-content">
       <div class="yt-modal-header">
@@ -525,10 +534,10 @@
 
       <div class="yt-modal-body yt-history-body" id="history-list-container"></div>
     </div>
-  </div>
+  </dialog>
 
   <!-- Sleep Timer Modal Dialog -->
-  <div id="sleep-timer-modal" class="yt-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="sleep-timer-modal-title">
+  <dialog id="sleep-timer-modal" class="yt-modal" style="display: none;" aria-modal="true" aria-labelledby="sleep-timer-modal-title">
     <div class="yt-modal-backdrop" id="sleep-timer-modal-backdrop"></div>
     <div class="yt-modal-content yt-modal-sm">
       <div class="yt-modal-header">
@@ -558,7 +567,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </dialog>
 
   <script src="./frame-thumbnails.js"></script>
   <script src="./qrcode.js"></script>
