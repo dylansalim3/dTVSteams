@@ -41,39 +41,30 @@ class _HistoryScreenState extends State<HistoryScreen> {
       child: Scaffold(
         backgroundColor: AppColors.canvas,
         appBar: AppBar(
-        backgroundColor: AppColors.surfaceOverlay,
+        backgroundColor: AppColors.surfaceSecondary,
         elevation: 0,
         bottom: const PreferredSize(
           preferredSize: Size.fromHeight(1),
-          child: Divider(color: AppColors.borderSubtle, height: 1),
+          child: Divider(color: AppColors.borderSeparator, height: 1),
         ),
         title: Row(
           children: [
-            const Icon(Icons.history, color: AppColors.accent, size: 22),
+            const Icon(Icons.history, color: AppColors.accent, size: 20),
             const SizedBox(width: AppSpacing.sm),
-            const Text(
-              '觀看紀錄',
-              style: TextStyle(
-                color: AppColors.textPrimary,
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
-            ),
+            const Text('觀看紀錄', style: AppType.title3Semibold),
             if (records.isNotEmpty) ...[
               const SizedBox(width: AppSpacing.sm),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: AppColors.surfaceInteractive,
-                  borderRadius: BorderRadius.circular(10),
+                  color: AppColors.surfacePrimary,
+                  borderRadius: BorderRadius.circular(AppRadius.xs),
                 ),
                 child: Text(
                   '${records.length}',
-                  style: const TextStyle(
+                  style: AppType.caption1Semibold.copyWith(
                     color: AppColors.textSecondary,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    fontFeatures: [FontFeature.tabularFigures()],
+                    fontFeatures: AppType.tabular,
                   ),
                 ),
               ),
@@ -268,36 +259,28 @@ class _HistoryBodyState extends State<HistoryBody> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 72,
-              height: 72,
+              width: 56,
+              height: 56,
               decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.cardBg,
-                border: Border.all(color: AppColors.borderSubtle),
+                color: AppColors.surfaceSecondary,
+                borderRadius: BorderRadius.circular(AppRadius.card),
+                border: Border.all(color: AppColors.borderSeparator),
               ),
               child: const Icon(
                 Icons.history_toggle_off_rounded,
-                size: 36,
-                color: AppColors.textMuted,
+                size: 28,
+                color: AppColors.textSecondary,
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
-            const Text(
-              '尚無觀看歷史紀錄',
-              style: TextStyle(
-                color: AppColors.textPrimary,
-                fontSize: 17,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            const Text('尚無觀看歷史紀錄', style: AppType.title3Semibold),
             const SizedBox(height: AppSpacing.sm),
-            const Text(
+            Text(
               '您播放過的任何精彩節目與分段都會自動記錄在這裡，隨時隨地一鍵續播。',
               textAlign: TextAlign.center,
-              style: TextStyle(
-                color: AppColors.textMuted,
-                fontSize: 13,
-                height: 1.4,
+              style: AppType.body2Medium.copyWith(
+                color: AppColors.textSecondary,
+                fontWeight: FontWeight.w400,
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
@@ -305,14 +288,15 @@ class _HistoryBodyState extends State<HistoryBody> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.accent,
                 foregroundColor: AppColors.textPrimary,
+                elevation: 0,
                 minimumSize: const Size(0, 44),
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(22),
+                  borderRadius: BorderRadius.circular(AppRadius.control),
                 ),
               ),
               icon: const Icon(Icons.explore_outlined, size: 18),
-              label: const Text('開始探索節目', style: TextStyle(fontWeight: FontWeight.bold)),
+              label: const Text('開始探索節目', style: AppType.bodyMedium),
               onPressed: () => Navigator.of(context).pop(),
             ),
           ],
@@ -411,11 +395,11 @@ class _HistoryBodyState extends State<HistoryBody> {
       },
       child: Card(
         margin: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
-        color: AppColors.cardBg,
+        color: AppColors.surfaceSecondary,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.card),
-          side: const BorderSide(color: AppColors.borderSubtle, width: 1),
+          side: const BorderSide(color: AppColors.borderSeparator, width: 1),
         ),
         clipBehavior: Clip.antiAlias,
         child: InkWell(

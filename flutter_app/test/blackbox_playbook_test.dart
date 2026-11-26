@@ -48,7 +48,7 @@ void main() {
       // =========================================================================
       expect(find.text('最新劇集與節目 (Episodes)'), findsOneWidget);
       expect(find.byType(YouTubeEpisodeCard), findsWidgets);
-      expect(find.text('1080p FHD'), findsWidgets);
+      expect(find.textContaining('1080p'), findsNothing);
 
       // Direct chapter/part quick selectors directly on cards
       expect(find.text('Part 1'), findsWidgets);
@@ -205,8 +205,11 @@ void main() {
       expect(find.text('Part 2'), findsWidgets);
       expect(find.text('Part 3'), findsWidgets);
 
-      // 6.4 Verify OSD download button & 1080p FHD badge
-      expect(find.text('1080p FHD'), findsOneWidget);
+      // 6.4 Verify OSD download button, playtime-only bottom bar, center play/pause, and no 1080p/seek buttons
+      expect(find.textContaining('1080p'), findsNothing);
+      expect(find.byIcon(Icons.replay_10), findsNothing);
+      expect(find.byIcon(Icons.forward_10), findsNothing);
+      expect(find.byKey(const ValueKey('player_time_display')), findsOneWidget);
       expect(find.byIcon(Icons.download), findsOneWidget);
 
       // Unmount player cleanly
@@ -313,7 +316,7 @@ void main() {
       expect(find.text('2026-11-08'), findsOneWidget);
       expect(find.byIcon(Icons.location_on_outlined), findsOneWidget);
       expect(find.text('台北'), findsOneWidget);
-      expect(find.text('1080p FHD'), findsOneWidget);
+      expect(find.textContaining('1080p'), findsNothing);
       expect(find.textContaining('已儲存 25.0 MB'), findsOneWidget);
       expect(find.text('Part 1 (已下載)'), findsOneWidget);
 
@@ -355,7 +358,8 @@ void main() {
       expect(find.text('下載分段管理'), findsOneWidget);
       expect(find.textContaining('已下載完成'), findsOneWidget);
       expect(find.text('未下載 (支援離線播放)'), findsNWidgets(2));
-      expect(find.text('下載全集 (1080p FHD)'), findsNWidgets(2));
+      expect(find.text('下載全集'), findsNWidgets(2));
+      expect(find.textContaining('1080p'), findsNothing);
       expect(find.textContaining('快速版'), findsNothing);
 
       // Dismiss popover

@@ -115,7 +115,7 @@ var require_react_production = __commonJS({
     function cloneAndReplaceKey(oldElement, newKey) {
       return ReactElement(oldElement.type, newKey, oldElement.props);
     }
-    function isValidElement2(object) {
+    function isValidElement3(object) {
       return "object" === typeof object && null !== object && object.$$typeof === REACT_ELEMENT_TYPE;
     }
     function escape(key) {
@@ -182,7 +182,7 @@ var require_react_production = __commonJS({
       if (invokeCallback)
         return callback = callback(children), invokeCallback = "" === nameSoFar ? "." + getElementKey(children, 0) : nameSoFar, isArrayImpl(callback) ? (escapedPrefix = "", null != invokeCallback && (escapedPrefix = invokeCallback.replace(userProvidedKeyEscapeRegex, "$&/") + "/"), mapIntoArray(callback, array, escapedPrefix, "", function(c89) {
           return c89;
-        })) : null != callback && (isValidElement2(callback) && (callback = cloneAndReplaceKey(
+        })) : null != callback && (isValidElement3(callback) && (callback = cloneAndReplaceKey(
           callback,
           escapedPrefix + (null == callback.key || children && children.key === callback.key ? "" : ("" + callback.key).replace(
             userProvidedKeyEscapeRegex,
@@ -311,7 +311,7 @@ var require_react_production = __commonJS({
         }) || [];
       },
       only: function(children) {
-        if (!isValidElement2(children))
+        if (!isValidElement3(children))
           throw Error(
             "React.Children.only expected to receive a single React element child."
           );
@@ -400,7 +400,7 @@ var require_react_production = __commonJS({
     exports.forwardRef = function(render) {
       return { $$typeof: REACT_FORWARD_REF_TYPE, render };
     };
-    exports.isValidElement = isValidElement2;
+    exports.isValidElement = isValidElement3;
     exports.lazy = function(ctor) {
       return {
         $$typeof: REACT_LAZY_TYPE,
@@ -2080,18 +2080,18 @@ var require_react_dom_client_production = __commonJS({
       var isCustomProperty = 0 === styleName.indexOf("--");
       null == value || "boolean" === typeof value || "" === value ? isCustomProperty ? style2.setProperty(styleName, "") : "float" === styleName ? style2.cssFloat = "" : style2[styleName] = "" : isCustomProperty ? style2.setProperty(styleName, value) : "number" !== typeof value || 0 === value || unitlessNumbers.has(styleName) ? "float" === styleName ? style2.cssFloat = value : style2[styleName] = ("" + value).trim() : style2[styleName] = value + "px";
     }
-    function setValueForStyles(node, styles, prevStyles) {
-      if (null != styles && "object" !== typeof styles)
+    function setValueForStyles(node, styles8, prevStyles) {
+      if (null != styles8 && "object" !== typeof styles8)
         throw Error(formatProdErrorMessage(62));
       node = node.style;
       if (null != prevStyles) {
         for (var styleName in prevStyles)
-          !prevStyles.hasOwnProperty(styleName) || null != styles && styles.hasOwnProperty(styleName) || (0 === styleName.indexOf("--") ? node.setProperty(styleName, "") : "float" === styleName ? node.cssFloat = "" : node[styleName] = "", viewTransitionMutationContext = true);
-        for (var styleName$16 in styles)
-          styleName = styles[styleName$16], styles.hasOwnProperty(styleName$16) && prevStyles[styleName$16] !== styleName && (setValueForStyle(node, styleName$16, styleName), viewTransitionMutationContext = true);
+          !prevStyles.hasOwnProperty(styleName) || null != styles8 && styles8.hasOwnProperty(styleName) || (0 === styleName.indexOf("--") ? node.setProperty(styleName, "") : "float" === styleName ? node.cssFloat = "" : node[styleName] = "", viewTransitionMutationContext = true);
+        for (var styleName$16 in styles8)
+          styleName = styles8[styleName$16], styles8.hasOwnProperty(styleName$16) && prevStyles[styleName$16] !== styleName && (setValueForStyle(node, styleName$16, styleName), viewTransitionMutationContext = true);
       } else
-        for (var styleName$17 in styles)
-          styles.hasOwnProperty(styleName$17) && setValueForStyle(node, styleName$17, styles[styleName$17]);
+        for (var styleName$17 in styles8)
+          styles8.hasOwnProperty(styleName$17) && setValueForStyle(node, styleName$17, styles8[styleName$17]);
     }
     function isCustomElement(tagName) {
       if (-1 === tagName.indexOf("-")) return false;
@@ -13356,9 +13356,9 @@ var require_react_dom_client_production = __commonJS({
       previousDispatcher.S(href, precedence, options2);
       var ownerDocument = globalDocument;
       if (ownerDocument && href) {
-        var styles = getResourcesFromRoot(ownerDocument).hoistableStyles, key = getStyleKey(href);
+        var styles8 = getResourcesFromRoot(ownerDocument).hoistableStyles, key = getStyleKey(href);
         precedence = precedence || "default";
-        var resource = styles.get(key);
+        var resource = styles8.get(key);
         if (!resource) {
           var state = { loading: 0, preload: null };
           if (resource = ownerDocument.querySelector(
@@ -13393,7 +13393,7 @@ var require_react_dom_client_production = __commonJS({
             count: 1,
             state
           };
-          styles.set(key, resource);
+          styles8.set(key, resource);
         }
       }
     }
@@ -14535,11 +14535,53 @@ var require_client = __commonJS({
   }
 });
 
+// node_modules/react/cjs/react-jsx-runtime.production.js
+var require_react_jsx_runtime_production = __commonJS({
+  "node_modules/react/cjs/react-jsx-runtime.production.js"(exports) {
+    "use strict";
+    var REACT_ELEMENT_TYPE = Symbol.for("react.transitional.element");
+    var REACT_FRAGMENT_TYPE = Symbol.for("react.fragment");
+    function jsxProd(type, config, maybeKey) {
+      var key = null;
+      void 0 !== maybeKey && (key = "" + maybeKey);
+      void 0 !== config.key && (key = "" + config.key);
+      if ("key" in config) {
+        maybeKey = {};
+        for (var propName in config)
+          "key" !== propName && (maybeKey[propName] = config[propName]);
+      } else maybeKey = config;
+      config = maybeKey.ref;
+      return {
+        $$typeof: REACT_ELEMENT_TYPE,
+        type,
+        key,
+        ref: void 0 !== config ? config : null,
+        props: maybeKey
+      };
+    }
+    exports.Fragment = REACT_FRAGMENT_TYPE;
+    exports.jsx = jsxProd;
+    exports.jsxs = jsxProd;
+  }
+});
+
+// node_modules/react/jsx-runtime.js
+var require_jsx_runtime = __commonJS({
+  "node_modules/react/jsx-runtime.js"(exports, module) {
+    "use strict";
+    if (true) {
+      module.exports = require_react_jsx_runtime_production();
+    } else {
+      module.exports = null;
+    }
+  }
+});
+
 // node_modules/@videojs/utils/dist/predicate/predicate.js
 function isString(value) {
   return typeof value === "string";
 }
-function isNumber(value) {
+function isNumber2(value) {
   return typeof value === "number";
 }
 function isBoolean(value) {
@@ -14696,7 +14738,7 @@ var require_dist = __commonJS({
     });
     module.exports = __toCommonJS(index_exports);
     var React3 = __toESM2(require_react());
-    var { useRef: useRef22, useEffect: useEffect26, isValidElement: isValidElement2 } = React3;
+    var { useRef: useRef24, useEffect: useEffect27, isValidElement: isValidElement3 } = React3;
     var _a;
     var ReactSecretInternals = (
       //@ts-ignore
@@ -14836,11 +14878,11 @@ var require_dist = __commonJS({
       counters.delete(val);
     }
     function useRenderCounter(name) {
-      const val = useRef22(null);
+      const val = useRef24(null);
       if (val.current != null) {
         val.current.count += 1;
       }
-      useEffect26(() => {
+      useEffect27(() => {
         if (val.current == null) {
           const counter = { count: 0 };
           registerRenderCounter(name, counter);
@@ -14855,8 +14897,8 @@ var require_dist = __commonJS({
     }
     var seenErrors = /* @__PURE__ */ new Set();
     function $structuralCheck(oldValue, newValue, variableName, fnName, kind, loc) {
-      function error(l, r, path, depth) {
-        const str = `${fnName}:${loc} [${kind}] ${variableName}${path} changed from ${l} to ${r} at depth ${depth}`;
+      function error(l, r3, path, depth) {
+        const str = `${fnName}:${loc} [${kind}] ${variableName}${path} changed from ${l} to ${r3} at depth ${depth}`;
         if (seenErrors.has(str)) {
           return;
         }
@@ -14948,11 +14990,11 @@ var require_dist = __commonJS({
                 recur(oldValue2[ii], newValue2[ii], `${path}[${ii}]`, depth + 1);
               }
             }
-          } else if (isValidElement2(oldValue2) || isValidElement2(newValue2)) {
-            if (isValidElement2(oldValue2) !== isValidElement2(newValue2)) {
+          } else if (isValidElement3(oldValue2) || isValidElement3(newValue2)) {
+            if (isValidElement3(oldValue2) !== isValidElement3(newValue2)) {
               error(
-                `type ${isValidElement2(oldValue2) ? "React element" : "object"}`,
-                `type ${isValidElement2(newValue2) ? "React element" : "object"}`,
+                `type ${isValidElement3(oldValue2) ? "React element" : "object"}`,
+                `type ${isValidElement3(newValue2) ? "React element" : "object"}`,
                 path,
                 depth
               );
@@ -15011,48 +15053,6 @@ var require_dist = __commonJS({
         }
       }
       recur(oldValue, newValue, "", 0);
-    }
-  }
-});
-
-// node_modules/react/cjs/react-jsx-runtime.production.js
-var require_react_jsx_runtime_production = __commonJS({
-  "node_modules/react/cjs/react-jsx-runtime.production.js"(exports) {
-    "use strict";
-    var REACT_ELEMENT_TYPE = Symbol.for("react.transitional.element");
-    var REACT_FRAGMENT_TYPE = Symbol.for("react.fragment");
-    function jsxProd(type, config, maybeKey) {
-      var key = null;
-      void 0 !== maybeKey && (key = "" + maybeKey);
-      void 0 !== config.key && (key = "" + config.key);
-      if ("key" in config) {
-        maybeKey = {};
-        for (var propName in config)
-          "key" !== propName && (maybeKey[propName] = config[propName]);
-      } else maybeKey = config;
-      config = maybeKey.ref;
-      return {
-        $$typeof: REACT_ELEMENT_TYPE,
-        type,
-        key,
-        ref: void 0 !== config ? config : null,
-        props: maybeKey
-      };
-    }
-    exports.Fragment = REACT_FRAGMENT_TYPE;
-    exports.jsx = jsxProd;
-    exports.jsxs = jsxProd;
-  }
-});
-
-// node_modules/react/jsx-runtime.js
-var require_jsx_runtime = __commonJS({
-  "node_modules/react/jsx-runtime.js"(exports, module) {
-    "use strict";
-    if (true) {
-      module.exports = require_react_jsx_runtime_production();
-    } else {
-      module.exports = null;
     }
   }
 });
@@ -15234,14 +15234,8881 @@ var init_parse_vtt = __esm({
 });
 
 // src/react/demo.tsx
-var import_react136 = __toESM(require_react(), 1);
+var import_react190 = __toESM(require_react(), 1);
 var import_client = __toESM(require_client(), 1);
 
+// node_modules/@remixicon/react/index.mjs
+var import_react = __toESM(require_react(), 1);
+var f1 = ({ color: C = "currentColor", size: e = 24, className: l, ...i }) => import_react.default.createElement("svg", { viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg", width: e, height: e, fill: C, ...i, className: "remixicon " + (l || "") }, import_react.default.createElement("path", { d: "M11.9999 13.1714L16.9497 8.22168L18.3639 9.63589L11.9999 15.9999L5.63599 9.63589L7.0502 8.22168L11.9999 13.1714Z" }));
+var K1 = ({ color: C = "currentColor", size: e = 24, className: l, ...i }) => import_react.default.createElement("svg", { viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg", width: e, height: e, fill: C, ...i, className: "remixicon " + (l || "") }, import_react.default.createElement("path", { d: "M7.82843 10.9999H20V12.9999H7.82843L13.1924 18.3638L11.7782 19.778L4 11.9999L11.7782 4.22168L13.1924 5.63589L7.82843 10.9999Z" }));
+var J1 = ({ color: C = "currentColor", size: e = 24, className: l, ...i }) => import_react.default.createElement("svg", { viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg", width: e, height: e, fill: C, ...i, className: "remixicon " + (l || "") }, import_react.default.createElement("path", { d: "M10.8284 12.0007L15.7782 16.9504L14.364 18.3646L8 12.0007L14.364 5.63672L15.7782 7.05093L10.8284 12.0007Z" }));
+var i2 = ({ color: C = "currentColor", size: e = 24, className: l, ...i }) => import_react.default.createElement("svg", { viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg", width: e, height: e, fill: C, ...i, className: "remixicon " + (l || "") }, import_react.default.createElement("path", { d: "M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z" }));
+var r2 = ({ color: C = "currentColor", size: e = 24, className: l, ...i }) => import_react.default.createElement("svg", { viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg", width: e, height: e, fill: C, ...i, className: "remixicon " + (l || "") }, import_react.default.createElement("path", { d: "M13.1717 12.0007L8.22192 7.05093L9.63614 5.63672L16.0001 12.0007L9.63614 18.3646L8.22192 16.9504L13.1717 12.0007Z" }));
+var R5 = ({ color: C = "currentColor", size: e = 24, className: l, ...i }) => import_react.default.createElement("svg", { viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg", width: e, height: e, fill: C, ...i, className: "remixicon " + (l || "") }, import_react.default.createElement("path", { d: "M9 1V3H15V1H17V3H21C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H7V1H9ZM20 11H4V19H20V11ZM7 5H4V9H20V5H17V7H15V5H9V7H7V5Z" }));
+var Wt = ({ color: C = "currentColor", size: e = 24, className: l, ...i }) => import_react.default.createElement("svg", { viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg", width: e, height: e, fill: C, ...i, className: "remixicon " + (l || "") }, import_react.default.createElement("path", { d: "M10 6V8H5V19H16V14H18V20C18 20.5523 17.5523 21 17 21H4C3.44772 21 3 20.5523 3 20V7C3 6.44772 3.44772 6 4 6H10ZM21 3V11H19L18.9999 6.413L11.2071 14.2071L9.79289 12.7929L17.5849 5H13V3H21Z" }));
+var Xl = ({ color: C = "currentColor", size: e = 24, className: l, ...i }) => import_react.default.createElement("svg", { viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg", width: e, height: e, fill: C, ...i, className: "remixicon " + (l || "") }, import_react.default.createElement("path", { d: "M2 3.9934C2 3.44476 2.45531 3 2.9918 3H21.0082C21.556 3 22 3.44495 22 3.9934V20.0066C22 20.5552 21.5447 21 21.0082 21H2.9918C2.44405 21 2 20.5551 2 20.0066V3.9934ZM8 5V19H16V5H8ZM4 5V7H6V5H4ZM18 5V7H20V5H18ZM4 9V11H6V9H4ZM18 9V11H20V9H18ZM4 13V15H6V13H4ZM18 13V15H20V13H18ZM4 17V19H6V17H4ZM18 17V19H20V17H18Z" }));
+var ya = ({ color: C = "currentColor", size: e = 24, className: l, ...i }) => import_react.default.createElement("svg", { viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg", width: e, height: e, fill: C, ...i, className: "remixicon " + (l || "") }, import_react.default.createElement("path", { d: "M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM11 11V17H13V11H11ZM11 7V9H13V7H11Z" }));
+var Ug = ({ color: C = "currentColor", size: e = 24, className: l, ...i }) => import_react.default.createElement("svg", { viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg", width: e, height: e, fill: C, ...i, className: "remixicon " + (l || "") }, import_react.default.createElement("path", { d: "M19.376 12.4161L8.77735 19.4818C8.54759 19.635 8.23715 19.5729 8.08397 19.3432C8.02922 19.261 8 19.1645 8 19.0658V4.93433C8 4.65818 8.22386 4.43433 8.5 4.43433C8.59871 4.43433 8.69522 4.46355 8.77735 4.5183L19.376 11.584C19.6057 11.7372 19.6678 12.0477 19.5146 12.2774C19.478 12.3323 19.4309 12.3795 19.376 12.4161Z" }));
+var dZ = ({ color: C = "currentColor", size: e = 24, className: l, ...i }) => import_react.default.createElement("svg", { viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg", width: e, height: e, fill: C, ...i, className: "remixicon " + (l || "") }, import_react.default.createElement("path", { d: "M5.46257 4.43262C7.21556 2.91688 9.5007 2 12 2C17.5228 2 22 6.47715 22 12C22 14.1361 21.3302 16.1158 20.1892 17.7406L17 12H20C20 7.58172 16.4183 4 12 4C9.84982 4 7.89777 4.84827 6.46023 6.22842L5.46257 4.43262ZM18.5374 19.5674C16.7844 21.0831 14.4993 22 12 22C6.47715 22 2 17.5228 2 12C2 9.86386 2.66979 7.88416 3.8108 6.25944L7 12H4C4 16.4183 7.58172 20 12 20C14.1502 20 16.1022 19.1517 17.5398 17.7716L18.5374 19.5674Z" }));
+var pv = ({ color: C = "currentColor", size: e = 24, className: l, ...i }) => import_react.default.createElement("svg", { viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg", width: e, height: e, fill: C, ...i, className: "remixicon " + (l || "") }, import_react.default.createElement("path", { d: "M18.031 16.6168L22.3137 20.8995L20.8995 22.3137L16.6168 18.031C15.0769 19.263 13.124 20 11 20C6.032 20 2 15.968 2 11C2 6.032 6.032 2 11 2C15.968 2 20 6.032 20 11C20 13.124 19.263 15.0769 18.031 16.6168ZM16.0247 15.8748C17.2475 14.6146 18 12.8956 18 11C18 7.1325 14.8675 4 11 4C7.1325 4 4 7.1325 4 11C4 14.8675 7.1325 18 11 18C12.8956 18 14.6146 17.2475 15.8748 16.0247L16.0247 15.8748Z" }));
+var tf = ({ color: C = "currentColor", size: e = 24, className: l, ...i }) => import_react.default.createElement("svg", { viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg", width: e, height: e, fill: C, ...i, className: "remixicon " + (l || "") }, import_react.default.createElement("path", { d: "M2 4.00087C2 3.44811 2.45531 3 2.9918 3H21.0082C21.556 3 22 3.44463 22 4.00087V17.9991C22 18.5519 21.5447 19 21.0082 19H2.9918C2.44405 19 2 18.5554 2 17.9991V4.00087ZM4 5V17H20V5H4ZM5 20H19V22H5V20Z" }));
+var wb = ({ color: C = "currentColor", size: e = 24, className: l, ...i }) => import_react.default.createElement("svg", { viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg", width: e, height: e, fill: C, ...i, className: "remixicon " + (l || "") }, import_react.default.createElement("path", { d: "M5 5H13V19H5V5ZM19 19H15V5H19V19ZM4 3C3.44772 3 3 3.44772 3 4V20C3 20.5523 3.44772 21 4 21H20C20.5523 21 21 20.5523 21 20V4C21 3.44772 20.5523 3 20 3H4ZM7 12L11 8.5V15.5L7 12Z" }));
+var hb = ({ color: C = "currentColor", size: e = 24, className: l, ...i }) => import_react.default.createElement("svg", { viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg", width: e, height: e, fill: C, ...i, className: "remixicon " + (l || "") }, import_react.default.createElement("path", { d: "M5 5H13V19H5V5ZM19 19H15V5H19V19ZM4 3C3.44772 3 3 3.44772 3 4V20C3 20.5523 3.44772 21 4 21H20C20.5523 21 21 20.5523 21 20V4C21 3.44772 20.5523 3 20 3H4ZM11 12L7 8.5V15.5L11 12Z" }));
+
+// node_modules/tailwind-merge/dist/bundle-mjs.mjs
+var concatArrays = (array1, array2) => {
+  const combinedArray = new Array(array1.length + array2.length);
+  for (let i = 0; i < array1.length; i++) {
+    combinedArray[i] = array1[i];
+  }
+  for (let i = 0; i < array2.length; i++) {
+    combinedArray[array1.length + i] = array2[i];
+  }
+  return combinedArray;
+};
+var createClassValidatorObject = (classGroupId, validator) => ({
+  classGroupId,
+  validator
+});
+var createClassPartObject = (nextPart = /* @__PURE__ */ new Map(), validators = null, classGroupId) => ({
+  nextPart,
+  validators,
+  classGroupId
+});
+var CLASS_PART_SEPARATOR = "-";
+var EMPTY_CONFLICTS = [];
+var ARBITRARY_PROPERTY_PREFIX = "arbitrary..";
+var createClassGroupUtils = (config) => {
+  const classMap = createClassMap(config);
+  const {
+    conflictingClassGroups,
+    conflictingClassGroupModifiers
+  } = config;
+  const getClassGroupId = (className) => {
+    if (className.startsWith("[") && className.endsWith("]")) {
+      return getGroupIdForArbitraryProperty(className);
+    }
+    const classParts = className.split(CLASS_PART_SEPARATOR);
+    const startIndex = classParts[0] === "" && classParts.length > 1 ? 1 : 0;
+    return getGroupRecursive(classParts, startIndex, classMap);
+  };
+  const getConflictingClassGroupIds = (classGroupId, hasPostfixModifier) => {
+    if (hasPostfixModifier) {
+      const modifierConflicts = conflictingClassGroupModifiers[classGroupId];
+      const baseConflicts = conflictingClassGroups[classGroupId];
+      if (modifierConflicts) {
+        if (baseConflicts) {
+          return concatArrays(baseConflicts, modifierConflicts);
+        }
+        return modifierConflicts;
+      }
+      return baseConflicts || EMPTY_CONFLICTS;
+    }
+    return conflictingClassGroups[classGroupId] || EMPTY_CONFLICTS;
+  };
+  return {
+    getClassGroupId,
+    getConflictingClassGroupIds
+  };
+};
+var getGroupRecursive = (classParts, startIndex, classPartObject) => {
+  const classPathsLength = classParts.length - startIndex;
+  if (classPathsLength === 0) {
+    return classPartObject.classGroupId;
+  }
+  const currentClassPart = classParts[startIndex];
+  const nextClassPartObject = classPartObject.nextPart.get(currentClassPart);
+  if (nextClassPartObject) {
+    const result = getGroupRecursive(classParts, startIndex + 1, nextClassPartObject);
+    if (result) return result;
+  }
+  const validators = classPartObject.validators;
+  if (validators === null) {
+    return void 0;
+  }
+  const classRest = startIndex === 0 ? classParts.join(CLASS_PART_SEPARATOR) : classParts.slice(startIndex).join(CLASS_PART_SEPARATOR);
+  const validatorsLength = validators.length;
+  for (let i = 0; i < validatorsLength; i++) {
+    const validatorObj = validators[i];
+    if (validatorObj.validator(classRest)) {
+      return validatorObj.classGroupId;
+    }
+  }
+  return void 0;
+};
+var getGroupIdForArbitraryProperty = (className) => className.slice(1, -1).indexOf(":") === -1 ? void 0 : (() => {
+  const content = className.slice(1, -1);
+  const colonIndex = content.indexOf(":");
+  const property = content.slice(0, colonIndex);
+  return property ? ARBITRARY_PROPERTY_PREFIX + property : void 0;
+})();
+var createClassMap = (config) => {
+  const {
+    theme,
+    classGroups
+  } = config;
+  return processClassGroups(classGroups, theme);
+};
+var processClassGroups = (classGroups, theme) => {
+  const classMap = createClassPartObject();
+  for (const classGroupId in classGroups) {
+    const group = classGroups[classGroupId];
+    processClassesRecursively(group, classMap, classGroupId, theme);
+  }
+  return classMap;
+};
+var processClassesRecursively = (classGroup, classPartObject, classGroupId, theme) => {
+  const len = classGroup.length;
+  for (let i = 0; i < len; i++) {
+    const classDefinition = classGroup[i];
+    processClassDefinition(classDefinition, classPartObject, classGroupId, theme);
+  }
+};
+var processClassDefinition = (classDefinition, classPartObject, classGroupId, theme) => {
+  if (typeof classDefinition === "string") {
+    processStringDefinition(classDefinition, classPartObject, classGroupId);
+    return;
+  }
+  if (typeof classDefinition === "function") {
+    processFunctionDefinition(classDefinition, classPartObject, classGroupId, theme);
+    return;
+  }
+  processObjectDefinition(classDefinition, classPartObject, classGroupId, theme);
+};
+var processStringDefinition = (classDefinition, classPartObject, classGroupId) => {
+  const classPartObjectToEdit = classDefinition === "" ? classPartObject : getPart(classPartObject, classDefinition);
+  classPartObjectToEdit.classGroupId = classGroupId;
+};
+var processFunctionDefinition = (classDefinition, classPartObject, classGroupId, theme) => {
+  if (isThemeGetter(classDefinition)) {
+    processClassesRecursively(classDefinition(theme), classPartObject, classGroupId, theme);
+    return;
+  }
+  if (classPartObject.validators === null) {
+    classPartObject.validators = [];
+  }
+  classPartObject.validators.push(createClassValidatorObject(classGroupId, classDefinition));
+};
+var processObjectDefinition = (classDefinition, classPartObject, classGroupId, theme) => {
+  const entries = Object.entries(classDefinition);
+  const len = entries.length;
+  for (let i = 0; i < len; i++) {
+    const [key, value] = entries[i];
+    processClassesRecursively(value, getPart(classPartObject, key), classGroupId, theme);
+  }
+};
+var getPart = (classPartObject, path) => {
+  let current = classPartObject;
+  const parts = path.split(CLASS_PART_SEPARATOR);
+  const len = parts.length;
+  for (let i = 0; i < len; i++) {
+    const part = parts[i];
+    let next = current.nextPart.get(part);
+    if (!next) {
+      next = createClassPartObject();
+      current.nextPart.set(part, next);
+    }
+    current = next;
+  }
+  return current;
+};
+var isThemeGetter = (func) => "isThemeGetter" in func && func.isThemeGetter === true;
+var createLruCache = (maxCacheSize) => {
+  if (maxCacheSize < 1) {
+    return {
+      get: () => void 0,
+      set: () => {
+      }
+    };
+  }
+  let cacheSize = 0;
+  let cache = /* @__PURE__ */ Object.create(null);
+  let previousCache = /* @__PURE__ */ Object.create(null);
+  const update = (key, value) => {
+    cache[key] = value;
+    cacheSize++;
+    if (cacheSize > maxCacheSize) {
+      cacheSize = 0;
+      previousCache = cache;
+      cache = /* @__PURE__ */ Object.create(null);
+    }
+  };
+  return {
+    get(key) {
+      let value = cache[key];
+      if (value !== void 0) {
+        return value;
+      }
+      if ((value = previousCache[key]) !== void 0) {
+        update(key, value);
+        return value;
+      }
+    },
+    set(key, value) {
+      if (key in cache) {
+        cache[key] = value;
+      } else {
+        update(key, value);
+      }
+    }
+  };
+};
+var IMPORTANT_MODIFIER = "!";
+var MODIFIER_SEPARATOR = ":";
+var EMPTY_MODIFIERS = [];
+var createResultObject = (modifiers, hasImportantModifier, baseClassName, maybePostfixModifierPosition, isExternal) => ({
+  modifiers,
+  hasImportantModifier,
+  baseClassName,
+  maybePostfixModifierPosition,
+  isExternal
+});
+var createParseClassName = (config) => {
+  const {
+    prefix: prefix14,
+    experimentalParseClassName
+  } = config;
+  let parseClassName = (className) => {
+    const modifiers = [];
+    let bracketDepth = 0;
+    let parenDepth = 0;
+    let modifierStart = 0;
+    let postfixModifierPosition;
+    const len = className.length;
+    for (let index = 0; index < len; index++) {
+      const currentCharacter = className[index];
+      if (bracketDepth === 0 && parenDepth === 0) {
+        if (currentCharacter === MODIFIER_SEPARATOR) {
+          modifiers.push(className.slice(modifierStart, index));
+          modifierStart = index + 1;
+          continue;
+        }
+        if (currentCharacter === "/") {
+          postfixModifierPosition = index;
+          continue;
+        }
+      }
+      if (currentCharacter === "[") bracketDepth++;
+      else if (currentCharacter === "]") bracketDepth--;
+      else if (currentCharacter === "(") parenDepth++;
+      else if (currentCharacter === ")") parenDepth--;
+      else if (currentCharacter === "\\") index++;
+      else if (currentCharacter === '"' || currentCharacter === "'") {
+        while (++index < len) {
+          const quotedCharacter = className[index];
+          if (quotedCharacter === "\\") index++;
+          else if (quotedCharacter === currentCharacter) break;
+        }
+      }
+    }
+    const baseClassNameWithImportantModifier = modifiers.length === 0 ? className : className.slice(modifierStart);
+    let baseClassName = baseClassNameWithImportantModifier;
+    let hasImportantModifier = false;
+    if (baseClassNameWithImportantModifier.endsWith(IMPORTANT_MODIFIER)) {
+      baseClassName = baseClassNameWithImportantModifier.slice(0, -1);
+      hasImportantModifier = true;
+    } else if (
+      /**
+       * In Tailwind CSS v3 the important modifier was at the start of the base class name. This is still supported for legacy reasons.
+       * @see https://github.com/dcastil/tailwind-merge/issues/513#issuecomment-2614029864
+       */
+      baseClassNameWithImportantModifier.startsWith(IMPORTANT_MODIFIER)
+    ) {
+      baseClassName = baseClassNameWithImportantModifier.slice(1);
+      hasImportantModifier = true;
+    }
+    const importantModifierOffset = hasImportantModifier && baseClassNameWithImportantModifier.startsWith(IMPORTANT_MODIFIER) ? IMPORTANT_MODIFIER.length : 0;
+    const maybePostfixModifierPosition = postfixModifierPosition && postfixModifierPosition > modifierStart ? postfixModifierPosition - modifierStart - importantModifierOffset : void 0;
+    return createResultObject(modifiers, hasImportantModifier, baseClassName, maybePostfixModifierPosition);
+  };
+  if (prefix14) {
+    const fullPrefix = prefix14 + MODIFIER_SEPARATOR;
+    const parseClassNameOriginal = parseClassName;
+    parseClassName = (className) => className.startsWith(fullPrefix) ? parseClassNameOriginal(className.slice(fullPrefix.length)) : createResultObject(EMPTY_MODIFIERS, false, className, void 0, true);
+  }
+  if (experimentalParseClassName) {
+    const parseClassNameOriginal = parseClassName;
+    parseClassName = (className) => experimentalParseClassName({
+      className,
+      parseClassName: parseClassNameOriginal
+    });
+  }
+  return parseClassName;
+};
+var createSortModifiers = (config) => {
+  const modifierWeights = /* @__PURE__ */ new Map();
+  config.orderSensitiveModifiers.forEach((mod, index) => {
+    modifierWeights.set(mod, 1e6 + index);
+  });
+  return (modifiers) => {
+    const result = [];
+    let currentSegment = [];
+    for (let i = 0; i < modifiers.length; i++) {
+      const modifier = modifiers[i];
+      const isArbitrary = modifier[0] === "[";
+      const isOrderSensitive = modifierWeights.has(modifier);
+      if (isArbitrary || isOrderSensitive) {
+        if (currentSegment.length > 0) {
+          currentSegment.sort();
+          result.push(...currentSegment);
+          currentSegment = [];
+        }
+        result.push(modifier);
+      } else {
+        currentSegment.push(modifier);
+      }
+    }
+    if (currentSegment.length > 0) {
+      currentSegment.sort();
+      result.push(...currentSegment);
+    }
+    return result;
+  };
+};
+var createConfigUtils = (config) => ({
+  cache: createLruCache(config.cacheSize),
+  parseClassName: createParseClassName(config),
+  sortModifiers: createSortModifiers(config),
+  postfixLookupClassGroupIds: createPostfixLookupClassGroupIds(config),
+  ...createClassGroupUtils(config)
+});
+var createPostfixLookupClassGroupIds = (config) => {
+  const lookup = /* @__PURE__ */ Object.create(null);
+  const classGroupIds = config.postfixLookupClassGroups;
+  if (classGroupIds) {
+    for (let i = 0; i < classGroupIds.length; i++) {
+      lookup[classGroupIds[i]] = true;
+    }
+  }
+  return lookup;
+};
+var SPLIT_CLASSES_REGEX = /\s+/;
+var mergeClassList = (classList, configUtils) => {
+  const {
+    parseClassName,
+    getClassGroupId,
+    getConflictingClassGroupIds,
+    sortModifiers,
+    postfixLookupClassGroupIds
+  } = configUtils;
+  const classGroupsInConflict = [];
+  const classNames = classList.trim().split(SPLIT_CLASSES_REGEX);
+  let result = "";
+  for (let index = classNames.length - 1; index >= 0; index -= 1) {
+    const originalClassName = classNames[index];
+    const {
+      isExternal,
+      modifiers,
+      hasImportantModifier,
+      baseClassName,
+      maybePostfixModifierPosition
+    } = parseClassName(originalClassName);
+    if (isExternal) {
+      result = originalClassName + (result.length > 0 ? " " + result : result);
+      continue;
+    }
+    let hasPostfixModifier = !!maybePostfixModifierPosition;
+    let classGroupId;
+    if (hasPostfixModifier) {
+      const baseClassNameWithoutPostfix = baseClassName.substring(0, maybePostfixModifierPosition);
+      classGroupId = getClassGroupId(baseClassNameWithoutPostfix);
+      const classGroupIdWithPostfix = classGroupId && postfixLookupClassGroupIds[classGroupId] ? getClassGroupId(baseClassName) : void 0;
+      if (classGroupIdWithPostfix && classGroupIdWithPostfix !== classGroupId) {
+        classGroupId = classGroupIdWithPostfix;
+        hasPostfixModifier = false;
+      }
+    } else {
+      classGroupId = getClassGroupId(baseClassName);
+    }
+    if (!classGroupId) {
+      if (!hasPostfixModifier) {
+        result = originalClassName + (result.length > 0 ? " " + result : result);
+        continue;
+      }
+      classGroupId = getClassGroupId(baseClassName);
+      if (!classGroupId) {
+        result = originalClassName + (result.length > 0 ? " " + result : result);
+        continue;
+      }
+      hasPostfixModifier = false;
+    }
+    const variantModifier = modifiers.length === 0 ? "" : modifiers.length === 1 ? modifiers[0] : sortModifiers(modifiers).join(":");
+    const modifierId = hasImportantModifier ? variantModifier + IMPORTANT_MODIFIER : variantModifier;
+    const classId = modifierId + classGroupId;
+    if (classGroupsInConflict.indexOf(classId) > -1) {
+      continue;
+    }
+    classGroupsInConflict.push(classId);
+    const conflictGroups = getConflictingClassGroupIds(classGroupId, hasPostfixModifier);
+    for (let i = 0; i < conflictGroups.length; ++i) {
+      const group = conflictGroups[i];
+      classGroupsInConflict.push(modifierId + group);
+    }
+    result = originalClassName + (result.length > 0 ? " " + result : result);
+  }
+  return result;
+};
+var twJoin = (...classLists) => {
+  let index = 0;
+  let argument;
+  let resolvedValue;
+  let string = "";
+  while (index < classLists.length) {
+    if (argument = classLists[index++]) {
+      if (resolvedValue = toValue(argument)) {
+        string && (string += " ");
+        string += resolvedValue;
+      }
+    }
+  }
+  return string;
+};
+var toValue = (mix) => {
+  if (typeof mix === "string") {
+    return mix;
+  }
+  let resolvedValue;
+  let string = "";
+  for (let k = 0; k < mix.length; k++) {
+    if (mix[k]) {
+      if (resolvedValue = toValue(mix[k])) {
+        string && (string += " ");
+        string += resolvedValue;
+      }
+    }
+  }
+  return string;
+};
+var createTailwindMerge = (createConfigFirst, ...createConfigRest) => {
+  let configUtils;
+  let cacheGet;
+  let cacheSet;
+  let functionToCall;
+  const initTailwindMerge = (classList) => {
+    const config = createConfigRest.reduce((previousConfig, createConfigCurrent) => createConfigCurrent(previousConfig), createConfigFirst());
+    configUtils = createConfigUtils(config);
+    cacheGet = configUtils.cache.get;
+    cacheSet = configUtils.cache.set;
+    functionToCall = tailwindMerge;
+    return tailwindMerge(classList);
+  };
+  const tailwindMerge = (classList) => {
+    const cachedResult = cacheGet(classList);
+    if (cachedResult) {
+      return cachedResult;
+    }
+    const result = mergeClassList(classList, configUtils);
+    cacheSet(classList, result);
+    return result;
+  };
+  functionToCall = initTailwindMerge;
+  return (...args) => functionToCall(twJoin(...args));
+};
+var fallbackThemeArr = [];
+var fromTheme = (key) => {
+  const themeGetter = (theme) => theme[key] || fallbackThemeArr;
+  themeGetter.isThemeGetter = true;
+  themeGetter.themeKey = key;
+  return themeGetter;
+};
+var arbitraryValueRegex = /^\[(?:(\w[\w-]*):)?(.+)\]$/i;
+var arbitraryVariableRegex = /^\((?:(\w[\w-]*):)?(.+)\)$/i;
+var fractionRegex = /^\d+(?:\.\d+)?\/\d+(?:\.\d+)?$/;
+var tshirtUnitRegex = /^(\d+(\.\d+)?)?(xs|sm|md|lg|xl)$/;
+var lengthUnitRegex = /\d+(%|px|r?em|[sdl]?v([hwib]|min|max)|pt|pc|in|cm|mm|Q|cap|ch|ex|r?lh|cq(w|h|i|b|min|max))|\b(calc|min|max|clamp)\(.+\)|^--spacing\(.+\)|^0$/;
+var colorFunctionRegex = /^(rgba?|hsla?|hwb|(ok)?(lab|lch)|color-mix|color|light-dark|contrast-color|device-cmyk|--alpha)\(.+\)$/i;
+var maskPositionRegex = /^(?:_*[+-]?(?:\d|\.\d)|[\w-]+\(|_*(?:inherit|initial|revert(?:-layer)?|unset)_*$)/i;
+var shadowRegex = /^(inset_)?-?((\d+)?\.?(\d+)[a-z]+|0)_-?((\d+)?\.?(\d+)[a-z]+|0)/;
+var imageRegex = /^(url|image|image-set|cross-fade|element|(repeating-)?(linear|radial|conic)-gradient)\(.+\)$/;
+var isFraction = (value) => fractionRegex.test(value);
+var isNumber = (value) => !!value && !Number.isNaN(Number(value));
+var isInteger = (value) => !!value && Number.isInteger(Number(value));
+var isPercent = (value) => value.endsWith("%") && isNumber(value.slice(0, -1));
+var isTshirtSize = (value) => tshirtUnitRegex.test(value);
+var isAny = () => true;
+var isLengthOnly = (value) => (
+  // `colorFunctionRegex` check is necessary because color functions can have percentages in them which which would be incorrectly classified as lengths.
+  // For example, `hsl(0 0% 0%)` would be classified as a length without this check.
+  // I could also use lookbehind assertion in `lengthUnitRegex` but that isn't supported widely enough.
+  lengthUnitRegex.test(value) && !colorFunctionRegex.test(value)
+);
+var isMaskPosition = (value) => (
+  // Mask stops default to positions for variables and non-color CSS functions, including angles, so color functions need to be excluded explicitly.
+  maskPositionRegex.test(value) && !colorFunctionRegex.test(value)
+);
+var isNever = () => false;
+var isShadow = (value) => shadowRegex.test(value);
+var isImage = (value) => imageRegex.test(value);
+var isAnyNonArbitrary = (value) => !isArbitraryValue(value) && !isArbitraryVariable(value);
+var isNamedContainerQuery = (value) => value.startsWith("@container") && (value[10] === "/" && value[11] !== void 0 || value[11] === "s" && value[16] !== void 0 && value.startsWith("-size/", 10) || value[11] === "n" && value[18] !== void 0 && value.startsWith("-normal/", 10));
+var isArbitrarySize = (value) => getIsArbitraryValue(value, isLabelSize, isNever);
+var isArbitraryValue = (value) => arbitraryValueRegex.test(value);
+var isArbitraryLength = (value) => getIsArbitraryValue(value, isLabelLength, isLengthOnly);
+var isArbitraryMaskPosition = (value) => getIsArbitraryValue(value, isLabelMaskPosition, isMaskPosition);
+var isArbitraryNumber = (value) => getIsArbitraryValue(value, isLabelNumber, isNumber);
+var isArbitraryWeight = (value) => getIsArbitraryValue(value, isLabelWeight, isAny);
+var isArbitraryFamilyName = (value) => getIsArbitraryValue(value, isLabelFamilyName, isNever);
+var isArbitraryPosition = (value) => getIsArbitraryValue(value, isLabelPosition, isNever);
+var isArbitraryImage = (value) => getIsArbitraryValue(value, isLabelImage, isImage);
+var isArbitraryShadow = (value) => getIsArbitraryValue(value, isLabelShadow, isShadow);
+var isArbitraryVariable = (value) => arbitraryVariableRegex.test(value);
+var isArbitraryVariableLength = (value) => getIsArbitraryVariable(value, isLabelLength);
+var isArbitraryVariableMaskPosition = (value) => getIsArbitraryVariable(value, isLabelMaskPosition, true);
+var isArbitraryVariableFamilyName = (value) => getIsArbitraryVariable(value, isLabelFamilyName);
+var isArbitraryVariablePosition = (value) => getIsArbitraryVariable(value, isLabelPosition);
+var isArbitraryVariableSize = (value) => getIsArbitraryVariable(value, isLabelSize);
+var isArbitraryVariableImage = (value) => getIsArbitraryVariable(value, isLabelImage);
+var isArbitraryVariableShadow = (value) => getIsArbitraryVariable(value, isLabelShadow, true);
+var isArbitraryVariableWeight = (value) => getIsArbitraryVariable(value, isLabelWeight, true);
+var getIsArbitraryValue = (value, testLabel, testValue) => {
+  const result = arbitraryValueRegex.exec(value);
+  if (result) {
+    if (result[1]) {
+      return testLabel(result[1]);
+    }
+    return testValue(result[2]);
+  }
+  return false;
+};
+var getIsArbitraryVariable = (value, testLabel, shouldMatchNoLabel = false) => {
+  const result = arbitraryVariableRegex.exec(value);
+  if (result) {
+    if (result[1]) {
+      return testLabel(result[1]);
+    }
+    return shouldMatchNoLabel;
+  }
+  return false;
+};
+var isLabelPosition = (label) => label === "position" || label === "percentage";
+var isLabelImage = (label) => label === "image" || label === "url";
+var isLabelSize = (label) => label === "length" || label === "size" || label === "bg-size";
+var isLabelLength = (label) => label === "length";
+var isLabelMaskPosition = (label) => label !== "color";
+var isLabelNumber = (label) => label === "number";
+var isLabelFamilyName = (label) => label === "family-name";
+var isLabelWeight = (label) => label === "number" || label === "weight";
+var isLabelShadow = (label) => label === "shadow";
+var getDefaultConfig = () => {
+  const themeColor = fromTheme("color");
+  const themeFont = fromTheme("font");
+  const themeText = fromTheme("text");
+  const themeFontWeight = fromTheme("font-weight");
+  const themeTracking = fromTheme("tracking");
+  const themeLeading = fromTheme("leading");
+  const themeBreakpoint = fromTheme("breakpoint");
+  const themeContainer = fromTheme("container");
+  const themeSpacing = fromTheme("spacing");
+  const themeRadius = fromTheme("radius");
+  const themeShadow = fromTheme("shadow");
+  const themeInsetShadow = fromTheme("inset-shadow");
+  const themeTextShadow = fromTheme("text-shadow");
+  const themeDropShadow = fromTheme("drop-shadow");
+  const themeBlur = fromTheme("blur");
+  const themePerspective = fromTheme("perspective");
+  const themeAspect = fromTheme("aspect");
+  const themeEase = fromTheme("ease");
+  const themeAnimate = fromTheme("animate");
+  const scaleBreak = () => ["auto", "avoid", "all", "avoid-page", "page", "left", "right", "column"];
+  const scalePosition = () => [
+    "center",
+    "top",
+    "bottom",
+    "left",
+    "right",
+    "top-left",
+    // Deprecated since Tailwind CSS v4.1.0, see https://github.com/tailwindlabs/tailwindcss/pull/17378
+    "left-top",
+    "top-right",
+    // Deprecated since Tailwind CSS v4.1.0, see https://github.com/tailwindlabs/tailwindcss/pull/17378
+    "right-top",
+    "bottom-right",
+    // Deprecated since Tailwind CSS v4.1.0, see https://github.com/tailwindlabs/tailwindcss/pull/17378
+    "right-bottom",
+    "bottom-left",
+    // Deprecated since Tailwind CSS v4.1.0, see https://github.com/tailwindlabs/tailwindcss/pull/17378
+    "left-bottom"
+  ];
+  const scalePositionWithArbitrary = () => [...scalePosition(), isArbitraryVariable, isArbitraryValue];
+  const scaleOverflow = () => ["auto", "hidden", "clip", "visible", "scroll"];
+  const scaleOverscroll = () => ["auto", "contain", "none"];
+  const scaleUnambiguousSpacing = () => [isArbitraryVariable, isArbitraryValue, themeSpacing];
+  const scaleInset = () => [isFraction, "full", "auto", ...scaleUnambiguousSpacing()];
+  const scaleGridTemplateColsRows = () => [isInteger, "none", "subgrid", isArbitraryVariable, isArbitraryValue];
+  const scaleGridColRowStartAndEnd = () => ["auto", {
+    span: ["full", isInteger, isArbitraryVariable, isArbitraryValue]
+  }, isInteger, isArbitraryVariable, isArbitraryValue];
+  const scaleGridColRowStartOrEnd = () => [isInteger, "auto", isArbitraryVariable, isArbitraryValue];
+  const scaleGridAutoColsRows = () => ["auto", "min", "max", "fr", isArbitraryVariable, isArbitraryValue];
+  const scaleAlignPrimaryAxis = () => ["start", "end", "center", "between", "around", "evenly", "stretch", "baseline", "center-safe", "end-safe"];
+  const scaleAlignSecondaryAxis = () => ["start", "end", "center", "stretch", "center-safe", "end-safe"];
+  const scaleMargin = () => ["auto", ...scaleUnambiguousSpacing()];
+  const scaleSizing = () => [isFraction, "auto", "full", "dvw", "dvh", "lvw", "lvh", "svw", "svh", "min", "max", "fit", ...scaleUnambiguousSpacing()];
+  const scaleSizingInline = () => [themeContainer, isFraction, "screen", "full", "dvw", "lvw", "svw", "min", "max", "fit", ...scaleUnambiguousSpacing()];
+  const scaleSizingBlock = () => [isFraction, "screen", "full", "lh", "dvh", "lvh", "svh", "min", "max", "fit", ...scaleUnambiguousSpacing()];
+  const scaleColor = () => [themeColor, isArbitraryVariable, isArbitraryValue];
+  const scaleBgPosition = () => [...scalePosition(), isArbitraryVariablePosition, isArbitraryPosition, {
+    position: [isArbitraryVariable, isArbitraryValue]
+  }];
+  const scaleBgRepeat = () => ["no-repeat", {
+    repeat: ["", "x", "y", "space", "round"]
+  }];
+  const scaleBgSize = () => ["auto", "cover", "contain", isArbitraryVariableSize, isArbitrarySize, {
+    size: [isArbitraryVariable, isArbitraryValue]
+  }];
+  const scaleGradientStopPosition = () => [isPercent, isArbitraryVariableLength, isArbitraryLength];
+  const scaleRadius = () => [
+    // Deprecated since Tailwind CSS v4.0.0
+    "",
+    "none",
+    "full",
+    themeRadius,
+    isArbitraryVariable,
+    isArbitraryValue
+  ];
+  const scaleBorderWidth = () => ["", isNumber, isArbitraryVariableLength, isArbitraryLength];
+  const scaleLineStyle = () => ["solid", "dashed", "dotted", "double"];
+  const scaleBlendMode = () => ["normal", "multiply", "screen", "overlay", "darken", "lighten", "color-dodge", "color-burn", "hard-light", "soft-light", "difference", "exclusion", "hue", "saturation", "color", "luminosity"];
+  const scaleMaskImagePosition = () => [isNumber, isPercent, isArbitraryVariableMaskPosition, isArbitraryMaskPosition];
+  const scaleBlur = () => [
+    // Deprecated since Tailwind CSS v4.0.0
+    "",
+    "none",
+    themeBlur,
+    isArbitraryVariable,
+    isArbitraryValue
+  ];
+  const scaleRotate = () => ["none", isNumber, isArbitraryVariable, isArbitraryValue];
+  const scaleScale = () => ["none", isNumber, isArbitraryVariable, isArbitraryValue];
+  const scaleSkew = () => [isNumber, isArbitraryVariable, isArbitraryValue];
+  const scaleTranslate = () => [isFraction, "full", ...scaleUnambiguousSpacing()];
+  return {
+    cacheSize: 500,
+    theme: {
+      animate: ["spin", "ping", "pulse", "bounce"],
+      aspect: ["video"],
+      blur: [isTshirtSize],
+      breakpoint: [isTshirtSize],
+      color: [isAny],
+      container: [isTshirtSize],
+      "drop-shadow": [isTshirtSize],
+      ease: ["in", "out", "in-out"],
+      font: [isAnyNonArbitrary],
+      "font-weight": ["thin", "extralight", "light", "normal", "medium", "semibold", "bold", "extrabold", "black"],
+      "inset-shadow": [isTshirtSize],
+      leading: ["none", "tight", "snug", "normal", "relaxed", "loose"],
+      perspective: ["dramatic", "near", "normal", "midrange", "distant", "none"],
+      radius: [isTshirtSize],
+      shadow: [isTshirtSize],
+      spacing: ["px", isNumber],
+      text: [isTshirtSize],
+      "text-shadow": [isTshirtSize],
+      tracking: ["tighter", "tight", "normal", "wide", "wider", "widest"]
+    },
+    classGroups: {
+      // --------------
+      // --- Layout ---
+      // --------------
+      /**
+       * Aspect Ratio
+       * @see https://tailwindcss.com/docs/aspect-ratio
+       */
+      aspect: [{
+        aspect: ["auto", "square", isFraction, isArbitraryValue, isArbitraryVariable, themeAspect]
+      }],
+      /**
+       * Container
+       * @see https://tailwindcss.com/docs/container
+       * @deprecated since Tailwind CSS v4.0.0
+       */
+      container: ["container"],
+      /**
+       * Container Type
+       * @see https://tailwindcss.com/docs/responsive-design#container-queries
+       */
+      "container-type": [{
+        "@container": ["", "normal", "size", isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Container Name
+       * @see https://tailwindcss.com/docs/responsive-design#named-containers
+       */
+      "container-named": [isNamedContainerQuery],
+      /**
+       * Columns
+       * @see https://tailwindcss.com/docs/columns
+       */
+      columns: [{
+        columns: [isNumber, "auto", isArbitraryValue, isArbitraryVariable, themeContainer]
+      }],
+      /**
+       * Break After
+       * @see https://tailwindcss.com/docs/break-after
+       */
+      "break-after": [{
+        "break-after": scaleBreak()
+      }],
+      /**
+       * Break Before
+       * @see https://tailwindcss.com/docs/break-before
+       */
+      "break-before": [{
+        "break-before": scaleBreak()
+      }],
+      /**
+       * Break Inside
+       * @see https://tailwindcss.com/docs/break-inside
+       */
+      "break-inside": [{
+        "break-inside": ["auto", "avoid", "avoid-page", "avoid-column"]
+      }],
+      /**
+       * Box Decoration Break
+       * @see https://tailwindcss.com/docs/box-decoration-break
+       */
+      "box-decoration": [{
+        "box-decoration": ["slice", "clone"]
+      }],
+      /**
+       * Box Sizing
+       * @see https://tailwindcss.com/docs/box-sizing
+       */
+      box: [{
+        box: ["border", "content"]
+      }],
+      /**
+       * Display
+       * @see https://tailwindcss.com/docs/display
+       */
+      display: ["block", "inline-block", "inline", "flex", "inline-flex", "table", "inline-table", "table-caption", "table-cell", "table-column", "table-column-group", "table-footer-group", "table-header-group", "table-row-group", "table-row", "flow-root", "grid", "inline-grid", "contents", "list-item", "hidden"],
+      /**
+       * Screen Reader Only
+       * @see https://tailwindcss.com/docs/display#screen-reader-only
+       */
+      sr: ["sr-only"],
+      /**
+       * Not Screen Reader Only
+       * @see https://tailwindcss.com/docs/display#screen-reader-only
+       */
+      "not-sr": ["not-sr-only"],
+      /**
+       * Floats
+       * @see https://tailwindcss.com/docs/float
+       */
+      float: [{
+        float: ["right", "left", "none", "start", "end"]
+      }],
+      /**
+       * Clear
+       * @see https://tailwindcss.com/docs/clear
+       */
+      clear: [{
+        clear: ["left", "right", "both", "none", "start", "end"]
+      }],
+      /**
+       * Isolation
+       * @see https://tailwindcss.com/docs/isolation
+       */
+      isolation: ["isolate", "isolation-auto"],
+      /**
+       * Object Fit
+       * @see https://tailwindcss.com/docs/object-fit
+       */
+      "object-fit": [{
+        object: ["contain", "cover", "fill", "none", "scale-down"]
+      }],
+      /**
+       * Object Position
+       * @see https://tailwindcss.com/docs/object-position
+       */
+      "object-position": [{
+        object: scalePositionWithArbitrary()
+      }],
+      /**
+       * Overflow
+       * @see https://tailwindcss.com/docs/overflow
+       */
+      overflow: [{
+        overflow: scaleOverflow()
+      }],
+      /**
+       * Overflow X
+       * @see https://tailwindcss.com/docs/overflow
+       */
+      "overflow-x": [{
+        "overflow-x": scaleOverflow()
+      }],
+      /**
+       * Overflow Y
+       * @see https://tailwindcss.com/docs/overflow
+       */
+      "overflow-y": [{
+        "overflow-y": scaleOverflow()
+      }],
+      /**
+       * Overscroll Behavior
+       * @see https://tailwindcss.com/docs/overscroll-behavior
+       */
+      overscroll: [{
+        overscroll: scaleOverscroll()
+      }],
+      /**
+       * Overscroll Behavior X
+       * @see https://tailwindcss.com/docs/overscroll-behavior
+       */
+      "overscroll-x": [{
+        "overscroll-x": scaleOverscroll()
+      }],
+      /**
+       * Overscroll Behavior Y
+       * @see https://tailwindcss.com/docs/overscroll-behavior
+       */
+      "overscroll-y": [{
+        "overscroll-y": scaleOverscroll()
+      }],
+      /**
+       * Position
+       * @see https://tailwindcss.com/docs/position
+       */
+      position: ["static", "fixed", "absolute", "relative", "sticky"],
+      /**
+       * Inset
+       * @see https://tailwindcss.com/docs/top-right-bottom-left
+       */
+      inset: [{
+        inset: scaleInset()
+      }],
+      /**
+       * Inset Inline
+       * @see https://tailwindcss.com/docs/top-right-bottom-left
+       */
+      "inset-x": [{
+        "inset-x": scaleInset()
+      }],
+      /**
+       * Inset Block
+       * @see https://tailwindcss.com/docs/top-right-bottom-left
+       */
+      "inset-y": [{
+        "inset-y": scaleInset()
+      }],
+      /**
+       * Inset Inline Start
+       * @see https://tailwindcss.com/docs/top-right-bottom-left
+       * @todo class group will be renamed to `inset-s` in next major release
+       */
+      start: [{
+        "inset-s": scaleInset(),
+        /**
+         * @deprecated since Tailwind CSS v4.2.0 in favor of `inset-s-*` utilities.
+         * @see https://github.com/tailwindlabs/tailwindcss/pull/19613
+         */
+        start: scaleInset()
+      }],
+      /**
+       * Inset Inline End
+       * @see https://tailwindcss.com/docs/top-right-bottom-left
+       * @todo class group will be renamed to `inset-e` in next major release
+       */
+      end: [{
+        "inset-e": scaleInset(),
+        /**
+         * @deprecated since Tailwind CSS v4.2.0 in favor of `inset-e-*` utilities.
+         * @see https://github.com/tailwindlabs/tailwindcss/pull/19613
+         */
+        end: scaleInset()
+      }],
+      /**
+       * Inset Block Start
+       * @see https://tailwindcss.com/docs/top-right-bottom-left
+       */
+      "inset-bs": [{
+        "inset-bs": scaleInset()
+      }],
+      /**
+       * Inset Block End
+       * @see https://tailwindcss.com/docs/top-right-bottom-left
+       */
+      "inset-be": [{
+        "inset-be": scaleInset()
+      }],
+      /**
+       * Top
+       * @see https://tailwindcss.com/docs/top-right-bottom-left
+       */
+      top: [{
+        top: scaleInset()
+      }],
+      /**
+       * Right
+       * @see https://tailwindcss.com/docs/top-right-bottom-left
+       */
+      right: [{
+        right: scaleInset()
+      }],
+      /**
+       * Bottom
+       * @see https://tailwindcss.com/docs/top-right-bottom-left
+       */
+      bottom: [{
+        bottom: scaleInset()
+      }],
+      /**
+       * Left
+       * @see https://tailwindcss.com/docs/top-right-bottom-left
+       */
+      left: [{
+        left: scaleInset()
+      }],
+      /**
+       * Visibility
+       * @see https://tailwindcss.com/docs/visibility
+       */
+      visibility: ["visible", "invisible", "collapse"],
+      /**
+       * Z-Index
+       * @see https://tailwindcss.com/docs/z-index
+       */
+      z: [{
+        z: [isInteger, "auto", isArbitraryVariable, isArbitraryValue]
+      }],
+      // ------------------------
+      // --- Flexbox and Grid ---
+      // ------------------------
+      /**
+       * Flex Basis
+       * @see https://tailwindcss.com/docs/flex-basis
+       */
+      basis: [{
+        basis: [isFraction, "full", "auto", themeContainer, ...scaleUnambiguousSpacing()]
+      }],
+      /**
+       * Flex Direction
+       * @see https://tailwindcss.com/docs/flex-direction
+       */
+      "flex-direction": [{
+        flex: ["row", "row-reverse", "col", "col-reverse"]
+      }],
+      /**
+       * Flex Wrap
+       * @see https://tailwindcss.com/docs/flex-wrap
+       */
+      "flex-wrap": [{
+        flex: ["nowrap", "wrap", "wrap-reverse"]
+      }],
+      /**
+       * Flex
+       * @see https://tailwindcss.com/docs/flex
+       */
+      flex: [{
+        flex: [isNumber, isFraction, "auto", "initial", "none", isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Flex Grow
+       * @see https://tailwindcss.com/docs/flex-grow
+       */
+      grow: [{
+        grow: ["", isNumber, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Flex Shrink
+       * @see https://tailwindcss.com/docs/flex-shrink
+       */
+      shrink: [{
+        shrink: ["", isNumber, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Order
+       * @see https://tailwindcss.com/docs/order
+       */
+      order: [{
+        order: [isInteger, "first", "last", "none", isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Grid Template Columns
+       * @see https://tailwindcss.com/docs/grid-template-columns
+       */
+      "grid-cols": [{
+        "grid-cols": scaleGridTemplateColsRows()
+      }],
+      /**
+       * Grid Column Start / End
+       * @see https://tailwindcss.com/docs/grid-column
+       */
+      "col-start-end": [{
+        col: scaleGridColRowStartAndEnd()
+      }],
+      /**
+       * Grid Column Start
+       * @see https://tailwindcss.com/docs/grid-column
+       */
+      "col-start": [{
+        "col-start": scaleGridColRowStartOrEnd()
+      }],
+      /**
+       * Grid Column End
+       * @see https://tailwindcss.com/docs/grid-column
+       */
+      "col-end": [{
+        "col-end": scaleGridColRowStartOrEnd()
+      }],
+      /**
+       * Grid Template Rows
+       * @see https://tailwindcss.com/docs/grid-template-rows
+       */
+      "grid-rows": [{
+        "grid-rows": scaleGridTemplateColsRows()
+      }],
+      /**
+       * Grid Row Start / End
+       * @see https://tailwindcss.com/docs/grid-row
+       */
+      "row-start-end": [{
+        row: scaleGridColRowStartAndEnd()
+      }],
+      /**
+       * Grid Row Start
+       * @see https://tailwindcss.com/docs/grid-row
+       */
+      "row-start": [{
+        "row-start": scaleGridColRowStartOrEnd()
+      }],
+      /**
+       * Grid Row End
+       * @see https://tailwindcss.com/docs/grid-row
+       */
+      "row-end": [{
+        "row-end": scaleGridColRowStartOrEnd()
+      }],
+      /**
+       * Grid Auto Flow
+       * @see https://tailwindcss.com/docs/grid-auto-flow
+       */
+      "grid-flow": [{
+        "grid-flow": ["row", "col", "dense", "row-dense", "col-dense"]
+      }],
+      /**
+       * Grid Auto Columns
+       * @see https://tailwindcss.com/docs/grid-auto-columns
+       */
+      "auto-cols": [{
+        "auto-cols": scaleGridAutoColsRows()
+      }],
+      /**
+       * Grid Auto Rows
+       * @see https://tailwindcss.com/docs/grid-auto-rows
+       */
+      "auto-rows": [{
+        "auto-rows": scaleGridAutoColsRows()
+      }],
+      /**
+       * Gap
+       * @see https://tailwindcss.com/docs/gap
+       */
+      gap: [{
+        gap: scaleUnambiguousSpacing()
+      }],
+      /**
+       * Gap X
+       * @see https://tailwindcss.com/docs/gap
+       */
+      "gap-x": [{
+        "gap-x": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Gap Y
+       * @see https://tailwindcss.com/docs/gap
+       */
+      "gap-y": [{
+        "gap-y": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Justify Content
+       * @see https://tailwindcss.com/docs/justify-content
+       */
+      "justify-content": [{
+        justify: [...scaleAlignPrimaryAxis(), "normal"]
+      }],
+      /**
+       * Justify Items
+       * @see https://tailwindcss.com/docs/justify-items
+       */
+      "justify-items": [{
+        "justify-items": [...scaleAlignSecondaryAxis(), "normal"]
+      }],
+      /**
+       * Justify Self
+       * @see https://tailwindcss.com/docs/justify-self
+       */
+      "justify-self": [{
+        "justify-self": ["auto", ...scaleAlignSecondaryAxis()]
+      }],
+      /**
+       * Align Content
+       * @see https://tailwindcss.com/docs/align-content
+       */
+      "align-content": [{
+        content: ["normal", ...scaleAlignPrimaryAxis()]
+      }],
+      /**
+       * Align Items
+       * @see https://tailwindcss.com/docs/align-items
+       */
+      "align-items": [{
+        items: [...scaleAlignSecondaryAxis(), {
+          baseline: ["", "last"]
+        }]
+      }],
+      /**
+       * Align Self
+       * @see https://tailwindcss.com/docs/align-self
+       */
+      "align-self": [{
+        self: ["auto", ...scaleAlignSecondaryAxis(), {
+          baseline: ["", "last"]
+        }]
+      }],
+      /**
+       * Place Content
+       * @see https://tailwindcss.com/docs/place-content
+       */
+      "place-content": [{
+        "place-content": scaleAlignPrimaryAxis()
+      }],
+      /**
+       * Place Items
+       * @see https://tailwindcss.com/docs/place-items
+       */
+      "place-items": [{
+        "place-items": [...scaleAlignSecondaryAxis(), "baseline"]
+      }],
+      /**
+       * Place Self
+       * @see https://tailwindcss.com/docs/place-self
+       */
+      "place-self": [{
+        "place-self": ["auto", ...scaleAlignSecondaryAxis()]
+      }],
+      // Spacing
+      /**
+       * Padding
+       * @see https://tailwindcss.com/docs/padding
+       */
+      p: [{
+        p: scaleUnambiguousSpacing()
+      }],
+      /**
+       * Padding Inline
+       * @see https://tailwindcss.com/docs/padding
+       */
+      px: [{
+        px: scaleUnambiguousSpacing()
+      }],
+      /**
+       * Padding Block
+       * @see https://tailwindcss.com/docs/padding
+       */
+      py: [{
+        py: scaleUnambiguousSpacing()
+      }],
+      /**
+       * Padding Inline Start
+       * @see https://tailwindcss.com/docs/padding
+       */
+      ps: [{
+        ps: scaleUnambiguousSpacing()
+      }],
+      /**
+       * Padding Inline End
+       * @see https://tailwindcss.com/docs/padding
+       */
+      pe: [{
+        pe: scaleUnambiguousSpacing()
+      }],
+      /**
+       * Padding Block Start
+       * @see https://tailwindcss.com/docs/padding
+       */
+      pbs: [{
+        pbs: scaleUnambiguousSpacing()
+      }],
+      /**
+       * Padding Block End
+       * @see https://tailwindcss.com/docs/padding
+       */
+      pbe: [{
+        pbe: scaleUnambiguousSpacing()
+      }],
+      /**
+       * Padding Top
+       * @see https://tailwindcss.com/docs/padding
+       */
+      pt: [{
+        pt: scaleUnambiguousSpacing()
+      }],
+      /**
+       * Padding Right
+       * @see https://tailwindcss.com/docs/padding
+       */
+      pr: [{
+        pr: scaleUnambiguousSpacing()
+      }],
+      /**
+       * Padding Bottom
+       * @see https://tailwindcss.com/docs/padding
+       */
+      pb: [{
+        pb: scaleUnambiguousSpacing()
+      }],
+      /**
+       * Padding Left
+       * @see https://tailwindcss.com/docs/padding
+       */
+      pl: [{
+        pl: scaleUnambiguousSpacing()
+      }],
+      /**
+       * Margin
+       * @see https://tailwindcss.com/docs/margin
+       */
+      m: [{
+        m: scaleMargin()
+      }],
+      /**
+       * Margin Inline
+       * @see https://tailwindcss.com/docs/margin
+       */
+      mx: [{
+        mx: scaleMargin()
+      }],
+      /**
+       * Margin Block
+       * @see https://tailwindcss.com/docs/margin
+       */
+      my: [{
+        my: scaleMargin()
+      }],
+      /**
+       * Margin Inline Start
+       * @see https://tailwindcss.com/docs/margin
+       */
+      ms: [{
+        ms: scaleMargin()
+      }],
+      /**
+       * Margin Inline End
+       * @see https://tailwindcss.com/docs/margin
+       */
+      me: [{
+        me: scaleMargin()
+      }],
+      /**
+       * Margin Block Start
+       * @see https://tailwindcss.com/docs/margin
+       */
+      mbs: [{
+        mbs: scaleMargin()
+      }],
+      /**
+       * Margin Block End
+       * @see https://tailwindcss.com/docs/margin
+       */
+      mbe: [{
+        mbe: scaleMargin()
+      }],
+      /**
+       * Margin Top
+       * @see https://tailwindcss.com/docs/margin
+       */
+      mt: [{
+        mt: scaleMargin()
+      }],
+      /**
+       * Margin Right
+       * @see https://tailwindcss.com/docs/margin
+       */
+      mr: [{
+        mr: scaleMargin()
+      }],
+      /**
+       * Margin Bottom
+       * @see https://tailwindcss.com/docs/margin
+       */
+      mb: [{
+        mb: scaleMargin()
+      }],
+      /**
+       * Margin Left
+       * @see https://tailwindcss.com/docs/margin
+       */
+      ml: [{
+        ml: scaleMargin()
+      }],
+      /**
+       * Space Between X
+       * @see https://tailwindcss.com/docs/margin#adding-space-between-children
+       */
+      "space-x": [{
+        "space-x": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Space Between X Reverse
+       * @see https://tailwindcss.com/docs/margin#adding-space-between-children
+       */
+      "space-x-reverse": ["space-x-reverse"],
+      /**
+       * Space Between Y
+       * @see https://tailwindcss.com/docs/margin#adding-space-between-children
+       */
+      "space-y": [{
+        "space-y": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Space Between Y Reverse
+       * @see https://tailwindcss.com/docs/margin#adding-space-between-children
+       */
+      "space-y-reverse": ["space-y-reverse"],
+      // --------------
+      // --- Sizing ---
+      // --------------
+      /**
+       * Size
+       * @see https://tailwindcss.com/docs/width#setting-both-width-and-height
+       */
+      size: [{
+        size: scaleSizing()
+      }],
+      /**
+       * Inline Size
+       * @see https://tailwindcss.com/docs/inline-size
+       */
+      "inline-size": [{
+        inline: ["auto", ...scaleSizingInline()]
+      }],
+      /**
+       * Min-Inline Size
+       * @see https://tailwindcss.com/docs/min-inline-size
+       */
+      "min-inline-size": [{
+        "min-inline": ["auto", ...scaleSizingInline()]
+      }],
+      /**
+       * Max-Inline Size
+       * @see https://tailwindcss.com/docs/max-inline-size
+       */
+      "max-inline-size": [{
+        "max-inline": ["none", ...scaleSizingInline()]
+      }],
+      /**
+       * Block Size
+       * @see https://tailwindcss.com/docs/block-size
+       */
+      "block-size": [{
+        block: ["auto", ...scaleSizingBlock()]
+      }],
+      /**
+       * Min-Block Size
+       * @see https://tailwindcss.com/docs/min-block-size
+       */
+      "min-block-size": [{
+        "min-block": ["auto", ...scaleSizingBlock()]
+      }],
+      /**
+       * Max-Block Size
+       * @see https://tailwindcss.com/docs/max-block-size
+       */
+      "max-block-size": [{
+        "max-block": ["none", ...scaleSizingBlock()]
+      }],
+      /**
+       * Width
+       * @see https://tailwindcss.com/docs/width
+       */
+      w: [{
+        w: [themeContainer, "screen", ...scaleSizing()]
+      }],
+      /**
+       * Min-Width
+       * @see https://tailwindcss.com/docs/min-width
+       */
+      "min-w": [{
+        "min-w": [
+          themeContainer,
+          "screen",
+          /** Deprecated. @see https://github.com/tailwindlabs/tailwindcss.com/issues/2027#issuecomment-2620152757 */
+          "none",
+          ...scaleSizing()
+        ]
+      }],
+      /**
+       * Max-Width
+       * @see https://tailwindcss.com/docs/max-width
+       */
+      "max-w": [{
+        "max-w": [
+          themeContainer,
+          "screen",
+          "none",
+          /** Deprecated since Tailwind CSS v4.0.0. @see https://github.com/tailwindlabs/tailwindcss.com/issues/2027#issuecomment-2620152757 */
+          "prose",
+          /** Deprecated since Tailwind CSS v4.0.0. @see https://github.com/tailwindlabs/tailwindcss.com/issues/2027#issuecomment-2620152757 */
+          {
+            screen: [themeBreakpoint]
+          },
+          ...scaleSizing()
+        ]
+      }],
+      /**
+       * Height
+       * @see https://tailwindcss.com/docs/height
+       */
+      h: [{
+        h: ["screen", "lh", ...scaleSizing()]
+      }],
+      /**
+       * Min-Height
+       * @see https://tailwindcss.com/docs/min-height
+       */
+      "min-h": [{
+        "min-h": ["screen", "lh", "none", ...scaleSizing()]
+      }],
+      /**
+       * Max-Height
+       * @see https://tailwindcss.com/docs/max-height
+       */
+      "max-h": [{
+        "max-h": ["screen", "lh", "none", ...scaleSizing()]
+      }],
+      // ------------------
+      // --- Typography ---
+      // ------------------
+      /**
+       * Font Size
+       * @see https://tailwindcss.com/docs/font-size
+       */
+      "font-size": [{
+        text: ["base", themeText, isArbitraryVariableLength, isArbitraryLength]
+      }],
+      /**
+       * Font Smoothing
+       * @see https://tailwindcss.com/docs/font-smoothing
+       */
+      "font-smoothing": ["antialiased", "subpixel-antialiased"],
+      /**
+       * Font Style
+       * @see https://tailwindcss.com/docs/font-style
+       */
+      "font-style": ["italic", "not-italic"],
+      /**
+       * Font Weight
+       * @see https://tailwindcss.com/docs/font-weight
+       */
+      "font-weight": [{
+        font: [themeFontWeight, isArbitraryVariableWeight, isArbitraryWeight]
+      }],
+      /**
+       * Font Stretch
+       * @see https://tailwindcss.com/docs/font-stretch
+       */
+      "font-stretch": [{
+        "font-stretch": ["ultra-condensed", "extra-condensed", "condensed", "semi-condensed", "normal", "semi-expanded", "expanded", "extra-expanded", "ultra-expanded", isPercent, isArbitraryValue]
+      }],
+      /**
+       * Font Family
+       * @see https://tailwindcss.com/docs/font-family
+       */
+      "font-family": [{
+        font: [isArbitraryVariableFamilyName, isArbitraryFamilyName, themeFont]
+      }],
+      /**
+       * Font Feature Settings
+       * @see https://tailwindcss.com/docs/font-feature-settings
+       */
+      "font-features": [{
+        "font-features": [isArbitraryValue]
+      }],
+      /**
+       * Font Variant Numeric
+       * @see https://tailwindcss.com/docs/font-variant-numeric
+       */
+      "fvn-normal": ["normal-nums"],
+      /**
+       * Font Variant Numeric
+       * @see https://tailwindcss.com/docs/font-variant-numeric
+       */
+      "fvn-ordinal": ["ordinal"],
+      /**
+       * Font Variant Numeric
+       * @see https://tailwindcss.com/docs/font-variant-numeric
+       */
+      "fvn-slashed-zero": ["slashed-zero"],
+      /**
+       * Font Variant Numeric
+       * @see https://tailwindcss.com/docs/font-variant-numeric
+       */
+      "fvn-figure": ["lining-nums", "oldstyle-nums"],
+      /**
+       * Font Variant Numeric
+       * @see https://tailwindcss.com/docs/font-variant-numeric
+       */
+      "fvn-spacing": ["proportional-nums", "tabular-nums"],
+      /**
+       * Font Variant Numeric
+       * @see https://tailwindcss.com/docs/font-variant-numeric
+       */
+      "fvn-fraction": ["diagonal-fractions", "stacked-fractions"],
+      /**
+       * Letter Spacing
+       * @see https://tailwindcss.com/docs/letter-spacing
+       */
+      tracking: [{
+        tracking: [themeTracking, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Line Clamp
+       * @see https://tailwindcss.com/docs/line-clamp
+       */
+      "line-clamp": [{
+        "line-clamp": [isNumber, "none", isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Line Height
+       * @see https://tailwindcss.com/docs/line-height
+       */
+      leading: [{
+        leading: [
+          "none",
+          /** Deprecated since Tailwind CSS v4.0.0. @see https://github.com/tailwindlabs/tailwindcss.com/issues/2027#issuecomment-2620152757 */
+          themeLeading,
+          ...scaleUnambiguousSpacing()
+        ]
+      }],
+      /**
+       * List Style Image
+       * @see https://tailwindcss.com/docs/list-style-image
+       */
+      "list-image": [{
+        "list-image": ["none", isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * List Style Position
+       * @see https://tailwindcss.com/docs/list-style-position
+       */
+      "list-style-position": [{
+        list: ["inside", "outside"]
+      }],
+      /**
+       * List Style Type
+       * @see https://tailwindcss.com/docs/list-style-type
+       */
+      "list-style-type": [{
+        list: ["disc", "decimal", "none", isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Text Alignment
+       * @see https://tailwindcss.com/docs/text-align
+       */
+      "text-alignment": [{
+        text: ["left", "center", "right", "justify", "start", "end"]
+      }],
+      /**
+       * Placeholder Color
+       * @deprecated since Tailwind CSS v3.0.0
+       * @see https://v3.tailwindcss.com/docs/placeholder-color
+       */
+      "placeholder-color": [{
+        placeholder: scaleColor()
+      }],
+      /**
+       * Text Color
+       * @see https://tailwindcss.com/docs/text-color
+       */
+      "text-color": [{
+        text: scaleColor()
+      }],
+      /**
+       * Text Decoration
+       * @see https://tailwindcss.com/docs/text-decoration
+       */
+      "text-decoration": ["underline", "overline", "line-through", "no-underline"],
+      /**
+       * Text Decoration Style
+       * @see https://tailwindcss.com/docs/text-decoration-style
+       */
+      "text-decoration-style": [{
+        decoration: [...scaleLineStyle(), "wavy"]
+      }],
+      /**
+       * Text Decoration Thickness
+       * @see https://tailwindcss.com/docs/text-decoration-thickness
+       */
+      "text-decoration-thickness": [{
+        decoration: [isNumber, "from-font", "auto", isArbitraryVariableLength, isArbitraryVariablePosition, isArbitraryLength]
+      }],
+      /**
+       * Text Decoration Color
+       * @see https://tailwindcss.com/docs/text-decoration-color
+       */
+      "text-decoration-color": [{
+        decoration: scaleColor()
+      }],
+      /**
+       * Text Underline Offset
+       * @see https://tailwindcss.com/docs/text-underline-offset
+       */
+      "underline-offset": [{
+        "underline-offset": [isNumber, "auto", isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Text Transform
+       * @see https://tailwindcss.com/docs/text-transform
+       */
+      "text-transform": ["uppercase", "lowercase", "capitalize", "normal-case"],
+      /**
+       * Text Overflow
+       * @see https://tailwindcss.com/docs/text-overflow
+       */
+      "text-overflow": ["truncate", "text-ellipsis", "text-clip"],
+      /**
+       * Text Wrap
+       * @see https://tailwindcss.com/docs/text-wrap
+       */
+      "text-wrap": [{
+        text: ["wrap", "nowrap", "balance", "pretty"]
+      }],
+      /**
+       * Text Indent
+       * @see https://tailwindcss.com/docs/text-indent
+       */
+      indent: [{
+        indent: scaleUnambiguousSpacing()
+      }],
+      /**
+       * Tab Size
+       * @see https://tailwindcss.com/docs/tab-size
+       */
+      "tab-size": [{
+        tab: [isInteger, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Vertical Alignment
+       * @see https://tailwindcss.com/docs/vertical-align
+       */
+      "vertical-align": [{
+        align: ["baseline", "top", "middle", "bottom", "text-top", "text-bottom", "sub", "super", isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Whitespace
+       * @see https://tailwindcss.com/docs/whitespace
+       */
+      whitespace: [{
+        whitespace: ["normal", "nowrap", "pre", "pre-line", "pre-wrap", "break-spaces"]
+      }],
+      /**
+       * Word Break
+       * @see https://tailwindcss.com/docs/word-break
+       */
+      break: [{
+        break: ["normal", "words", "all", "keep"]
+      }],
+      /**
+       * Overflow Wrap
+       * @see https://tailwindcss.com/docs/overflow-wrap
+       */
+      wrap: [{
+        wrap: ["break-word", "anywhere", "normal"]
+      }],
+      /**
+       * Hyphens
+       * @see https://tailwindcss.com/docs/hyphens
+       */
+      hyphens: [{
+        hyphens: ["none", "manual", "auto"]
+      }],
+      /**
+       * Content
+       * @see https://tailwindcss.com/docs/content
+       */
+      content: [{
+        content: ["none", isArbitraryVariable, isArbitraryValue]
+      }],
+      // -------------------
+      // --- Backgrounds ---
+      // -------------------
+      /**
+       * Background Attachment
+       * @see https://tailwindcss.com/docs/background-attachment
+       */
+      "bg-attachment": [{
+        bg: ["fixed", "local", "scroll"]
+      }],
+      /**
+       * Background Clip
+       * @see https://tailwindcss.com/docs/background-clip
+       */
+      "bg-clip": [{
+        "bg-clip": ["border", "padding", "content", "text"]
+      }],
+      /**
+       * Background Origin
+       * @see https://tailwindcss.com/docs/background-origin
+       */
+      "bg-origin": [{
+        "bg-origin": ["border", "padding", "content"]
+      }],
+      /**
+       * Background Position
+       * @see https://tailwindcss.com/docs/background-position
+       */
+      "bg-position": [{
+        bg: scaleBgPosition()
+      }],
+      /**
+       * Background Repeat
+       * @see https://tailwindcss.com/docs/background-repeat
+       */
+      "bg-repeat": [{
+        bg: scaleBgRepeat()
+      }],
+      /**
+       * Background Size
+       * @see https://tailwindcss.com/docs/background-size
+       */
+      "bg-size": [{
+        bg: scaleBgSize()
+      }],
+      /**
+       * Background Image
+       * @see https://tailwindcss.com/docs/background-image
+       */
+      "bg-image": [{
+        bg: ["none", {
+          linear: [{
+            to: ["t", "tr", "r", "br", "b", "bl", "l", "tl"]
+          }, isInteger, isArbitraryVariable, isArbitraryValue],
+          radial: ["", isArbitraryVariable, isArbitraryValue],
+          conic: ["", isInteger, isArbitraryVariable, isArbitraryValue]
+        }, isArbitraryVariableImage, isArbitraryImage]
+      }],
+      /**
+       * Background Color
+       * @see https://tailwindcss.com/docs/background-color
+       */
+      "bg-color": [{
+        bg: scaleColor()
+      }],
+      /**
+       * Gradient Color Stops From Position
+       * @see https://tailwindcss.com/docs/gradient-color-stops
+       */
+      "gradient-from-pos": [{
+        from: scaleGradientStopPosition()
+      }],
+      /**
+       * Gradient Color Stops Via Position
+       * @see https://tailwindcss.com/docs/gradient-color-stops
+       */
+      "gradient-via-pos": [{
+        via: scaleGradientStopPosition()
+      }],
+      /**
+       * Gradient Color Stops To Position
+       * @see https://tailwindcss.com/docs/gradient-color-stops
+       */
+      "gradient-to-pos": [{
+        to: scaleGradientStopPosition()
+      }],
+      /**
+       * Gradient Color Stops From
+       * @see https://tailwindcss.com/docs/gradient-color-stops
+       */
+      "gradient-from": [{
+        from: scaleColor()
+      }],
+      /**
+       * Gradient Color Stops Via
+       * @see https://tailwindcss.com/docs/gradient-color-stops
+       */
+      "gradient-via": [{
+        via: scaleColor()
+      }],
+      /**
+       * Gradient Color Stops To
+       * @see https://tailwindcss.com/docs/gradient-color-stops
+       */
+      "gradient-to": [{
+        to: scaleColor()
+      }],
+      // ---------------
+      // --- Borders ---
+      // ---------------
+      /**
+       * Border Radius
+       * @see https://tailwindcss.com/docs/border-radius
+       */
+      rounded: [{
+        rounded: scaleRadius()
+      }],
+      /**
+       * Border Radius Start
+       * @see https://tailwindcss.com/docs/border-radius
+       */
+      "rounded-s": [{
+        "rounded-s": scaleRadius()
+      }],
+      /**
+       * Border Radius End
+       * @see https://tailwindcss.com/docs/border-radius
+       */
+      "rounded-e": [{
+        "rounded-e": scaleRadius()
+      }],
+      /**
+       * Border Radius Top
+       * @see https://tailwindcss.com/docs/border-radius
+       */
+      "rounded-t": [{
+        "rounded-t": scaleRadius()
+      }],
+      /**
+       * Border Radius Right
+       * @see https://tailwindcss.com/docs/border-radius
+       */
+      "rounded-r": [{
+        "rounded-r": scaleRadius()
+      }],
+      /**
+       * Border Radius Bottom
+       * @see https://tailwindcss.com/docs/border-radius
+       */
+      "rounded-b": [{
+        "rounded-b": scaleRadius()
+      }],
+      /**
+       * Border Radius Left
+       * @see https://tailwindcss.com/docs/border-radius
+       */
+      "rounded-l": [{
+        "rounded-l": scaleRadius()
+      }],
+      /**
+       * Border Radius Start Start
+       * @see https://tailwindcss.com/docs/border-radius
+       */
+      "rounded-ss": [{
+        "rounded-ss": scaleRadius()
+      }],
+      /**
+       * Border Radius Start End
+       * @see https://tailwindcss.com/docs/border-radius
+       */
+      "rounded-se": [{
+        "rounded-se": scaleRadius()
+      }],
+      /**
+       * Border Radius End End
+       * @see https://tailwindcss.com/docs/border-radius
+       */
+      "rounded-ee": [{
+        "rounded-ee": scaleRadius()
+      }],
+      /**
+       * Border Radius End Start
+       * @see https://tailwindcss.com/docs/border-radius
+       */
+      "rounded-es": [{
+        "rounded-es": scaleRadius()
+      }],
+      /**
+       * Border Radius Top Left
+       * @see https://tailwindcss.com/docs/border-radius
+       */
+      "rounded-tl": [{
+        "rounded-tl": scaleRadius()
+      }],
+      /**
+       * Border Radius Top Right
+       * @see https://tailwindcss.com/docs/border-radius
+       */
+      "rounded-tr": [{
+        "rounded-tr": scaleRadius()
+      }],
+      /**
+       * Border Radius Bottom Right
+       * @see https://tailwindcss.com/docs/border-radius
+       */
+      "rounded-br": [{
+        "rounded-br": scaleRadius()
+      }],
+      /**
+       * Border Radius Bottom Left
+       * @see https://tailwindcss.com/docs/border-radius
+       */
+      "rounded-bl": [{
+        "rounded-bl": scaleRadius()
+      }],
+      /**
+       * Border Width
+       * @see https://tailwindcss.com/docs/border-width
+       */
+      "border-w": [{
+        border: scaleBorderWidth()
+      }],
+      /**
+       * Border Width Inline
+       * @see https://tailwindcss.com/docs/border-width
+       */
+      "border-w-x": [{
+        "border-x": scaleBorderWidth()
+      }],
+      /**
+       * Border Width Block
+       * @see https://tailwindcss.com/docs/border-width
+       */
+      "border-w-y": [{
+        "border-y": scaleBorderWidth()
+      }],
+      /**
+       * Border Width Inline Start
+       * @see https://tailwindcss.com/docs/border-width
+       */
+      "border-w-s": [{
+        "border-s": scaleBorderWidth()
+      }],
+      /**
+       * Border Width Inline End
+       * @see https://tailwindcss.com/docs/border-width
+       */
+      "border-w-e": [{
+        "border-e": scaleBorderWidth()
+      }],
+      /**
+       * Border Width Block Start
+       * @see https://tailwindcss.com/docs/border-width
+       */
+      "border-w-bs": [{
+        "border-bs": scaleBorderWidth()
+      }],
+      /**
+       * Border Width Block End
+       * @see https://tailwindcss.com/docs/border-width
+       */
+      "border-w-be": [{
+        "border-be": scaleBorderWidth()
+      }],
+      /**
+       * Border Width Top
+       * @see https://tailwindcss.com/docs/border-width
+       */
+      "border-w-t": [{
+        "border-t": scaleBorderWidth()
+      }],
+      /**
+       * Border Width Right
+       * @see https://tailwindcss.com/docs/border-width
+       */
+      "border-w-r": [{
+        "border-r": scaleBorderWidth()
+      }],
+      /**
+       * Border Width Bottom
+       * @see https://tailwindcss.com/docs/border-width
+       */
+      "border-w-b": [{
+        "border-b": scaleBorderWidth()
+      }],
+      /**
+       * Border Width Left
+       * @see https://tailwindcss.com/docs/border-width
+       */
+      "border-w-l": [{
+        "border-l": scaleBorderWidth()
+      }],
+      /**
+       * Divide Width X
+       * @see https://tailwindcss.com/docs/border-width#between-children
+       */
+      "divide-x": [{
+        "divide-x": scaleBorderWidth()
+      }],
+      /**
+       * Divide Width X Reverse
+       * @see https://tailwindcss.com/docs/border-width#between-children
+       */
+      "divide-x-reverse": ["divide-x-reverse"],
+      /**
+       * Divide Width Y
+       * @see https://tailwindcss.com/docs/border-width#between-children
+       */
+      "divide-y": [{
+        "divide-y": scaleBorderWidth()
+      }],
+      /**
+       * Divide Width Y Reverse
+       * @see https://tailwindcss.com/docs/border-width#between-children
+       */
+      "divide-y-reverse": ["divide-y-reverse"],
+      /**
+       * Border Style
+       * @see https://tailwindcss.com/docs/border-style
+       */
+      "border-style": [{
+        border: [...scaleLineStyle(), "hidden", "none"]
+      }],
+      /**
+       * Divide Style
+       * @see https://tailwindcss.com/docs/border-style#setting-the-divider-style
+       */
+      "divide-style": [{
+        divide: [...scaleLineStyle(), "hidden", "none"]
+      }],
+      /**
+       * Border Color
+       * @see https://tailwindcss.com/docs/border-color
+       */
+      "border-color": [{
+        border: scaleColor()
+      }],
+      /**
+       * Border Color Inline
+       * @see https://tailwindcss.com/docs/border-color
+       */
+      "border-color-x": [{
+        "border-x": scaleColor()
+      }],
+      /**
+       * Border Color Block
+       * @see https://tailwindcss.com/docs/border-color
+       */
+      "border-color-y": [{
+        "border-y": scaleColor()
+      }],
+      /**
+       * Border Color Inline Start
+       * @see https://tailwindcss.com/docs/border-color
+       */
+      "border-color-s": [{
+        "border-s": scaleColor()
+      }],
+      /**
+       * Border Color Inline End
+       * @see https://tailwindcss.com/docs/border-color
+       */
+      "border-color-e": [{
+        "border-e": scaleColor()
+      }],
+      /**
+       * Border Color Block Start
+       * @see https://tailwindcss.com/docs/border-color
+       */
+      "border-color-bs": [{
+        "border-bs": scaleColor()
+      }],
+      /**
+       * Border Color Block End
+       * @see https://tailwindcss.com/docs/border-color
+       */
+      "border-color-be": [{
+        "border-be": scaleColor()
+      }],
+      /**
+       * Border Color Top
+       * @see https://tailwindcss.com/docs/border-color
+       */
+      "border-color-t": [{
+        "border-t": scaleColor()
+      }],
+      /**
+       * Border Color Right
+       * @see https://tailwindcss.com/docs/border-color
+       */
+      "border-color-r": [{
+        "border-r": scaleColor()
+      }],
+      /**
+       * Border Color Bottom
+       * @see https://tailwindcss.com/docs/border-color
+       */
+      "border-color-b": [{
+        "border-b": scaleColor()
+      }],
+      /**
+       * Border Color Left
+       * @see https://tailwindcss.com/docs/border-color
+       */
+      "border-color-l": [{
+        "border-l": scaleColor()
+      }],
+      /**
+       * Divide Color
+       * @see https://tailwindcss.com/docs/divide-color
+       */
+      "divide-color": [{
+        divide: scaleColor()
+      }],
+      /**
+       * Outline Style
+       * @see https://tailwindcss.com/docs/outline-style
+       */
+      "outline-style": [{
+        outline: [...scaleLineStyle(), "none", "hidden"]
+      }],
+      /**
+       * Outline Offset
+       * @see https://tailwindcss.com/docs/outline-offset
+       */
+      "outline-offset": [{
+        "outline-offset": [isNumber, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Outline Width
+       * @see https://tailwindcss.com/docs/outline-width
+       */
+      "outline-w": [{
+        outline: ["", isNumber, isArbitraryVariableLength, isArbitraryLength]
+      }],
+      /**
+       * Outline Color
+       * @see https://tailwindcss.com/docs/outline-color
+       */
+      "outline-color": [{
+        outline: scaleColor()
+      }],
+      // ---------------
+      // --- Effects ---
+      // ---------------
+      /**
+       * Box Shadow
+       * @see https://tailwindcss.com/docs/box-shadow
+       */
+      shadow: [{
+        shadow: [
+          // Deprecated since Tailwind CSS v4.0.0
+          "",
+          // Deprecated since Tailwind CSS v4.0.0
+          "inner",
+          "none",
+          themeShadow,
+          isArbitraryVariableShadow,
+          isArbitraryShadow
+        ]
+      }],
+      /**
+       * Box Shadow Color
+       * @see https://tailwindcss.com/docs/box-shadow#setting-the-shadow-color
+       */
+      "shadow-color": [{
+        shadow: scaleColor()
+      }],
+      /**
+       * Inset Box Shadow
+       * @see https://tailwindcss.com/docs/box-shadow#adding-an-inset-shadow
+       */
+      "inset-shadow": [{
+        "inset-shadow": ["none", themeInsetShadow, isArbitraryVariableShadow, isArbitraryShadow]
+      }],
+      /**
+       * Inset Box Shadow Color
+       * @see https://tailwindcss.com/docs/box-shadow#setting-the-inset-shadow-color
+       */
+      "inset-shadow-color": [{
+        "inset-shadow": scaleColor()
+      }],
+      /**
+       * Ring Width
+       * @see https://tailwindcss.com/docs/box-shadow#adding-a-ring
+       */
+      "ring-w": [{
+        ring: scaleBorderWidth()
+      }],
+      /**
+       * Ring Width Inset
+       * @see https://v3.tailwindcss.com/docs/ring-width#inset-rings
+       * @deprecated since Tailwind CSS v4.0.0
+       * @see https://github.com/tailwindlabs/tailwindcss/blob/v4.0.0/packages/tailwindcss/src/utilities.ts#L4158
+       */
+      "ring-w-inset": ["ring-inset"],
+      /**
+       * Ring Color
+       * @see https://tailwindcss.com/docs/box-shadow#setting-the-ring-color
+       */
+      "ring-color": [{
+        ring: scaleColor()
+      }],
+      /**
+       * Ring Offset Width
+       * @see https://v3.tailwindcss.com/docs/ring-offset-width
+       * @deprecated since Tailwind CSS v4.0.0
+       * @see https://github.com/tailwindlabs/tailwindcss/blob/v4.0.0/packages/tailwindcss/src/utilities.ts#L4158
+       */
+      "ring-offset-w": [{
+        "ring-offset": [isNumber, isArbitraryLength]
+      }],
+      /**
+       * Ring Offset Color
+       * @see https://v3.tailwindcss.com/docs/ring-offset-color
+       * @deprecated since Tailwind CSS v4.0.0
+       * @see https://github.com/tailwindlabs/tailwindcss/blob/v4.0.0/packages/tailwindcss/src/utilities.ts#L4158
+       */
+      "ring-offset-color": [{
+        "ring-offset": scaleColor()
+      }],
+      /**
+       * Inset Ring Width
+       * @see https://tailwindcss.com/docs/box-shadow#adding-an-inset-ring
+       */
+      "inset-ring-w": [{
+        "inset-ring": scaleBorderWidth()
+      }],
+      /**
+       * Inset Ring Color
+       * @see https://tailwindcss.com/docs/box-shadow#setting-the-inset-ring-color
+       */
+      "inset-ring-color": [{
+        "inset-ring": scaleColor()
+      }],
+      /**
+       * Text Shadow
+       * @see https://tailwindcss.com/docs/text-shadow
+       */
+      "text-shadow": [{
+        "text-shadow": ["none", themeTextShadow, isArbitraryVariableShadow, isArbitraryShadow]
+      }],
+      /**
+       * Text Shadow Color
+       * @see https://tailwindcss.com/docs/text-shadow#setting-the-shadow-color
+       */
+      "text-shadow-color": [{
+        "text-shadow": scaleColor()
+      }],
+      /**
+       * Opacity
+       * @see https://tailwindcss.com/docs/opacity
+       */
+      opacity: [{
+        opacity: [isNumber, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Mix Blend Mode
+       * @see https://tailwindcss.com/docs/mix-blend-mode
+       */
+      "mix-blend": [{
+        "mix-blend": [...scaleBlendMode(), "plus-darker", "plus-lighter"]
+      }],
+      /**
+       * Background Blend Mode
+       * @see https://tailwindcss.com/docs/background-blend-mode
+       */
+      "bg-blend": [{
+        "bg-blend": scaleBlendMode()
+      }],
+      /**
+       * Mask Clip
+       * @see https://tailwindcss.com/docs/mask-clip
+       */
+      "mask-clip": [{
+        "mask-clip": ["border", "padding", "content", "fill", "stroke", "view"]
+      }, "mask-no-clip"],
+      /**
+       * Mask Composite
+       * @see https://tailwindcss.com/docs/mask-composite
+       */
+      "mask-composite": [{
+        mask: ["add", "subtract", "intersect", "exclude"]
+      }],
+      /**
+       * Mask Image
+       * @see https://tailwindcss.com/docs/mask-image
+       */
+      "mask-image-linear-pos": [{
+        "mask-linear": [isNumber]
+      }],
+      "mask-image-linear-from-pos": [{
+        "mask-linear-from": scaleMaskImagePosition()
+      }],
+      "mask-image-linear-to-pos": [{
+        "mask-linear-to": scaleMaskImagePosition()
+      }],
+      "mask-image-linear-from-color": [{
+        "mask-linear-from": scaleColor()
+      }],
+      "mask-image-linear-to-color": [{
+        "mask-linear-to": scaleColor()
+      }],
+      "mask-image-t-from-pos": [{
+        "mask-t-from": scaleMaskImagePosition()
+      }],
+      "mask-image-t-to-pos": [{
+        "mask-t-to": scaleMaskImagePosition()
+      }],
+      "mask-image-t-from-color": [{
+        "mask-t-from": scaleColor()
+      }],
+      "mask-image-t-to-color": [{
+        "mask-t-to": scaleColor()
+      }],
+      "mask-image-r-from-pos": [{
+        "mask-r-from": scaleMaskImagePosition()
+      }],
+      "mask-image-r-to-pos": [{
+        "mask-r-to": scaleMaskImagePosition()
+      }],
+      "mask-image-r-from-color": [{
+        "mask-r-from": scaleColor()
+      }],
+      "mask-image-r-to-color": [{
+        "mask-r-to": scaleColor()
+      }],
+      "mask-image-b-from-pos": [{
+        "mask-b-from": scaleMaskImagePosition()
+      }],
+      "mask-image-b-to-pos": [{
+        "mask-b-to": scaleMaskImagePosition()
+      }],
+      "mask-image-b-from-color": [{
+        "mask-b-from": scaleColor()
+      }],
+      "mask-image-b-to-color": [{
+        "mask-b-to": scaleColor()
+      }],
+      "mask-image-l-from-pos": [{
+        "mask-l-from": scaleMaskImagePosition()
+      }],
+      "mask-image-l-to-pos": [{
+        "mask-l-to": scaleMaskImagePosition()
+      }],
+      "mask-image-l-from-color": [{
+        "mask-l-from": scaleColor()
+      }],
+      "mask-image-l-to-color": [{
+        "mask-l-to": scaleColor()
+      }],
+      "mask-image-x-from-pos": [{
+        "mask-x-from": scaleMaskImagePosition()
+      }],
+      "mask-image-x-to-pos": [{
+        "mask-x-to": scaleMaskImagePosition()
+      }],
+      "mask-image-x-from-color": [{
+        "mask-x-from": scaleColor()
+      }],
+      "mask-image-x-to-color": [{
+        "mask-x-to": scaleColor()
+      }],
+      "mask-image-y-from-pos": [{
+        "mask-y-from": scaleMaskImagePosition()
+      }],
+      "mask-image-y-to-pos": [{
+        "mask-y-to": scaleMaskImagePosition()
+      }],
+      "mask-image-y-from-color": [{
+        "mask-y-from": scaleColor()
+      }],
+      "mask-image-y-to-color": [{
+        "mask-y-to": scaleColor()
+      }],
+      "mask-image-radial": [{
+        "mask-radial": [isArbitraryVariable, isArbitraryValue]
+      }],
+      "mask-image-radial-from-pos": [{
+        "mask-radial-from": scaleMaskImagePosition()
+      }],
+      "mask-image-radial-to-pos": [{
+        "mask-radial-to": scaleMaskImagePosition()
+      }],
+      "mask-image-radial-from-color": [{
+        "mask-radial-from": scaleColor()
+      }],
+      "mask-image-radial-to-color": [{
+        "mask-radial-to": scaleColor()
+      }],
+      "mask-image-radial-shape": [{
+        mask: ["circle", "ellipse"]
+      }],
+      "mask-image-radial-size": [{
+        "mask-radial": [{
+          closest: ["side", "corner"],
+          farthest: ["side", "corner"]
+        }]
+      }],
+      "mask-image-radial-pos": [{
+        "mask-radial-at": scalePosition()
+      }],
+      "mask-image-conic-pos": [{
+        "mask-conic": [isNumber]
+      }],
+      "mask-image-conic-from-pos": [{
+        "mask-conic-from": scaleMaskImagePosition()
+      }],
+      "mask-image-conic-to-pos": [{
+        "mask-conic-to": scaleMaskImagePosition()
+      }],
+      "mask-image-conic-from-color": [{
+        "mask-conic-from": scaleColor()
+      }],
+      "mask-image-conic-to-color": [{
+        "mask-conic-to": scaleColor()
+      }],
+      /**
+       * Mask Mode
+       * @see https://tailwindcss.com/docs/mask-mode
+       */
+      "mask-mode": [{
+        mask: ["alpha", "luminance", "match"]
+      }],
+      /**
+       * Mask Origin
+       * @see https://tailwindcss.com/docs/mask-origin
+       */
+      "mask-origin": [{
+        "mask-origin": ["border", "padding", "content", "fill", "stroke", "view"]
+      }],
+      /**
+       * Mask Position
+       * @see https://tailwindcss.com/docs/mask-position
+       */
+      "mask-position": [{
+        mask: scaleBgPosition()
+      }],
+      /**
+       * Mask Repeat
+       * @see https://tailwindcss.com/docs/mask-repeat
+       */
+      "mask-repeat": [{
+        mask: scaleBgRepeat()
+      }],
+      /**
+       * Mask Size
+       * @see https://tailwindcss.com/docs/mask-size
+       */
+      "mask-size": [{
+        mask: scaleBgSize()
+      }],
+      /**
+       * Mask Type
+       * @see https://tailwindcss.com/docs/mask-type
+       */
+      "mask-type": [{
+        "mask-type": ["alpha", "luminance"]
+      }],
+      /**
+       * Mask Image
+       * @see https://tailwindcss.com/docs/mask-image
+       */
+      "mask-image": [{
+        mask: ["none", isArbitraryVariable, isArbitraryValue]
+      }],
+      // ---------------
+      // --- Filters ---
+      // ---------------
+      /**
+       * Filter
+       * @see https://tailwindcss.com/docs/filter
+       */
+      filter: [{
+        filter: [
+          // Deprecated since Tailwind CSS v3.0.0
+          "",
+          "none",
+          isArbitraryVariable,
+          isArbitraryValue
+        ]
+      }],
+      /**
+       * Blur
+       * @see https://tailwindcss.com/docs/blur
+       */
+      blur: [{
+        blur: scaleBlur()
+      }],
+      /**
+       * Brightness
+       * @see https://tailwindcss.com/docs/brightness
+       */
+      brightness: [{
+        brightness: [isNumber, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Contrast
+       * @see https://tailwindcss.com/docs/contrast
+       */
+      contrast: [{
+        contrast: [isNumber, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Drop Shadow
+       * @see https://tailwindcss.com/docs/drop-shadow
+       */
+      "drop-shadow": [{
+        "drop-shadow": [
+          // Deprecated since Tailwind CSS v4.0.0
+          "",
+          "none",
+          themeDropShadow,
+          isArbitraryVariableShadow,
+          isArbitraryShadow
+        ]
+      }],
+      /**
+       * Drop Shadow Color
+       * @see https://tailwindcss.com/docs/filter-drop-shadow#setting-the-shadow-color
+       */
+      "drop-shadow-color": [{
+        "drop-shadow": scaleColor()
+      }],
+      /**
+       * Grayscale
+       * @see https://tailwindcss.com/docs/grayscale
+       */
+      grayscale: [{
+        grayscale: ["", isNumber, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Hue Rotate
+       * @see https://tailwindcss.com/docs/hue-rotate
+       */
+      "hue-rotate": [{
+        "hue-rotate": [isNumber, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Invert
+       * @see https://tailwindcss.com/docs/invert
+       */
+      invert: [{
+        invert: ["", isNumber, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Saturate
+       * @see https://tailwindcss.com/docs/saturate
+       */
+      saturate: [{
+        saturate: [isNumber, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Sepia
+       * @see https://tailwindcss.com/docs/sepia
+       */
+      sepia: [{
+        sepia: ["", isNumber, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Backdrop Filter
+       * @see https://tailwindcss.com/docs/backdrop-filter
+       */
+      "backdrop-filter": [{
+        "backdrop-filter": [
+          // Deprecated since Tailwind CSS v3.0.0
+          "",
+          "none",
+          isArbitraryVariable,
+          isArbitraryValue
+        ]
+      }],
+      /**
+       * Backdrop Blur
+       * @see https://tailwindcss.com/docs/backdrop-blur
+       */
+      "backdrop-blur": [{
+        "backdrop-blur": scaleBlur()
+      }],
+      /**
+       * Backdrop Brightness
+       * @see https://tailwindcss.com/docs/backdrop-brightness
+       */
+      "backdrop-brightness": [{
+        "backdrop-brightness": [isNumber, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Backdrop Contrast
+       * @see https://tailwindcss.com/docs/backdrop-contrast
+       */
+      "backdrop-contrast": [{
+        "backdrop-contrast": [isNumber, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Backdrop Grayscale
+       * @see https://tailwindcss.com/docs/backdrop-grayscale
+       */
+      "backdrop-grayscale": [{
+        "backdrop-grayscale": ["", isNumber, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Backdrop Hue Rotate
+       * @see https://tailwindcss.com/docs/backdrop-hue-rotate
+       */
+      "backdrop-hue-rotate": [{
+        "backdrop-hue-rotate": [isNumber, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Backdrop Invert
+       * @see https://tailwindcss.com/docs/backdrop-invert
+       */
+      "backdrop-invert": [{
+        "backdrop-invert": ["", isNumber, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Backdrop Opacity
+       * @see https://tailwindcss.com/docs/backdrop-opacity
+       */
+      "backdrop-opacity": [{
+        "backdrop-opacity": [isNumber, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Backdrop Saturate
+       * @see https://tailwindcss.com/docs/backdrop-saturate
+       */
+      "backdrop-saturate": [{
+        "backdrop-saturate": [isNumber, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Backdrop Sepia
+       * @see https://tailwindcss.com/docs/backdrop-sepia
+       */
+      "backdrop-sepia": [{
+        "backdrop-sepia": ["", isNumber, isArbitraryVariable, isArbitraryValue]
+      }],
+      // --------------
+      // --- Tables ---
+      // --------------
+      /**
+       * Border Collapse
+       * @see https://tailwindcss.com/docs/border-collapse
+       */
+      "border-collapse": [{
+        border: ["collapse", "separate"]
+      }],
+      /**
+       * Border Spacing
+       * @see https://tailwindcss.com/docs/border-spacing
+       */
+      "border-spacing": [{
+        "border-spacing": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Border Spacing X
+       * @see https://tailwindcss.com/docs/border-spacing
+       */
+      "border-spacing-x": [{
+        "border-spacing-x": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Border Spacing Y
+       * @see https://tailwindcss.com/docs/border-spacing
+       */
+      "border-spacing-y": [{
+        "border-spacing-y": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Table Layout
+       * @see https://tailwindcss.com/docs/table-layout
+       */
+      "table-layout": [{
+        table: ["auto", "fixed"]
+      }],
+      /**
+       * Caption Side
+       * @see https://tailwindcss.com/docs/caption-side
+       */
+      caption: [{
+        caption: ["top", "bottom"]
+      }],
+      // ---------------------------------
+      // --- Transitions and Animation ---
+      // ---------------------------------
+      /**
+       * Transition Property
+       * @see https://tailwindcss.com/docs/transition-property
+       */
+      transition: [{
+        transition: ["", "all", "colors", "opacity", "shadow", "transform", "none", isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Transition Behavior
+       * @see https://tailwindcss.com/docs/transition-behavior
+       */
+      "transition-behavior": [{
+        transition: ["normal", "discrete"]
+      }],
+      /**
+       * Transition Duration
+       * @see https://tailwindcss.com/docs/transition-duration
+       */
+      duration: [{
+        duration: [isNumber, "initial", isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Transition Timing Function
+       * @see https://tailwindcss.com/docs/transition-timing-function
+       */
+      ease: [{
+        ease: ["linear", "initial", themeEase, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Transition Delay
+       * @see https://tailwindcss.com/docs/transition-delay
+       */
+      delay: [{
+        delay: [isNumber, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Animation
+       * @see https://tailwindcss.com/docs/animation
+       */
+      animate: [{
+        animate: ["none", themeAnimate, isArbitraryVariable, isArbitraryValue]
+      }],
+      // ------------------
+      // --- Transforms ---
+      // ------------------
+      /**
+       * Backface Visibility
+       * @see https://tailwindcss.com/docs/backface-visibility
+       */
+      backface: [{
+        backface: ["hidden", "visible"]
+      }],
+      /**
+       * Perspective
+       * @see https://tailwindcss.com/docs/perspective
+       */
+      perspective: [{
+        perspective: [themePerspective, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Perspective Origin
+       * @see https://tailwindcss.com/docs/perspective-origin
+       */
+      "perspective-origin": [{
+        "perspective-origin": scalePositionWithArbitrary()
+      }],
+      /**
+       * Rotate
+       * @see https://tailwindcss.com/docs/rotate
+       */
+      rotate: [{
+        rotate: scaleRotate()
+      }],
+      /**
+       * Rotate X
+       * @see https://tailwindcss.com/docs/rotate
+       */
+      "rotate-x": [{
+        "rotate-x": scaleRotate()
+      }],
+      /**
+       * Rotate Y
+       * @see https://tailwindcss.com/docs/rotate
+       */
+      "rotate-y": [{
+        "rotate-y": scaleRotate()
+      }],
+      /**
+       * Rotate Z
+       * @see https://tailwindcss.com/docs/rotate
+       */
+      "rotate-z": [{
+        "rotate-z": scaleRotate()
+      }],
+      /**
+       * Scale
+       * @see https://tailwindcss.com/docs/scale
+       */
+      scale: [{
+        scale: scaleScale()
+      }],
+      /**
+       * Scale X
+       * @see https://tailwindcss.com/docs/scale
+       */
+      "scale-x": [{
+        "scale-x": scaleScale()
+      }],
+      /**
+       * Scale Y
+       * @see https://tailwindcss.com/docs/scale
+       */
+      "scale-y": [{
+        "scale-y": scaleScale()
+      }],
+      /**
+       * Scale Z
+       * @see https://tailwindcss.com/docs/scale
+       */
+      "scale-z": [{
+        "scale-z": scaleScale()
+      }],
+      /**
+       * Scale 3D
+       * @see https://tailwindcss.com/docs/scale
+       */
+      "scale-3d": ["scale-3d"],
+      /**
+       * Skew
+       * @see https://tailwindcss.com/docs/skew
+       */
+      skew: [{
+        skew: scaleSkew()
+      }],
+      /**
+       * Skew X
+       * @see https://tailwindcss.com/docs/skew
+       */
+      "skew-x": [{
+        "skew-x": scaleSkew()
+      }],
+      /**
+       * Skew Y
+       * @see https://tailwindcss.com/docs/skew
+       */
+      "skew-y": [{
+        "skew-y": scaleSkew()
+      }],
+      /**
+       * Transform
+       * @see https://tailwindcss.com/docs/transform
+       */
+      transform: [{
+        transform: [isArbitraryVariable, isArbitraryValue, "", "none", "gpu", "cpu"]
+      }],
+      /**
+       * Transform Origin
+       * @see https://tailwindcss.com/docs/transform-origin
+       */
+      "transform-origin": [{
+        origin: scalePositionWithArbitrary()
+      }],
+      /**
+       * Transform Style
+       * @see https://tailwindcss.com/docs/transform-style
+       */
+      "transform-style": [{
+        transform: ["3d", "flat"]
+      }],
+      /**
+       * Translate
+       * @see https://tailwindcss.com/docs/translate
+       */
+      translate: [{
+        translate: scaleTranslate()
+      }],
+      /**
+       * Translate X
+       * @see https://tailwindcss.com/docs/translate
+       */
+      "translate-x": [{
+        "translate-x": scaleTranslate()
+      }],
+      /**
+       * Translate Y
+       * @see https://tailwindcss.com/docs/translate
+       */
+      "translate-y": [{
+        "translate-y": scaleTranslate()
+      }],
+      /**
+       * Translate Z
+       * @see https://tailwindcss.com/docs/translate
+       */
+      "translate-z": [{
+        "translate-z": scaleTranslate()
+      }],
+      /**
+       * Translate None
+       * @see https://tailwindcss.com/docs/translate
+       */
+      "translate-none": ["translate-none"],
+      /**
+       * Zoom
+       * @see https://tailwindcss.com/docs/zoom
+       */
+      zoom: [{
+        zoom: [isInteger, isArbitraryVariable, isArbitraryValue]
+      }],
+      // ---------------------
+      // --- Interactivity ---
+      // ---------------------
+      /**
+       * Accent Color
+       * @see https://tailwindcss.com/docs/accent-color
+       */
+      accent: [{
+        accent: scaleColor()
+      }],
+      /**
+       * Appearance
+       * @see https://tailwindcss.com/docs/appearance
+       */
+      appearance: [{
+        appearance: ["none", "auto"]
+      }],
+      /**
+       * Caret Color
+       * @see https://tailwindcss.com/docs/just-in-time-mode#caret-color-utilities
+       */
+      "caret-color": [{
+        caret: scaleColor()
+      }],
+      /**
+       * Color Scheme
+       * @see https://tailwindcss.com/docs/color-scheme
+       */
+      "color-scheme": [{
+        scheme: ["normal", "dark", "light", "light-dark", "only-dark", "only-light"]
+      }],
+      /**
+       * Cursor
+       * @see https://tailwindcss.com/docs/cursor
+       */
+      cursor: [{
+        cursor: ["auto", "default", "pointer", "wait", "text", "move", "help", "not-allowed", "none", "context-menu", "progress", "cell", "crosshair", "vertical-text", "alias", "copy", "no-drop", "grab", "grabbing", "all-scroll", "col-resize", "row-resize", "n-resize", "e-resize", "s-resize", "w-resize", "ne-resize", "nw-resize", "se-resize", "sw-resize", "ew-resize", "ns-resize", "nesw-resize", "nwse-resize", "zoom-in", "zoom-out", isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Field Sizing
+       * @see https://tailwindcss.com/docs/field-sizing
+       */
+      "field-sizing": [{
+        "field-sizing": ["fixed", "content"]
+      }],
+      /**
+       * Pointer Events
+       * @see https://tailwindcss.com/docs/pointer-events
+       */
+      "pointer-events": [{
+        "pointer-events": ["auto", "none"]
+      }],
+      /**
+       * Resize
+       * @see https://tailwindcss.com/docs/resize
+       */
+      resize: [{
+        resize: ["none", "", "y", "x"]
+      }],
+      /**
+       * Scroll Behavior
+       * @see https://tailwindcss.com/docs/scroll-behavior
+       */
+      "scroll-behavior": [{
+        scroll: ["auto", "smooth"]
+      }],
+      /**
+       * Scrollbar Thumb Color
+       * @see https://tailwindcss.com/docs/scrollbar-color
+       */
+      "scrollbar-thumb-color": [{
+        "scrollbar-thumb": scaleColor()
+      }],
+      /**
+       * Scrollbar Track Color
+       * @see https://tailwindcss.com/docs/scrollbar-color
+       */
+      "scrollbar-track-color": [{
+        "scrollbar-track": scaleColor()
+      }],
+      /**
+       * Scrollbar Gutter
+       * @see https://tailwindcss.com/docs/scrollbar-gutter
+       */
+      "scrollbar-gutter": [{
+        "scrollbar-gutter": ["auto", "stable", "both"]
+      }],
+      /**
+       * Scrollbar Width
+       * @see https://tailwindcss.com/docs/scrollbar-width
+       */
+      "scrollbar-w": [{
+        scrollbar: ["auto", "thin", "none"]
+      }],
+      /**
+       * Scroll Margin
+       * @see https://tailwindcss.com/docs/scroll-margin
+       */
+      "scroll-m": [{
+        "scroll-m": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Margin Inline
+       * @see https://tailwindcss.com/docs/scroll-margin
+       */
+      "scroll-mx": [{
+        "scroll-mx": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Margin Block
+       * @see https://tailwindcss.com/docs/scroll-margin
+       */
+      "scroll-my": [{
+        "scroll-my": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Margin Inline Start
+       * @see https://tailwindcss.com/docs/scroll-margin
+       */
+      "scroll-ms": [{
+        "scroll-ms": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Margin Inline End
+       * @see https://tailwindcss.com/docs/scroll-margin
+       */
+      "scroll-me": [{
+        "scroll-me": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Margin Block Start
+       * @see https://tailwindcss.com/docs/scroll-margin
+       */
+      "scroll-mbs": [{
+        "scroll-mbs": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Margin Block End
+       * @see https://tailwindcss.com/docs/scroll-margin
+       */
+      "scroll-mbe": [{
+        "scroll-mbe": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Margin Top
+       * @see https://tailwindcss.com/docs/scroll-margin
+       */
+      "scroll-mt": [{
+        "scroll-mt": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Margin Right
+       * @see https://tailwindcss.com/docs/scroll-margin
+       */
+      "scroll-mr": [{
+        "scroll-mr": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Margin Bottom
+       * @see https://tailwindcss.com/docs/scroll-margin
+       */
+      "scroll-mb": [{
+        "scroll-mb": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Margin Left
+       * @see https://tailwindcss.com/docs/scroll-margin
+       */
+      "scroll-ml": [{
+        "scroll-ml": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Padding
+       * @see https://tailwindcss.com/docs/scroll-padding
+       */
+      "scroll-p": [{
+        "scroll-p": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Padding Inline
+       * @see https://tailwindcss.com/docs/scroll-padding
+       */
+      "scroll-px": [{
+        "scroll-px": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Padding Block
+       * @see https://tailwindcss.com/docs/scroll-padding
+       */
+      "scroll-py": [{
+        "scroll-py": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Padding Inline Start
+       * @see https://tailwindcss.com/docs/scroll-padding
+       */
+      "scroll-ps": [{
+        "scroll-ps": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Padding Inline End
+       * @see https://tailwindcss.com/docs/scroll-padding
+       */
+      "scroll-pe": [{
+        "scroll-pe": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Padding Block Start
+       * @see https://tailwindcss.com/docs/scroll-padding
+       */
+      "scroll-pbs": [{
+        "scroll-pbs": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Padding Block End
+       * @see https://tailwindcss.com/docs/scroll-padding
+       */
+      "scroll-pbe": [{
+        "scroll-pbe": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Padding Top
+       * @see https://tailwindcss.com/docs/scroll-padding
+       */
+      "scroll-pt": [{
+        "scroll-pt": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Padding Right
+       * @see https://tailwindcss.com/docs/scroll-padding
+       */
+      "scroll-pr": [{
+        "scroll-pr": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Padding Bottom
+       * @see https://tailwindcss.com/docs/scroll-padding
+       */
+      "scroll-pb": [{
+        "scroll-pb": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Padding Left
+       * @see https://tailwindcss.com/docs/scroll-padding
+       */
+      "scroll-pl": [{
+        "scroll-pl": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Snap Align
+       * @see https://tailwindcss.com/docs/scroll-snap-align
+       */
+      "snap-align": [{
+        snap: ["start", "end", "center", "align-none"]
+      }],
+      /**
+       * Scroll Snap Stop
+       * @see https://tailwindcss.com/docs/scroll-snap-stop
+       */
+      "snap-stop": [{
+        snap: ["normal", "always"]
+      }],
+      /**
+       * Scroll Snap Type
+       * @see https://tailwindcss.com/docs/scroll-snap-type
+       */
+      "snap-type": [{
+        snap: ["none", "x", "y", "both"]
+      }],
+      /**
+       * Scroll Snap Type Strictness
+       * @see https://tailwindcss.com/docs/scroll-snap-type
+       */
+      "snap-strictness": [{
+        snap: ["mandatory", "proximity"]
+      }],
+      /**
+       * Touch Action
+       * @see https://tailwindcss.com/docs/touch-action
+       */
+      touch: [{
+        touch: ["auto", "none", "manipulation"]
+      }],
+      /**
+       * Touch Action X
+       * @see https://tailwindcss.com/docs/touch-action
+       */
+      "touch-x": [{
+        "touch-pan": ["x", "left", "right"]
+      }],
+      /**
+       * Touch Action Y
+       * @see https://tailwindcss.com/docs/touch-action
+       */
+      "touch-y": [{
+        "touch-pan": ["y", "up", "down"]
+      }],
+      /**
+       * Touch Action Pinch Zoom
+       * @see https://tailwindcss.com/docs/touch-action
+       */
+      "touch-pz": ["touch-pinch-zoom"],
+      /**
+       * User Select
+       * @see https://tailwindcss.com/docs/user-select
+       */
+      select: [{
+        select: ["none", "text", "all", "auto"]
+      }],
+      /**
+       * Will Change
+       * @see https://tailwindcss.com/docs/will-change
+       */
+      "will-change": [{
+        "will-change": ["auto", "scroll", "contents", "transform", isArbitraryVariable, isArbitraryValue]
+      }],
+      // -----------
+      // --- SVG ---
+      // -----------
+      /**
+       * Fill
+       * @see https://tailwindcss.com/docs/fill
+       */
+      fill: [{
+        fill: ["none", ...scaleColor()]
+      }],
+      /**
+       * Stroke Width
+       * @see https://tailwindcss.com/docs/stroke-width
+       */
+      "stroke-w": [{
+        stroke: [isNumber, isArbitraryVariableLength, isArbitraryLength, isArbitraryNumber]
+      }],
+      /**
+       * Stroke
+       * @see https://tailwindcss.com/docs/stroke
+       */
+      stroke: [{
+        stroke: ["none", ...scaleColor()]
+      }],
+      // ---------------------
+      // --- Accessibility ---
+      // ---------------------
+      /**
+       * Forced Color Adjust
+       * @see https://tailwindcss.com/docs/forced-color-adjust
+       */
+      "forced-color-adjust": [{
+        "forced-color-adjust": ["auto", "none"]
+      }]
+    },
+    conflictingClassGroups: {
+      "container-named": ["container-type"],
+      overflow: ["overflow-x", "overflow-y"],
+      overscroll: ["overscroll-x", "overscroll-y"],
+      inset: ["inset-x", "inset-y", "inset-bs", "inset-be", "start", "end", "top", "right", "bottom", "left"],
+      "inset-x": ["start", "end", "right", "left"],
+      "inset-y": ["inset-bs", "inset-be", "top", "bottom"],
+      flex: ["basis", "grow", "shrink"],
+      gap: ["gap-x", "gap-y"],
+      "place-content": ["align-content", "justify-content"],
+      "place-items": ["align-items", "justify-items"],
+      "place-self": ["align-self", "justify-self"],
+      p: ["px", "py", "ps", "pe", "pbs", "pbe", "pt", "pr", "pb", "pl"],
+      px: ["ps", "pe", "pr", "pl"],
+      py: ["pbs", "pbe", "pt", "pb"],
+      m: ["mx", "my", "ms", "me", "mbs", "mbe", "mt", "mr", "mb", "ml"],
+      mx: ["ms", "me", "mr", "ml"],
+      my: ["mbs", "mbe", "mt", "mb"],
+      size: ["w", "h"],
+      "fvn-normal": ["fvn-ordinal", "fvn-slashed-zero", "fvn-figure", "fvn-spacing", "fvn-fraction"],
+      "fvn-ordinal": ["fvn-normal"],
+      "fvn-slashed-zero": ["fvn-normal"],
+      "fvn-figure": ["fvn-normal"],
+      "fvn-spacing": ["fvn-normal"],
+      "fvn-fraction": ["fvn-normal"],
+      "line-clamp": ["display", "overflow"],
+      // Tailwind emits these utilities after `sr-only`, so keeping an earlier `relative` or `p-4` undoes the hide. Removing them is safe because `not-sr-only` resets the same properties when the element is revealed.
+      // Border width and min/max sizes stay independent because `not-sr-only` doesn't reset them, so they still apply once the element is revealed. While hidden they don't undo the hide: the element is absolutely positioned and clipped away.
+      // `not-sr-only` only conflicts with `sr-only`: Tailwind emits these utilities after it too, so an earlier `relative` or `p-4` is meant to apply once the element is visible.
+      sr: ["not-sr", "position", "size", "w", "h", "p", "px", "py", "ps", "pe", "pbs", "pbe", "pt", "pr", "pb", "pl", "m", "mx", "my", "ms", "me", "mbs", "mbe", "mt", "mr", "mb", "ml", "overflow", "overflow-x", "overflow-y", "whitespace"],
+      "not-sr": ["sr"],
+      rounded: ["rounded-s", "rounded-e", "rounded-t", "rounded-r", "rounded-b", "rounded-l", "rounded-ss", "rounded-se", "rounded-ee", "rounded-es", "rounded-tl", "rounded-tr", "rounded-br", "rounded-bl"],
+      "rounded-s": ["rounded-ss", "rounded-es"],
+      "rounded-e": ["rounded-se", "rounded-ee"],
+      "rounded-t": ["rounded-tl", "rounded-tr"],
+      "rounded-r": ["rounded-tr", "rounded-br"],
+      "rounded-b": ["rounded-br", "rounded-bl"],
+      "rounded-l": ["rounded-tl", "rounded-bl"],
+      "border-spacing": ["border-spacing-x", "border-spacing-y"],
+      "border-w": ["border-w-x", "border-w-y", "border-w-s", "border-w-e", "border-w-bs", "border-w-be", "border-w-t", "border-w-r", "border-w-b", "border-w-l"],
+      "border-w-x": ["border-w-s", "border-w-e", "border-w-r", "border-w-l"],
+      "border-w-y": ["border-w-bs", "border-w-be", "border-w-t", "border-w-b"],
+      "border-color": ["border-color-x", "border-color-y", "border-color-s", "border-color-e", "border-color-bs", "border-color-be", "border-color-t", "border-color-r", "border-color-b", "border-color-l"],
+      "border-color-x": ["border-color-s", "border-color-e", "border-color-r", "border-color-l"],
+      "border-color-y": ["border-color-bs", "border-color-be", "border-color-t", "border-color-b"],
+      "mask-image-x-from-pos": ["mask-image-r-from-pos", "mask-image-l-from-pos"],
+      "mask-image-x-to-pos": ["mask-image-r-to-pos", "mask-image-l-to-pos"],
+      "mask-image-x-from-color": ["mask-image-r-from-color", "mask-image-l-from-color"],
+      "mask-image-x-to-color": ["mask-image-r-to-color", "mask-image-l-to-color"],
+      "mask-image-y-from-pos": ["mask-image-t-from-pos", "mask-image-b-from-pos"],
+      "mask-image-y-to-pos": ["mask-image-t-to-pos", "mask-image-b-to-pos"],
+      "mask-image-y-from-color": ["mask-image-t-from-color", "mask-image-b-from-color"],
+      "mask-image-y-to-color": ["mask-image-t-to-color", "mask-image-b-to-color"],
+      translate: ["translate-x", "translate-y", "translate-none"],
+      "translate-none": ["translate", "translate-x", "translate-y", "translate-z"],
+      "scroll-m": ["scroll-mx", "scroll-my", "scroll-ms", "scroll-me", "scroll-mbs", "scroll-mbe", "scroll-mt", "scroll-mr", "scroll-mb", "scroll-ml"],
+      "scroll-mx": ["scroll-ms", "scroll-me", "scroll-mr", "scroll-ml"],
+      "scroll-my": ["scroll-mbs", "scroll-mbe", "scroll-mt", "scroll-mb"],
+      "scroll-p": ["scroll-px", "scroll-py", "scroll-ps", "scroll-pe", "scroll-pbs", "scroll-pbe", "scroll-pt", "scroll-pr", "scroll-pb", "scroll-pl"],
+      "scroll-px": ["scroll-ps", "scroll-pe", "scroll-pr", "scroll-pl"],
+      "scroll-py": ["scroll-pbs", "scroll-pbe", "scroll-pt", "scroll-pb"],
+      touch: ["touch-x", "touch-y", "touch-pz"],
+      "touch-x": ["touch"],
+      "touch-y": ["touch"],
+      "touch-pz": ["touch"]
+    },
+    conflictingClassGroupModifiers: {
+      // Only a font size with a line-height modifier like `text-lg/7` sets `line-height` directly. Without a modifier, font sizes don't conflict with `leading-*`: arbitrary ones only set `font-size`, and the theme ones set `line-height: var(--tw-leading, …)`, so an earlier `leading-*` keeps applying in Tailwind's CSS.
+      "font-size": ["leading"]
+    },
+    postfixLookupClassGroups: ["container-type"],
+    orderSensitiveModifiers: ["*", "**", "after", "backdrop", "before", "details-content", "file", "first-letter", "first-line", "marker", "placeholder", "selection"]
+  };
+};
+var mergeConfigs = (baseConfig, {
+  cacheSize,
+  prefix: prefix14,
+  experimentalParseClassName,
+  extend = {},
+  override = {}
+}) => {
+  overrideProperty(baseConfig, "cacheSize", cacheSize);
+  overrideProperty(baseConfig, "prefix", prefix14);
+  overrideProperty(baseConfig, "experimentalParseClassName", experimentalParseClassName);
+  overrideConfigProperties(baseConfig.theme, override.theme);
+  overrideConfigProperties(baseConfig.classGroups, override.classGroups);
+  overrideConfigProperties(baseConfig.conflictingClassGroups, override.conflictingClassGroups);
+  overrideConfigProperties(baseConfig.conflictingClassGroupModifiers, override.conflictingClassGroupModifiers);
+  overrideProperty(baseConfig, "postfixLookupClassGroups", override.postfixLookupClassGroups);
+  overrideProperty(baseConfig, "orderSensitiveModifiers", override.orderSensitiveModifiers);
+  mergeConfigProperties(baseConfig.theme, extend.theme);
+  mergeConfigProperties(baseConfig.classGroups, extend.classGroups);
+  mergeConfigProperties(baseConfig.conflictingClassGroups, extend.conflictingClassGroups);
+  mergeConfigProperties(baseConfig.conflictingClassGroupModifiers, extend.conflictingClassGroupModifiers);
+  mergeArrayProperties(baseConfig, extend, "postfixLookupClassGroups");
+  mergeArrayProperties(baseConfig, extend, "orderSensitiveModifiers");
+  return baseConfig;
+};
+var overrideProperty = (baseObject, overrideKey, overrideValue) => {
+  if (overrideValue !== void 0) {
+    baseObject[overrideKey] = overrideValue;
+  }
+};
+var overrideConfigProperties = (baseObject, overrideObject) => {
+  if (overrideObject) {
+    for (const key in overrideObject) {
+      overrideProperty(baseObject, key, overrideObject[key]);
+    }
+  }
+};
+var mergeConfigProperties = (baseObject, mergeObject) => {
+  if (mergeObject) {
+    for (const key in mergeObject) {
+      mergeArrayProperties(baseObject, mergeObject, key);
+    }
+  }
+};
+var mergeArrayProperties = (baseObject, mergeObject, key) => {
+  const mergeValue = mergeObject[key];
+  if (mergeValue !== void 0) {
+    baseObject[key] = baseObject[key] ? baseObject[key].concat(mergeValue) : mergeValue;
+  }
+};
+var extendTailwindMerge = (configExtension, ...createConfig) => typeof configExtension === "function" ? createTailwindMerge(getDefaultConfig, configExtension, ...createConfig) : createTailwindMerge(() => mergeConfigs(getDefaultConfig(), configExtension), ...createConfig);
+
+// src/react/utils/cx.ts
+var TEXT_FAMILIES = [
+  "large-title",
+  "display-1",
+  "display-2",
+  "display-3",
+  "display-4",
+  "title-1",
+  "title-2",
+  "title-3",
+  "headline",
+  "body",
+  "body-2",
+  "caption-1",
+  "caption-2"
+];
+var TEXT_WEIGHTS = ["regular", "medium", "semibold", "bold"];
+var TEXT_STYLE_SUFFIXES = TEXT_FAMILIES.flatMap(
+  (family) => TEXT_WEIGHTS.map((weight) => `${family}-${weight}`)
+);
+var twMerge = extendTailwindMerge({
+  extend: {
+    classGroups: {
+      "font-size": [{ text: TEXT_STYLE_SUFFIXES }]
+    }
+  }
+});
+var cx = twMerge;
+function sortCx(classes) {
+  return classes;
+}
+
+// src/react/components/base/badges/chip.tsx
+var import_jsx_runtime = __toESM(require_jsx_runtime(), 1);
+var CHIP_COLORS = {
+  orange: "bg-status-orange-background text-status-orange-text",
+  lime: "bg-status-lime-background text-status-lime-text",
+  rose: "bg-status-rose-background text-status-rose-text",
+  yellow: "bg-status-yellow-background text-status-yellow-text",
+  cyan: "bg-status-cyan-background text-status-cyan-text",
+  blue: "bg-status-blue-background text-status-blue-text",
+  purple: "bg-status-purple-background text-status-purple-text",
+  neutral: "bg-background-tertiary-default text-text-secondary",
+  gray: "bg-background-secondary-default text-text-primary",
+  soft: "bg-background-secondary-default text-text-secondary"
+};
+var styles = sortCx({
+  base: "inline-flex items-center justify-center rounded-md px-1.5 whitespace-nowrap transition-[padding,font-size] duration-200 ease",
+  variant: {
+    bold: "py-0.5 text-body-medium",
+    subtle: "py-1 text-body-medium",
+    caption: "py-1 text-caption-1-medium"
+  },
+  color: CHIP_COLORS
+});
+function Chip({
+  variant = "bold",
+  color = "neutral",
+  className,
+  ref,
+  ...props
+}) {
+  return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+    "span",
+    {
+      ref,
+      className: cx(styles.base, styles.variant[variant], styles.color[color], className),
+      ...props
+    }
+  );
+}
+
+// src/react/components/base/badges/counter.tsx
+var import_jsx_runtime2 = __toESM(require_jsx_runtime(), 1);
+var styles2 = sortCx({
+  base: "inline-flex items-center justify-center rounded-sm px-1 py-px text-caption-1-semibold tracking-normal whitespace-nowrap",
+  color: {
+    primary: "bg-accent-400 text-white",
+    neutral: "bg-badge-neutral-background text-text-secondary"
+  }
+});
+function Counter({ color = "neutral", className, ref, ...props }) {
+  return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+    "span",
+    {
+      ref,
+      className: cx(styles2.base, styles2.color[color], className),
+      ...props
+    }
+  );
+}
+
+// src/react/utils/directional-icon.ts
+var directionalIcons = /* @__PURE__ */ new Set([
+  K1,
+  J1,
+  i2,
+  r2,
+  wb,
+  hb
+]);
+function directionalIconClass(icon) {
+  return directionalIcons.has(icon) ? "rtl:rotate-180" : void 0;
+}
+
+// src/react/components/base/buttons/button.tsx
+var import_jsx_runtime3 = __toESM(require_jsx_runtime(), 1);
+var styles3 = sortCx({
+  base: [
+    "inline-flex items-center justify-center gap-0.5 whitespace-nowrap overflow-hidden",
+    "font-sans select-none cursor-pointer",
+    "button-press-motion",
+    "outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-border-focus-ring",
+    "disabled:cursor-not-allowed aria-disabled:cursor-not-allowed"
+  ].join(" "),
+  // Base shape per size (used when label is present OR medium icon-only).
+  size: {
+    medium: "h-9 rounded-2lg p-2 text-body-medium",
+    small: "h-8 rounded-lg px-2 py-1.5 text-body-medium",
+    xs: "h-6 rounded-sm px-2 text-caption-1-semibold"
+  },
+  // Icon-only override:
+  //   Medium → keep p-2; w expands from content (8+20+8 = 36) → square.
+  //   Small  → Figma forces 32×32 even though 8+18+8=34, so we hard-set size-8
+  //            and zero the padding; the inner flex centers the 18px icon.
+  //   Xs     → forces 24×24, content-centered — used for the calendar
+  //            template's edit-icon buttons (timezone/participants/reminder).
+  iconOnlySize: {
+    medium: "",
+    // base size already produces 36×36 with a 20px icon
+    small: "size-8 p-0",
+    // hard 32×32, content-centered
+    xs: "size-6 p-0"
+    // hard 24×24, content-centered
+  },
+  icon: {
+    medium: "size-5 shrink-0",
+    // 20px
+    small: "size-[18px] shrink-0",
+    // 18px
+    xs: "size-3.5 shrink-0"
+    // 14px
+  },
+  label: {
+    medium: "inline-flex items-center justify-center px-1 shrink-0",
+    // px=4
+    small: "inline-flex items-center justify-center px-0.5 shrink-0",
+    // px=2
+    xs: "inline-flex items-center justify-center px-0.5 shrink-0"
+    // px=2
+  },
+  variant: {
+    primary: [
+      "bg-button-primary text-text-white shadow-xs",
+      "disabled:text-button-primary-disabled-foreground disabled:shadow-none",
+      "aria-disabled:text-button-primary-disabled-foreground aria-disabled:shadow-none"
+    ].join(" "),
+    danger: [
+      "bg-button-danger text-text-white shadow-xs",
+      "disabled:text-foreground-disabled-danger disabled:shadow-none",
+      "aria-disabled:text-foreground-disabled-danger aria-disabled:shadow-none"
+    ].join(" "),
+    secondary: [
+      "bg-background-primary-default text-text-primary",
+      "border border-border-button-default shadow-xs",
+      "hover:bg-background-primary-hover  hover:border-border-button-hover",
+      "active:bg-background-primary-active active:border-border-button-active",
+      "disabled:bg-background-primary-disabled disabled:border-border-button-default disabled:text-text-tertiary disabled:shadow-none",
+      "aria-disabled:bg-background-primary-disabled aria-disabled:border-border-button-default aria-disabled:text-text-tertiary aria-disabled:shadow-none"
+    ].join(" "),
+    ghost: [
+      "bg-button-ghost-background text-button-ghost-foreground",
+      "hover:bg-button-ghost-hover active:bg-button-ghost-active",
+      "disabled:bg-button-ghost-disabled disabled:text-button-ghost-disabled-foreground disabled:shadow-none",
+      "aria-disabled:bg-button-ghost-disabled aria-disabled:text-button-ghost-disabled-foreground aria-disabled:shadow-none"
+    ].join(" ")
+  }
+});
+function Button({
+  variant = "primary",
+  size = "medium",
+  iconOnly = false,
+  leadingIcon: Leading,
+  trailingIcon: Trailing,
+  children,
+  className,
+  type = "button",
+  ref,
+  ...props
+}) {
+  return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
+    "button",
+    {
+      ref,
+      type,
+      className: cx(
+        styles3.base,
+        styles3.size[size],
+        styles3.variant[variant],
+        iconOnly && styles3.iconOnlySize[size],
+        className
+      ),
+      ...props,
+      children: [
+        Leading ? /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(Leading, { className: cx(styles3.icon[size], directionalIconClass(Leading)), "aria-hidden": true }) : null,
+        !iconOnly && children !== void 0 && children !== null && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: styles3.label[size], children }),
+        !iconOnly && Trailing ? /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(Trailing, { className: cx(styles3.icon[size], directionalIconClass(Trailing)), "aria-hidden": true }) : null
+      ]
+    }
+  );
+}
+
+// src/react/components/base/buttons/link-button.tsx
+var import_jsx_runtime4 = __toESM(require_jsx_runtime(), 1);
+var styles4 = sortCx({
+  base: [
+    "inline-flex items-center justify-center gap-1 whitespace-nowrap",
+    "font-sans select-none cursor-pointer rounded-sm",
+    "underline-offset-3 hover:underline",
+    "transition-colors duration-150 ease",
+    "outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-border-focus-ring",
+    "disabled:cursor-not-allowed disabled:no-underline aria-disabled:cursor-not-allowed aria-disabled:no-underline"
+  ].join(" "),
+  size: {
+    medium: "text-body-medium",
+    small: "text-body-medium",
+    xs: "text-caption-1-semibold"
+  },
+  icon: {
+    medium: "size-5 shrink-0",
+    small: "size-[18px] shrink-0",
+    xs: "size-3.5 shrink-0"
+  },
+  variant: {
+    // Hover keeps the resting color — the underline is the hover cue; only
+    // the press darkens.
+    primary: [
+      "text-accent-600 active:text-accent-800",
+      "disabled:text-text-tertiary aria-disabled:text-text-tertiary"
+    ].join(" "),
+    secondary: [
+      "text-text-secondary active:text-text-primary",
+      "disabled:text-text-tertiary aria-disabled:text-text-tertiary"
+    ].join(" ")
+  }
+});
+function LinkButton({
+  variant = "primary",
+  size = "medium",
+  leadingIcon: Leading,
+  trailingIcon: Trailing,
+  children,
+  className,
+  disabled = false,
+  ...props
+}) {
+  const classes = cx(styles4.base, styles4.size[size], styles4.variant[variant], className);
+  const content = /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_jsx_runtime4.Fragment, { children: [
+    Leading ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Leading, { className: cx(styles4.icon[size], directionalIconClass(Leading)), "aria-hidden": true }) : null,
+    children !== void 0 && children !== null && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { children }),
+    Trailing ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Trailing, { className: cx(styles4.icon[size], directionalIconClass(Trailing)), "aria-hidden": true }) : null
+  ] });
+  if (props.href !== void 0) {
+    const { ref: ref2, href, ...anchorProps } = props;
+    return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+      "a",
+      {
+        ref: ref2,
+        href: disabled ? void 0 : href,
+        "aria-disabled": disabled || void 0,
+        className: classes,
+        ...anchorProps,
+        children: content
+      }
+    );
+  }
+  const { ref, type = "button", ...buttonProps } = props;
+  return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { ref, type, disabled, className: classes, ...buttonProps, children: content });
+}
+
+// src/react/components/base/divider/divider.tsx
+var import_jsx_runtime5 = __toESM(require_jsx_runtime(), 1);
+var styles5 = sortCx({
+  root: "w-full",
+  line: "h-px min-w-0 flex-1 bg-separator-border",
+  content: "shrink-0 text-body-medium text-text-secondary",
+  align: {
+    start: "justify-start",
+    center: "justify-center",
+    end: "justify-end"
+  },
+  withContent: {
+    single: "flex items-center gap-3",
+    double: "flex items-center border-y border-separator-border py-2.5",
+    fill: "flex items-center rounded-2lg bg-background-secondary-default px-4 py-2.5"
+  },
+  empty: {
+    single: "h-px bg-separator-border",
+    double: "h-2 border-y border-separator-border",
+    fill: "h-2 rounded-full bg-background-secondary-default"
+  }
+});
+function Divider({
+  variant = "single",
+  align = "center",
+  children,
+  contentClassName,
+  className,
+  ref,
+  ...props
+}) {
+  const hasContent = children !== void 0 && children !== null;
+  if (!hasContent) {
+    return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+      "div",
+      {
+        ref,
+        role: "separator",
+        "aria-orientation": "horizontal",
+        "data-variant": variant,
+        className: cx(styles5.root, styles5.empty[variant], className),
+        ...props
+      }
+    );
+  }
+  const showLeadingLine = variant === "single" && align !== "start";
+  const showTrailingLine = variant === "single" && align !== "end";
+  return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(
+    "div",
+    {
+      ref,
+      "data-variant": variant,
+      "data-align": align,
+      className: cx(
+        styles5.root,
+        styles5.withContent[variant],
+        styles5.align[align],
+        className
+      ),
+      ...props,
+      children: [
+        showLeadingLine ? /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { "aria-hidden": true, className: styles5.line }) : null,
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: cx(styles5.content, contentClassName), children }),
+        showTrailingLine ? /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { "aria-hidden": true, className: styles5.line }) : null
+      ]
+    }
+  );
+}
+
+// src/react/components/base/search-field/search-field.tsx
+var import_react52 = __toESM(require_react(), 1);
+
+// node_modules/react-aria/dist/private/utils/chain.mjs
+function $a4e76a5424781910$export$e08e3b67e392101e(...callbacks) {
+  return (...args) => {
+    for (let callback of callbacks) if (typeof callback === "function") callback(...args);
+  };
+}
+
+// node_modules/react-aria/dist/private/utils/useLayoutEffect.mjs
+var import_react3 = __toESM(require_react(), 1);
+var $c4867b2f328c2698$export$e5c5a5f917a5871c = typeof document !== "undefined" ? (0, import_react3.default).useLayoutEffect : () => {
+};
+
+// node_modules/react-aria/dist/private/ssr/SSRProvider.mjs
+var import_react4 = __toESM(require_react(), 1);
+var $c7eafbbe1ea5834e$var$defaultContext = {
+  prefix: String(Math.round(Math.random() * 1e10)),
+  current: 0
+};
+var $c7eafbbe1ea5834e$var$SSRContext = /* @__PURE__ */ (0, import_react4.default).createContext($c7eafbbe1ea5834e$var$defaultContext);
+var $c7eafbbe1ea5834e$var$IsSSRContext = /* @__PURE__ */ (0, import_react4.default).createContext(false);
+var $c7eafbbe1ea5834e$var$canUseDOM = Boolean(typeof window !== "undefined" && window.document && window.document.createElement);
+var $c7eafbbe1ea5834e$var$componentIds = /* @__PURE__ */ new WeakMap();
+function $c7eafbbe1ea5834e$var$useCounter(isDisabled = false) {
+  let ctx = (0, import_react4.useContext)($c7eafbbe1ea5834e$var$SSRContext);
+  let ref = (0, import_react4.useRef)(null);
+  if (ref.current === null && !isDisabled) {
+    let currentOwner = (
+      // @ts-ignore
+      (0, import_react4.default).__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED?.ReactCurrentOwner?.current
+    );
+    if (currentOwner) {
+      let prevComponentValue = $c7eafbbe1ea5834e$var$componentIds.get(currentOwner);
+      if (prevComponentValue == null)
+        $c7eafbbe1ea5834e$var$componentIds.set(currentOwner, {
+          id: ctx.current,
+          state: currentOwner.memoizedState
+        });
+      else if (currentOwner.memoizedState !== prevComponentValue.state) {
+        ctx.current = prevComponentValue.id;
+        $c7eafbbe1ea5834e$var$componentIds.delete(currentOwner);
+      }
+    }
+    ref.current = ++ctx.current;
+  }
+  return ref.current;
+}
+function $c7eafbbe1ea5834e$var$useLegacySSRSafeId(defaultId) {
+  let ctx = (0, import_react4.useContext)($c7eafbbe1ea5834e$var$SSRContext);
+  if (ctx === $c7eafbbe1ea5834e$var$defaultContext && !$c7eafbbe1ea5834e$var$canUseDOM && false) console.warn("When server rendering, you must wrap your application in an <SSRProvider> to ensure consistent ids are generated between the client and server.");
+  let counter = $c7eafbbe1ea5834e$var$useCounter(!!defaultId);
+  let prefix14 = ctx === $c7eafbbe1ea5834e$var$defaultContext && false ? "react-aria" : `react-aria${ctx.prefix}`;
+  return defaultId || `${prefix14}-${counter}`;
+}
+function $c7eafbbe1ea5834e$var$useModernSSRSafeId(defaultId) {
+  let id = (0, import_react4.default).useId();
+  let [didSSR] = (0, import_react4.useState)($c7eafbbe1ea5834e$export$535bd6ca7f90a273());
+  let prefix14 = didSSR || false ? "react-aria" : `react-aria${$c7eafbbe1ea5834e$var$defaultContext.prefix}`;
+  return defaultId || `${prefix14}-${id}`;
+}
+var $c7eafbbe1ea5834e$export$619500959fc48b26 = typeof (0, import_react4.default)["useId"] === "function" ? $c7eafbbe1ea5834e$var$useModernSSRSafeId : $c7eafbbe1ea5834e$var$useLegacySSRSafeId;
+function $c7eafbbe1ea5834e$var$getSnapshot() {
+  return false;
+}
+function $c7eafbbe1ea5834e$var$getServerSnapshot() {
+  return true;
+}
+function $c7eafbbe1ea5834e$var$subscribe(onStoreChange) {
+  return () => {
+  };
+}
+function $c7eafbbe1ea5834e$export$535bd6ca7f90a273() {
+  if (typeof (0, import_react4.default)["useSyncExternalStore"] === "function")
+    return (0, import_react4.default)["useSyncExternalStore"]($c7eafbbe1ea5834e$var$subscribe, $c7eafbbe1ea5834e$var$getSnapshot, $c7eafbbe1ea5834e$var$getServerSnapshot);
+  return (0, import_react4.useContext)($c7eafbbe1ea5834e$var$IsSSRContext);
+}
+
+// node_modules/react-aria/dist/private/utils/useValueEffect.mjs
+var import_react5 = __toESM(require_react(), 1);
+function $1a716630a9e3a599$export$14d238f342723f25(defaultValue) {
+  let [value, setValue] = (0, import_react5.useState)(defaultValue);
+  let currValue = (0, import_react5.useRef)(value);
+  let effect = (0, import_react5.useRef)(null);
+  let nextRef = (0, import_react5.useRef)(() => {
+    if (!effect.current) return;
+    let newValue = effect.current.next();
+    if (newValue.done) {
+      effect.current = null;
+      return;
+    }
+    if (currValue.current === newValue.value) nextRef.current();
+    else setValue(newValue.value);
+  });
+  (0, $c4867b2f328c2698$export$e5c5a5f917a5871c)(() => {
+    currValue.current = value;
+    if (effect.current) nextRef.current();
+  });
+  let queue = (0, import_react5.useCallback)((fn) => {
+    effect.current = fn(currValue.current);
+    nextRef.current();
+  }, [
+    nextRef
+  ]);
+  return [
+    value,
+    queue
+  ];
+}
+
+// node_modules/react-aria/dist/private/utils/useId.mjs
+var import_react6 = __toESM(require_react(), 1);
+var $390e54f620492c70$var$canUseDOM = Boolean(typeof window !== "undefined" && window.document && window.document.createElement);
+var $390e54f620492c70$export$d41a04c74483c6ef = /* @__PURE__ */ new Map();
+var $390e54f620492c70$var$registry;
+if (typeof FinalizationRegistry !== "undefined") $390e54f620492c70$var$registry = new FinalizationRegistry((heldValue) => {
+  $390e54f620492c70$export$d41a04c74483c6ef.delete(heldValue);
+});
+var $390e54f620492c70$var$registeredIds = /* @__PURE__ */ new WeakMap();
+function $390e54f620492c70$export$f680877a34711e37(defaultId) {
+  let [value, setValue] = (0, import_react6.useState)(defaultId);
+  let nextId = (0, import_react6.useRef)(null);
+  let res = (0, $c7eafbbe1ea5834e$export$619500959fc48b26)(value);
+  let cleanupRef = (0, import_react6.useRef)(null);
+  let registeredId = $390e54f620492c70$var$registeredIds.get(cleanupRef);
+  if ($390e54f620492c70$var$registry && registeredId !== res) {
+    if (registeredId != null)
+      $390e54f620492c70$var$registry.unregister(cleanupRef);
+    $390e54f620492c70$var$registry.register(cleanupRef, res, cleanupRef);
+    $390e54f620492c70$var$registeredIds.set(cleanupRef, res);
+  }
+  if ($390e54f620492c70$var$canUseDOM) {
+    const cacheIdRef = $390e54f620492c70$export$d41a04c74483c6ef.get(res);
+    if (cacheIdRef && !cacheIdRef.includes(nextId))
+      cacheIdRef.push(nextId);
+    else
+      $390e54f620492c70$export$d41a04c74483c6ef.set(res, [
+        nextId
+      ]);
+  }
+  (0, $c4867b2f328c2698$export$e5c5a5f917a5871c)(() => {
+    let r3 = res;
+    return () => {
+      if ($390e54f620492c70$var$registry) {
+        $390e54f620492c70$var$registry.unregister(cleanupRef);
+        $390e54f620492c70$var$registeredIds.delete(cleanupRef);
+      }
+      $390e54f620492c70$export$d41a04c74483c6ef.delete(r3);
+    };
+  }, [
+    res
+  ]);
+  (0, import_react6.useEffect)(() => {
+    let newId = nextId.current;
+    if (newId) setValue(newId);
+    return () => {
+      if (newId) nextId.current = null;
+    };
+  });
+  return res;
+}
+function $390e54f620492c70$export$cd8c9cb68f842629(idA, idB) {
+  if (idA === idB) return idA;
+  let setIdsA = $390e54f620492c70$export$d41a04c74483c6ef.get(idA);
+  if (setIdsA) {
+    setIdsA.forEach((ref) => ref.current = idB);
+    return idB;
+  }
+  let setIdsB = $390e54f620492c70$export$d41a04c74483c6ef.get(idB);
+  if (setIdsB) {
+    setIdsB.forEach((ref) => ref.current = idA);
+    return idA;
+  }
+  return idB;
+}
+function $390e54f620492c70$export$b4cc09c592e8fdb8(depArray = []) {
+  let id = $390e54f620492c70$export$f680877a34711e37();
+  let [resolvedId, setResolvedId] = (0, $1a716630a9e3a599$export$14d238f342723f25)(id);
+  let updateId = (0, import_react6.useCallback)(() => {
+    setResolvedId(function* () {
+      yield id;
+      yield document.getElementById(id) ? id : void 0;
+    });
+  }, [
+    id,
+    setResolvedId
+  ]);
+  (0, $c4867b2f328c2698$export$e5c5a5f917a5871c)(updateId, [
+    id,
+    updateId,
+    ...depArray
+  ]);
+  return resolvedId;
+}
+
+// node_modules/react-aria/dist/private/utils/mergeRefs.mjs
+function $4064df0d6f9620e1$export$c9058316764c140e(...refs) {
+  if (refs.length === 1 && refs[0]) return refs[0];
+  return (value) => {
+    let hasCleanup = false;
+    const cleanups = refs.map((ref) => {
+      const cleanup = $4064df0d6f9620e1$var$setRef(ref, value);
+      hasCleanup ||= typeof cleanup == "function";
+      return cleanup;
+    });
+    if (hasCleanup) return () => {
+      cleanups.forEach((cleanup, i) => {
+        if (typeof cleanup === "function") cleanup();
+        else $4064df0d6f9620e1$var$setRef(refs[i], null);
+      });
+    };
+  };
+}
+function $4064df0d6f9620e1$var$setRef(ref, value) {
+  if (typeof ref === "function") return ref(value);
+  else if (ref != null) ref.current = value;
+}
+
+// node_modules/clsx/dist/clsx.mjs
+function r(e) {
+  var t2, f, n = "";
+  if ("string" == typeof e || "number" == typeof e) n += e;
+  else if ("object" == typeof e) if (Array.isArray(e)) {
+    var o = e.length;
+    for (t2 = 0; t2 < o; t2++) e[t2] && (f = r(e[t2])) && (n && (n += " "), n += f);
+  } else for (f in e) e[f] && (n && (n += " "), n += f);
+  return n;
+}
+function clsx() {
+  for (var e, t2, f = 0, n = "", o = arguments.length; f < o; f++) (e = arguments[f]) && (t2 = r(e)) && (n && (n += " "), n += t2);
+  return n;
+}
+var clsx_default = clsx;
+
+// node_modules/react-aria/dist/private/utils/mergeProps.mjs
+function $bbaa08b3cd72f041$export$9d1611c77c2fe928(...args) {
+  let result = {
+    ...args[0]
+  };
+  for (let i = 1; i < args.length; i++) {
+    let props = args[i];
+    for (let key in props) {
+      let a = result[key];
+      let b = props[key];
+      if (typeof a === "function" && typeof b === "function" && // This is a lot faster than a regex.
+      key[0] === "o" && key[1] === "n" && key.charCodeAt(2) >= /* 'A' */
+      65 && key.charCodeAt(2) <= /* 'Z' */
+      90) result[key] = (0, $a4e76a5424781910$export$e08e3b67e392101e)(a, b);
+      else if ((key === "className" || key === "UNSAFE_className") && typeof a === "string" && typeof b === "string") result[key] = (0, clsx_default)(a, b);
+      else if (key === "id" && a && b) result.id = (0, $390e54f620492c70$export$cd8c9cb68f842629)(a, b);
+      else if (key === "ref" && a && b) result.ref = (0, $4064df0d6f9620e1$export$c9058316764c140e)(a, b);
+      else result[key] = b !== void 0 ? b : a;
+    }
+  }
+  return result;
+}
+
+// node_modules/react-aria-components/dist/private/utils.mjs
+var import_react8 = __toESM(require_react(), 1);
+
+// node_modules/react-aria/dist/private/utils/useObjectRef.mjs
+var import_react7 = __toESM(require_react(), 1);
+function $03e8ab2d84d7657a$export$4338b53315abf666(ref) {
+  const objRef = (0, import_react7.useRef)(null);
+  const cleanupRef = (0, import_react7.useRef)(void 0);
+  const refEffect = (0, import_react7.useCallback)((instance) => {
+    if (typeof ref === "function") {
+      const refCallback = ref;
+      const refCleanup = refCallback(instance);
+      return () => {
+        if (typeof refCleanup === "function") refCleanup();
+        else refCallback(null);
+      };
+    } else if (ref) {
+      ref.current = instance;
+      return () => {
+        ref.current = null;
+      };
+    }
+  }, [
+    ref
+  ]);
+  return (0, import_react7.useMemo)(
+    () => ({
+      get current() {
+        return objRef.current;
+      },
+      set current(value) {
+        objRef.current = value;
+        if (cleanupRef.current) {
+          cleanupRef.current();
+          cleanupRef.current = void 0;
+        }
+        if (value != null) cleanupRef.current = refEffect(value);
+      }
+    }),
+    // oxlint-disable-next-line react/react-compiler
+    [
+      refEffect
+    ]
+  );
+}
+
+// node_modules/react-aria-components/dist/private/utils.mjs
+var $7230ffa83bc0c2cf$export$c62b8e45d58ddad9 = Symbol("default");
+function $7230ffa83bc0c2cf$export$2881499e37b75b9a({ values, children }) {
+  for (let [Context, value] of values)
+    children = /* @__PURE__ */ (0, import_react8.default).createElement(Context.Provider, {
+      value
+    }, children);
+  return children;
+}
+function $7230ffa83bc0c2cf$export$4d86445c2cf5e3(props) {
+  let { className, style, children, defaultClassName, defaultChildren, defaultStyle, values, render } = props;
+  return (0, import_react8.useMemo)(() => {
+    let computedClassName;
+    let computedStyle;
+    let computedChildren;
+    if (typeof className === "function") computedClassName = className({
+      ...values,
+      defaultClassName
+    });
+    else computedClassName = className;
+    if (typeof style === "function") computedStyle = style({
+      ...values,
+      defaultStyle: defaultStyle || {}
+    });
+    else computedStyle = style;
+    if (typeof children === "function") computedChildren = children({
+      ...values,
+      defaultChildren
+    });
+    else if (children == null) computedChildren = defaultChildren;
+    else computedChildren = children;
+    return {
+      className: computedClassName ?? defaultClassName,
+      style: computedStyle || defaultStyle ? {
+        ...defaultStyle,
+        ...computedStyle
+      } : void 0,
+      children: computedChildren ?? defaultChildren,
+      "data-rac": "",
+      render: render ? (props2) => render(props2, values) : void 0
+    };
+  }, [
+    className,
+    style,
+    children,
+    defaultClassName,
+    defaultChildren,
+    defaultStyle,
+    values,
+    render
+  ]);
+}
+function $7230ffa83bc0c2cf$export$fabf2dc03a41866e(context, slot) {
+  let ctx = (0, import_react8.useContext)(context);
+  if (slot === null)
+    return null;
+  if (ctx && typeof ctx === "object" && "slots" in ctx && ctx.slots) {
+    let slotKey = slot || $7230ffa83bc0c2cf$export$c62b8e45d58ddad9;
+    if (!ctx.slots[slotKey]) {
+      let availableSlots = new Intl.ListFormat().format(Object.keys(ctx.slots).map((p) => `"${p}"`));
+      let errorMessage = slot ? `Invalid slot "${slot}".` : "A slot prop is required.";
+      throw new Error(`${errorMessage} Valid slot names are ${availableSlots}.`);
+    }
+    return ctx.slots[slotKey];
+  }
+  return ctx;
+}
+function $7230ffa83bc0c2cf$export$29f1550f4b0d4415(props, ref, context) {
+  let ctx = $7230ffa83bc0c2cf$export$fabf2dc03a41866e(context, props.slot) || {};
+  let { ref: contextRef, ...contextProps } = ctx;
+  let mergedRef = (0, $03e8ab2d84d7657a$export$4338b53315abf666)((0, import_react8.useMemo)(() => (0, $4064df0d6f9620e1$export$c9058316764c140e)(ref, contextRef), [
+    ref,
+    contextRef
+  ]));
+  let mergedProps = (0, $bbaa08b3cd72f041$export$9d1611c77c2fe928)(contextProps, props);
+  if ("style" in contextProps && contextProps.style && "style" in props && props.style) {
+    if (typeof contextProps.style === "function" || typeof props.style === "function")
+      mergedProps.style = (renderProps2) => {
+        let contextStyle = typeof contextProps.style === "function" ? contextProps.style(renderProps2) : contextProps.style;
+        let defaultStyle = {
+          ...renderProps2.defaultStyle,
+          ...contextStyle
+        };
+        let style = typeof props.style === "function" ? props.style({
+          ...renderProps2,
+          defaultStyle
+        }) : props.style;
+        return {
+          ...defaultStyle,
+          ...style
+        };
+      };
+    else
+      mergedProps.style = {
+        ...contextProps.style,
+        ...props.style
+      };
+  }
+  return [
+    mergedProps,
+    mergedRef
+  ];
+}
+function $7230ffa83bc0c2cf$export$9d4c57ee4c6ffdd8(initialState = true) {
+  let [hasSlot, setHasSlot] = (0, import_react8.useState)(initialState);
+  let hasRun = (0, import_react8.useRef)(false);
+  let ref = (0, import_react8.useCallback)((el) => {
+    hasRun.current = true;
+    setHasSlot(!!el);
+  }, []);
+  (0, $c4867b2f328c2698$export$e5c5a5f917a5871c)(() => {
+    if (!hasRun.current) setHasSlot(false);
+  }, []);
+  return [
+    ref,
+    hasSlot
+  ];
+}
+function $7230ffa83bc0c2cf$export$ef03459518577ad4(props) {
+  const prefix14 = /^(data-.*)$/;
+  let filteredProps = {};
+  for (const prop in props) if (!prefix14.test(prop)) filteredProps[prop] = props[prop];
+  return filteredProps;
+}
+function $7230ffa83bc0c2cf$var$DOMElement(ElementType, props, forwardedRef) {
+  let { render, ...otherProps } = props;
+  let elementRef = (0, import_react8.useRef)(null);
+  let ref = (0, import_react8.useMemo)(() => (0, $4064df0d6f9620e1$export$c9058316764c140e)(forwardedRef, elementRef), [
+    forwardedRef,
+    elementRef
+  ]);
+  (0, $c4867b2f328c2698$export$e5c5a5f917a5871c)(() => {
+    if (false) {
+      if (!elementRef.current) console.warn("Ref was not connected to DOM element returned by custom `render` function. Did you forget to pass through or merge the `ref`?");
+      else if (elementRef.current.localName !== ElementType) console.warn(`Unexpected DOM element returned by custom \`render\` function. Expected <${ElementType}>, got <${elementRef.current.localName}>. This may break the component behavior and accessibility.`);
+    }
+  }, [
+    ElementType,
+    render
+  ]);
+  let domProps = {
+    ...otherProps,
+    ref
+  };
+  if (render) return render(domProps, void 0);
+  return /* @__PURE__ */ (0, import_react8.default).createElement(ElementType, domProps);
+}
+var $7230ffa83bc0c2cf$var$domComponentCache = {};
+var $7230ffa83bc0c2cf$export$df3a06d6289f983e = new Proxy({}, {
+  get(target, elementType) {
+    if (typeof elementType !== "string") return void 0;
+    let res = $7230ffa83bc0c2cf$var$domComponentCache[elementType];
+    if (!res) {
+      res = /* @__PURE__ */ (0, import_react8.forwardRef)($7230ffa83bc0c2cf$var$DOMElement.bind(null, elementType));
+      $7230ffa83bc0c2cf$var$domComponentCache[elementType] = res;
+    }
+    return res;
+  }
+});
+
+// node_modules/react-aria/dist/private/utils/domHelpers.mjs
+var $d447af545b77c9f1$export$b204af158042fbac = (target) => {
+  if ($d447af545b77c9f1$var$isWindow(target)) return target.document;
+  if ($d447af545b77c9f1$export$62858bae88b53fd0(target)) return target;
+  return target?.ownerDocument ?? (typeof document !== "undefined" ? document : void 0);
+};
+var $d447af545b77c9f1$export$f21a1ffae260145a = (target) => {
+  let ownerDocument = $d447af545b77c9f1$export$b204af158042fbac(target);
+  return ownerDocument?.defaultView ?? (typeof window !== "undefined" ? window : void 0);
+};
+function $d447af545b77c9f1$export$8ee0fc9ee280b4ee(value) {
+  return value !== null && typeof value === "object" && "nodeType" in value && typeof value.nodeType === "number";
+}
+function $d447af545b77c9f1$var$isWindow(value) {
+  return typeof value === "object" && value != null && "window" in value && value.window === value;
+}
+function $d447af545b77c9f1$export$62858bae88b53fd0(value) {
+  return $d447af545b77c9f1$export$8ee0fc9ee280b4ee(value) && value.nodeType === 9;
+}
+function $d447af545b77c9f1$export$af51f0f06c0f328a(value) {
+  return $d447af545b77c9f1$export$8ee0fc9ee280b4ee(value) && value.nodeType === 11 && "host" in value;
+}
+function $d447af545b77c9f1$export$f531f92e2a15358f(target, event, listener, options) {
+  if (listener == null || target == null) return () => {
+  };
+  let eventTargets = Array.isArray(target) ? target : [
+    target
+  ];
+  for (let eventTarget of eventTargets) eventTarget.addEventListener(event, listener, options);
+  return () => {
+    for (let eventTarget of eventTargets) eventTarget.removeEventListener(event, listener, options);
+  };
+}
+
+// node_modules/react-stately/dist/private/flags/flags.mjs
+var $6a20a7989e6c817a$var$_shadowDOM = false;
+function $6a20a7989e6c817a$export$98658e8c59125e6a() {
+  return $6a20a7989e6c817a$var$_shadowDOM;
+}
+
+// node_modules/react-aria/dist/private/utils/shadowdom/DOMFunctions.mjs
+function $23f2114a1b82827e$export$4282f70798064fe0(node, otherNode) {
+  if (!(0, $6a20a7989e6c817a$export$98658e8c59125e6a)()) return otherNode && node ? node.contains(otherNode) : false;
+  if (!node || !otherNode) return false;
+  let currentNode = otherNode;
+  while (currentNode != null) {
+    if (currentNode === node) return true;
+    if (typeof currentNode.assignedElements !== "function" && currentNode.assignedSlot?.parentNode)
+      currentNode = currentNode.assignedSlot.parentNode;
+    else if ((0, $d447af545b77c9f1$export$af51f0f06c0f328a)(currentNode))
+      currentNode = currentNode.host;
+    else currentNode = currentNode.parentNode;
+  }
+  return false;
+}
+var $23f2114a1b82827e$export$cd4e5573fbe2b576 = (doc = document) => {
+  if (!(0, $6a20a7989e6c817a$export$98658e8c59125e6a)()) return doc.activeElement;
+  let activeElement = doc.activeElement;
+  while (activeElement && "shadowRoot" in activeElement && activeElement.shadowRoot?.activeElement) activeElement = activeElement.shadowRoot.activeElement;
+  return activeElement;
+};
+function $23f2114a1b82827e$export$e58f029f0fbfdb29(event) {
+  if ((0, $6a20a7989e6c817a$export$98658e8c59125e6a)() && event.target instanceof Element && event.target.shadowRoot) {
+    if ("composedPath" in event) return event.composedPath()[0] ?? null;
+    else if ("composedPath" in event.nativeEvent) return event.nativeEvent.composedPath()[0] ?? null;
+  }
+  return event.target;
+}
+
+// node_modules/react-aria/dist/private/utils/focusWithoutScrolling.mjs
+function $1969ac565cfec8d0$export$de79e2c695e052f3(element) {
+  element.focus({
+    preventScroll: true
+  });
+}
+
+// node_modules/react-aria/dist/private/utils/isElementVisible.mjs
+var $ae77152785188400$var$supportsCheckVisibility = typeof Element !== "undefined" && "checkVisibility" in Element.prototype;
+function $ae77152785188400$var$isStyleVisible(element) {
+  const windowObject = (0, $d447af545b77c9f1$export$f21a1ffae260145a)(element);
+  if (!(element instanceof windowObject.HTMLElement) && !(element instanceof windowObject.SVGElement)) return false;
+  let { display, visibility } = element.style;
+  let isVisible = display !== "none" && visibility !== "hidden" && visibility !== "collapse";
+  if (isVisible) {
+    const { getComputedStyle: getComputedStyle2 } = (0, $d447af545b77c9f1$export$f21a1ffae260145a)(element);
+    let { display: computedDisplay, visibility: computedVisibility } = getComputedStyle2(element);
+    isVisible = computedDisplay !== "none" && computedVisibility !== "hidden" && computedVisibility !== "collapse";
+  }
+  return isVisible;
+}
+function $ae77152785188400$var$isAttributeVisible(element, childElement) {
+  return !element.hasAttribute("hidden") && // Ignore HiddenSelect when tree walking.
+  !element.hasAttribute("data-react-aria-prevent-focus") && (element.nodeName === "DETAILS" && childElement && childElement.nodeName !== "SUMMARY" ? element.hasAttribute("open") : true);
+}
+function $ae77152785188400$export$e989c0fffaa6b27a(element, childElement) {
+  if ($ae77152785188400$var$supportsCheckVisibility) return element.checkVisibility({
+    visibilityProperty: true
+  }) && !element.closest("[data-react-aria-prevent-focus]");
+  return element.nodeName !== "#comment" && $ae77152785188400$var$isStyleVisible(element) && $ae77152785188400$var$isAttributeVisible(element, childElement) && (!element.parentElement || $ae77152785188400$export$e989c0fffaa6b27a(element.parentElement, element));
+}
+
+// node_modules/react-aria/dist/private/utils/isFocusable.mjs
+var $3b8b240c1bf84ab9$var$focusableElements = [
+  "input:not([disabled]):not([type=hidden])",
+  "select:not([disabled])",
+  "textarea:not([disabled])",
+  "button:not([disabled])",
+  "a[href]",
+  "area[href]",
+  "summary",
+  "iframe",
+  "object",
+  "embed",
+  "audio[controls]",
+  "video[controls]",
+  '[contenteditable]:not([contenteditable^="false"])',
+  "permission"
+];
+var $3b8b240c1bf84ab9$var$FOCUSABLE_ELEMENT_SELECTOR = $3b8b240c1bf84ab9$var$focusableElements.join(":not([hidden]),") + ",[tabindex]:not([disabled]):not([hidden])";
+$3b8b240c1bf84ab9$var$focusableElements.push('[tabindex]:not([tabindex="-1"]):not([disabled])');
+var $3b8b240c1bf84ab9$var$TABBABLE_ELEMENT_SELECTOR = $3b8b240c1bf84ab9$var$focusableElements.join(':not([hidden]):not([tabindex="-1"]),');
+function $3b8b240c1bf84ab9$export$4c063cf1350e6fed(element, options) {
+  return element.matches($3b8b240c1bf84ab9$var$FOCUSABLE_ELEMENT_SELECTOR) && !$3b8b240c1bf84ab9$var$isInert(element) && (options?.skipVisibilityCheck || (0, $ae77152785188400$export$e989c0fffaa6b27a)(element));
+}
+function $3b8b240c1bf84ab9$export$bebd5a1431fec25d(element) {
+  return element.matches($3b8b240c1bf84ab9$var$TABBABLE_ELEMENT_SELECTOR) && (0, $ae77152785188400$export$e989c0fffaa6b27a)(element) && !$3b8b240c1bf84ab9$var$isInert(element);
+}
+function $3b8b240c1bf84ab9$var$isInert(element) {
+  let node = element;
+  while (node != null) {
+    if (node instanceof (0, $d447af545b77c9f1$export$f21a1ffae260145a)(node).HTMLElement && node.inert) return true;
+    node = node.parentElement;
+  }
+  return false;
+}
+
+// node_modules/react-aria/dist/private/interactions/utils.mjs
+var import_react9 = __toESM(require_react(), 1);
+function $a92dc41f639950be$export$525bc4921d56d4a(nativeEvent) {
+  let event = nativeEvent;
+  event.nativeEvent = nativeEvent;
+  event.isDefaultPrevented = () => event.defaultPrevented;
+  event.isPropagationStopped = () => event.cancelBubble;
+  event.persist = () => {
+  };
+  return event;
+}
+function $a92dc41f639950be$export$c2b7abe5d61ec696(event, target) {
+  Object.defineProperty(event, "target", {
+    value: target
+  });
+  Object.defineProperty(event, "currentTarget", {
+    value: target
+  });
+}
+function $a92dc41f639950be$export$715c682d09d639cc(onBlur) {
+  let stateRef = (0, import_react9.useRef)({
+    isFocused: false,
+    observer: null
+  });
+  (0, $c4867b2f328c2698$export$e5c5a5f917a5871c)(() => {
+    const state = stateRef.current;
+    return () => {
+      if (state.observer) {
+        state.observer.disconnect();
+        state.observer = null;
+      }
+    };
+  }, []);
+  return (0, import_react9.useCallback)((e) => {
+    let eventTarget = (0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e);
+    if (eventTarget instanceof HTMLButtonElement || eventTarget instanceof HTMLInputElement || eventTarget instanceof HTMLTextAreaElement || eventTarget instanceof HTMLSelectElement) {
+      stateRef.current.isFocused = true;
+      let target = eventTarget;
+      let onBlurHandler = (e2) => {
+        stateRef.current.isFocused = false;
+        if (target.disabled) {
+          let event = $a92dc41f639950be$export$525bc4921d56d4a(e2);
+          onBlur?.(event);
+        }
+        if (stateRef.current.observer) {
+          stateRef.current.observer.disconnect();
+          stateRef.current.observer = null;
+        }
+      };
+      target.addEventListener("focusout", onBlurHandler, {
+        once: true
+      });
+      stateRef.current.observer = new MutationObserver(() => {
+        if (stateRef.current.isFocused && target.disabled) {
+          stateRef.current.observer?.disconnect();
+          let relatedTargetEl = target === (0, $23f2114a1b82827e$export$cd4e5573fbe2b576)() ? null : (0, $23f2114a1b82827e$export$cd4e5573fbe2b576)();
+          target.dispatchEvent(new FocusEvent("blur", {
+            relatedTarget: relatedTargetEl
+          }));
+          target.dispatchEvent(new FocusEvent("focusout", {
+            bubbles: true,
+            relatedTarget: relatedTargetEl
+          }));
+        }
+      });
+      stateRef.current.observer.observe(target, {
+        attributes: true,
+        attributeFilter: [
+          "disabled"
+        ]
+      });
+    }
+  }, [
+    onBlur
+  ]);
+}
+var $a92dc41f639950be$export$fda7da73ab5d4c48 = false;
+function $a92dc41f639950be$export$cabe61c495ee3649(target) {
+  while (target && !(0, $3b8b240c1bf84ab9$export$4c063cf1350e6fed)(target, {
+    skipVisibilityCheck: true
+  })) target = target.parentElement;
+  let ownerWindow = (0, $d447af545b77c9f1$export$f21a1ffae260145a)(target);
+  let activeElement = (0, $23f2114a1b82827e$export$cd4e5573fbe2b576)(ownerWindow.document);
+  if (!activeElement || activeElement === target) return;
+  let targetRoot = target?.getRootNode();
+  let root = targetRoot != null && (0, $d447af545b77c9f1$export$af51f0f06c0f328a)(targetRoot) ? targetRoot : (0, $d447af545b77c9f1$export$f21a1ffae260145a)(target);
+  let isFocusMovingToTarget = (focusTarget) => focusTarget === target || (0, $d447af545b77c9f1$export$8ee0fc9ee280b4ee)(focusTarget) && (0, $23f2114a1b82827e$export$4282f70798064fe0)(target, focusTarget);
+  let isBlurFromActiveElement = (eventTarget) => eventTarget === activeElement || activeElement != null && (0, $d447af545b77c9f1$export$8ee0fc9ee280b4ee)(eventTarget) && (0, $23f2114a1b82827e$export$4282f70798064fe0)(activeElement, eventTarget);
+  $a92dc41f639950be$export$fda7da73ab5d4c48 = true;
+  let isRefocusing = false;
+  let onBlur = (e) => {
+    if (isBlurFromActiveElement((0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e)) || isRefocusing) e.stopImmediatePropagation();
+  };
+  let onFocusOut = (e) => {
+    if (isBlurFromActiveElement((0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e)) || isRefocusing) {
+      e.stopImmediatePropagation();
+      if (!target && !isRefocusing) {
+        isRefocusing = true;
+        (0, $1969ac565cfec8d0$export$de79e2c695e052f3)(activeElement);
+        cleanup();
+      }
+    }
+  };
+  let onFocus = (e) => {
+    if (isFocusMovingToTarget((0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e)) || isRefocusing) e.stopImmediatePropagation();
+  };
+  let onFocusIn = (e) => {
+    if (isFocusMovingToTarget((0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e)) || isRefocusing) {
+      e.stopImmediatePropagation();
+      if (!isRefocusing) {
+        isRefocusing = true;
+        (0, $1969ac565cfec8d0$export$de79e2c695e052f3)(activeElement);
+        cleanup();
+      }
+    }
+  };
+  root.addEventListener("blur", onBlur, true);
+  root.addEventListener("focusout", onFocusOut, true);
+  root.addEventListener("focusin", onFocusIn, true);
+  root.addEventListener("focus", onFocus, true);
+  let cleanup = () => {
+    cancelAnimationFrame(raf);
+    root.removeEventListener("blur", onBlur, true);
+    root.removeEventListener("focusout", onFocusOut, true);
+    root.removeEventListener("focusin", onFocusIn, true);
+    root.removeEventListener("focus", onFocus, true);
+    $a92dc41f639950be$export$fda7da73ab5d4c48 = false;
+    isRefocusing = false;
+  };
+  let raf = requestAnimationFrame(cleanup);
+  return cleanup;
+}
+
+// node_modules/react-aria/dist/private/utils/platform.mjs
+function $2add3ce32c6007eb$var$testUserAgent(re) {
+  if (typeof window === "undefined" || window.navigator == null) return false;
+  let brands = window.navigator["userAgentData"]?.brands;
+  return Array.isArray(brands) && brands.some((brand) => re.test(brand.brand)) || re.test(window.navigator.userAgent);
+}
+function $2add3ce32c6007eb$var$testPlatform(re) {
+  return typeof window !== "undefined" && window.navigator != null ? re.test(window.navigator["userAgentData"]?.platform || window.navigator.platform) : false;
+}
+function $2add3ce32c6007eb$var$cached(fn) {
+  if (false) return fn;
+  let res = null;
+  return () => {
+    if (res == null) res = fn();
+    return res;
+  };
+}
+var $2add3ce32c6007eb$export$9ac100e40613ea10 = $2add3ce32c6007eb$var$cached(function() {
+  return $2add3ce32c6007eb$var$testPlatform(/^Mac/i);
+});
+var $2add3ce32c6007eb$export$186c6964ca17d99 = $2add3ce32c6007eb$var$cached(function() {
+  return $2add3ce32c6007eb$var$testPlatform(/^iPhone/i);
+});
+var $2add3ce32c6007eb$export$7bef049ce92e4224 = $2add3ce32c6007eb$var$cached(function() {
+  return $2add3ce32c6007eb$var$testPlatform(/^iPad/i) || // iPadOS 13 lies and says it's a Mac, but we can distinguish by detecting touch support.
+  $2add3ce32c6007eb$export$9ac100e40613ea10() && navigator.maxTouchPoints > 1;
+});
+var $2add3ce32c6007eb$export$fedb369cb70207f1 = $2add3ce32c6007eb$var$cached(function() {
+  return $2add3ce32c6007eb$export$186c6964ca17d99() || $2add3ce32c6007eb$export$7bef049ce92e4224();
+});
+var $2add3ce32c6007eb$export$e1865c3bedcd822b = $2add3ce32c6007eb$var$cached(function() {
+  return $2add3ce32c6007eb$export$9ac100e40613ea10() || $2add3ce32c6007eb$export$fedb369cb70207f1();
+});
+var $2add3ce32c6007eb$export$78551043582a6a98 = $2add3ce32c6007eb$var$cached(function() {
+  return $2add3ce32c6007eb$var$testUserAgent(/AppleWebKit/i) && ($2add3ce32c6007eb$export$fedb369cb70207f1() || !$2add3ce32c6007eb$export$6446a186d09e379e());
+});
+var $2add3ce32c6007eb$export$95df08bae54cb4df = $2add3ce32c6007eb$var$cached(function() {
+  return $2add3ce32c6007eb$export$78551043582a6a98() && !$2add3ce32c6007eb$export$6446a186d09e379e() && !$2add3ce32c6007eb$export$b7d78993b74f766d();
+});
+var $2add3ce32c6007eb$export$6446a186d09e379e = $2add3ce32c6007eb$var$cached(function() {
+  return $2add3ce32c6007eb$var$testUserAgent(/Chrome|CriOS|CrMo/i);
+});
+var $2add3ce32c6007eb$export$a11b0059900ceec8 = $2add3ce32c6007eb$var$cached(function() {
+  return $2add3ce32c6007eb$var$testUserAgent(/Android/i);
+});
+var $2add3ce32c6007eb$export$b7d78993b74f766d = $2add3ce32c6007eb$var$cached(function() {
+  return $2add3ce32c6007eb$var$testUserAgent(/(Firefox|FxiOS)/i);
+});
+
+// node_modules/react-aria/dist/private/utils/isVirtualEvent.mjs
+function $b5c62b033c25b96d$export$60278871457622de(event) {
+  if (event.pointerType === "" && event.isTrusted) return true;
+  if ((0, $2add3ce32c6007eb$export$a11b0059900ceec8)() && event.pointerType) return event.type === "click" && event.buttons === 1;
+  return event.detail === 0 && !event.pointerType;
+}
+function $b5c62b033c25b96d$export$29bf1b5f2c56cf63(event) {
+  return !(0, $2add3ce32c6007eb$export$a11b0059900ceec8)() && event.width === 0 && event.height === 0 || (0, $2add3ce32c6007eb$export$a11b0059900ceec8)() && event.width === 1 && event.height === 1 && event.pressure === 0 && event.detail === 0 && event.pointerType === "mouse";
+}
+
+// node_modules/react-aria/dist/private/utils/openLink.mjs
+var import_react10 = __toESM(require_react(), 1);
+function $caaf0dd3060ed57c$export$95185d699e05d4d7(target, modifiers, setOpening = true) {
+  let { metaKey, ctrlKey, altKey, shiftKey } = modifiers;
+  let event = (0, $2add3ce32c6007eb$export$78551043582a6a98)() && (0, $2add3ce32c6007eb$export$9ac100e40613ea10)() && !(0, $2add3ce32c6007eb$export$7bef049ce92e4224)() && true ? new KeyboardEvent("keydown", {
+    keyIdentifier: "Enter",
+    metaKey,
+    ctrlKey,
+    altKey,
+    shiftKey
+  }) : new MouseEvent("click", {
+    metaKey,
+    ctrlKey,
+    altKey,
+    shiftKey,
+    detail: 1,
+    bubbles: true,
+    cancelable: true
+  });
+  $caaf0dd3060ed57c$export$95185d699e05d4d7.isOpening = setOpening;
+  (0, $1969ac565cfec8d0$export$de79e2c695e052f3)(target);
+  target.dispatchEvent(event);
+  $caaf0dd3060ed57c$export$95185d699e05d4d7.isOpening = false;
+}
+$caaf0dd3060ed57c$export$95185d699e05d4d7.isOpening = false;
+
+// node_modules/react-aria/dist/private/interactions/useFocusVisible.mjs
+var import_react11 = __toESM(require_react(), 1);
+var $8f5a2122b0992be3$var$currentModality = null;
+var $8f5a2122b0992be3$var$currentPointerType = "keyboard";
+var $8f5a2122b0992be3$export$901e90a13c50a14e = /* @__PURE__ */ new Set();
+var $8f5a2122b0992be3$export$d90243b58daecda7 = /* @__PURE__ */ new Map();
+var $8f5a2122b0992be3$var$hasEventBeforeFocus = false;
+var $8f5a2122b0992be3$var$hasBlurredWindowRecently = false;
+var $8f5a2122b0992be3$var$FOCUS_VISIBLE_INPUT_KEYS = {
+  Tab: true,
+  Escape: true
+};
+function $8f5a2122b0992be3$var$triggerChangeHandlers(modality, e) {
+  for (let handler of $8f5a2122b0992be3$export$901e90a13c50a14e) handler(modality, e);
+}
+function $8f5a2122b0992be3$var$isValidKey(e) {
+  return !(e.metaKey || !(0, $2add3ce32c6007eb$export$9ac100e40613ea10)() && e.altKey || e.ctrlKey || e.key === "Control" || e.key === "Shift" || e.key === "Meta");
+}
+function $8f5a2122b0992be3$var$handleKeyboardEvent(e) {
+  $8f5a2122b0992be3$var$hasEventBeforeFocus = true;
+  if (!(0, $caaf0dd3060ed57c$export$95185d699e05d4d7).isOpening && $8f5a2122b0992be3$var$isValidKey(e)) {
+    $8f5a2122b0992be3$var$currentModality = "keyboard";
+    $8f5a2122b0992be3$var$currentPointerType = "keyboard";
+    $8f5a2122b0992be3$var$triggerChangeHandlers("keyboard", e);
+  }
+}
+function $8f5a2122b0992be3$var$handlePointerEvent(e) {
+  $8f5a2122b0992be3$var$currentModality = "pointer";
+  $8f5a2122b0992be3$var$currentPointerType = "pointerType" in e ? e.pointerType : "mouse";
+  if (e.type === "mousedown" || e.type === "pointerdown") {
+    $8f5a2122b0992be3$var$hasEventBeforeFocus = true;
+    $8f5a2122b0992be3$var$triggerChangeHandlers("pointer", e);
+  }
+}
+function $8f5a2122b0992be3$var$handleClickEvent(e) {
+  if (!(0, $caaf0dd3060ed57c$export$95185d699e05d4d7).isOpening && (0, $b5c62b033c25b96d$export$60278871457622de)(e)) {
+    $8f5a2122b0992be3$var$hasEventBeforeFocus = true;
+    $8f5a2122b0992be3$var$currentModality = "virtual";
+    $8f5a2122b0992be3$var$currentPointerType = "virtual";
+  }
+}
+function $8f5a2122b0992be3$var$handleFocusEvent(e) {
+  if (0, $a92dc41f639950be$export$fda7da73ab5d4c48) return;
+  let target = (0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e);
+  let ownerWindow = (0, $d447af545b77c9f1$export$f21a1ffae260145a)(target);
+  let ownerDocument = (0, $d447af545b77c9f1$export$b204af158042fbac)(target);
+  if (target === ownerWindow) {
+    $8f5a2122b0992be3$var$hasBlurredWindowRecently = true;
+    return;
+  }
+  if (target === ownerDocument || !e.isTrusted) return;
+  if (!$8f5a2122b0992be3$var$hasEventBeforeFocus && !$8f5a2122b0992be3$var$hasBlurredWindowRecently) {
+    $8f5a2122b0992be3$var$currentModality = "virtual";
+    $8f5a2122b0992be3$var$currentPointerType = "virtual";
+    $8f5a2122b0992be3$var$triggerChangeHandlers("virtual", e);
+  }
+  $8f5a2122b0992be3$var$hasEventBeforeFocus = false;
+  $8f5a2122b0992be3$var$hasBlurredWindowRecently = false;
+}
+function $8f5a2122b0992be3$var$handleWindowBlur() {
+  if (0, $a92dc41f639950be$export$fda7da73ab5d4c48) return;
+  $8f5a2122b0992be3$var$hasEventBeforeFocus = false;
+  $8f5a2122b0992be3$var$hasBlurredWindowRecently = true;
+}
+function $8f5a2122b0992be3$var$handleInvalidEvent(e) {
+  let startingActiveElement = (0, $23f2114a1b82827e$export$cd4e5573fbe2b576)((0, $d447af545b77c9f1$export$b204af158042fbac)((0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e)));
+  queueMicrotask(() => {
+    if ((0, $23f2114a1b82827e$export$cd4e5573fbe2b576)((0, $d447af545b77c9f1$export$b204af158042fbac)((0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e))) !== startingActiveElement) $8f5a2122b0992be3$export$8397ddfc504fdb9a("keyboard");
+  });
+}
+function $8f5a2122b0992be3$var$setupGlobalFocusEvents(element) {
+  if (typeof window === "undefined" || typeof document === "undefined") return;
+  const windowObject = (0, $d447af545b77c9f1$export$f21a1ffae260145a)(element);
+  const documentObject = (0, $d447af545b77c9f1$export$b204af158042fbac)(element);
+  if ($8f5a2122b0992be3$export$d90243b58daecda7.get(windowObject)) return;
+  let focus = windowObject.HTMLElement.prototype.focus;
+  Reflect.defineProperty(windowObject.HTMLElement.prototype, "focus", {
+    configurable: true,
+    writable: true,
+    value: function() {
+      $8f5a2122b0992be3$var$hasEventBeforeFocus = true;
+      focus.apply(this, arguments);
+    }
+  });
+  documentObject.addEventListener("keydown", $8f5a2122b0992be3$var$handleKeyboardEvent, true);
+  documentObject.addEventListener("keyup", $8f5a2122b0992be3$var$handleKeyboardEvent, true);
+  documentObject.addEventListener("click", $8f5a2122b0992be3$var$handleClickEvent, true);
+  documentObject.addEventListener("invalid", $8f5a2122b0992be3$var$handleInvalidEvent, true);
+  windowObject.addEventListener("focus", $8f5a2122b0992be3$var$handleFocusEvent, true);
+  windowObject.addEventListener("blur", $8f5a2122b0992be3$var$handleWindowBlur, false);
+  if (typeof PointerEvent !== "undefined") {
+    documentObject.addEventListener("pointerdown", $8f5a2122b0992be3$var$handlePointerEvent, true);
+    documentObject.addEventListener("pointermove", $8f5a2122b0992be3$var$handlePointerEvent, true);
+    documentObject.addEventListener("pointerup", $8f5a2122b0992be3$var$handlePointerEvent, true);
+  } else if (false) {
+    documentObject.addEventListener("mousedown", $8f5a2122b0992be3$var$handlePointerEvent, true);
+    documentObject.addEventListener("mousemove", $8f5a2122b0992be3$var$handlePointerEvent, true);
+    documentObject.addEventListener("mouseup", $8f5a2122b0992be3$var$handlePointerEvent, true);
+  }
+  windowObject.addEventListener("beforeunload", () => {
+    $8f5a2122b0992be3$var$tearDownWindowFocusTracking(element);
+  }, {
+    once: true
+  });
+  $8f5a2122b0992be3$export$d90243b58daecda7.set(windowObject, {
+    focus
+  });
+}
+var $8f5a2122b0992be3$var$tearDownWindowFocusTracking = (element, loadListener) => {
+  const windowObject = (0, $d447af545b77c9f1$export$f21a1ffae260145a)(element);
+  const documentObject = (0, $d447af545b77c9f1$export$b204af158042fbac)(element);
+  if (loadListener) documentObject.removeEventListener("DOMContentLoaded", loadListener);
+  if (!$8f5a2122b0992be3$export$d90243b58daecda7.has(windowObject)) return;
+  Reflect.defineProperty(windowObject.HTMLElement.prototype, "focus", {
+    configurable: true,
+    writable: true,
+    value: $8f5a2122b0992be3$export$d90243b58daecda7.get(windowObject).focus
+  });
+  documentObject.removeEventListener("keydown", $8f5a2122b0992be3$var$handleKeyboardEvent, true);
+  documentObject.removeEventListener("keyup", $8f5a2122b0992be3$var$handleKeyboardEvent, true);
+  documentObject.removeEventListener("click", $8f5a2122b0992be3$var$handleClickEvent, true);
+  documentObject.removeEventListener("invalid", $8f5a2122b0992be3$var$handleInvalidEvent, true);
+  windowObject.removeEventListener("focus", $8f5a2122b0992be3$var$handleFocusEvent, true);
+  windowObject.removeEventListener("blur", $8f5a2122b0992be3$var$handleWindowBlur, false);
+  if (typeof PointerEvent !== "undefined") {
+    documentObject.removeEventListener("pointerdown", $8f5a2122b0992be3$var$handlePointerEvent, true);
+    documentObject.removeEventListener("pointermove", $8f5a2122b0992be3$var$handlePointerEvent, true);
+    documentObject.removeEventListener("pointerup", $8f5a2122b0992be3$var$handlePointerEvent, true);
+  } else if (false) {
+    documentObject.removeEventListener("mousedown", $8f5a2122b0992be3$var$handlePointerEvent, true);
+    documentObject.removeEventListener("mousemove", $8f5a2122b0992be3$var$handlePointerEvent, true);
+    documentObject.removeEventListener("mouseup", $8f5a2122b0992be3$var$handlePointerEvent, true);
+  }
+  $8f5a2122b0992be3$export$d90243b58daecda7.delete(windowObject);
+};
+function $8f5a2122b0992be3$export$2f1888112f558a7d(element) {
+  const documentObject = (0, $d447af545b77c9f1$export$b204af158042fbac)(element);
+  let loadListener;
+  if (documentObject.readyState !== "loading") $8f5a2122b0992be3$var$setupGlobalFocusEvents(element);
+  else {
+    loadListener = () => {
+      $8f5a2122b0992be3$var$setupGlobalFocusEvents(element);
+    };
+    documentObject.addEventListener("DOMContentLoaded", loadListener);
+  }
+  return () => $8f5a2122b0992be3$var$tearDownWindowFocusTracking(element, loadListener);
+}
+if (typeof document !== "undefined") $8f5a2122b0992be3$export$2f1888112f558a7d();
+function $8f5a2122b0992be3$export$b9b3dfddab17db27() {
+  return $8f5a2122b0992be3$var$currentModality !== "pointer";
+}
+function $8f5a2122b0992be3$export$630ff653c5ada6a9() {
+  return $8f5a2122b0992be3$var$currentModality;
+}
+function $8f5a2122b0992be3$export$8397ddfc504fdb9a(modality) {
+  $8f5a2122b0992be3$var$currentModality = modality;
+  $8f5a2122b0992be3$var$currentPointerType = modality === "pointer" ? "mouse" : modality;
+  $8f5a2122b0992be3$var$triggerChangeHandlers(modality, null);
+}
+var $8f5a2122b0992be3$var$nonTextInputTypes = /* @__PURE__ */ new Set([
+  "checkbox",
+  "radio",
+  "range",
+  "color",
+  "file",
+  "image",
+  "button",
+  "submit",
+  "reset"
+]);
+function $8f5a2122b0992be3$var$isKeyboardFocusEvent(isTextInput, modality, e) {
+  let eventTarget = e ? (0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e) : void 0;
+  let ownerDocument = (0, $d447af545b77c9f1$export$b204af158042fbac)(eventTarget);
+  let ownerWindow = (0, $d447af545b77c9f1$export$f21a1ffae260145a)(eventTarget);
+  const IHTMLInputElement = typeof ownerWindow !== "undefined" ? ownerWindow.HTMLInputElement : HTMLInputElement;
+  const IHTMLTextAreaElement = typeof ownerWindow !== "undefined" ? ownerWindow.HTMLTextAreaElement : HTMLTextAreaElement;
+  const IHTMLElement = typeof ownerWindow !== "undefined" ? ownerWindow.HTMLElement : HTMLElement;
+  const IKeyboardEvent = typeof ownerWindow !== "undefined" ? ownerWindow.KeyboardEvent : KeyboardEvent;
+  let activeElement = (0, $23f2114a1b82827e$export$cd4e5573fbe2b576)(ownerDocument);
+  isTextInput = isTextInput || activeElement instanceof IHTMLInputElement && !$8f5a2122b0992be3$var$nonTextInputTypes.has(activeElement.type) || activeElement instanceof IHTMLTextAreaElement || activeElement instanceof IHTMLElement && activeElement.isContentEditable;
+  return !(isTextInput && modality === "keyboard" && e instanceof IKeyboardEvent && !$8f5a2122b0992be3$var$FOCUS_VISIBLE_INPUT_KEYS[e.key]);
+}
+function $8f5a2122b0992be3$export$ec71b4b83ac08ec3(fn, deps, opts) {
+  $8f5a2122b0992be3$var$setupGlobalFocusEvents();
+  (0, import_react11.useEffect)(() => {
+    if (opts?.enabled === false) return;
+    let handler = (modality, e) => {
+      if (!$8f5a2122b0992be3$var$isKeyboardFocusEvent(!!opts?.isTextInput, modality, e)) return;
+      fn($8f5a2122b0992be3$export$b9b3dfddab17db27());
+    };
+    $8f5a2122b0992be3$export$901e90a13c50a14e.add(handler);
+    return () => {
+      $8f5a2122b0992be3$export$901e90a13c50a14e.delete(handler);
+    };
+  }, deps);
+}
+
+// node_modules/react-aria/dist/private/utils/getMetaValue.mjs
+function $7096878c21af5e66$export$a929f3f93e2cc67e(key, doc) {
+  let ownerWindow = (0, $d447af545b77c9f1$export$f21a1ffae260145a)(doc);
+  let ownerDocument = (0, $d447af545b77c9f1$export$b204af158042fbac)(doc);
+  if (ownerDocument == null || ownerWindow == null) return;
+  let content = void 0;
+  let selector = `meta[name="${CSS.escape(key)}"], meta[property="${CSS.escape(key)}"]`;
+  let meta = ownerDocument.querySelector(selector);
+  if (meta && meta instanceof ownerWindow.HTMLMetaElement) {
+    if (key === "csp-nonce" && meta.nonce) content ??= meta.nonce || void 0;
+    if (meta.content) content ??= meta.content || void 0;
+  }
+  if (key === "csp-nonce") content ??= ownerWindow.__webpack_nonce__ || globalThis.__webpack_nonce__ || void 0;
+  return content;
+}
+
+// node_modules/react-aria/dist/private/utils/useEffectEvent.mjs
+var import_react12 = __toESM(require_react(), 1);
+var $fe16bffc7a557bf0$var$useEarlyEffect = (0, import_react12.default)["useInsertionEffect"] ?? (0, $c4867b2f328c2698$export$e5c5a5f917a5871c);
+function $fe16bffc7a557bf0$export$7f54fc3180508a52(fn) {
+  const ref = (0, import_react12.useRef)(null);
+  $fe16bffc7a557bf0$var$useEarlyEffect(() => {
+    ref.current = fn;
+  }, [
+    fn
+  ]);
+  return (0, import_react12.useCallback)((...args) => {
+    const f = ref.current;
+    return f?.(...args);
+  }, []);
+}
+
+// node_modules/react-aria/dist/private/utils/useLabels.mjs
+function $e8ac3c3f5d4bae7f$export$d6875122194c7b44(props, defaultLabel) {
+  let { id, "aria-label": label, "aria-labelledby": labelledBy } = props;
+  id = (0, $390e54f620492c70$export$f680877a34711e37)(id);
+  if (labelledBy && label) {
+    let ids = /* @__PURE__ */ new Set([
+      id,
+      ...labelledBy.trim().split(/\s+/)
+    ]);
+    labelledBy = [
+      ...ids
+    ].join(" ");
+  } else if (labelledBy) labelledBy = labelledBy.trim().split(/\s+/).join(" ");
+  if (!label && !labelledBy && defaultLabel) label = defaultLabel;
+  return {
+    id,
+    "aria-label": label,
+    "aria-labelledby": labelledBy
+  };
+}
+
+// node_modules/react-aria/dist/private/i18n/utils.mjs
+var $d805ff57cab8bee2$var$RTL_SCRIPTS = /* @__PURE__ */ new Set([
+  "Arab",
+  "Syrc",
+  "Samr",
+  "Mand",
+  "Thaa",
+  "Mend",
+  "Nkoo",
+  "Adlm",
+  "Rohg",
+  "Hebr"
+]);
+var $d805ff57cab8bee2$var$RTL_LANGS = /* @__PURE__ */ new Set([
+  "ae",
+  "ar",
+  "arc",
+  "bcc",
+  "bqi",
+  "ckb",
+  "dv",
+  "fa",
+  "glk",
+  "he",
+  "ku",
+  "mzn",
+  "nqo",
+  "pnb",
+  "ps",
+  "sd",
+  "ug",
+  "ur",
+  "yi"
+]);
+function $d805ff57cab8bee2$export$702d680b21cbd764(localeString) {
+  if (Intl.Locale) {
+    let locale = new Intl.Locale(localeString).maximize();
+    let textInfo = (
+      // @ts-ignore - this was implemented as a property by some browsers before it was standardized as a function.
+      typeof locale.getTextInfo === "function" ? locale.getTextInfo() : locale.textInfo
+    );
+    if (textInfo) return textInfo.direction === "rtl";
+    if (locale.script) return $d805ff57cab8bee2$var$RTL_SCRIPTS.has(locale.script);
+  }
+  let lang = localeString.split("-")[0];
+  return $d805ff57cab8bee2$var$RTL_LANGS.has(lang);
+}
+
+// node_modules/react-aria/dist/private/i18n/useDefaultLocale.mjs
+var import_react13 = __toESM(require_react(), 1);
+var $520a025cdb0d710d$var$localeSymbol = Symbol.for("react-aria.i18n.locale");
+function $520a025cdb0d710d$export$f09106e7c6677ec5() {
+  let locale = typeof window !== "undefined" && window[$520a025cdb0d710d$var$localeSymbol] || // @ts-ignore
+  typeof navigator !== "undefined" && (navigator.language || navigator.userLanguage) || "en-US";
+  try {
+    Intl.DateTimeFormat.supportedLocalesOf([
+      locale
+    ]);
+  } catch {
+    locale = "en-US";
+  }
+  return {
+    locale,
+    direction: (0, $d805ff57cab8bee2$export$702d680b21cbd764)(locale) ? "rtl" : "ltr"
+  };
+}
+var $520a025cdb0d710d$var$currentLocale = $520a025cdb0d710d$export$f09106e7c6677ec5();
+var $520a025cdb0d710d$var$listeners = /* @__PURE__ */ new Set();
+function $520a025cdb0d710d$var$updateLocale() {
+  $520a025cdb0d710d$var$currentLocale = $520a025cdb0d710d$export$f09106e7c6677ec5();
+  for (let listener of $520a025cdb0d710d$var$listeners) listener($520a025cdb0d710d$var$currentLocale);
+}
+function $520a025cdb0d710d$export$188ec29ebc2bdc3a() {
+  let isSSR = (0, $c7eafbbe1ea5834e$export$535bd6ca7f90a273)();
+  let [defaultLocale, setDefaultLocale] = (0, import_react13.useState)($520a025cdb0d710d$var$currentLocale);
+  (0, import_react13.useEffect)(() => {
+    if ($520a025cdb0d710d$var$listeners.size === 0) window.addEventListener("languagechange", $520a025cdb0d710d$var$updateLocale);
+    $520a025cdb0d710d$var$listeners.add(setDefaultLocale);
+    return () => {
+      $520a025cdb0d710d$var$listeners.delete(setDefaultLocale);
+      if ($520a025cdb0d710d$var$listeners.size === 0) window.removeEventListener("languagechange", $520a025cdb0d710d$var$updateLocale);
+    };
+  }, []);
+  if (isSSR) {
+    let locale = typeof window !== "undefined" && window[$520a025cdb0d710d$var$localeSymbol];
+    return {
+      locale: locale || "en-US",
+      direction: "ltr"
+    };
+  }
+  return defaultLocale;
+}
+
+// node_modules/react-aria/dist/private/i18n/I18nProvider.mjs
+var import_react14 = __toESM(require_react(), 1);
+var $2eb8e6d23f3d0cb0$var$I18nContext = /* @__PURE__ */ (0, import_react14.default).createContext(null);
+function $2eb8e6d23f3d0cb0$var$I18nProviderWithLocale(props) {
+  let { locale, children } = props;
+  let value = (0, import_react14.default).useMemo(() => ({
+    locale,
+    direction: (0, $d805ff57cab8bee2$export$702d680b21cbd764)(locale) ? "rtl" : "ltr"
+  }), [
+    locale
+  ]);
+  return /* @__PURE__ */ (0, import_react14.default).createElement($2eb8e6d23f3d0cb0$var$I18nContext.Provider, {
+    value
+  }, children);
+}
+function $2eb8e6d23f3d0cb0$var$I18nProviderWithDefaultLocale(props) {
+  let { children } = props;
+  let defaultLocale = (0, $520a025cdb0d710d$export$188ec29ebc2bdc3a)();
+  return /* @__PURE__ */ (0, import_react14.default).createElement($2eb8e6d23f3d0cb0$var$I18nContext.Provider, {
+    value: defaultLocale
+  }, children);
+}
+function $2eb8e6d23f3d0cb0$export$a54013f0d02a8f82(props) {
+  let { locale, children } = props;
+  if (locale) return /* @__PURE__ */ (0, import_react14.default).createElement($2eb8e6d23f3d0cb0$var$I18nProviderWithLocale, {
+    locale,
+    children
+  });
+  return /* @__PURE__ */ (0, import_react14.default).createElement($2eb8e6d23f3d0cb0$var$I18nProviderWithDefaultLocale, {
+    children
+  });
+}
+function $2eb8e6d23f3d0cb0$export$43bb16f9c6d9e3f7() {
+  let defaultLocale = (0, $520a025cdb0d710d$export$188ec29ebc2bdc3a)();
+  let context = (0, import_react14.useContext)($2eb8e6d23f3d0cb0$var$I18nContext);
+  return context || defaultLocale;
+}
+
+// node_modules/@internationalized/string/dist/private/LocalizedStringDictionary.mjs
+var $a747a10fe70a57da$var$localeSymbol = Symbol.for("react-aria.i18n.locale");
+var $a747a10fe70a57da$var$stringsSymbol = Symbol.for("react-aria.i18n.strings");
+var $a747a10fe70a57da$var$cachedGlobalStrings = void 0;
+var $a747a10fe70a57da$export$c17fa47878dc55b6 = class _$a747a10fe70a57da$export$c17fa47878dc55b6 {
+  constructor(messages, defaultLocale = "en-US") {
+    this.strings = Object.fromEntries(Object.entries(messages).filter(([, v]) => v));
+    this.defaultLocale = defaultLocale;
+  }
+  /** Returns a localized string for the given key and locale. */
+  getStringForLocale(key, locale) {
+    let strings = this.getStringsForLocale(locale);
+    let string = strings[key];
+    if (!string) throw new Error(`Could not find intl message ${key} in ${locale} locale`);
+    return string;
+  }
+  /** Returns all localized strings for the given locale. */
+  getStringsForLocale(locale) {
+    let strings = this.strings[locale];
+    if (!strings) {
+      strings = $a747a10fe70a57da$var$getStringsForLocale(locale, this.strings, this.defaultLocale);
+      this.strings[locale] = strings;
+    }
+    return strings;
+  }
+  static getGlobalDictionaryForPackage(packageName) {
+    if (typeof window === "undefined") return null;
+    let locale = window[$a747a10fe70a57da$var$localeSymbol];
+    if ($a747a10fe70a57da$var$cachedGlobalStrings === void 0) {
+      let globalStrings = window[$a747a10fe70a57da$var$stringsSymbol];
+      if (!globalStrings) return null;
+      $a747a10fe70a57da$var$cachedGlobalStrings = {};
+      for (let pkg in globalStrings) $a747a10fe70a57da$var$cachedGlobalStrings[pkg] = new _$a747a10fe70a57da$export$c17fa47878dc55b6({
+        [locale]: globalStrings[pkg]
+      }, locale);
+    }
+    let dictionary = $a747a10fe70a57da$var$cachedGlobalStrings?.[packageName];
+    if (!dictionary) throw new Error(`Strings for package "${packageName}" were not included by LocalizedStringProvider. Please add it to the list passed to createLocalizedStringDictionary.`);
+    return dictionary;
+  }
+};
+function $a747a10fe70a57da$var$getStringsForLocale(locale, strings, defaultLocale = "en-US") {
+  if (strings[locale]) return strings[locale];
+  let language = $a747a10fe70a57da$var$getLanguage(locale);
+  let script = $a747a10fe70a57da$var$getScript(locale);
+  if (script && strings[`${language}-${script}`]) return strings[`${language}-${script}`];
+  if (strings[language]) return strings[language];
+  for (let key in strings) {
+    if (key.startsWith(language + "-")) return strings[key];
+  }
+  return strings[defaultLocale];
+}
+function $a747a10fe70a57da$var$getLanguage(locale) {
+  if (Intl.Locale)
+    return new Intl.Locale(locale).language;
+  return locale.split("-")[0];
+}
+function $a747a10fe70a57da$var$getScript(locale) {
+  if (Intl.Locale)
+    return new Intl.Locale(locale).script;
+  return void 0;
+}
+
+// node_modules/@internationalized/string/dist/private/LocalizedStringFormatter.mjs
+var $b27c684a33948c64$var$pluralRulesCache = /* @__PURE__ */ new Map();
+var $b27c684a33948c64$var$numberFormatCache = /* @__PURE__ */ new Map();
+var $b27c684a33948c64$export$2f817fcdc4b89ae0 = class {
+  constructor(locale, strings) {
+    this.locale = locale;
+    this.strings = strings;
+  }
+  /** Formats a localized string for the given key with the provided variables. */
+  format(key, variables) {
+    let message = this.strings.getStringForLocale(key, this.locale);
+    return typeof message === "function" ? message(variables, this) : message;
+  }
+  plural(count, options, type = "cardinal") {
+    let opt = options["=" + count];
+    if (opt) return typeof opt === "function" ? opt() : opt;
+    let key = this.locale + ":" + type;
+    let pluralRules = $b27c684a33948c64$var$pluralRulesCache.get(key);
+    if (!pluralRules) {
+      pluralRules = new Intl.PluralRules(this.locale, {
+        type
+      });
+      $b27c684a33948c64$var$pluralRulesCache.set(key, pluralRules);
+    }
+    let selected = pluralRules.select(count);
+    opt = options[selected] || options.other;
+    return typeof opt === "function" ? opt() : opt;
+  }
+  number(value) {
+    let numberFormat = $b27c684a33948c64$var$numberFormatCache.get(this.locale);
+    if (!numberFormat) {
+      numberFormat = new Intl.NumberFormat(this.locale);
+      $b27c684a33948c64$var$numberFormatCache.set(this.locale, numberFormat);
+    }
+    return numberFormat.format(value);
+  }
+  select(options, value) {
+    let opt = options[value] || options.other;
+    return typeof opt === "function" ? opt() : opt;
+  }
+};
+
+// node_modules/react-aria/dist/private/i18n/useLocalizedStringFormatter.mjs
+var import_react15 = __toESM(require_react(), 1);
+var $cf2482eff2eeeec2$var$cache = /* @__PURE__ */ new WeakMap();
+function $cf2482eff2eeeec2$var$getCachedDictionary(strings) {
+  let dictionary = $cf2482eff2eeeec2$var$cache.get(strings);
+  if (!dictionary) {
+    dictionary = new (0, $a747a10fe70a57da$export$c17fa47878dc55b6)(strings);
+    $cf2482eff2eeeec2$var$cache.set(strings, dictionary);
+  }
+  return dictionary;
+}
+function $cf2482eff2eeeec2$export$87b761675e8eaa10(strings, packageName) {
+  return packageName && (0, $a747a10fe70a57da$export$c17fa47878dc55b6).getGlobalDictionaryForPackage(packageName) || $cf2482eff2eeeec2$var$getCachedDictionary(strings);
+}
+function $cf2482eff2eeeec2$export$f12b703ca79dfbb1(strings, packageName) {
+  let { locale } = (0, $2eb8e6d23f3d0cb0$export$43bb16f9c6d9e3f7)();
+  let dictionary = $cf2482eff2eeeec2$export$87b761675e8eaa10(strings, packageName);
+  return (0, import_react15.useMemo)(() => new (0, $b27c684a33948c64$export$2f817fcdc4b89ae0)(locale, dictionary), [
+    locale,
+    dictionary
+  ]);
+}
+
+// node_modules/react-stately/dist/private/utils/useControlledState.mjs
+var import_react16 = __toESM(require_react(), 1);
+var $3e6197669829fe11$var$useEarlyEffect = typeof document !== "undefined" || parseInt((0, import_react16.default).version, 10) >= 19 ? (0, import_react16.default)["useInsertionEffect"] ?? (0, import_react16.default).useLayoutEffect : () => {
+};
+function $3e6197669829fe11$export$40bfa8c7b0832715(value, defaultValue, onChange) {
+  let [stateValue, setStateValue] = (0, import_react16.useState)(value || defaultValue);
+  let valueRef = (0, import_react16.useRef)(stateValue);
+  let isControlledRef = (0, import_react16.useRef)(value !== void 0);
+  let isControlled = value !== void 0;
+  (0, import_react16.useEffect)(() => {
+    let wasControlled = isControlledRef.current;
+    if (wasControlled !== isControlled && false) console.warn(`WARN: A component changed from ${wasControlled ? "controlled" : "uncontrolled"} to ${isControlled ? "controlled" : "uncontrolled"}.`);
+    isControlledRef.current = isControlled;
+  }, [
+    isControlled
+  ]);
+  let currentValue = isControlled ? value : stateValue;
+  $3e6197669829fe11$var$useEarlyEffect(() => {
+    valueRef.current = currentValue;
+  });
+  let [, forceUpdate] = (0, import_react16.useReducer)(() => ({}), {});
+  let setValue = (0, import_react16.useCallback)((value2, ...args) => {
+    let newValue = typeof value2 === "function" ? value2(valueRef.current) : value2;
+    if (!Object.is(valueRef.current, newValue)) {
+      valueRef.current = newValue;
+      setStateValue(newValue);
+      forceUpdate();
+      onChange?.(newValue, ...args);
+    }
+  }, [
+    onChange
+  ]);
+  return [
+    currentValue,
+    setValue
+  ];
+}
+
+// node_modules/react-aria-components/dist/private/Autocomplete.mjs
+var import_react17 = __toESM(require_react(), 1);
+var $4b38b5b75ecc6208$export$698f465ec27e93df = /* @__PURE__ */ (0, import_react17.createContext)(null);
+
+// node_modules/react-aria/dist/private/utils/runAfterTransition.mjs
+var $081cb5757e08788e$var$transitionsByElement = /* @__PURE__ */ new Map();
+var $081cb5757e08788e$var$transitionCallbacks = /* @__PURE__ */ new Set();
+function $081cb5757e08788e$var$isTransitionEvent(event) {
+  return "propertyName" in event;
+}
+function $081cb5757e08788e$var$onTransitionStart(e) {
+  let eventTarget = (0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e);
+  if (!$081cb5757e08788e$var$isTransitionEvent(e) || !eventTarget) return;
+  let transitions = $081cb5757e08788e$var$transitionsByElement.get(eventTarget);
+  if (!transitions) {
+    transitions = /* @__PURE__ */ new Set();
+    $081cb5757e08788e$var$transitionsByElement.set(eventTarget, transitions);
+    eventTarget.addEventListener("transitioncancel", $081cb5757e08788e$var$onTransitionEnd, {
+      once: true
+    });
+  }
+  transitions.add(e.propertyName);
+}
+function $081cb5757e08788e$var$onTransitionEnd(e) {
+  let eventTarget = (0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e);
+  if (!$081cb5757e08788e$var$isTransitionEvent(e) || !eventTarget) return;
+  let properties = $081cb5757e08788e$var$transitionsByElement.get(eventTarget);
+  if (!properties) return;
+  properties.delete(e.propertyName);
+  if (properties.size === 0) {
+    eventTarget.removeEventListener("transitioncancel", $081cb5757e08788e$var$onTransitionEnd);
+    $081cb5757e08788e$var$transitionsByElement.delete(eventTarget);
+  }
+  if ($081cb5757e08788e$var$transitionsByElement.size === 0) for (let callback of $081cb5757e08788e$var$transitionCallbacks) {
+    callback(true);
+    $081cb5757e08788e$var$transitionCallbacks.delete(callback);
+  }
+}
+function $081cb5757e08788e$var$setupGlobalEvents() {
+  (0, $d447af545b77c9f1$export$f531f92e2a15358f)(document, "transitionrun", $081cb5757e08788e$var$onTransitionStart);
+  (0, $d447af545b77c9f1$export$f531f92e2a15358f)(document, "transitionend", $081cb5757e08788e$var$onTransitionEnd);
+}
+function $081cb5757e08788e$var$cleanupDetachedElements() {
+  for (const [eventTarget] of $081cb5757e08788e$var$transitionsByElement)
+    if ("isConnected" in eventTarget && !eventTarget.isConnected) $081cb5757e08788e$var$transitionsByElement.delete(eventTarget);
+}
+if (typeof document !== "undefined") {
+  if (document.readyState !== "loading") $081cb5757e08788e$var$setupGlobalEvents();
+  else (0, $d447af545b77c9f1$export$f531f92e2a15358f)(document, "DOMContentLoaded", $081cb5757e08788e$var$setupGlobalEvents);
+}
+function $081cb5757e08788e$export$24490316f764c430(fn) {
+  let frame = window.requestAnimationFrame(() => {
+    $081cb5757e08788e$var$cleanupDetachedElements();
+    if ($081cb5757e08788e$var$transitionsByElement.size === 0) return fn(false);
+    $081cb5757e08788e$var$transitionCallbacks.add(fn);
+  });
+  return () => {
+    window.cancelAnimationFrame(frame);
+    $081cb5757e08788e$var$transitionCallbacks.delete(fn);
+  };
+}
+
+// node_modules/react-aria/dist/private/interactions/focusSafely.mjs
+function $f192c2f16961cbe0$export$80f3e147d781571c(element) {
+  if (!element.isConnected) return;
+  const ownerDocument = (0, $d447af545b77c9f1$export$b204af158042fbac)(element);
+  if ((0, $8f5a2122b0992be3$export$630ff653c5ada6a9)() === "virtual") {
+    let lastFocusedElement = (0, $23f2114a1b82827e$export$cd4e5573fbe2b576)(ownerDocument);
+    (0, $081cb5757e08788e$export$24490316f764c430)(() => {
+      const activeElement = (0, $23f2114a1b82827e$export$cd4e5573fbe2b576)(ownerDocument);
+      if ((activeElement === lastFocusedElement || activeElement === ownerDocument.body) && element.isConnected) (0, $1969ac565cfec8d0$export$de79e2c695e052f3)(element);
+    });
+  } else (0, $1969ac565cfec8d0$export$de79e2c695e052f3)(element);
+}
+
+// node_modules/react-aria/dist/private/interactions/useFocus.mjs
+var import_react18 = __toESM(require_react(), 1);
+function $1e74c67db218ce67$export$f8168d8dd8fd66e6(props) {
+  let { isDisabled, onFocus: onFocusProp, onBlur: onBlurProp, onFocusChange } = props;
+  const onBlur = (0, import_react18.useCallback)((e) => {
+    if ((0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e) === e.currentTarget) {
+      if (onBlurProp) onBlurProp(e);
+      if (onFocusChange) onFocusChange(false);
+      return true;
+    }
+  }, [
+    onBlurProp,
+    onFocusChange
+  ]);
+  const onSyntheticFocus = (0, $a92dc41f639950be$export$715c682d09d639cc)(onBlur);
+  const onFocus = (0, import_react18.useCallback)((e) => {
+    let eventTarget = (0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e);
+    const ownerDocument = (0, $d447af545b77c9f1$export$b204af158042fbac)(eventTarget);
+    const activeElement = ownerDocument ? (0, $23f2114a1b82827e$export$cd4e5573fbe2b576)(ownerDocument) : (0, $23f2114a1b82827e$export$cd4e5573fbe2b576)();
+    if (eventTarget === e.currentTarget && eventTarget === activeElement) {
+      if (onFocusProp) onFocusProp(e);
+      if (onFocusChange) onFocusChange(true);
+      onSyntheticFocus(e);
+    }
+  }, [
+    onFocusChange,
+    onFocusProp,
+    onSyntheticFocus
+  ]);
+  return {
+    focusProps: {
+      onFocus: !isDisabled && (onFocusProp || onFocusChange || onBlurProp) ? onFocus : void 0,
+      onBlur: !isDisabled && (onBlurProp || onFocusChange) ? onBlur : void 0
+    }
+  };
+}
+
+// node_modules/react-aria/dist/private/interactions/createEventHandler.mjs
+function $8dba16319206abb6$export$48d1ea6320830260(handler) {
+  if (!handler) return void 0;
+  return (e) => {
+    let shouldStopPropagation = true;
+    let event = {
+      ...e,
+      preventDefault() {
+        e.preventDefault();
+      },
+      isDefaultPrevented() {
+        return e.isDefaultPrevented();
+      },
+      stopPropagation() {
+        if (shouldStopPropagation && false) console.error("stopPropagation is now the default behavior for events in React Spectrum. You can use continuePropagation() to revert this behavior.");
+        else shouldStopPropagation = true;
+      },
+      continuePropagation() {
+        shouldStopPropagation = false;
+        if (typeof e.continuePropagation === "function") e.continuePropagation();
+      },
+      isPropagationStopped() {
+        return shouldStopPropagation;
+      }
+    };
+    handler(event);
+    if (shouldStopPropagation && !(typeof e.isPropagationStopped === "function" && e.isPropagationStopped())) e.stopPropagation();
+  };
+}
+
+// node_modules/react-aria/dist/private/interactions/createKeyboardShortcutHandler.mjs
+var $cbf729ad7eb217b0$var$MODIFIER_NAMES = /* @__PURE__ */ new Set([
+  "shift",
+  "alt",
+  "control",
+  "meta",
+  "mod"
+  // OS dependent - Cmd on Mac, Control on Windows/Linux
+]);
+var $cbf729ad7eb217b0$var$CANONICAL_MODIFIER_ORDER = [
+  "Alt",
+  "Control",
+  "Meta",
+  "Shift"
+];
+function $cbf729ad7eb217b0$export$9932402e211e7315(parsed) {
+  let set = /* @__PURE__ */ new Set();
+  if (parsed.alt) set.add("Alt");
+  if (parsed.shift) set.add("Shift");
+  if (parsed.ctrl) set.add("Control");
+  if (parsed.meta) set.add("Meta");
+  if (parsed.mod) set.add((0, $2add3ce32c6007eb$export$9ac100e40613ea10)() ? "Meta" : "Control");
+  return set;
+}
+function $cbf729ad7eb217b0$export$bf26c410e1f8fe6d(e) {
+  let set = /* @__PURE__ */ new Set();
+  if (e.altKey) set.add("Alt");
+  if (e.ctrlKey) set.add("Control");
+  if (e.metaKey) set.add("Meta");
+  if (e.shiftKey) set.add("Shift");
+  return set;
+}
+function $cbf729ad7eb217b0$var$sortedModifierTokens(set) {
+  return $cbf729ad7eb217b0$var$CANONICAL_MODIFIER_ORDER.filter((name) => set.has(name));
+}
+function $cbf729ad7eb217b0$export$d636f01a2eaffd51(spec) {
+  let parts = spec.split("+").reduce((prev, part) => {
+    let lower = part.toLowerCase();
+    if ($cbf729ad7eb217b0$var$MODIFIER_NAMES.has(lower)) {
+      if (lower === "shift") prev.shift = true;
+      else if (lower === "alt") prev.alt = true;
+      else if (lower === "control") prev.ctrl = true;
+      else if (lower === "meta") prev.meta = true;
+      else if (lower === "mod") prev.mod = true;
+    } else prev.key = part;
+    return prev;
+  }, {
+    shift: false,
+    alt: false,
+    ctrl: false,
+    meta: false,
+    mod: false,
+    key: ""
+  });
+  if (parts.key === "") throw new Error(`Invalid keyboard shortcut: "${spec}". Must include exactly one non-modifier key (e.g. "a", "Enter", "ArrowDown"). Combine any of Shift, Alt, Ctrl, Meta, and Mod.`);
+  return parts;
+}
+function $cbf729ad7eb217b0$var$normalizeEventKey(key) {
+  return key.toLowerCase();
+}
+var $cbf729ad7eb217b0$var$KEY_ALIASES = {
+  space: " ",
+  esc: "escape",
+  del: "delete",
+  ins: "insert",
+  left: "arrowleft",
+  right: "arrowright",
+  up: "arrowup",
+  down: "arrowdown",
+  pageup: "pageup",
+  pagedown: "pagedown"
+};
+function $cbf729ad7eb217b0$var$canonicalKeyFromSpecKey(specKey) {
+  let k = $cbf729ad7eb217b0$var$normalizeEventKey(specKey);
+  let aliased = $cbf729ad7eb217b0$var$KEY_ALIASES[k];
+  return aliased != null ? aliased : k;
+}
+function $cbf729ad7eb217b0$export$6cfa2ace150c84a5(parsed) {
+  let mods = $cbf729ad7eb217b0$var$sortedModifierTokens($cbf729ad7eb217b0$export$9932402e211e7315(parsed));
+  let key = $cbf729ad7eb217b0$var$canonicalKeyFromSpecKey(parsed.key);
+  return mods.length > 0 ? `${mods.join("+")}+${key}` : key;
+}
+function $cbf729ad7eb217b0$export$786304bda41dd69f(e) {
+  let mods = $cbf729ad7eb217b0$var$sortedModifierTokens($cbf729ad7eb217b0$export$bf26c410e1f8fe6d(e));
+  let key = $cbf729ad7eb217b0$var$normalizeEventKey(e.key);
+  let prefix14 = mods.length > 0 ? `${mods.join("+")}+` : "";
+  return prefix14 + key;
+}
+function $cbf729ad7eb217b0$export$2fd1fc8039383ae1(bindings) {
+  let map = /* @__PURE__ */ new Map();
+  for (let [spec, action] of Object.entries(bindings)) {
+    let parsed = $cbf729ad7eb217b0$export$d636f01a2eaffd51(spec);
+    map.set($cbf729ad7eb217b0$export$6cfa2ace150c84a5(parsed), action);
+  }
+  return (e) => {
+    let canonical = $cbf729ad7eb217b0$export$786304bda41dd69f(e);
+    let action = map.get(canonical);
+    let result = action?.(e);
+    if (result === void 0 && action !== void 0) result = {
+      shouldContinuePropagation: false,
+      shouldPreventDefault: true
+    };
+    else if (typeof result === "boolean") result = {
+      shouldContinuePropagation: !result,
+      shouldPreventDefault: result
+    };
+    if (result?.shouldPreventDefault) e.preventDefault();
+    if (!action || result?.shouldContinuePropagation) e.continuePropagation();
+  };
+}
+
+// node_modules/react-aria/dist/private/interactions/useKeyboard.mjs
+function $8296dad1a4c5e0dc$export$8f71654801c2f7cd(props) {
+  let { shortcuts, allowRepeats = false, allowComposing = false } = props;
+  let onKeyDown;
+  let onKeyUp;
+  if (shortcuts) {
+    let shortcutHandler = (0, $cbf729ad7eb217b0$export$2fd1fc8039383ae1)(shortcuts);
+    let shortcutOnKeyDown = (0, $8dba16319206abb6$export$48d1ea6320830260)((e) => {
+      if (!(0, $23f2114a1b82827e$export$4282f70798064fe0)(e.currentTarget, (0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e))) {
+        e.continuePropagation();
+        return;
+      }
+      if (e.nativeEvent?.repeat && !allowRepeats || e.nativeEvent?.isComposing && !allowComposing) {
+        e.continuePropagation();
+        return;
+      }
+      shortcutHandler(e);
+    });
+    let shortcutOnKeyUp = (0, $8dba16319206abb6$export$48d1ea6320830260)((e) => {
+      if (!(0, $23f2114a1b82827e$export$4282f70798064fe0)(e.currentTarget, (0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e))) {
+        e.continuePropagation();
+        return;
+      }
+      if (e.nativeEvent?.repeat && !allowRepeats || e.nativeEvent?.isComposing && !allowComposing) {
+        e.continuePropagation();
+        return;
+      }
+      e.continuePropagation();
+    });
+    onKeyDown = props.onKeyDown ? (0, $a4e76a5424781910$export$e08e3b67e392101e)(props.onKeyDown, shortcutOnKeyDown) : shortcutOnKeyDown;
+    onKeyUp = props.onKeyUp ? (0, $a4e76a5424781910$export$e08e3b67e392101e)(props.onKeyUp, shortcutOnKeyUp) : shortcutOnKeyUp;
+  } else {
+    onKeyDown = (0, $8dba16319206abb6$export$48d1ea6320830260)(props.onKeyDown);
+    onKeyUp = (0, $8dba16319206abb6$export$48d1ea6320830260)(props.onKeyUp);
+  }
+  return {
+    keyboardProps: props.isDisabled ? {} : {
+      onKeyDown,
+      onKeyUp
+    }
+  };
+}
+
+// node_modules/react-aria/dist/private/utils/useSyncRef.mjs
+function $b7115c395c64f7b5$export$4debdb1a3f0fa79e(context, ref) {
+  (0, $c4867b2f328c2698$export$e5c5a5f917a5871c)(() => {
+    if (context && context.ref && ref) {
+      context.ref.current = ref.current;
+      return () => {
+        if (context.ref)
+          context.ref.current = null;
+      };
+    }
+  });
+}
+
+// node_modules/react-aria/dist/private/interactions/useFocusable.mjs
+var import_react19 = __toESM(require_react(), 1);
+var $d1116acdf220c2da$export$f9762fab77588ecb = /* @__PURE__ */ (0, import_react19.default).createContext(null);
+function $d1116acdf220c2da$var$useFocusableContext(ref) {
+  let context = (0, import_react19.useContext)($d1116acdf220c2da$export$f9762fab77588ecb) || {};
+  (0, $b7115c395c64f7b5$export$4debdb1a3f0fa79e)(context, ref);
+  let { ref: _, ...otherProps } = context;
+  return otherProps;
+}
+function $d1116acdf220c2da$export$4c014de7c8940b4c(props, domRef) {
+  let { focusProps } = (0, $1e74c67db218ce67$export$f8168d8dd8fd66e6)(props);
+  let { keyboardProps } = (0, $8296dad1a4c5e0dc$export$8f71654801c2f7cd)(props);
+  let interactions = (0, $bbaa08b3cd72f041$export$9d1611c77c2fe928)(focusProps, keyboardProps);
+  let domProps = $d1116acdf220c2da$var$useFocusableContext(domRef);
+  let interactionProps = props.isDisabled ? {} : domProps;
+  let autoFocusRef = (0, import_react19.useRef)(props.autoFocus);
+  (0, import_react19.useEffect)(() => {
+    if (autoFocusRef.current && domRef.current) (0, $f192c2f16961cbe0$export$80f3e147d781571c)(domRef.current);
+    autoFocusRef.current = false;
+  }, [
+    domRef
+  ]);
+  let tabIndex = props.excludeFromTabOrder ? -1 : 0;
+  if (props.isDisabled) tabIndex = void 0;
+  return {
+    focusableProps: (0, $bbaa08b3cd72f041$export$9d1611c77c2fe928)({
+      ...interactions,
+      tabIndex
+    }, interactionProps)
+  };
+}
+
+// node_modules/react-aria/dist/private/collections/Hidden.mjs
+var import_react20 = __toESM(require_react(), 1);
+if (typeof HTMLTemplateElement !== "undefined") {
+  Object.defineProperty(HTMLTemplateElement.prototype, "firstChild", {
+    configurable: true,
+    enumerable: true,
+    get: function() {
+      return this.content.firstChild;
+    }
+  });
+  Object.defineProperty(HTMLTemplateElement.prototype, "appendChild", {
+    configurable: true,
+    enumerable: true,
+    value: function(node) {
+      return this.content.appendChild(node);
+    }
+  });
+  Object.defineProperty(HTMLTemplateElement.prototype, "removeChild", {
+    configurable: true,
+    enumerable: true,
+    value: function(node) {
+      return this.content.removeChild(node);
+    }
+  });
+  Object.defineProperty(HTMLTemplateElement.prototype, "insertBefore", {
+    configurable: true,
+    enumerable: true,
+    value: function(node, child) {
+      return this.content.insertBefore(node, child);
+    }
+  });
+}
+var $d7f64c32b702fe2c$export$94b6d0abf7d33e8c = /* @__PURE__ */ (0, import_react20.createContext)(false);
+function $d7f64c32b702fe2c$export$86427a43e3e48ebb(fn) {
+  let Wrapper = (props, ref) => {
+    let isHidden = (0, import_react20.useContext)($d7f64c32b702fe2c$export$94b6d0abf7d33e8c);
+    if (isHidden) return null;
+    return fn(props, ref);
+  };
+  Wrapper.displayName = fn.displayName || fn.name;
+  return (0, import_react20.forwardRef)(Wrapper);
+}
+
+// node_modules/react-aria/dist/private/utils/filterDOMProps.mjs
+var $8e9d2fae0ecb9001$var$DOMPropNames = /* @__PURE__ */ new Set([
+  "id"
+]);
+var $8e9d2fae0ecb9001$var$labelablePropNames = /* @__PURE__ */ new Set([
+  "aria-label",
+  "aria-labelledby",
+  "aria-describedby",
+  "aria-details"
+]);
+var $8e9d2fae0ecb9001$var$linkPropNames = /* @__PURE__ */ new Set([
+  "href",
+  "hrefLang",
+  "target",
+  "rel",
+  "download",
+  "ping",
+  "referrerPolicy"
+]);
+var $8e9d2fae0ecb9001$var$globalAttrs = /* @__PURE__ */ new Set([
+  "dir",
+  "lang",
+  "hidden",
+  "inert",
+  "translate",
+  "suppressHydrationWarning"
+]);
+var $8e9d2fae0ecb9001$var$globalEvents = /* @__PURE__ */ new Set([
+  "onClick",
+  "onAuxClick",
+  "onContextMenu",
+  "onDoubleClick",
+  "onMouseDown",
+  "onMouseEnter",
+  "onMouseLeave",
+  "onMouseMove",
+  "onMouseOut",
+  "onMouseOver",
+  "onMouseUp",
+  "onTouchCancel",
+  "onTouchEnd",
+  "onTouchMove",
+  "onTouchStart",
+  "onPointerDown",
+  "onPointerMove",
+  "onPointerUp",
+  "onPointerCancel",
+  "onPointerEnter",
+  "onPointerLeave",
+  "onPointerOver",
+  "onPointerOut",
+  "onGotPointerCapture",
+  "onLostPointerCapture",
+  "onScroll",
+  "onWheel",
+  "onAnimationStart",
+  "onAnimationEnd",
+  "onAnimationIteration",
+  "onTransitionCancel",
+  "onTransitionEnd",
+  "onTransitionRun",
+  "onTransitionStart"
+]);
+var $8e9d2fae0ecb9001$var$propRe = /^(data-.*)$/;
+function $8e9d2fae0ecb9001$export$457c3d6518dd4c6f(props, opts = {}) {
+  let { labelable, isLink, global, events = global, propNames } = opts;
+  let filteredProps = {};
+  for (const prop in props) if (Object.prototype.hasOwnProperty.call(props, prop) && ($8e9d2fae0ecb9001$var$DOMPropNames.has(prop) || labelable && $8e9d2fae0ecb9001$var$labelablePropNames.has(prop) || isLink && $8e9d2fae0ecb9001$var$linkPropNames.has(prop) || global && $8e9d2fae0ecb9001$var$globalAttrs.has(prop) || events && ($8e9d2fae0ecb9001$var$globalEvents.has(prop) || prop.endsWith("Capture") && $8e9d2fae0ecb9001$var$globalEvents.has(prop.slice(0, -7))) || propNames?.has(prop) || $8e9d2fae0ecb9001$var$propRe.test(prop))) filteredProps[prop] = props[prop];
+  return filteredProps;
+}
+
+// node_modules/react-aria/dist/private/interactions/textSelection.mjs
+var $cbf007e418543821$var$state = "default";
+var $cbf007e418543821$var$savedUserSelect = "";
+var $cbf007e418543821$var$modifiedElementMap = /* @__PURE__ */ new WeakMap();
+function $cbf007e418543821$export$16a4697467175487(target) {
+  if ((0, $2add3ce32c6007eb$export$fedb369cb70207f1)() && (0, $2add3ce32c6007eb$export$78551043582a6a98)()) {
+    if ($cbf007e418543821$var$state === "default") {
+      const documentObject = (0, $d447af545b77c9f1$export$b204af158042fbac)(target);
+      $cbf007e418543821$var$savedUserSelect = documentObject.documentElement.style.webkitUserSelect;
+      documentObject.documentElement.style.webkitUserSelect = "none";
+    }
+    $cbf007e418543821$var$state = "disabled";
+  } else if (target instanceof HTMLElement || target instanceof SVGElement) {
+    let property = "userSelect" in target.style ? "userSelect" : "webkitUserSelect";
+    $cbf007e418543821$var$modifiedElementMap.set(target, target.style[property]);
+    target.style[property] = "none";
+  }
+}
+function $cbf007e418543821$export$b0d6fa1ab32e3295(target) {
+  if ((0, $2add3ce32c6007eb$export$fedb369cb70207f1)() && (0, $2add3ce32c6007eb$export$78551043582a6a98)()) {
+    if ($cbf007e418543821$var$state !== "disabled") return;
+    $cbf007e418543821$var$state = "restoring";
+    setTimeout(() => {
+      (0, $081cb5757e08788e$export$24490316f764c430)(() => {
+        if ($cbf007e418543821$var$state === "restoring") {
+          const documentObject = (0, $d447af545b77c9f1$export$b204af158042fbac)(target);
+          if (documentObject.documentElement.style.webkitUserSelect === "none") documentObject.documentElement.style.webkitUserSelect = $cbf007e418543821$var$savedUserSelect || "";
+          $cbf007e418543821$var$savedUserSelect = "";
+          $cbf007e418543821$var$state = "default";
+        }
+      });
+    }, 300);
+  } else if (target instanceof HTMLElement || target instanceof SVGElement) {
+    if (target && $cbf007e418543821$var$modifiedElementMap.has(target)) {
+      let targetOldUserSelect = $cbf007e418543821$var$modifiedElementMap.get(target);
+      let property = "userSelect" in target.style ? "userSelect" : "webkitUserSelect";
+      if (target.style[property] === "none") target.style[property] = targetOldUserSelect;
+      if (target.getAttribute("style") === "") target.removeAttribute("style");
+      $cbf007e418543821$var$modifiedElementMap.delete(target);
+    }
+  }
+}
+
+// node_modules/react-aria/dist/private/utils/getNonce.mjs
+var $2b2d34ff061957fb$var$nonceCache = /* @__PURE__ */ new WeakMap();
+function $2b2d34ff061957fb$export$2b85b721e524d74b(doc) {
+  let ownerDocument = (0, $d447af545b77c9f1$export$b204af158042fbac)(doc);
+  let nonce = $2b2d34ff061957fb$var$nonceCache.get(ownerDocument);
+  nonce ??= (0, $7096878c21af5e66$export$a929f3f93e2cc67e)("csp-nonce", ownerDocument);
+  if (nonce !== void 0) $2b2d34ff061957fb$var$nonceCache.set(ownerDocument, nonce);
+  return nonce;
+}
+
+// node_modules/react-aria/dist/private/interactions/context.mjs
+var import_react21 = __toESM(require_react(), 1);
+var $24f9a20f226ad820$export$5165eccb35aaadb5 = (0, import_react21.default).createContext({
+  register: () => {
+  }
+});
+$24f9a20f226ad820$export$5165eccb35aaadb5.displayName = "PressResponderContext";
+
+// node_modules/react-aria/dist/private/utils/useGlobalListeners.mjs
+var import_react22 = __toESM(require_react(), 1);
+function $48a7d519b337145d$export$4eaf04e54aa8eed6() {
+  let globalListeners = (0, import_react22.useRef)(/* @__PURE__ */ new Map());
+  let addGlobalListener = (0, import_react22.useCallback)((eventTarget, type, listener, options) => {
+    let fn = options?.once ? (...args) => {
+      globalListeners.current.delete(listener);
+      listener(...args);
+    } : listener;
+    globalListeners.current.set(listener, {
+      type,
+      eventTarget,
+      fn,
+      options
+    });
+    eventTarget.addEventListener(type, fn, options);
+  }, []);
+  let removeGlobalListener = (0, import_react22.useCallback)((eventTarget, type, listener, options) => {
+    let fn = globalListeners.current.get(listener)?.fn || listener;
+    eventTarget.removeEventListener(type, fn, options);
+    globalListeners.current.delete(listener);
+  }, []);
+  let removeAllGlobalListeners = (0, import_react22.useCallback)(() => {
+    globalListeners.current.forEach((value, key) => {
+      removeGlobalListener(value.eventTarget, value.type, key, value.options);
+    });
+  }, [
+    removeGlobalListener
+  ]);
+  (0, import_react22.useEffect)(() => {
+    return removeAllGlobalListeners;
+  }, [
+    removeAllGlobalListeners
+  ]);
+  return {
+    addGlobalListener,
+    removeGlobalListener,
+    removeAllGlobalListeners
+  };
+}
+
+// node_modules/react-aria/dist/private/interactions/usePress.mjs
+var import_react_dom = __toESM(require_react_dom(), 1);
+var import_react23 = __toESM(require_react(), 1);
+function $d27d541f9569d26d$var$usePressResponderContext(props) {
+  let context = (0, import_react23.useContext)((0, $24f9a20f226ad820$export$5165eccb35aaadb5));
+  if (context) {
+    let { register, ref, ...contextProps } = context;
+    props = (0, $bbaa08b3cd72f041$export$9d1611c77c2fe928)(contextProps, props);
+    register();
+  }
+  (0, $b7115c395c64f7b5$export$4debdb1a3f0fa79e)(context, props.ref);
+  return props;
+}
+var $d27d541f9569d26d$var$PressEvent = class {
+  #shouldStopPropagation;
+  constructor(type, pointerType, originalEvent, state) {
+    this.#shouldStopPropagation = true;
+    let currentTarget = state?.target ?? originalEvent.currentTarget;
+    const rect = currentTarget?.getBoundingClientRect();
+    let x, y = 0;
+    let clientX, clientY = null;
+    if (originalEvent.clientX != null && originalEvent.clientY != null) {
+      clientX = originalEvent.clientX;
+      clientY = originalEvent.clientY;
+    }
+    if (rect) {
+      if (clientX != null && clientY != null) {
+        x = clientX - rect.left;
+        y = clientY - rect.top;
+      } else {
+        x = rect.width / 2;
+        y = rect.height / 2;
+      }
+    }
+    this.type = type;
+    this.pointerType = pointerType;
+    this.target = originalEvent.currentTarget;
+    this.shiftKey = originalEvent.shiftKey;
+    this.metaKey = originalEvent.metaKey;
+    this.ctrlKey = originalEvent.ctrlKey;
+    this.altKey = originalEvent.altKey;
+    this.x = x;
+    this.y = y;
+    this.key = originalEvent.key;
+  }
+  continuePropagation() {
+    this.#shouldStopPropagation = false;
+  }
+  get shouldStopPropagation() {
+    return this.#shouldStopPropagation;
+  }
+};
+var $d27d541f9569d26d$var$LINK_CLICKED = Symbol("linkClicked");
+var $d27d541f9569d26d$var$STYLE_ID = "react-aria-pressable-style";
+var $d27d541f9569d26d$var$PRESSABLE_ATTRIBUTE = "data-react-aria-pressable";
+function $d27d541f9569d26d$export$45712eceda6fad21(props) {
+  let { onPress, onPressChange, onPressStart, onPressEnd, onPressUp, onClick, isDisabled, isPressed: isPressedProp, preventFocusOnPress, shouldCancelOnPointerExit, allowTextSelectionOnPress, ref: domRef, ...domProps } = $d27d541f9569d26d$var$usePressResponderContext(props);
+  let [isPressed, setPressed] = (0, import_react23.useState)(false);
+  let ref = (0, import_react23.useRef)({
+    isPressed: false,
+    ignoreEmulatedMouseEvents: false,
+    didFirePressStart: false,
+    isTriggeringEvent: false,
+    activePointerId: null,
+    target: null,
+    isOverTarget: false,
+    pointerType: null,
+    disposables: []
+  });
+  let { addGlobalListener, removeAllGlobalListeners } = (0, $48a7d519b337145d$export$4eaf04e54aa8eed6)();
+  let triggerPressStart = (0, import_react23.useCallback)((originalEvent, pointerType) => {
+    let state = ref.current;
+    if (isDisabled || state.didFirePressStart) return false;
+    let shouldStopPropagation = true;
+    state.isTriggeringEvent = true;
+    if (onPressStart) {
+      let event = new $d27d541f9569d26d$var$PressEvent("pressstart", pointerType, originalEvent);
+      onPressStart(event);
+      shouldStopPropagation = event.shouldStopPropagation;
+    }
+    if (onPressChange) onPressChange(true);
+    state.isTriggeringEvent = false;
+    state.didFirePressStart = true;
+    setPressed(true);
+    return shouldStopPropagation;
+  }, [
+    isDisabled,
+    onPressStart,
+    onPressChange
+  ]);
+  let triggerPressEnd = (0, import_react23.useCallback)((originalEvent, pointerType, wasPressed = true) => {
+    let state = ref.current;
+    if (!state.didFirePressStart) return false;
+    state.didFirePressStart = false;
+    state.isTriggeringEvent = true;
+    let shouldStopPropagation = true;
+    if (onPressEnd) {
+      let event = new $d27d541f9569d26d$var$PressEvent("pressend", pointerType, originalEvent);
+      onPressEnd(event);
+      shouldStopPropagation = event.shouldStopPropagation;
+    }
+    if (onPressChange) onPressChange(false);
+    setPressed(false);
+    if (onPress && wasPressed && !isDisabled) {
+      let event = new $d27d541f9569d26d$var$PressEvent("press", pointerType, originalEvent);
+      onPress(event);
+      shouldStopPropagation &&= event.shouldStopPropagation;
+    }
+    state.isTriggeringEvent = false;
+    return shouldStopPropagation;
+  }, [
+    isDisabled,
+    onPressEnd,
+    onPressChange,
+    onPress
+  ]);
+  let triggerPressEndEvent = (0, $fe16bffc7a557bf0$export$7f54fc3180508a52)(triggerPressEnd);
+  let triggerPressUp = (0, import_react23.useCallback)((originalEvent, pointerType) => {
+    let state = ref.current;
+    if (isDisabled) return false;
+    if (onPressUp) {
+      state.isTriggeringEvent = true;
+      let event = new $d27d541f9569d26d$var$PressEvent("pressup", pointerType, originalEvent);
+      onPressUp(event);
+      state.isTriggeringEvent = false;
+      return event.shouldStopPropagation;
+    }
+    return true;
+  }, [
+    isDisabled,
+    onPressUp
+  ]);
+  let triggerPressUpEvent = (0, $fe16bffc7a557bf0$export$7f54fc3180508a52)(triggerPressUp);
+  let cancel = (0, import_react23.useCallback)((e) => {
+    let state = ref.current;
+    if (state.isPressed && state.target) {
+      if (state.didFirePressStart && state.pointerType != null) triggerPressEnd($d27d541f9569d26d$var$createEvent(state.target, e), state.pointerType, false);
+      state.isPressed = false;
+      state.isOverTarget = false;
+      state.activePointerId = null;
+      state.pointerType = null;
+      removeAllGlobalListeners();
+      if (!allowTextSelectionOnPress) (0, $cbf007e418543821$export$b0d6fa1ab32e3295)(state.target);
+      for (let dispose of state.disposables) dispose();
+      state.disposables = [];
+    }
+  }, [
+    allowTextSelectionOnPress,
+    removeAllGlobalListeners,
+    triggerPressEnd
+  ]);
+  let cancelEvent = (0, $fe16bffc7a557bf0$export$7f54fc3180508a52)(cancel);
+  (0, import_react23.useEffect)(() => {
+    if (isDisabled && ref.current.isPressed) cancelEvent({
+      currentTarget: ref.current.target,
+      shiftKey: false,
+      ctrlKey: false,
+      metaKey: false,
+      altKey: false
+    });
+  }, [
+    isDisabled
+  ]);
+  let cancelOnPointerExit = (0, import_react23.useCallback)((e) => {
+    if (shouldCancelOnPointerExit) cancel(e);
+  }, [
+    shouldCancelOnPointerExit,
+    cancel
+  ]);
+  let triggerClick = (0, import_react23.useCallback)((e) => {
+    if (isDisabled) return;
+    onClick?.(e);
+  }, [
+    isDisabled,
+    onClick
+  ]);
+  let triggerSyntheticClick = (0, import_react23.useCallback)((e, target) => {
+    if (isDisabled) return;
+    if (onClick) {
+      let event = new MouseEvent("click", e);
+      (0, $a92dc41f639950be$export$c2b7abe5d61ec696)(event, target);
+      onClick((0, $a92dc41f639950be$export$525bc4921d56d4a)(event));
+    }
+  }, [
+    isDisabled,
+    onClick
+  ]);
+  let pressProps = (0, import_react23.useMemo)(() => {
+    let state = ref.current;
+    let pressProps2 = {
+      onKeyDown(e) {
+        if ($d27d541f9569d26d$var$isValidKeyboardEvent(e.nativeEvent, e.currentTarget) && (0, $23f2114a1b82827e$export$4282f70798064fe0)(e.currentTarget, (0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e))) {
+          if ($d27d541f9569d26d$var$shouldPreventDefaultKeyboard((0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e), e.key)) e.preventDefault();
+          let shouldStopPropagation = true;
+          if (!state.isPressed && !e.repeat) {
+            state.target = e.currentTarget;
+            state.isPressed = true;
+            state.pointerType = "keyboard";
+            shouldStopPropagation = triggerPressStart(e, "keyboard");
+          }
+          let originalTarget = e.currentTarget;
+          let pressUp = (e2) => {
+            if ($d27d541f9569d26d$var$isValidKeyboardEvent(e2, originalTarget) && !e2.repeat && (0, $23f2114a1b82827e$export$4282f70798064fe0)(originalTarget, (0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e2)) && state.target) triggerPressUpEvent($d27d541f9569d26d$var$createEvent(state.target, e2), "keyboard");
+          };
+          addGlobalListener((0, $d447af545b77c9f1$export$b204af158042fbac)(e.currentTarget), "keyup", (0, $a4e76a5424781910$export$e08e3b67e392101e)(pressUp, onKeyUp), true);
+          if (shouldStopPropagation) e.stopPropagation();
+          if (e.metaKey && (0, $2add3ce32c6007eb$export$9ac100e40613ea10)()) state.metaKeyEvents?.set(e.key, e.nativeEvent);
+        } else if (e.key === "Meta") state.metaKeyEvents = /* @__PURE__ */ new Map();
+      },
+      onClick(e) {
+        if (e && !(0, $23f2114a1b82827e$export$4282f70798064fe0)(e.currentTarget, (0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e))) return;
+        if (e && e.button === 0 && !state.isTriggeringEvent && !(0, $caaf0dd3060ed57c$export$95185d699e05d4d7).isOpening) {
+          let shouldStopPropagation = true;
+          if (isDisabled) e.preventDefault();
+          if (!state.ignoreEmulatedMouseEvents && !state.isPressed && (state.pointerType === "virtual" || (0, $b5c62b033c25b96d$export$60278871457622de)(e.nativeEvent))) {
+            let stopPressStart = triggerPressStart(e, "virtual");
+            let stopPressUp = triggerPressUpEvent(e, "virtual");
+            let stopPressEnd = triggerPressEndEvent(e, "virtual");
+            triggerClick(e);
+            shouldStopPropagation = stopPressStart && stopPressUp && stopPressEnd;
+          } else if (state.isPressed && state.pointerType !== "keyboard") {
+            let pointerType = state.pointerType || e.nativeEvent.pointerType || "virtual";
+            let stopPressUp = triggerPressUpEvent($d27d541f9569d26d$var$createEvent(e.currentTarget, e), pointerType);
+            let stopPressEnd = triggerPressEndEvent($d27d541f9569d26d$var$createEvent(e.currentTarget, e), pointerType, true);
+            shouldStopPropagation = stopPressUp && stopPressEnd;
+            state.isOverTarget = false;
+            triggerClick(e);
+            cancelEvent(e);
+          }
+          state.ignoreEmulatedMouseEvents = false;
+          if (shouldStopPropagation) e.stopPropagation();
+        }
+      }
+    };
+    let onKeyUp = (e) => {
+      if (state.isPressed && state.target && $d27d541f9569d26d$var$isValidKeyboardEvent(e, state.target)) {
+        if ($d27d541f9569d26d$var$shouldPreventDefaultKeyboard((0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e), e.key)) e.preventDefault();
+        let target = (0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e);
+        let wasPressed = (0, $23f2114a1b82827e$export$4282f70798064fe0)(state.target, target);
+        triggerPressEndEvent($d27d541f9569d26d$var$createEvent(state.target, e), "keyboard", wasPressed);
+        if (wasPressed) triggerSyntheticClick(e, state.target);
+        removeAllGlobalListeners();
+        if (e.key !== "Enter" && $d27d541f9569d26d$var$isHTMLAnchorLink(state.target) && (0, $23f2114a1b82827e$export$4282f70798064fe0)(state.target, target) && !e[$d27d541f9569d26d$var$LINK_CLICKED]) {
+          e[$d27d541f9569d26d$var$LINK_CLICKED] = true;
+          (0, $caaf0dd3060ed57c$export$95185d699e05d4d7)(state.target, e, false);
+        }
+        state.isPressed = false;
+        state.metaKeyEvents?.delete(e.key);
+      } else if (e.key === "Meta" && state.metaKeyEvents?.size) {
+        let events = state.metaKeyEvents;
+        state.metaKeyEvents = void 0;
+        for (let event of events.values()) state.target?.dispatchEvent(new KeyboardEvent("keyup", event));
+      }
+    };
+    if (typeof PointerEvent !== "undefined") {
+      pressProps2.onPointerDown = (e) => {
+        if (e.button !== 0 || !(0, $23f2114a1b82827e$export$4282f70798064fe0)(e.currentTarget, (0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e))) return;
+        if ((0, $b5c62b033c25b96d$export$29bf1b5f2c56cf63)(e.nativeEvent)) {
+          state.pointerType = "virtual";
+          return;
+        }
+        state.pointerType = e.pointerType;
+        let shouldStopPropagation = true;
+        if (!state.isPressed) {
+          state.isPressed = true;
+          state.isOverTarget = true;
+          state.activePointerId = e.pointerId;
+          state.target = e.currentTarget;
+          if (!allowTextSelectionOnPress) (0, $cbf007e418543821$export$16a4697467175487)(state.target);
+          shouldStopPropagation = triggerPressStart(e, state.pointerType);
+          let target = (0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e);
+          if ("releasePointerCapture" in target) {
+            if ("hasPointerCapture" in target) {
+              if (target.hasPointerCapture(e.pointerId)) target.releasePointerCapture(e.pointerId);
+            } else target.releasePointerCapture(e.pointerId);
+          }
+          addGlobalListener((0, $d447af545b77c9f1$export$b204af158042fbac)(e.currentTarget), "pointerup", onPointerUp, false);
+          addGlobalListener((0, $d447af545b77c9f1$export$b204af158042fbac)(e.currentTarget), "pointercancel", onPointerCancel, false);
+        }
+        if (shouldStopPropagation) e.stopPropagation();
+      };
+      pressProps2.onMouseDown = (e) => {
+        if (!(0, $23f2114a1b82827e$export$4282f70798064fe0)(e.currentTarget, (0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e))) return;
+        if (e.button === 0) {
+          if (preventFocusOnPress) {
+            let dispose = (0, $a92dc41f639950be$export$cabe61c495ee3649)(e.target);
+            if (dispose) state.disposables.push(dispose);
+          }
+          e.stopPropagation();
+        }
+      };
+      pressProps2.onPointerUp = (e) => {
+        if (!(0, $23f2114a1b82827e$export$4282f70798064fe0)(e.currentTarget, (0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e)) || state.pointerType === "virtual") return;
+        if (e.button === 0 && !state.isPressed) triggerPressUpEvent(e, state.pointerType || e.pointerType);
+      };
+      pressProps2.onPointerEnter = (e) => {
+        if (e.pointerId === state.activePointerId && state.target && !state.isOverTarget && state.pointerType != null) {
+          state.isOverTarget = true;
+          triggerPressStart($d27d541f9569d26d$var$createEvent(state.target, e), state.pointerType);
+        }
+      };
+      pressProps2.onPointerLeave = (e) => {
+        if (e.pointerId === state.activePointerId && state.target && state.isOverTarget && state.pointerType != null) {
+          state.isOverTarget = false;
+          triggerPressEndEvent($d27d541f9569d26d$var$createEvent(state.target, e), state.pointerType, false);
+          cancelOnPointerExit(e);
+        }
+      };
+      let onPointerUp = (e) => {
+        if (e.pointerId === state.activePointerId && state.isPressed && e.button === 0 && state.target) {
+          if ((0, $23f2114a1b82827e$export$4282f70798064fe0)(state.target, (0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e)) && state.pointerType != null) {
+            let clicked = false;
+            let timeout = setTimeout(() => {
+              if (state.isPressed && state.target instanceof HTMLElement) {
+                if (clicked) cancelEvent(e);
+                else {
+                  (0, $1969ac565cfec8d0$export$de79e2c695e052f3)(state.target);
+                  state.target.click();
+                }
+              }
+            }, 80);
+            addGlobalListener(e.currentTarget, "click", () => clicked = true, true);
+            state.disposables.push(() => clearTimeout(timeout));
+          } else cancelEvent(e);
+          state.isOverTarget = false;
+        }
+      };
+      let onPointerCancel = (e) => {
+        cancelEvent(e);
+      };
+      pressProps2.onDragStart = (e) => {
+        if (!(0, $23f2114a1b82827e$export$4282f70798064fe0)(e.currentTarget, (0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e))) return;
+        cancelEvent(e);
+      };
+    } else if (false) {
+      pressProps2.onMouseDown = (e) => {
+        if (e.button !== 0 || !(0, $23f2114a1b82827e$export$4282f70798064fe0)(e.currentTarget, (0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e))) return;
+        if (state.ignoreEmulatedMouseEvents) {
+          e.stopPropagation();
+          return;
+        }
+        state.isPressed = true;
+        state.isOverTarget = true;
+        state.target = e.currentTarget;
+        state.pointerType = (0, $b5c62b033c25b96d$export$60278871457622de)(e.nativeEvent) ? "virtual" : "mouse";
+        let shouldStopPropagation = (0, import_react_dom.flushSync)(() => triggerPressStart(e, state.pointerType));
+        if (shouldStopPropagation) e.stopPropagation();
+        if (preventFocusOnPress) {
+          let dispose = (0, $a92dc41f639950be$export$cabe61c495ee3649)(e.target);
+          if (dispose) state.disposables.push(dispose);
+        }
+        addGlobalListener((0, $d447af545b77c9f1$export$b204af158042fbac)(e.currentTarget), "mouseup", onMouseUp, false);
+      };
+      pressProps2.onMouseEnter = (e) => {
+        if (!(0, $23f2114a1b82827e$export$4282f70798064fe0)(e.currentTarget, (0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e))) return;
+        let shouldStopPropagation = true;
+        if (state.isPressed && !state.ignoreEmulatedMouseEvents && state.pointerType != null) {
+          state.isOverTarget = true;
+          shouldStopPropagation = triggerPressStart(e, state.pointerType);
+        }
+        if (shouldStopPropagation) e.stopPropagation();
+      };
+      pressProps2.onMouseLeave = (e) => {
+        if (!(0, $23f2114a1b82827e$export$4282f70798064fe0)(e.currentTarget, (0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e))) return;
+        let shouldStopPropagation = true;
+        if (state.isPressed && !state.ignoreEmulatedMouseEvents && state.pointerType != null) {
+          state.isOverTarget = false;
+          shouldStopPropagation = triggerPressEndEvent(e, state.pointerType, false);
+          cancelOnPointerExit(e);
+        }
+        if (shouldStopPropagation) e.stopPropagation();
+      };
+      pressProps2.onMouseUp = (e) => {
+        if (!(0, $23f2114a1b82827e$export$4282f70798064fe0)(e.currentTarget, (0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e))) return;
+        if (!state.ignoreEmulatedMouseEvents && e.button === 0 && !state.isPressed) triggerPressUpEvent(e, state.pointerType || "mouse");
+      };
+      let onMouseUp = (e) => {
+        if (e.button !== 0) return;
+        if (state.ignoreEmulatedMouseEvents) {
+          state.ignoreEmulatedMouseEvents = false;
+          return;
+        }
+        if (state.target && (0, $23f2114a1b82827e$export$4282f70798064fe0)(state.target, (0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e)) && state.pointerType != null) ;
+        else cancelEvent(e);
+        state.isOverTarget = false;
+      };
+      pressProps2.onTouchStart = (e) => {
+        if (!(0, $23f2114a1b82827e$export$4282f70798064fe0)(e.currentTarget, (0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e))) return;
+        let touch = $d27d541f9569d26d$var$getTouchFromEvent(e.nativeEvent);
+        if (!touch) return;
+        state.activePointerId = touch.identifier;
+        state.ignoreEmulatedMouseEvents = true;
+        state.isOverTarget = true;
+        state.isPressed = true;
+        state.target = e.currentTarget;
+        state.pointerType = "touch";
+        if (!allowTextSelectionOnPress) (0, $cbf007e418543821$export$16a4697467175487)(state.target);
+        let shouldStopPropagation = triggerPressStart($d27d541f9569d26d$var$createTouchEvent(state.target, e), state.pointerType);
+        if (shouldStopPropagation) e.stopPropagation();
+        addGlobalListener((0, $d447af545b77c9f1$export$f21a1ffae260145a)(e.currentTarget), "scroll", onScroll, true);
+      };
+      pressProps2.onTouchMove = (e) => {
+        if (!(0, $23f2114a1b82827e$export$4282f70798064fe0)(e.currentTarget, (0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e))) return;
+        if (!state.isPressed) {
+          e.stopPropagation();
+          return;
+        }
+        let touch = $d27d541f9569d26d$var$getTouchById(e.nativeEvent, state.activePointerId);
+        let shouldStopPropagation = true;
+        if (touch && $d27d541f9569d26d$var$isOverTarget(touch, e.currentTarget)) {
+          if (!state.isOverTarget && state.pointerType != null) {
+            state.isOverTarget = true;
+            shouldStopPropagation = triggerPressStart($d27d541f9569d26d$var$createTouchEvent(state.target, e), state.pointerType);
+          }
+        } else if (state.isOverTarget && state.pointerType != null) {
+          state.isOverTarget = false;
+          shouldStopPropagation = triggerPressEndEvent($d27d541f9569d26d$var$createTouchEvent(state.target, e), state.pointerType, false);
+          cancelOnPointerExit($d27d541f9569d26d$var$createTouchEvent(state.target, e));
+        }
+        if (shouldStopPropagation) e.stopPropagation();
+      };
+      pressProps2.onTouchEnd = (e) => {
+        if (!(0, $23f2114a1b82827e$export$4282f70798064fe0)(e.currentTarget, (0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e))) return;
+        if (!state.isPressed) {
+          e.stopPropagation();
+          return;
+        }
+        let touch = $d27d541f9569d26d$var$getTouchById(e.nativeEvent, state.activePointerId);
+        let shouldStopPropagation = true;
+        if (touch && $d27d541f9569d26d$var$isOverTarget(touch, e.currentTarget) && state.pointerType != null) {
+          triggerPressUpEvent($d27d541f9569d26d$var$createTouchEvent(state.target, e), state.pointerType);
+          shouldStopPropagation = triggerPressEndEvent($d27d541f9569d26d$var$createTouchEvent(state.target, e), state.pointerType);
+          triggerSyntheticClick(e.nativeEvent, state.target);
+        } else if (state.isOverTarget && state.pointerType != null) shouldStopPropagation = triggerPressEndEvent($d27d541f9569d26d$var$createTouchEvent(state.target, e), state.pointerType, false);
+        if (shouldStopPropagation) e.stopPropagation();
+        state.isPressed = false;
+        state.activePointerId = null;
+        state.isOverTarget = false;
+        state.ignoreEmulatedMouseEvents = true;
+        if (state.target && !allowTextSelectionOnPress) (0, $cbf007e418543821$export$b0d6fa1ab32e3295)(state.target);
+        removeAllGlobalListeners();
+      };
+      pressProps2.onTouchCancel = (e) => {
+        if (!(0, $23f2114a1b82827e$export$4282f70798064fe0)(e.currentTarget, (0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e))) return;
+        e.stopPropagation();
+        if (state.isPressed) cancelEvent($d27d541f9569d26d$var$createTouchEvent(state.target, e));
+      };
+      let onScroll = (e) => {
+        if (state.isPressed && (0, $23f2114a1b82827e$export$4282f70798064fe0)((0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e), state.target)) cancelEvent({
+          currentTarget: state.target,
+          shiftKey: false,
+          ctrlKey: false,
+          metaKey: false,
+          altKey: false
+        });
+      };
+      pressProps2.onDragStart = (e) => {
+        if (!(0, $23f2114a1b82827e$export$4282f70798064fe0)(e.currentTarget, (0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e))) return;
+        cancelEvent(e);
+      };
+    }
+    return pressProps2;
+  }, [
+    addGlobalListener,
+    isDisabled,
+    preventFocusOnPress,
+    removeAllGlobalListeners,
+    allowTextSelectionOnPress,
+    cancelOnPointerExit,
+    triggerPressStart,
+    triggerClick,
+    triggerSyntheticClick
+  ]);
+  (0, import_react23.useEffect)(() => {
+    if (!domRef || false) return;
+    const ownerDocument = (0, $d447af545b77c9f1$export$b204af158042fbac)(domRef.current);
+    if (!ownerDocument || !ownerDocument.head || ownerDocument.getElementById($d27d541f9569d26d$var$STYLE_ID)) return;
+    const style = ownerDocument.createElement("style");
+    style.id = $d27d541f9569d26d$var$STYLE_ID;
+    let nonce = (0, $2b2d34ff061957fb$export$2b85b721e524d74b)(ownerDocument);
+    if (nonce) style.nonce = nonce;
+    style.textContent = `
+@layer {
+  [${$d27d541f9569d26d$var$PRESSABLE_ATTRIBUTE}] {
+    touch-action: pan-x pan-y pinch-zoom;
+  }
+}
+    `.trim();
+    ownerDocument.head.prepend(style);
+  }, [
+    domRef
+  ]);
+  (0, import_react23.useEffect)(() => {
+    let state = ref.current;
+    return () => {
+      if (!allowTextSelectionOnPress) (0, $cbf007e418543821$export$b0d6fa1ab32e3295)(state.target ?? void 0);
+      for (let dispose of state.disposables) dispose();
+      state.disposables = [];
+    };
+  }, [
+    allowTextSelectionOnPress
+  ]);
+  return {
+    isPressed: isPressedProp || isPressed,
+    // oxlint-disable-next-line react/react-compiler
+    pressProps: (0, $bbaa08b3cd72f041$export$9d1611c77c2fe928)(domProps, pressProps, {
+      [$d27d541f9569d26d$var$PRESSABLE_ATTRIBUTE]: true
+    })
+  };
+}
+function $d27d541f9569d26d$var$isHTMLAnchorLink(target) {
+  return target.tagName === "A" && target.hasAttribute("href");
+}
+function $d27d541f9569d26d$var$isValidKeyboardEvent(event, currentTarget) {
+  const { key, code } = event;
+  const element = currentTarget;
+  const role = element.getAttribute("role");
+  return (key === "Enter" || key === " " || key === "Spacebar" || code === "Space") && !(element instanceof (0, $d447af545b77c9f1$export$f21a1ffae260145a)(element).HTMLInputElement && !$d27d541f9569d26d$var$isValidInputKey(element, key) || element instanceof (0, $d447af545b77c9f1$export$f21a1ffae260145a)(element).HTMLTextAreaElement || element.isContentEditable) && // Links should only trigger with Enter key
+  !((role === "link" || !role && $d27d541f9569d26d$var$isHTMLAnchorLink(element)) && key !== "Enter");
+}
+function $d27d541f9569d26d$var$createEvent(target, e) {
+  let clientX = e.clientX;
+  let clientY = e.clientY;
+  return {
+    currentTarget: target,
+    shiftKey: e.shiftKey,
+    ctrlKey: e.ctrlKey,
+    metaKey: e.metaKey,
+    altKey: e.altKey,
+    clientX,
+    clientY,
+    key: e.key
+  };
+}
+function $d27d541f9569d26d$var$shouldPreventDefaultUp(target) {
+  if (target instanceof HTMLInputElement) return false;
+  if (target instanceof HTMLButtonElement) return target.type !== "submit" && target.type !== "reset";
+  if ($d27d541f9569d26d$var$isHTMLAnchorLink(target)) return false;
+  return true;
+}
+function $d27d541f9569d26d$var$shouldPreventDefaultKeyboard(target, key) {
+  if ((0, $2add3ce32c6007eb$export$9ac100e40613ea10)() && key === "Enter") return false;
+  if (target instanceof HTMLInputElement) {
+    if (key === "Enter" && (target.type === "checkbox" || target.type === "radio"))
+      return false;
+    return !$d27d541f9569d26d$var$isValidInputKey(target, key);
+  }
+  return $d27d541f9569d26d$var$shouldPreventDefaultUp(target);
+}
+var $d27d541f9569d26d$var$nonTextInputTypes = /* @__PURE__ */ new Set([
+  "checkbox",
+  "radio",
+  "range",
+  "color",
+  "file",
+  "image",
+  "button",
+  "submit",
+  "reset"
+]);
+function $d27d541f9569d26d$var$isValidInputKey(target, key) {
+  return target.type === "checkbox" || target.type === "radio" ? key === " " : $d27d541f9569d26d$var$nonTextInputTypes.has(target.type);
+}
+
+// node_modules/react-aria/dist/private/interactions/useFocusWithin.mjs
+var import_react24 = __toESM(require_react(), 1);
+function $2c9edc598a03d523$export$420e68273165f4ec(props) {
+  let { isDisabled, onBlurWithin, onFocusWithin, onFocusWithinChange } = props;
+  let state = (0, import_react24.useRef)({
+    isFocusWithin: false
+  });
+  let { addGlobalListener, removeAllGlobalListeners } = (0, $48a7d519b337145d$export$4eaf04e54aa8eed6)();
+  let onBlur = (0, import_react24.useCallback)((e) => {
+    if (!(0, $23f2114a1b82827e$export$4282f70798064fe0)(e.currentTarget, (0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e))) return;
+    if (state.current.isFocusWithin && !(0, $23f2114a1b82827e$export$4282f70798064fe0)(e.currentTarget, e.relatedTarget)) {
+      state.current.isFocusWithin = false;
+      removeAllGlobalListeners();
+      if (onBlurWithin) onBlurWithin(e);
+      if (onFocusWithinChange) onFocusWithinChange(false);
+    }
+  }, [
+    onBlurWithin,
+    onFocusWithinChange,
+    state,
+    removeAllGlobalListeners
+  ]);
+  let onSyntheticFocus = (0, $a92dc41f639950be$export$715c682d09d639cc)(onBlur);
+  let onFocus = (0, import_react24.useCallback)((e) => {
+    if (!(0, $23f2114a1b82827e$export$4282f70798064fe0)(e.currentTarget, (0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e))) return;
+    let eventTarget = (0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e);
+    const ownerDocument = (0, $d447af545b77c9f1$export$b204af158042fbac)(eventTarget);
+    const activeElement = (0, $23f2114a1b82827e$export$cd4e5573fbe2b576)(ownerDocument);
+    if (!state.current.isFocusWithin && activeElement === eventTarget) {
+      if (onFocusWithin) onFocusWithin(e);
+      if (onFocusWithinChange) onFocusWithinChange(true);
+      state.current.isFocusWithin = true;
+      onSyntheticFocus(e);
+      let currentTarget = e.currentTarget;
+      addGlobalListener(ownerDocument, "focus", (e2) => {
+        let eventTarget2 = (0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e2);
+        if (state.current.isFocusWithin && !(0, $23f2114a1b82827e$export$4282f70798064fe0)(currentTarget, eventTarget2)) {
+          let nativeEvent = new ownerDocument.defaultView.FocusEvent("blur", {
+            relatedTarget: eventTarget2
+          });
+          (0, $a92dc41f639950be$export$c2b7abe5d61ec696)(nativeEvent, currentTarget);
+          let event = (0, $a92dc41f639950be$export$525bc4921d56d4a)(nativeEvent);
+          onBlur(event);
+        }
+      }, {
+        capture: true
+      });
+    }
+  }, [
+    onFocusWithin,
+    onFocusWithinChange,
+    onSyntheticFocus,
+    addGlobalListener,
+    onBlur
+  ]);
+  if (isDisabled) return {
+    focusWithinProps: {
+      // These cannot be null, that would conflict in mergeProps
+      onFocus: void 0,
+      onBlur: void 0
+    }
+  };
+  return {
+    focusWithinProps: {
+      onFocus,
+      onBlur
+    }
+  };
+}
+
+// node_modules/react-aria/dist/private/focus/useFocusRing.mjs
+var import_react25 = __toESM(require_react(), 1);
+function $0c4a58759813079a$export$4e328f61c538687f(props = {}) {
+  let { autoFocus = false, isTextInput, within } = props;
+  let state = (0, import_react25.useRef)({
+    isFocused: false,
+    isFocusVisible: autoFocus || (0, $8f5a2122b0992be3$export$b9b3dfddab17db27)()
+  });
+  let [isFocused, setFocused] = (0, import_react25.useState)(false);
+  let [isFocusVisibleState, setFocusVisible] = (0, import_react25.useState)(
+    // oxlint-disable-next-line react/react-compiler
+    () => state.current.isFocused && state.current.isFocusVisible
+  );
+  let updateState = (0, import_react25.useCallback)(() => setFocusVisible(state.current.isFocused && state.current.isFocusVisible), []);
+  let onFocusChange = (0, import_react25.useCallback)((isFocused2) => {
+    state.current.isFocused = isFocused2;
+    state.current.isFocusVisible = (0, $8f5a2122b0992be3$export$b9b3dfddab17db27)();
+    setFocused(isFocused2);
+    updateState();
+  }, [
+    updateState
+  ]);
+  (0, $8f5a2122b0992be3$export$ec71b4b83ac08ec3)((isFocusVisible) => {
+    state.current.isFocusVisible = isFocusVisible;
+    updateState();
+  }, [
+    isTextInput,
+    isFocused
+  ], {
+    enabled: isFocused,
+    isTextInput
+  });
+  let { focusProps } = (0, $1e74c67db218ce67$export$f8168d8dd8fd66e6)({
+    isDisabled: within,
+    onFocusChange
+  });
+  let { focusWithinProps } = (0, $2c9edc598a03d523$export$420e68273165f4ec)({
+    isDisabled: !within,
+    onFocusWithinChange: onFocusChange
+  });
+  return {
+    isFocused,
+    isFocusVisible: isFocusVisibleState,
+    focusProps: within ? focusWithinProps : focusProps
+  };
+}
+
+// node_modules/react-aria/dist/private/interactions/useHover.mjs
+var import_react26 = __toESM(require_react(), 1);
+var $e969f22b6713ca4a$var$globalIgnoreEmulatedMouseEvents = false;
+var $e969f22b6713ca4a$var$hoverCount = 0;
+function $e969f22b6713ca4a$var$setGlobalIgnoreEmulatedMouseEvents() {
+  $e969f22b6713ca4a$var$globalIgnoreEmulatedMouseEvents = true;
+  setTimeout(() => {
+    $e969f22b6713ca4a$var$globalIgnoreEmulatedMouseEvents = false;
+  }, 500);
+}
+function $e969f22b6713ca4a$var$handleGlobalPointerEvent(e) {
+  if (e.pointerType === "touch") $e969f22b6713ca4a$var$setGlobalIgnoreEmulatedMouseEvents();
+}
+function $e969f22b6713ca4a$var$setupGlobalTouchEvents() {
+  let ownerDocument = (0, $d447af545b77c9f1$export$b204af158042fbac)(null);
+  if (typeof ownerDocument === "undefined") return;
+  if ($e969f22b6713ca4a$var$hoverCount === 0) {
+    if (typeof PointerEvent !== "undefined") ownerDocument.addEventListener("pointerup", $e969f22b6713ca4a$var$handleGlobalPointerEvent);
+    else if (false) ownerDocument.addEventListener("touchend", $e969f22b6713ca4a$var$setGlobalIgnoreEmulatedMouseEvents);
+  }
+  $e969f22b6713ca4a$var$hoverCount++;
+  return () => {
+    $e969f22b6713ca4a$var$hoverCount--;
+    if ($e969f22b6713ca4a$var$hoverCount > 0) return;
+    if (typeof PointerEvent !== "undefined") ownerDocument.removeEventListener("pointerup", $e969f22b6713ca4a$var$handleGlobalPointerEvent);
+    else if (false) ownerDocument.removeEventListener("touchend", $e969f22b6713ca4a$var$setGlobalIgnoreEmulatedMouseEvents);
+  };
+}
+function $e969f22b6713ca4a$export$ae780daf29e6d456(props) {
+  let { onHoverStart, onHoverChange, onHoverEnd, isDisabled } = props;
+  let [isHovered, setHovered] = (0, import_react26.useState)(false);
+  let state = (0, import_react26.useRef)({
+    isHovered: false,
+    ignoreEmulatedMouseEvents: false,
+    pointerType: "",
+    target: null
+  }).current;
+  (0, import_react26.useEffect)($e969f22b6713ca4a$var$setupGlobalTouchEvents, []);
+  let { addGlobalListener, removeAllGlobalListeners } = (0, $48a7d519b337145d$export$4eaf04e54aa8eed6)();
+  let { hoverProps, triggerHoverEnd } = (0, import_react26.useMemo)(() => {
+    let triggerHoverStart = (event, pointerType) => {
+      state.pointerType = pointerType;
+      if (isDisabled || pointerType === "touch" || state.isHovered || !(0, $23f2114a1b82827e$export$4282f70798064fe0)(event.currentTarget, (0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(event))) return;
+      state.isHovered = true;
+      let target = event.currentTarget;
+      state.target = target;
+      addGlobalListener((0, $d447af545b77c9f1$export$b204af158042fbac)((0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(event)), "pointerover", (e) => {
+        if (state.isHovered && state.target && !(0, $23f2114a1b82827e$export$4282f70798064fe0)(state.target, (0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e)))
+          triggerHoverEnd2(e, e.pointerType);
+      }, {
+        capture: true
+      });
+      if (onHoverStart) onHoverStart({
+        type: "hoverstart",
+        target,
+        pointerType
+      });
+      if (onHoverChange) onHoverChange(true);
+      setHovered(true);
+    };
+    let triggerHoverEnd2 = (event, pointerType) => {
+      let target = state.target;
+      state.pointerType = "";
+      state.target = null;
+      if (pointerType === "touch" || !state.isHovered || !target) return;
+      state.isHovered = false;
+      removeAllGlobalListeners();
+      if (onHoverEnd) onHoverEnd({
+        type: "hoverend",
+        target,
+        pointerType
+      });
+      if (onHoverChange) onHoverChange(false);
+      setHovered(false);
+    };
+    let hoverProps2 = {};
+    if (typeof PointerEvent !== "undefined") {
+      hoverProps2.onPointerEnter = (e) => {
+        if ($e969f22b6713ca4a$var$globalIgnoreEmulatedMouseEvents && e.pointerType === "mouse") return;
+        triggerHoverStart(e, e.pointerType);
+      };
+      hoverProps2.onPointerLeave = (e) => {
+        if (!isDisabled && (0, $23f2114a1b82827e$export$4282f70798064fe0)(e.currentTarget, (0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e))) triggerHoverEnd2(e, e.pointerType);
+      };
+    } else if (false) {
+      hoverProps2.onTouchStart = () => {
+        state.ignoreEmulatedMouseEvents = true;
+      };
+      hoverProps2.onMouseEnter = (e) => {
+        if (!state.ignoreEmulatedMouseEvents && !$e969f22b6713ca4a$var$globalIgnoreEmulatedMouseEvents) triggerHoverStart(e, "mouse");
+        state.ignoreEmulatedMouseEvents = false;
+      };
+      hoverProps2.onMouseLeave = (e) => {
+        if (!isDisabled && (0, $23f2114a1b82827e$export$4282f70798064fe0)(e.currentTarget, (0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e))) triggerHoverEnd2(e, "mouse");
+      };
+    }
+    return {
+      hoverProps: hoverProps2,
+      triggerHoverEnd: triggerHoverEnd2
+    };
+  }, [
+    onHoverStart,
+    onHoverChange,
+    onHoverEnd,
+    isDisabled,
+    state,
+    addGlobalListener,
+    removeAllGlobalListeners
+  ]);
+  (0, import_react26.useEffect)(() => {
+    if (isDisabled) triggerHoverEnd({
+      currentTarget: state.target
+    }, state.pointerType);
+  }, [
+    isDisabled
+  ]);
+  return {
+    hoverProps,
+    isHovered
+  };
+}
+
+// node_modules/react-aria-components/dist/private/Label.mjs
+var import_react27 = __toESM(require_react(), 1);
+var $43a3b93638fe5db9$export$75b6ee27786ba447 = /* @__PURE__ */ (0, import_react27.createContext)({});
+var $43a3b93638fe5db9$export$b04be29aa201d4f5 = /* @__PURE__ */ (0, $d7f64c32b702fe2c$export$86427a43e3e48ebb)(function Label(props, ref) {
+  [props, ref] = (0, $7230ffa83bc0c2cf$export$29f1550f4b0d4415)(props, ref, $43a3b93638fe5db9$export$75b6ee27786ba447);
+  let { elementType = "label", ...labelProps } = props;
+  let ElementType = (0, $7230ffa83bc0c2cf$export$df3a06d6289f983e)[elementType];
+  return /* @__PURE__ */ (0, import_react27.default).createElement(ElementType, {
+    className: "react-aria-Label",
+    ...labelProps,
+    ref
+  });
+});
+
+// node_modules/react-aria/dist/private/label/useLabel.mjs
+function $0beb20c9744a2065$export$8467354a121f1b9f(props) {
+  let { id, label, "aria-labelledby": ariaLabelledby, "aria-label": ariaLabel, labelElementType = "label" } = props;
+  id = (0, $390e54f620492c70$export$f680877a34711e37)(id);
+  let labelId = (0, $390e54f620492c70$export$f680877a34711e37)();
+  let labelProps = {};
+  if (label) {
+    ariaLabelledby = ariaLabelledby ? `${labelId} ${ariaLabelledby}` : labelId;
+    labelProps = {
+      id: labelId,
+      htmlFor: labelElementType === "label" ? id : void 0
+    };
+  } else if (!ariaLabelledby && !ariaLabel && false) console.warn("If you do not provide a visible label, you must specify an aria-label or aria-labelledby attribute for accessibility");
+  let fieldProps = (0, $e8ac3c3f5d4bae7f$export$d6875122194c7b44)({
+    id,
+    "aria-label": ariaLabel,
+    "aria-labelledby": ariaLabelledby
+  });
+  return {
+    labelProps,
+    fieldProps
+  };
+}
+
+// node_modules/react-aria/dist/private/button/useButton.mjs
+function $ac4318a9c075bb9f$export$ea18c227d4417cc3(props, ref) {
+  let { elementType = "button", isDisabled, onPress, onPressStart, onPressEnd, onPressUp, onPressChange, preventFocusOnPress, allowFocusWhenDisabled, onClick, href, target, rel, type = "button" } = props;
+  let additionalProps;
+  if (elementType === "button") additionalProps = {
+    type,
+    disabled: isDisabled,
+    form: props.form,
+    formAction: props.formAction,
+    formEncType: props.formEncType,
+    formMethod: props.formMethod,
+    formNoValidate: props.formNoValidate,
+    formTarget: props.formTarget,
+    name: props.name,
+    value: props.value
+  };
+  else additionalProps = {
+    role: "button",
+    href: elementType === "a" && !isDisabled ? href : void 0,
+    target: elementType === "a" ? target : void 0,
+    type: elementType === "input" ? type : void 0,
+    disabled: elementType === "input" ? isDisabled : void 0,
+    "aria-disabled": !isDisabled || elementType === "input" ? void 0 : isDisabled,
+    rel: elementType === "a" ? rel : void 0
+  };
+  let { pressProps, isPressed } = (0, $d27d541f9569d26d$export$45712eceda6fad21)({
+    onPressStart,
+    onPressEnd,
+    onPressChange,
+    onPress,
+    onPressUp,
+    onClick,
+    isDisabled,
+    preventFocusOnPress,
+    ref
+  });
+  let { focusableProps } = (0, $d1116acdf220c2da$export$4c014de7c8940b4c)(props, ref);
+  if (allowFocusWhenDisabled)
+    focusableProps.tabIndex = isDisabled ? -1 : focusableProps.tabIndex;
+  let buttonProps = (0, $bbaa08b3cd72f041$export$9d1611c77c2fe928)(focusableProps, pressProps, (0, $8e9d2fae0ecb9001$export$457c3d6518dd4c6f)(props, {
+    labelable: true
+  }));
+  return {
+    isPressed,
+    buttonProps: (0, $bbaa08b3cd72f041$export$9d1611c77c2fe928)(additionalProps, buttonProps, {
+      "aria-haspopup": props["aria-haspopup"],
+      "aria-expanded": props["aria-expanded"],
+      "aria-controls": props["aria-controls"],
+      "aria-pressed": props["aria-pressed"],
+      "aria-current": props["aria-current"],
+      "aria-disabled": props["aria-disabled"]
+    })
+  };
+}
+
+// node_modules/react-aria-components/dist/private/Button.mjs
+var import_react28 = __toESM(require_react(), 1);
+var $7705c033048f6da7$export$24d547caef80ccd1 = /* @__PURE__ */ (0, import_react28.createContext)({});
+
+// node_modules/react-aria-components/dist/private/Text.mjs
+var import_react29 = __toESM(require_react(), 1);
+var $efe09c6d1c304b50$export$9afb8bc826b033ea = /* @__PURE__ */ (0, import_react29.createContext)({});
+var $efe09c6d1c304b50$export$5f1af8db9871e1d6 = /* @__PURE__ */ (0, $d7f64c32b702fe2c$export$86427a43e3e48ebb)(function Text(props, ref) {
+  [props, ref] = (0, $7230ffa83bc0c2cf$export$29f1550f4b0d4415)(props, ref, $efe09c6d1c304b50$export$9afb8bc826b033ea);
+  let { elementType = "span", ...domProps } = props;
+  let ElementType = (0, $7230ffa83bc0c2cf$export$df3a06d6289f983e)[elementType];
+  return /* @__PURE__ */ (0, import_react29.default).createElement(ElementType, {
+    className: "react-aria-Text",
+    ...domProps,
+    ref
+  });
+});
+
+// node_modules/react-aria-components/dist/private/FieldError.mjs
+var import_react30 = __toESM(require_react(), 1);
+var $1f3c3b1a70cec653$export$ff05c3ac10437e03 = /* @__PURE__ */ (0, import_react30.createContext)(null);
+var $1f3c3b1a70cec653$export$f551688fc98f2e09 = /* @__PURE__ */ (0, import_react30.forwardRef)(function FieldError(props, ref) {
+  let validation = (0, import_react30.useContext)($1f3c3b1a70cec653$export$ff05c3ac10437e03);
+  if (!validation?.isInvalid) return null;
+  return /* @__PURE__ */ (0, import_react30.default).createElement($1f3c3b1a70cec653$var$FieldErrorInner, {
+    ...props,
+    ref
+  });
+});
+var $1f3c3b1a70cec653$var$FieldErrorInner = /* @__PURE__ */ (0, import_react30.forwardRef)((props, ref) => {
+  let validation = (0, import_react30.useContext)($1f3c3b1a70cec653$export$ff05c3ac10437e03);
+  let { elementType, ...restProps } = props;
+  let domProps = (0, $8e9d2fae0ecb9001$export$457c3d6518dd4c6f)(restProps, {
+    global: true
+  });
+  let renderProps2 = (0, $7230ffa83bc0c2cf$export$4d86445c2cf5e3)({
+    ...restProps,
+    defaultClassName: "react-aria-FieldError",
+    defaultChildren: validation.validationErrors.length === 0 ? void 0 : validation.validationErrors.join(" "),
+    values: validation
+  });
+  if (renderProps2.children == null) return null;
+  return /* @__PURE__ */ (0, import_react30.default).createElement((0, $efe09c6d1c304b50$export$5f1af8db9871e1d6), {
+    slot: "errorMessage",
+    elementType,
+    ...domProps,
+    ...renderProps2,
+    ref
+  });
+});
+
+// node_modules/react-stately/dist/private/form/useFormValidationState.mjs
+var import_react31 = __toESM(require_react(), 1);
+var $fd2148440a13ec26$export$aca958c65c314e6c = {
+  badInput: false,
+  customError: false,
+  patternMismatch: false,
+  rangeOverflow: false,
+  rangeUnderflow: false,
+  stepMismatch: false,
+  tooLong: false,
+  tooShort: false,
+  typeMismatch: false,
+  valueMissing: false,
+  valid: true
+};
+var $fd2148440a13ec26$var$CUSTOM_VALIDITY_STATE = {
+  ...$fd2148440a13ec26$export$aca958c65c314e6c,
+  customError: true,
+  valid: false
+};
+var $fd2148440a13ec26$export$dad6ae84456c676a = {
+  isInvalid: false,
+  validationDetails: $fd2148440a13ec26$export$aca958c65c314e6c,
+  validationErrors: []
+};
+var $fd2148440a13ec26$export$571b5131b7e65c11 = (0, import_react31.createContext)({});
+var $fd2148440a13ec26$export$a763b9476acd3eb = "__reactAriaFormValidationState";
+function $fd2148440a13ec26$export$fc1a364ae1f3ff10(props) {
+  if (props[$fd2148440a13ec26$export$a763b9476acd3eb]) {
+    let { realtimeValidation, displayValidation, updateValidation, resetValidation, commitValidation } = props[$fd2148440a13ec26$export$a763b9476acd3eb];
+    return {
+      realtimeValidation,
+      displayValidation,
+      updateValidation,
+      resetValidation,
+      commitValidation
+    };
+  }
+  return $fd2148440a13ec26$var$useFormValidationStateImpl(props);
+}
+function $fd2148440a13ec26$var$useFormValidationStateImpl(props) {
+  let { isInvalid, validationState, name, value, builtinValidation, validate, validationBehavior = "aria" } = props;
+  if (validationState) isInvalid ||= validationState === "invalid";
+  let controlledError = isInvalid !== void 0 ? {
+    isInvalid,
+    validationErrors: [],
+    validationDetails: $fd2148440a13ec26$var$CUSTOM_VALIDITY_STATE
+  } : null;
+  let clientError = (0, import_react31.useMemo)(() => {
+    if (!validate || value == null) return null;
+    let validateErrors = $fd2148440a13ec26$var$runValidate(validate, value);
+    return $fd2148440a13ec26$var$getValidationResult(validateErrors);
+  }, [
+    validate,
+    value
+  ]);
+  if (builtinValidation?.validationDetails.valid) builtinValidation = void 0;
+  let serverErrors = (0, import_react31.useContext)($fd2148440a13ec26$export$571b5131b7e65c11);
+  let serverErrorMessages = (0, import_react31.useMemo)(() => {
+    if (name) return Array.isArray(name) ? name.flatMap((name2) => $fd2148440a13ec26$var$asArray(serverErrors[name2])) : $fd2148440a13ec26$var$asArray(serverErrors[name]);
+    return [];
+  }, [
+    serverErrors,
+    name
+  ]);
+  let [lastServerErrors, setLastServerErrors] = (0, import_react31.useState)(serverErrors);
+  let [isServerErrorCleared, setServerErrorCleared] = (0, import_react31.useState)(false);
+  if (serverErrors !== lastServerErrors) {
+    setLastServerErrors(serverErrors);
+    setServerErrorCleared(false);
+  }
+  let serverError = (0, import_react31.useMemo)(() => $fd2148440a13ec26$var$getValidationResult(isServerErrorCleared ? [] : serverErrorMessages), [
+    isServerErrorCleared,
+    serverErrorMessages
+  ]);
+  let nextValidation = (0, import_react31.useRef)($fd2148440a13ec26$export$dad6ae84456c676a);
+  let [currentValidity, setCurrentValidity] = (0, import_react31.useState)($fd2148440a13ec26$export$dad6ae84456c676a);
+  let lastError = (0, import_react31.useRef)($fd2148440a13ec26$export$dad6ae84456c676a);
+  let commitValidation = () => {
+    if (!commitQueued) return;
+    setCommitQueued(false);
+    let error = clientError || builtinValidation || nextValidation.current;
+    if (!$fd2148440a13ec26$var$isEqualValidation(error, lastError.current)) {
+      lastError.current = error;
+      setCurrentValidity(error);
+    }
+  };
+  let [commitQueued, setCommitQueued] = (0, import_react31.useState)(false);
+  (0, import_react31.useEffect)(commitValidation);
+  let realtimeValidation = controlledError || serverError || clientError || builtinValidation || $fd2148440a13ec26$export$dad6ae84456c676a;
+  let displayValidation = validationBehavior === "native" ? controlledError || serverError || currentValidity : controlledError || serverError || clientError || builtinValidation || currentValidity;
+  return {
+    realtimeValidation,
+    displayValidation,
+    updateValidation(value2) {
+      if (validationBehavior === "aria" && !$fd2148440a13ec26$var$isEqualValidation(currentValidity, value2)) setCurrentValidity(value2);
+      else nextValidation.current = value2;
+    },
+    resetValidation() {
+      let error = $fd2148440a13ec26$export$dad6ae84456c676a;
+      if (!$fd2148440a13ec26$var$isEqualValidation(error, lastError.current)) {
+        lastError.current = error;
+        setCurrentValidity(error);
+      }
+      if (validationBehavior === "native") setCommitQueued(false);
+      setServerErrorCleared(true);
+    },
+    commitValidation() {
+      if (validationBehavior === "native") setCommitQueued(true);
+      setServerErrorCleared(true);
+    }
+  };
+}
+function $fd2148440a13ec26$var$asArray(v) {
+  if (!v) return [];
+  return Array.isArray(v) ? v : [
+    v
+  ];
+}
+function $fd2148440a13ec26$var$runValidate(validate, value) {
+  if (typeof validate === "function") {
+    let e = validate(value);
+    if (e && typeof e !== "boolean") return $fd2148440a13ec26$var$asArray(e);
+  }
+  return [];
+}
+function $fd2148440a13ec26$var$getValidationResult(errors) {
+  return errors.length ? {
+    isInvalid: true,
+    validationErrors: errors,
+    validationDetails: $fd2148440a13ec26$var$CUSTOM_VALIDITY_STATE
+  } : null;
+}
+function $fd2148440a13ec26$var$isEqualValidation(a, b) {
+  if (a === b) return true;
+  return !!a && !!b && a.isInvalid === b.isInvalid && a.validationErrors.length === b.validationErrors.length && a.validationErrors.every((a2, i) => a2 === b.validationErrors[i]) && Object.entries(a.validationDetails).every(([k, v]) => b.validationDetails[k] === v);
+}
+
+// node_modules/react-aria-components/dist/private/Form.mjs
+var import_react32 = __toESM(require_react(), 1);
+var $cdaed739b1139372$export$c24727297075ec6a = /* @__PURE__ */ (0, import_react32.createContext)(null);
+
+// node_modules/react-aria/dist/private/label/useField.mjs
+function $191c9b6d48a0a4e2$export$294aa081a6c6f55d(props) {
+  let { description, errorMessage, isInvalid, validationState } = props;
+  let { labelProps, fieldProps } = (0, $0beb20c9744a2065$export$8467354a121f1b9f)(props);
+  let descriptionId = (0, $390e54f620492c70$export$b4cc09c592e8fdb8)([
+    Boolean(description),
+    Boolean(errorMessage),
+    isInvalid,
+    validationState
+  ]);
+  let errorMessageId = (0, $390e54f620492c70$export$b4cc09c592e8fdb8)([
+    Boolean(description),
+    Boolean(errorMessage),
+    isInvalid,
+    validationState
+  ]);
+  fieldProps = (0, $bbaa08b3cd72f041$export$9d1611c77c2fe928)(fieldProps, {
+    "aria-describedby": [
+      descriptionId,
+      // Use aria-describedby for error message because aria-errormessage is unsupported using VoiceOver or NVDA. See https://github.com/adobe/react-spectrum/issues/1346#issuecomment-740136268
+      errorMessageId,
+      props["aria-describedby"]
+    ].filter(Boolean).join(" ") || void 0
+  });
+  return {
+    labelProps,
+    fieldProps,
+    descriptionProps: {
+      id: descriptionId
+    },
+    errorMessageProps: {
+      id: errorMessageId
+    }
+  };
+}
+
+// node_modules/react-aria/dist/private/utils/useFormReset.mjs
+var import_react33 = __toESM(require_react(), 1);
+function $3274bf1495747a7b$export$5add1d006293d136(ref, initialValue, onReset) {
+  let handleReset = (0, $fe16bffc7a557bf0$export$7f54fc3180508a52)((e) => {
+    if (onReset && !e.defaultPrevented) onReset(initialValue);
+  });
+  (0, import_react33.useEffect)(() => {
+    let form = ref?.current?.form;
+    form?.addEventListener("reset", handleReset);
+    return () => {
+      form?.removeEventListener("reset", handleReset);
+    };
+  }, [
+    ref
+  ]);
+}
+
+// node_modules/react-aria/dist/private/form/useFormValidation.mjs
+var import_react34 = __toESM(require_react(), 1);
+function $860f7da480e22816$export$b8473d3665f3a75a(props, state, ref) {
+  let { validationBehavior, focus } = props;
+  (0, $c4867b2f328c2698$export$e5c5a5f917a5871c)(() => {
+    if (validationBehavior === "native" && ref?.current && "setCustomValidity" in ref.current && !ref.current.disabled) {
+      let errorMessage = state.realtimeValidation.isInvalid ? state.realtimeValidation.validationErrors.join(" ") || "Invalid value." : "";
+      ref.current.setCustomValidity(errorMessage);
+      if (!ref.current.hasAttribute("title")) ref.current.title = "";
+      if (!state.realtimeValidation.isInvalid) state.updateValidation($860f7da480e22816$var$getNativeValidity(ref.current));
+    }
+  });
+  let isIgnoredReset = (0, import_react34.useRef)(false);
+  let onReset = (0, $fe16bffc7a557bf0$export$7f54fc3180508a52)(() => {
+    if (!isIgnoredReset.current) state.resetValidation();
+  });
+  let onInvalid = (0, $fe16bffc7a557bf0$export$7f54fc3180508a52)((e) => {
+    if (!state.displayValidation.isInvalid) state.commitValidation();
+    let form = ref?.current?.form;
+    if (!e.defaultPrevented && ref && form && $860f7da480e22816$var$getFirstInvalidInput(form) === ref.current) {
+      if (focus) focus();
+      else ref.current?.focus();
+      (0, $8f5a2122b0992be3$export$8397ddfc504fdb9a)("keyboard");
+    }
+    e.preventDefault();
+  });
+  let onChange = (0, $fe16bffc7a557bf0$export$7f54fc3180508a52)(() => {
+    state.commitValidation();
+  });
+  (0, import_react34.useEffect)(() => {
+    let input = ref?.current;
+    if (!input) return;
+    let form = input.form;
+    let reset = form?.reset;
+    if (form)
+      form.reset = () => {
+        isIgnoredReset.current = !window.event || window.event.type === "message" && (0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(window.event) instanceof MessagePort;
+        reset?.call(form);
+        isIgnoredReset.current = false;
+      };
+    input.addEventListener("invalid", onInvalid);
+    input.addEventListener("change", onChange);
+    form?.addEventListener("reset", onReset);
+    return () => {
+      input.removeEventListener("invalid", onInvalid);
+      input.removeEventListener("change", onChange);
+      form?.removeEventListener("reset", onReset);
+      if (form)
+        form.reset = reset;
+    };
+  }, [
+    ref,
+    validationBehavior
+  ]);
+}
+function $860f7da480e22816$var$getValidity(input) {
+  let validity = input.validity;
+  return {
+    badInput: validity.badInput,
+    customError: validity.customError,
+    patternMismatch: validity.patternMismatch,
+    rangeOverflow: validity.rangeOverflow,
+    rangeUnderflow: validity.rangeUnderflow,
+    stepMismatch: validity.stepMismatch,
+    tooLong: validity.tooLong,
+    tooShort: validity.tooShort,
+    typeMismatch: validity.typeMismatch,
+    valueMissing: validity.valueMissing,
+    valid: validity.valid
+  };
+}
+function $860f7da480e22816$var$getNativeValidity(input) {
+  return {
+    isInvalid: !input.validity.valid,
+    validationDetails: $860f7da480e22816$var$getValidity(input),
+    validationErrors: input.validationMessage ? [
+      input.validationMessage
+    ] : []
+  };
+}
+function $860f7da480e22816$var$getFirstInvalidInput(form) {
+  for (let i = 0; i < form.elements.length; i++) {
+    let element = form.elements[i];
+    if (element.validity?.valid === false) return element;
+  }
+  return null;
+}
+
+// node_modules/react-stately/dist/private/toggle/useToggleState.mjs
+var import_react35 = __toESM(require_react(), 1);
+function $fd3c5e01e837dc20$export$8042c6c013fd5226(props = {}) {
+  let { isReadOnly } = props;
+  let [isSelected, setSelected] = (0, $3e6197669829fe11$export$40bfa8c7b0832715)(props.isSelected, props.defaultSelected || false, props.onChange);
+  let [initialValue] = (0, import_react35.useState)(isSelected);
+  function updateSelected(value) {
+    if (!isReadOnly) setSelected(value);
+  }
+  function toggleState() {
+    if (!isReadOnly) setSelected(!isSelected);
+  }
+  return {
+    isSelected,
+    defaultSelected: props.defaultSelected ?? initialValue,
+    setSelected: updateSelected,
+    toggle: toggleState
+  };
+}
+
+// node_modules/react-aria-components/dist/private/Group.mjs
+var import_react36 = __toESM(require_react(), 1);
+var $3a442827418ebe87$export$f9c6924e160136d1 = /* @__PURE__ */ (0, import_react36.createContext)({});
+var $3a442827418ebe87$export$eb2fcfdbd7ba97d4 = /* @__PURE__ */ (0, import_react36.forwardRef)(function Group(props, ref) {
+  [props, ref] = (0, $7230ffa83bc0c2cf$export$29f1550f4b0d4415)(props, ref, $3a442827418ebe87$export$f9c6924e160136d1);
+  let { isDisabled, isInvalid, isReadOnly, onHoverStart, onHoverChange, onHoverEnd, ...otherProps } = props;
+  isDisabled ??= !!props["aria-disabled"] && props["aria-disabled"] !== "false";
+  isInvalid ??= !!props["aria-invalid"] && props["aria-invalid"] !== "false";
+  let { hoverProps, isHovered } = (0, $e969f22b6713ca4a$export$ae780daf29e6d456)({
+    onHoverStart,
+    onHoverChange,
+    onHoverEnd,
+    isDisabled
+  });
+  let { isFocused, isFocusVisible, focusProps } = (0, $0c4a58759813079a$export$4e328f61c538687f)({
+    within: true
+  });
+  let renderProps2 = (0, $7230ffa83bc0c2cf$export$4d86445c2cf5e3)({
+    ...props,
+    values: {
+      isHovered,
+      isFocusWithin: isFocused,
+      isFocusVisible,
+      isDisabled,
+      isInvalid
+    },
+    defaultClassName: "react-aria-Group"
+  });
+  return /* @__PURE__ */ (0, import_react36.default).createElement((0, $7230ffa83bc0c2cf$export$df3a06d6289f983e).div, {
+    ...(0, $bbaa08b3cd72f041$export$9d1611c77c2fe928)(otherProps, focusProps, hoverProps),
+    ...renderProps2,
+    ref,
+    role: props.role ?? "group",
+    slot: props.slot ?? void 0,
+    "data-focus-within": isFocused || void 0,
+    "data-hovered": isHovered || void 0,
+    "data-focus-visible": isFocusVisible || void 0,
+    "data-disabled": isDisabled || void 0,
+    "data-invalid": isInvalid || void 0,
+    "data-readonly": isReadOnly || void 0
+  }, renderProps2.children);
+});
+
+// node_modules/react-aria-components/dist/private/Input.mjs
+var import_react37 = __toESM(require_react(), 1);
+var $41fb335299a4a39e$export$37fb8590cf2c088c = /* @__PURE__ */ (0, import_react37.createContext)({});
+var $41fb335299a4a39e$var$filterHoverProps = (props) => {
+  let { onHoverStart, onHoverChange, onHoverEnd, ...otherProps } = props;
+  return otherProps;
+};
+var $41fb335299a4a39e$export$f5b8910cec6cf069 = /* @__PURE__ */ (0, $d7f64c32b702fe2c$export$86427a43e3e48ebb)(function Input(props, ref) {
+  [props, ref] = (0, $7230ffa83bc0c2cf$export$29f1550f4b0d4415)(props, ref, $41fb335299a4a39e$export$37fb8590cf2c088c);
+  let { hoverProps, isHovered } = (0, $e969f22b6713ca4a$export$ae780daf29e6d456)({
+    ...props,
+    isDisabled: props.disabled
+  });
+  let { isFocused, isFocusVisible, focusProps } = (0, $0c4a58759813079a$export$4e328f61c538687f)({
+    isTextInput: true,
+    autoFocus: props.autoFocus
+  });
+  let isInvalid = !!props["aria-invalid"] && props["aria-invalid"] !== "false";
+  let renderProps2 = (0, $7230ffa83bc0c2cf$export$4d86445c2cf5e3)({
+    ...props,
+    values: {
+      isHovered,
+      isFocused,
+      isFocusVisible,
+      isDisabled: props.disabled || false,
+      isInvalid
+    },
+    defaultClassName: "react-aria-Input"
+  });
+  return /* @__PURE__ */ (0, import_react37.default).createElement((0, $7230ffa83bc0c2cf$export$df3a06d6289f983e).input, {
+    ...(0, $bbaa08b3cd72f041$export$9d1611c77c2fe928)($41fb335299a4a39e$var$filterHoverProps(props), focusProps, hoverProps),
+    ...renderProps2,
+    ref,
+    "data-focused": isFocused || void 0,
+    "data-disabled": props.disabled || void 0,
+    "data-hovered": isHovered || void 0,
+    "data-focus-visible": isFocusVisible || void 0,
+    "data-invalid": isInvalid || void 0
+  });
+});
+
+// node_modules/react-aria/dist/private/textfield/useTextField.mjs
+var import_react38 = __toESM(require_react(), 1);
+function $054f71d2330da2e3$export$712718f7aec83d5(props, ref) {
+  let { inputElementType = "input", isDisabled = false, isRequired = false, isReadOnly = false, type = "text", validationBehavior = "aria" } = props;
+  let [value, setValue] = (0, $3e6197669829fe11$export$40bfa8c7b0832715)(props.value, props.defaultValue || "", props.onChange);
+  let { focusableProps } = (0, $d1116acdf220c2da$export$4c014de7c8940b4c)(props, ref);
+  let validationState = (0, $fd2148440a13ec26$export$fc1a364ae1f3ff10)({
+    ...props,
+    value
+  });
+  let { isInvalid, validationErrors, validationDetails } = validationState.displayValidation;
+  let { labelProps, fieldProps, descriptionProps, errorMessageProps } = (0, $191c9b6d48a0a4e2$export$294aa081a6c6f55d)({
+    ...props,
+    isInvalid,
+    errorMessage: props.errorMessage || validationErrors
+  });
+  let domProps = (0, $8e9d2fae0ecb9001$export$457c3d6518dd4c6f)(props, {
+    labelable: true
+  });
+  const inputOnlyProps = {
+    type,
+    pattern: props.pattern
+  };
+  let [initialValue] = (0, import_react38.useState)(value);
+  (0, $3274bf1495747a7b$export$5add1d006293d136)(ref, props.defaultValue ?? initialValue, setValue);
+  (0, $860f7da480e22816$export$b8473d3665f3a75a)(props, validationState, ref);
+  return {
+    labelProps,
+    inputProps: (0, $bbaa08b3cd72f041$export$9d1611c77c2fe928)(domProps, inputElementType === "input" ? inputOnlyProps : void 0, {
+      disabled: isDisabled,
+      readOnly: isReadOnly,
+      required: isRequired && validationBehavior === "native",
+      "aria-required": isRequired && validationBehavior === "aria" || void 0,
+      "aria-invalid": isInvalid || void 0,
+      "aria-errormessage": props["aria-errormessage"],
+      "aria-activedescendant": props["aria-activedescendant"],
+      "aria-autocomplete": props["aria-autocomplete"],
+      "aria-haspopup": props["aria-haspopup"],
+      "aria-controls": props["aria-controls"],
+      value,
+      onChange: (e) => setValue((0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e).value),
+      autoComplete: props.autoComplete,
+      autoCapitalize: props.autoCapitalize,
+      maxLength: props.maxLength,
+      minLength: props.minLength,
+      name: props.name,
+      form: props.form,
+      placeholder: props.placeholder,
+      inputMode: props.inputMode,
+      autoCorrect: props.autoCorrect,
+      spellCheck: props.spellCheck,
+      [parseInt((0, import_react38.default).version, 10) >= 17 ? "enterKeyHint" : "enterkeyhint"]: props.enterKeyHint,
+      // Clipboard events
+      onCopy: props.onCopy,
+      onCut: props.onCut,
+      onPaste: props.onPaste,
+      // Composition events
+      onCompositionEnd: props.onCompositionEnd,
+      onCompositionStart: props.onCompositionStart,
+      onCompositionUpdate: props.onCompositionUpdate,
+      // Selection events
+      onSelect: props.onSelect,
+      // Input events
+      onBeforeInput: props.onBeforeInput,
+      onInput: props.onInput,
+      ...focusableProps,
+      ...fieldProps
+    }),
+    descriptionProps,
+    errorMessageProps,
+    isInvalid,
+    validationErrors,
+    validationDetails
+  };
+}
+
+// node_modules/react-aria-components/dist/private/SharedElementTransition.mjs
+var import_react_dom2 = __toESM(require_react_dom(), 1);
+var import_react39 = __toESM(require_react(), 1);
+var $792f28e438b9ad5f$var$SharedElementContext = /* @__PURE__ */ (0, import_react39.createContext)(null);
+function $792f28e438b9ad5f$export$758399f318e6385a(props) {
+  let ref = (0, import_react39.useRef)({});
+  return /* @__PURE__ */ (0, import_react39.default).createElement($792f28e438b9ad5f$var$SharedElementContext.Provider, {
+    value: ref
+  }, props.children);
+}
+
+// node_modules/react-aria-components/dist/private/SelectionIndicator.mjs
+var import_react40 = __toESM(require_react(), 1);
+var $91fe5e721c7f36c1$export$c9549807523555e0 = /* @__PURE__ */ (0, import_react40.createContext)({
+  isSelected: false
+});
+
+// node_modules/react-aria/dist/private/utils/shadowdom/ShadowTreeWalker.mjs
+var $654b97e09f2a30c1$export$63eb3ababa9c55c4 = class {
+  constructor(doc, root, whatToShow, filter) {
+    this._walkerStack = [];
+    this._currentSetFor = /* @__PURE__ */ new Set();
+    this._acceptNode = (node) => {
+      if (node.nodeType === Node.ELEMENT_NODE) {
+        const shadowRoot2 = node.shadowRoot;
+        if (shadowRoot2) {
+          const walker = this._doc.createTreeWalker(shadowRoot2, this.whatToShow, {
+            acceptNode: this._acceptNode
+          });
+          this._walkerStack.unshift(walker);
+          return NodeFilter.FILTER_ACCEPT;
+        } else {
+          if (typeof this.filter === "function") return this.filter(node);
+          else if (this.filter?.acceptNode) return this.filter.acceptNode(node);
+          else if (this.filter === null) return NodeFilter.FILTER_ACCEPT;
+        }
+      }
+      return NodeFilter.FILTER_SKIP;
+    };
+    this._doc = doc;
+    this.root = root;
+    this.filter = filter ?? null;
+    this.whatToShow = whatToShow ?? NodeFilter.SHOW_ALL;
+    this._currentNode = root;
+    this._walkerStack.unshift(doc.createTreeWalker(root, whatToShow, this._acceptNode));
+    const shadowRoot = root.shadowRoot;
+    if (shadowRoot) {
+      const walker = this._doc.createTreeWalker(shadowRoot, this.whatToShow, {
+        acceptNode: this._acceptNode
+      });
+      this._walkerStack.unshift(walker);
+    }
+  }
+  get currentNode() {
+    return this._currentNode;
+  }
+  set currentNode(node) {
+    if (!(0, $23f2114a1b82827e$export$4282f70798064fe0)(this.root, node)) throw new Error("Cannot set currentNode to a node that is not contained by the root node.");
+    const walkers = [];
+    let curNode = node;
+    let currentWalkerCurrentNode = node;
+    this._currentNode = node;
+    while (curNode && curNode !== this.root) if (curNode.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
+      const shadowRoot = curNode;
+      const walker2 = this._doc.createTreeWalker(shadowRoot, this.whatToShow, {
+        acceptNode: this._acceptNode
+      });
+      walkers.push(walker2);
+      walker2.currentNode = currentWalkerCurrentNode;
+      this._currentSetFor.add(walker2);
+      curNode = currentWalkerCurrentNode = shadowRoot.host;
+    } else curNode = curNode.parentNode;
+    const walker = this._doc.createTreeWalker(this.root, this.whatToShow, {
+      acceptNode: this._acceptNode
+    });
+    walkers.push(walker);
+    walker.currentNode = currentWalkerCurrentNode;
+    this._currentSetFor.add(walker);
+    this._walkerStack = walkers;
+  }
+  get doc() {
+    return this._doc;
+  }
+  firstChild() {
+    let currentNode = this.currentNode;
+    let newNode = this.nextNode();
+    if (!(0, $23f2114a1b82827e$export$4282f70798064fe0)(currentNode, newNode)) {
+      this.currentNode = currentNode;
+      return null;
+    }
+    if (newNode) this.currentNode = newNode;
+    return newNode;
+  }
+  lastChild() {
+    let walker = this._walkerStack[0];
+    let newNode = walker.lastChild();
+    if (newNode) this.currentNode = newNode;
+    return newNode;
+  }
+  nextNode() {
+    const nextNode = this._walkerStack[0].nextNode();
+    if (nextNode) {
+      const shadowRoot = nextNode.shadowRoot;
+      if (shadowRoot) {
+        let nodeResult;
+        if (typeof this.filter === "function") nodeResult = this.filter(nextNode);
+        else if (this.filter?.acceptNode) nodeResult = this.filter.acceptNode(nextNode);
+        if (nodeResult === NodeFilter.FILTER_ACCEPT) {
+          this.currentNode = nextNode;
+          return nextNode;
+        }
+        let newNode = this.nextNode();
+        if (newNode) this.currentNode = newNode;
+        return newNode;
+      }
+      if (nextNode) this.currentNode = nextNode;
+      return nextNode;
+    } else {
+      if (this._walkerStack.length > 1) {
+        this._walkerStack.shift();
+        let newNode = this.nextNode();
+        if (newNode) this.currentNode = newNode;
+        return newNode;
+      } else return null;
+    }
+  }
+  previousNode() {
+    const currentWalker = this._walkerStack[0];
+    if (currentWalker.currentNode === currentWalker.root) {
+      if (this._currentSetFor.has(currentWalker)) {
+        this._currentSetFor.delete(currentWalker);
+        if (this._walkerStack.length > 1) {
+          this._walkerStack.shift();
+          let newNode = this.previousNode();
+          if (newNode) this.currentNode = newNode;
+          return newNode;
+        } else return null;
+      }
+      return null;
+    }
+    const previousNode = currentWalker.previousNode();
+    if (previousNode) {
+      const shadowRoot = previousNode.shadowRoot;
+      if (shadowRoot) {
+        let nodeResult;
+        if (typeof this.filter === "function") nodeResult = this.filter(previousNode);
+        else if (this.filter?.acceptNode) nodeResult = this.filter.acceptNode(previousNode);
+        if (nodeResult === NodeFilter.FILTER_ACCEPT) {
+          if (previousNode) this.currentNode = previousNode;
+          return previousNode;
+        }
+        let newNode = this.lastChild();
+        if (newNode) this.currentNode = newNode;
+        return newNode;
+      }
+      if (previousNode) this.currentNode = previousNode;
+      return previousNode;
+    } else {
+      if (this._walkerStack.length > 1) {
+        this._walkerStack.shift();
+        let newNode = this.previousNode();
+        if (newNode) this.currentNode = newNode;
+        return newNode;
+      } else return null;
+    }
+  }
+  /**
+  * @deprecated
+  */
+  nextSibling() {
+    return null;
+  }
+  /**
+  * @deprecated
+  */
+  previousSibling() {
+    return null;
+  }
+  /**
+  * @deprecated
+  */
+  parentNode() {
+    return null;
+  }
+};
+function $654b97e09f2a30c1$export$4d0f8be8b12a7ef6(doc, root, whatToShow, filter) {
+  if ((0, $6a20a7989e6c817a$export$98658e8c59125e6a)()) return new $654b97e09f2a30c1$export$63eb3ababa9c55c4(doc, root, whatToShow, filter);
+  return doc.createTreeWalker(root, whatToShow, filter);
+}
+
+// node_modules/react-aria/dist/private/focus/FocusScope.mjs
+var import_react41 = __toESM(require_react(), 1);
+function $535772f9d2c1f38d$var$getRadiosInGroup(element) {
+  if (!element.form)
+    return Array.from((0, $d447af545b77c9f1$export$b204af158042fbac)(element).querySelectorAll(`input[type="radio"][name="${CSS.escape(element.name)}"]`)).filter((radio) => !radio.form);
+  const radioList = element.form.elements.namedItem(element.name);
+  let ownerWindow = (0, $d447af545b77c9f1$export$f21a1ffae260145a)(element);
+  if (radioList instanceof ownerWindow.RadioNodeList) return Array.from(radioList).filter((el) => el instanceof ownerWindow.HTMLInputElement);
+  if (radioList instanceof ownerWindow.HTMLInputElement) return [
+    radioList
+  ];
+  return [];
+}
+function $535772f9d2c1f38d$var$isTabbableRadio(element) {
+  if (element.checked) return true;
+  const radios = $535772f9d2c1f38d$var$getRadiosInGroup(element);
+  return radios.length > 0 && !radios.some((radio) => radio.checked);
+}
+function $535772f9d2c1f38d$var$isElementInScope(element, scope) {
+  if (!element) return false;
+  if (!scope) return false;
+  return scope.some((node) => (0, $23f2114a1b82827e$export$4282f70798064fe0)(node, element));
+}
+function $535772f9d2c1f38d$var$focusElement(element, scroll = false) {
+  if (element != null && !scroll) try {
+    (0, $f192c2f16961cbe0$export$80f3e147d781571c)(element);
+  } catch {
+  }
+  else if (element != null) try {
+    element.focus();
+  } catch {
+  }
+}
+function $535772f9d2c1f38d$export$2d6ec8fc375ceafa(root, opts, scope) {
+  let filter = opts?.tabbable ? (0, $3b8b240c1bf84ab9$export$bebd5a1431fec25d) : (0, $3b8b240c1bf84ab9$export$4c063cf1350e6fed);
+  let rootElement = root?.nodeType === Node.ELEMENT_NODE ? root : null;
+  let doc = (0, $d447af545b77c9f1$export$b204af158042fbac)(rootElement);
+  let walker = (0, $654b97e09f2a30c1$export$4d0f8be8b12a7ef6)(doc, root || doc, NodeFilter.SHOW_ELEMENT, {
+    acceptNode(node) {
+      if ((0, $23f2114a1b82827e$export$4282f70798064fe0)(opts?.from, node)) return NodeFilter.FILTER_REJECT;
+      if (opts?.tabbable && node.tagName === "INPUT" && node.getAttribute("type") === "radio") {
+        if (!$535772f9d2c1f38d$var$isTabbableRadio(node)) return NodeFilter.FILTER_REJECT;
+        if (walker.currentNode.tagName === "INPUT" && walker.currentNode.type === "radio" && walker.currentNode.name === node.name) return NodeFilter.FILTER_REJECT;
+      }
+      if (filter(node) && (!scope || $535772f9d2c1f38d$var$isElementInScope(node, scope)) && (!opts?.accept || opts.accept(node))) return NodeFilter.FILTER_ACCEPT;
+      return NodeFilter.FILTER_SKIP;
+    }
+  });
+  if (opts?.from) walker.currentNode = opts.from;
+  return walker;
+}
+function $535772f9d2c1f38d$export$c5251b9e124bf29(ref, defaultOptions = {}) {
+  return {
+    focusNext(opts = {}) {
+      let root = ref.current;
+      if (!root) return null;
+      let { from, tabbable = defaultOptions.tabbable, wrap = defaultOptions.wrap, accept = defaultOptions.accept } = opts;
+      let node = from || (0, $23f2114a1b82827e$export$cd4e5573fbe2b576)((0, $d447af545b77c9f1$export$b204af158042fbac)(root));
+      let walker = $535772f9d2c1f38d$export$2d6ec8fc375ceafa(root, {
+        tabbable,
+        accept
+      });
+      if ((0, $23f2114a1b82827e$export$4282f70798064fe0)(root, node)) walker.currentNode = node;
+      let nextNode = walker.nextNode();
+      if (!nextNode && wrap) {
+        walker.currentNode = root;
+        nextNode = walker.nextNode();
+      }
+      if (nextNode) $535772f9d2c1f38d$var$focusElement(nextNode, true);
+      return nextNode;
+    },
+    focusPrevious(opts = defaultOptions) {
+      let root = ref.current;
+      if (!root) return null;
+      let { from, tabbable = defaultOptions.tabbable, wrap = defaultOptions.wrap, accept = defaultOptions.accept } = opts;
+      let node = from || (0, $23f2114a1b82827e$export$cd4e5573fbe2b576)((0, $d447af545b77c9f1$export$b204af158042fbac)(root));
+      let walker = $535772f9d2c1f38d$export$2d6ec8fc375ceafa(root, {
+        tabbable,
+        accept
+      });
+      if ((0, $23f2114a1b82827e$export$4282f70798064fe0)(root, node)) walker.currentNode = node;
+      else {
+        let next = $535772f9d2c1f38d$var$last(walker);
+        if (next) $535772f9d2c1f38d$var$focusElement(next, true);
+        return next ?? null;
+      }
+      let previousNode = walker.previousNode();
+      if (!previousNode && wrap) {
+        walker.currentNode = root;
+        let lastNode = $535772f9d2c1f38d$var$last(walker);
+        if (!lastNode)
+          return null;
+        previousNode = lastNode;
+      }
+      if (previousNode) $535772f9d2c1f38d$var$focusElement(previousNode, true);
+      return previousNode ?? null;
+    },
+    focusFirst(opts = defaultOptions) {
+      let root = ref.current;
+      if (!root) return null;
+      let { tabbable = defaultOptions.tabbable, accept = defaultOptions.accept } = opts;
+      let walker = $535772f9d2c1f38d$export$2d6ec8fc375ceafa(root, {
+        tabbable,
+        accept
+      });
+      let nextNode = walker.nextNode();
+      if (nextNode) $535772f9d2c1f38d$var$focusElement(nextNode, true);
+      return nextNode;
+    },
+    focusLast(opts = defaultOptions) {
+      let root = ref.current;
+      if (!root) return null;
+      let { tabbable = defaultOptions.tabbable, accept = defaultOptions.accept } = opts;
+      let walker = $535772f9d2c1f38d$export$2d6ec8fc375ceafa(root, {
+        tabbable,
+        accept
+      });
+      let next = $535772f9d2c1f38d$var$last(walker);
+      if (next) $535772f9d2c1f38d$var$focusElement(next, true);
+      return next ?? null;
+    }
+  };
+}
+function $535772f9d2c1f38d$var$last(walker) {
+  let next = void 0;
+  let last;
+  do {
+    last = walker.lastChild();
+    if (last) next = last;
+  } while (last);
+  return next;
+}
+var $535772f9d2c1f38d$var$Tree = class _$535772f9d2c1f38d$var$Tree {
+  constructor() {
+    this.fastMap = /* @__PURE__ */ new Map();
+    this.root = new $535772f9d2c1f38d$var$TreeNode({
+      scopeRef: null
+    });
+    this.fastMap.set(null, this.root);
+  }
+  get size() {
+    return this.fastMap.size;
+  }
+  getTreeNode(data) {
+    return this.fastMap.get(data);
+  }
+  addTreeNode(scopeRef, parent, nodeToRestore) {
+    let parentNode = this.fastMap.get(parent ?? null);
+    if (!parentNode) return;
+    let node = new $535772f9d2c1f38d$var$TreeNode({
+      scopeRef
+    });
+    parentNode.addChild(node);
+    node.parent = parentNode;
+    this.fastMap.set(scopeRef, node);
+    if (nodeToRestore) node.nodeToRestore = nodeToRestore;
+  }
+  addNode(node) {
+    this.fastMap.set(node.scopeRef, node);
+  }
+  removeTreeNode(scopeRef) {
+    if (scopeRef === null) return;
+    let node = this.fastMap.get(scopeRef);
+    if (!node) return;
+    let parentNode = node.parent;
+    for (let current of this.traverse()) if (current !== node && node.nodeToRestore && current.nodeToRestore && node.scopeRef && node.scopeRef.current && $535772f9d2c1f38d$var$isElementInScope(current.nodeToRestore, node.scopeRef.current)) current.nodeToRestore = node.nodeToRestore;
+    let children = node.children;
+    if (parentNode) {
+      parentNode.removeChild(node);
+      if (children.size > 0) children.forEach((child) => parentNode && parentNode.addChild(child));
+    }
+    this.fastMap.delete(node.scopeRef);
+  }
+  // Pre Order Depth First
+  *traverse(node = this.root) {
+    if (node.scopeRef != null) yield node;
+    if (node.children.size > 0) for (let child of node.children) yield* this.traverse(child);
+  }
+  clone() {
+    let newTree = new _$535772f9d2c1f38d$var$Tree();
+    for (let node of this.traverse()) newTree.addTreeNode(node.scopeRef, node.parent?.scopeRef ?? null, node.nodeToRestore);
+    return newTree;
+  }
+};
+var $535772f9d2c1f38d$var$TreeNode = class {
+  constructor(props) {
+    this.children = /* @__PURE__ */ new Set();
+    this.contain = false;
+    this.scopeRef = props.scopeRef;
+  }
+  addChild(node) {
+    this.children.add(node);
+    node.parent = this;
+  }
+  removeChild(node) {
+    this.children.delete(node);
+    node.parent = void 0;
+  }
+};
+var $535772f9d2c1f38d$export$d06fae2ee68b101e = new $535772f9d2c1f38d$var$Tree();
+
+// node_modules/react-aria/dist/private/intl/searchfield/ar-AE.mjs
+var $144b40583c9847c5$exports = {};
+$144b40583c9847c5$exports = {
+  "Clear search": `\u0645\u0633\u062D \u0627\u0644\u0628\u062D\u062B`
+};
+
+// node_modules/react-aria/dist/private/intl/searchfield/bg-BG.mjs
+var $f7ac89ad9c1c6708$exports = {};
+$f7ac89ad9c1c6708$exports = {
+  "Clear search": `\u0418\u0437\u0447\u0438\u0441\u0442\u0432\u0430\u043D\u0435 \u043D\u0430 \u0442\u044A\u0440\u0441\u0435\u043D\u0435`
+};
+
+// node_modules/react-aria/dist/private/intl/searchfield/cs-CZ.mjs
+var $b5d80d3b86cad359$exports = {};
+$b5d80d3b86cad359$exports = {
+  "Clear search": `Vymazat hled\xE1n\xED`
+};
+
+// node_modules/react-aria/dist/private/intl/searchfield/da-DK.mjs
+var $7bc76068ce4c3b7e$exports = {};
+$7bc76068ce4c3b7e$exports = {
+  "Clear search": `Ryd s\xF8gning`
+};
+
+// node_modules/react-aria/dist/private/intl/searchfield/de-DE.mjs
+var $ccd90980ce76d396$exports = {};
+$ccd90980ce76d396$exports = {
+  "Clear search": `Suche zur\xFCcksetzen`
+};
+
+// node_modules/react-aria/dist/private/intl/searchfield/el-GR.mjs
+var $ad9b187d34fdd225$exports = {};
+$ad9b187d34fdd225$exports = {
+  "Clear search": `\u0391\u03C0\u03B1\u03BB\u03BF\u03B9\u03C6\u03AE \u03B1\u03BD\u03B1\u03B6\u03AE\u03C4\u03B7\u03C3\u03B7\u03C2`
+};
+
+// node_modules/react-aria/dist/private/intl/searchfield/en-US.mjs
+var $0b5fc13def2a30c7$exports = {};
+$0b5fc13def2a30c7$exports = {
+  "Clear search": `Clear search`
+};
+
+// node_modules/react-aria/dist/private/intl/searchfield/es-ES.mjs
+var $e35f8fb6c3f9e97c$exports = {};
+$e35f8fb6c3f9e97c$exports = {
+  "Clear search": `Borrar b\xFAsqueda`
+};
+
+// node_modules/react-aria/dist/private/intl/searchfield/et-EE.mjs
+var $40e49c6c9e6fa358$exports = {};
+$40e49c6c9e6fa358$exports = {
+  "Clear search": `T\xFChjenda otsing`
+};
+
+// node_modules/react-aria/dist/private/intl/searchfield/fi-FI.mjs
+var $a4988accc5a2bbb9$exports = {};
+$a4988accc5a2bbb9$exports = {
+  "Clear search": `Tyhjenn\xE4 haku`
+};
+
+// node_modules/react-aria/dist/private/intl/searchfield/fr-FR.mjs
+var $edce3ce0bbac84b4$exports = {};
+$edce3ce0bbac84b4$exports = {
+  "Clear search": `Effacer la recherche`
+};
+
+// node_modules/react-aria/dist/private/intl/searchfield/he-IL.mjs
+var $879d66a4ec6ff3f5$exports = {};
+$879d66a4ec6ff3f5$exports = {
+  "Clear search": `\u05E0\u05E7\u05D4 \u05D7\u05D9\u05E4\u05D5\u05E9`
+};
+
+// node_modules/react-aria/dist/private/intl/searchfield/hr-HR.mjs
+var $c1852d2398baa2ff$exports = {};
+$c1852d2398baa2ff$exports = {
+  "Clear search": `Obri\u0161i pretragu`
+};
+
+// node_modules/react-aria/dist/private/intl/searchfield/hu-HU.mjs
+var $970538d6c6329605$exports = {};
+$970538d6c6329605$exports = {
+  "Clear search": `Keres\xE9s t\xF6rl\xE9se`
+};
+
+// node_modules/react-aria/dist/private/intl/searchfield/it-IT.mjs
+var $508544fa08cae44d$exports = {};
+$508544fa08cae44d$exports = {
+  "Clear search": `Cancella ricerca`
+};
+
+// node_modules/react-aria/dist/private/intl/searchfield/ja-JP.mjs
+var $e6be46486a51c27f$exports = {};
+$e6be46486a51c27f$exports = {
+  "Clear search": `\u691C\u7D22\u3092\u30AF\u30EA\u30A2`
+};
+
+// node_modules/react-aria/dist/private/intl/searchfield/ko-KR.mjs
+var $aca782271fda5aaa$exports = {};
+$aca782271fda5aaa$exports = {
+  "Clear search": `\uAC80\uC0C9 \uC9C0\uC6B0\uAE30`
+};
+
+// node_modules/react-aria/dist/private/intl/searchfield/lt-LT.mjs
+var $3bf9ad93c1aad52f$exports = {};
+$3bf9ad93c1aad52f$exports = {
+  "Clear search": `I\u0161valyti ie\u0161k\u0105`
+};
+
+// node_modules/react-aria/dist/private/intl/searchfield/lv-LV.mjs
+var $f648321ae94b8ad5$exports = {};
+$f648321ae94b8ad5$exports = {
+  "Clear search": `Not\u012Br\u012Bt mekl\u0113\u0161anu`
+};
+
+// node_modules/react-aria/dist/private/intl/searchfield/nb-NO.mjs
+var $656f1a37422df52a$exports = {};
+$656f1a37422df52a$exports = {
+  "Clear search": `T\xF8m s\xF8k`
+};
+
+// node_modules/react-aria/dist/private/intl/searchfield/nl-NL.mjs
+var $82eacc9a6cad8168$exports = {};
+$82eacc9a6cad8168$exports = {
+  "Clear search": `Zoekactie wissen`
+};
+
+// node_modules/react-aria/dist/private/intl/searchfield/pl-PL.mjs
+var $9af183cfb2cb9094$exports = {};
+$9af183cfb2cb9094$exports = {
+  "Clear search": `Wyczy\u015B\u0107 zawarto\u015B\u0107 wyszukiwania`
+};
+
+// node_modules/react-aria/dist/private/intl/searchfield/pt-BR.mjs
+var $53e95c7b6521e26c$exports = {};
+$53e95c7b6521e26c$exports = {
+  "Clear search": `Limpar pesquisa`
+};
+
+// node_modules/react-aria/dist/private/intl/searchfield/pt-PT.mjs
+var $ab35ca149e74c27f$exports = {};
+$ab35ca149e74c27f$exports = {
+  "Clear search": `Limpar pesquisa`
+};
+
+// node_modules/react-aria/dist/private/intl/searchfield/ro-RO.mjs
+var $09af5659fa5d1530$exports = {};
+$09af5659fa5d1530$exports = {
+  "Clear search": `\u015Eterge\u0163i c\u0103utarea`
+};
+
+// node_modules/react-aria/dist/private/intl/searchfield/ru-RU.mjs
+var $bab267b77ddeadf8$exports = {};
+$bab267b77ddeadf8$exports = {
+  "Clear search": `\u041E\u0447\u0438\u0441\u0442\u0438\u0442\u044C \u043F\u043E\u0438\u0441\u043A`
+};
+
+// node_modules/react-aria/dist/private/intl/searchfield/sk-SK.mjs
+var $c42af7093d2ec3f7$exports = {};
+$c42af7093d2ec3f7$exports = {
+  "Clear search": `Vymaza\u0165 vyh\u013Ead\xE1vanie`
+};
+
+// node_modules/react-aria/dist/private/intl/searchfield/sl-SI.mjs
+var $79a999abfc605712$exports = {};
+$79a999abfc605712$exports = {
+  "Clear search": `Po\u010Disti iskanje`
+};
+
+// node_modules/react-aria/dist/private/intl/searchfield/sr-SP.mjs
+var $9790b582a4a31826$exports = {};
+$9790b582a4a31826$exports = {
+  "Clear search": `Obri\u0161i pretragu`
+};
+
+// node_modules/react-aria/dist/private/intl/searchfield/sv-SE.mjs
+var $f09c5845c732c7f4$exports = {};
+$f09c5845c732c7f4$exports = {
+  "Clear search": `Rensa s\xF6kning`
+};
+
+// node_modules/react-aria/dist/private/intl/searchfield/tr-TR.mjs
+var $22573d5058bf9ea8$exports = {};
+$22573d5058bf9ea8$exports = {
+  "Clear search": `Aramay\u0131 temizle`
+};
+
+// node_modules/react-aria/dist/private/intl/searchfield/uk-UA.mjs
+var $211addb72c816ef7$exports = {};
+$211addb72c816ef7$exports = {
+  "Clear search": `\u041E\u0447\u0438\u0441\u0442\u0438\u0442\u0438 \u043F\u043E\u0448\u0443\u043A`
+};
+
+// node_modules/react-aria/dist/private/intl/searchfield/zh-CN.mjs
+var $8eeb1c35d0764ab5$exports = {};
+$8eeb1c35d0764ab5$exports = {
+  "Clear search": `\u6E05\u9664\u641C\u7D22`
+};
+
+// node_modules/react-aria/dist/private/intl/searchfield/zh-TW.mjs
+var $d63da6b1e3b1db3a$exports = {};
+$d63da6b1e3b1db3a$exports = {
+  "Clear search": `\u6E05\u9664\u641C\u5C0B\u689D\u4EF6`
+};
+
+// node_modules/react-aria/dist/private/searchfield/intlStrings.mjs
+var $cb1bf3901ab9f046$exports = {};
+$cb1bf3901ab9f046$exports = {
+  "ar-AE": $144b40583c9847c5$exports,
+  "bg-BG": $f7ac89ad9c1c6708$exports,
+  "cs-CZ": $b5d80d3b86cad359$exports,
+  "da-DK": $7bc76068ce4c3b7e$exports,
+  "de-DE": $ccd90980ce76d396$exports,
+  "el-GR": $ad9b187d34fdd225$exports,
+  "en-US": $0b5fc13def2a30c7$exports,
+  "es-ES": $e35f8fb6c3f9e97c$exports,
+  "et-EE": $40e49c6c9e6fa358$exports,
+  "fi-FI": $a4988accc5a2bbb9$exports,
+  "fr-FR": $edce3ce0bbac84b4$exports,
+  "he-IL": $879d66a4ec6ff3f5$exports,
+  "hr-HR": $c1852d2398baa2ff$exports,
+  "hu-HU": $970538d6c6329605$exports,
+  "it-IT": $508544fa08cae44d$exports,
+  "ja-JP": $e6be46486a51c27f$exports,
+  "ko-KR": $aca782271fda5aaa$exports,
+  "lt-LT": $3bf9ad93c1aad52f$exports,
+  "lv-LV": $f648321ae94b8ad5$exports,
+  "nb-NO": $656f1a37422df52a$exports,
+  "nl-NL": $82eacc9a6cad8168$exports,
+  "pl-PL": $9af183cfb2cb9094$exports,
+  "pt-BR": $53e95c7b6521e26c$exports,
+  "pt-PT": $ab35ca149e74c27f$exports,
+  "ro-RO": $09af5659fa5d1530$exports,
+  "ru-RU": $bab267b77ddeadf8$exports,
+  "sk-SK": $c42af7093d2ec3f7$exports,
+  "sl-SI": $79a999abfc605712$exports,
+  "sr-SP": $9790b582a4a31826$exports,
+  "sv-SE": $f09c5845c732c7f4$exports,
+  "tr-TR": $22573d5058bf9ea8$exports,
+  "uk-UA": $211addb72c816ef7$exports,
+  "zh-CN": $8eeb1c35d0764ab5$exports,
+  "zh-TW": $d63da6b1e3b1db3a$exports
+};
+
+// node_modules/react-aria/dist/private/searchfield/useSearchField.mjs
+function $parcel$interopDefault(a) {
+  return a && a.__esModule ? a.default : a;
+}
+function $44614525ec969a63$export$9bb30bbe003b82e0(props, state, inputRef) {
+  let stringFormatter = (0, $cf2482eff2eeeec2$export$f12b703ca79dfbb1)((0, $parcel$interopDefault($cb1bf3901ab9f046$exports)), "@react-aria/searchfield");
+  let { isDisabled, isReadOnly, onSubmit, onClear, type = "search" } = props;
+  let { keyboardProps } = (0, $8296dad1a4c5e0dc$export$8f71654801c2f7cd)({
+    isDisabled: isDisabled || isReadOnly,
+    shortcuts: {
+      Enter: () => {
+        if (onSubmit) {
+          onSubmit(state.value);
+          return;
+        }
+        return false;
+      },
+      Escape: () => {
+        if (state.value === "" && (!inputRef.current || inputRef.current.value === "")) return false;
+        state.setValue("");
+        onClear?.();
+      }
+    }
+  });
+  let onClearButtonClick = () => {
+    state.setValue("");
+    if (onClear) onClear();
+  };
+  let onPressStart = () => {
+    inputRef.current?.focus();
+  };
+  let { labelProps, inputProps, descriptionProps, errorMessageProps, ...validation } = (0, $054f71d2330da2e3$export$712718f7aec83d5)({
+    ...props,
+    value: state.value,
+    onChange: state.setValue,
+    onKeyDown: props.onKeyDown,
+    onKeyUp: props.onKeyUp,
+    type
+  }, inputRef);
+  return {
+    labelProps,
+    // An edge case, in Autocomplete, if the keyboard hanlders are not in this order, then
+    // Escape runs autocomplete/listbox first, then the search-field shortcut returns false and
+    // continues propagation, leaking Escape to a parent Dialog.
+    inputProps: (0, $bbaa08b3cd72f041$export$9d1611c77c2fe928)(keyboardProps, {
+      ...inputProps,
+      // already handled by useSearchFieldState
+      defaultValue: void 0
+    }),
+    clearButtonProps: {
+      "aria-label": stringFormatter.format("Clear search"),
+      excludeFromTabOrder: true,
+      preventFocusOnPress: true,
+      isDisabled: isDisabled || isReadOnly,
+      onPress: onClearButtonClick,
+      onPressStart
+    },
+    descriptionProps,
+    errorMessageProps,
+    ...validation
+  };
+}
+
+// node_modules/react-aria-components/dist/private/SearchField.mjs
+var import_react42 = __toESM(require_react(), 1);
+
+// node_modules/react-stately/dist/private/searchfield/useSearchFieldState.mjs
+function $56baeede9f35e022$export$3f8be18b0f41eaf2(props) {
+  let [value, setValue] = (0, $3e6197669829fe11$export$40bfa8c7b0832715)($56baeede9f35e022$var$toString(props.value), $56baeede9f35e022$var$toString(props.defaultValue) || "", props.onChange);
+  return {
+    value,
+    setValue
+  };
+}
+function $56baeede9f35e022$var$toString(val) {
+  if (val == null) return;
+  return val.toString();
+}
+
+// node_modules/react-aria-components/dist/private/SearchField.mjs
+var $29a5029ff43c9612$export$d1c4e4c63cb03a11 = /* @__PURE__ */ (0, import_react42.createContext)(null);
+var $29a5029ff43c9612$export$b94867ecbd698f21 = /* @__PURE__ */ (0, $d7f64c32b702fe2c$export$86427a43e3e48ebb)(function SearchField(props, ref) {
+  [props, ref] = (0, $7230ffa83bc0c2cf$export$29f1550f4b0d4415)(props, ref, $29a5029ff43c9612$export$d1c4e4c63cb03a11);
+  let { validationBehavior: formValidationBehavior } = (0, $7230ffa83bc0c2cf$export$fabf2dc03a41866e)((0, $cdaed739b1139372$export$c24727297075ec6a)) || {};
+  let validationBehavior = props.validationBehavior ?? formValidationBehavior ?? "native";
+  let inputRef = (0, import_react42.useRef)(null);
+  [props, inputRef] = (0, $7230ffa83bc0c2cf$export$29f1550f4b0d4415)(props, inputRef, (0, $4b38b5b75ecc6208$export$698f465ec27e93df));
+  let [labelRef, label] = (0, $7230ffa83bc0c2cf$export$9d4c57ee4c6ffdd8)(!props["aria-label"] && !props["aria-labelledby"]);
+  let state = (0, $56baeede9f35e022$export$3f8be18b0f41eaf2)({
+    ...props,
+    validationBehavior
+  });
+  let { labelProps, inputProps, clearButtonProps, descriptionProps, errorMessageProps, ...validation } = (0, $44614525ec969a63$export$9bb30bbe003b82e0)({
+    ...(0, $7230ffa83bc0c2cf$export$ef03459518577ad4)(props),
+    label,
+    validationBehavior
+  }, state, inputRef);
+  let renderProps2 = (0, $7230ffa83bc0c2cf$export$4d86445c2cf5e3)({
+    ...props,
+    values: {
+      isEmpty: state.value === "",
+      isDisabled: props.isDisabled || false,
+      isInvalid: validation.isInvalid || false,
+      isReadOnly: props.isReadOnly || false,
+      isRequired: props.isRequired || false,
+      state
+    },
+    defaultClassName: "react-aria-SearchField"
+  });
+  let DOMProps = (0, $8e9d2fae0ecb9001$export$457c3d6518dd4c6f)(props, {
+    global: true
+  });
+  delete DOMProps.id;
+  return /* @__PURE__ */ (0, import_react42.default).createElement((0, $7230ffa83bc0c2cf$export$df3a06d6289f983e).div, {
+    ...DOMProps,
+    ...renderProps2,
+    ref,
+    slot: props.slot || void 0,
+    "data-empty": state.value === "" || void 0,
+    "data-disabled": props.isDisabled || void 0,
+    "data-invalid": validation.isInvalid || void 0,
+    "data-readonly": props.isReadOnly || void 0,
+    "data-required": props.isRequired || void 0
+  }, /* @__PURE__ */ (0, import_react42.default).createElement((0, $7230ffa83bc0c2cf$export$2881499e37b75b9a), {
+    values: [
+      [
+        (0, $43a3b93638fe5db9$export$75b6ee27786ba447),
+        {
+          ...labelProps,
+          ref: labelRef
+        }
+      ],
+      [
+        (0, $41fb335299a4a39e$export$37fb8590cf2c088c),
+        {
+          ...inputProps,
+          ref: inputRef
+        }
+      ],
+      [
+        (0, $7705c033048f6da7$export$24d547caef80ccd1),
+        clearButtonProps
+      ],
+      [
+        (0, $efe09c6d1c304b50$export$9afb8bc826b033ea),
+        {
+          slots: {
+            description: descriptionProps,
+            errorMessage: errorMessageProps
+          }
+        }
+      ],
+      [
+        (0, $3a442827418ebe87$export$f9c6924e160136d1),
+        {
+          isInvalid: validation.isInvalid,
+          isDisabled: props.isDisabled || false
+        }
+      ],
+      [
+        (0, $1f3c3b1a70cec653$export$ff05c3ac10437e03),
+        validation
+      ]
+    ]
+  }, renderProps2.children));
+});
+
+// node_modules/react-aria-components/dist/private/TextArea.mjs
+var import_react43 = __toESM(require_react(), 1);
+var $bd263d78e9bf3c56$export$2dc6166a7e65358c = /* @__PURE__ */ (0, import_react43.createContext)({});
+
+// node_modules/react-aria-components/dist/private/TextField.mjs
+var import_react44 = __toESM(require_react(), 1);
+var $b8dcdc58eeae0d40$export$2129e27b3ef0d483 = /* @__PURE__ */ (0, import_react44.createContext)(null);
+var $b8dcdc58eeae0d40$export$2c73285ae9390cec = /* @__PURE__ */ (0, $d7f64c32b702fe2c$export$86427a43e3e48ebb)(function TextField(props, ref) {
+  [props, ref] = (0, $7230ffa83bc0c2cf$export$29f1550f4b0d4415)(props, ref, $b8dcdc58eeae0d40$export$2129e27b3ef0d483);
+  let { validationBehavior: formValidationBehavior } = (0, $7230ffa83bc0c2cf$export$fabf2dc03a41866e)((0, $cdaed739b1139372$export$c24727297075ec6a)) || {};
+  let validationBehavior = props.validationBehavior ?? formValidationBehavior ?? "native";
+  let inputRef = (0, import_react44.useRef)(null);
+  [props, inputRef] = (0, $7230ffa83bc0c2cf$export$29f1550f4b0d4415)(props, inputRef, (0, $4b38b5b75ecc6208$export$698f465ec27e93df));
+  let [labelRef, label] = (0, $7230ffa83bc0c2cf$export$9d4c57ee4c6ffdd8)(!props["aria-label"] && !props["aria-labelledby"]);
+  let [inputElementType, setInputElementType] = (0, import_react44.useState)("input");
+  let { labelProps, inputProps, descriptionProps, errorMessageProps, ...validation } = (0, $054f71d2330da2e3$export$712718f7aec83d5)({
+    ...(0, $7230ffa83bc0c2cf$export$ef03459518577ad4)(props),
+    inputElementType,
+    label,
+    validationBehavior
+  }, inputRef);
+  let inputOrTextAreaRef = (0, import_react44.useCallback)((el) => {
+    inputRef.current = el;
+    if (el) setInputElementType(el instanceof HTMLTextAreaElement ? "textarea" : "input");
+  }, [
+    inputRef
+  ]);
+  let renderProps2 = (0, $7230ffa83bc0c2cf$export$4d86445c2cf5e3)({
+    ...props,
+    values: {
+      isDisabled: props.isDisabled || false,
+      isInvalid: validation.isInvalid,
+      isReadOnly: props.isReadOnly || false,
+      isRequired: props.isRequired || false
+    },
+    defaultClassName: "react-aria-TextField"
+  });
+  let DOMProps = (0, $8e9d2fae0ecb9001$export$457c3d6518dd4c6f)(props, {
+    global: true
+  });
+  delete DOMProps.id;
+  return /* @__PURE__ */ (0, import_react44.default).createElement((0, $7230ffa83bc0c2cf$export$df3a06d6289f983e).div, {
+    ...DOMProps,
+    ...renderProps2,
+    ref,
+    slot: props.slot || void 0,
+    "data-disabled": props.isDisabled || void 0,
+    "data-invalid": validation.isInvalid || void 0,
+    "data-readonly": props.isReadOnly || void 0,
+    "data-required": props.isRequired || void 0
+  }, /* @__PURE__ */ (0, import_react44.default).createElement((0, $7230ffa83bc0c2cf$export$2881499e37b75b9a), {
+    values: [
+      [
+        (0, $43a3b93638fe5db9$export$75b6ee27786ba447),
+        {
+          ...labelProps,
+          ref: labelRef
+        }
+      ],
+      [
+        (0, $41fb335299a4a39e$export$37fb8590cf2c088c),
+        {
+          ...inputProps,
+          ref: inputOrTextAreaRef
+        }
+      ],
+      [
+        (0, $bd263d78e9bf3c56$export$2dc6166a7e65358c),
+        {
+          ...inputProps,
+          ref: inputOrTextAreaRef
+        }
+      ],
+      [
+        (0, $3a442827418ebe87$export$f9c6924e160136d1),
+        {
+          role: "presentation",
+          isInvalid: validation.isInvalid,
+          isDisabled: props.isDisabled || false
+        }
+      ],
+      [
+        (0, $efe09c6d1c304b50$export$9afb8bc826b033ea),
+        {
+          slots: {
+            description: descriptionProps,
+            errorMessage: errorMessageProps
+          }
+        }
+      ],
+      [
+        (0, $1f3c3b1a70cec653$export$ff05c3ac10437e03),
+        validation
+      ]
+    ]
+  }, renderProps2.children));
+});
+
+// node_modules/react-aria/dist/private/button/useToggleButton.mjs
+function $b54a524c670b905d$export$51e84d46ca0bc451(props, state, ref) {
+  const { isSelected } = state;
+  const { isPressed, buttonProps } = (0, $ac4318a9c075bb9f$export$ea18c227d4417cc3)({
+    ...props,
+    onPress: (0, $a4e76a5424781910$export$e08e3b67e392101e)(state.toggle, props.onPress)
+  }, ref);
+  return {
+    isPressed,
+    isSelected,
+    isDisabled: props.isDisabled || false,
+    buttonProps: (0, $bbaa08b3cd72f041$export$9d1611c77c2fe928)(buttonProps, {
+      "aria-pressed": isSelected
+    })
+  };
+}
+
+// node_modules/react-aria/dist/private/toolbar/useToolbar.mjs
+var import_react45 = __toESM(require_react(), 1);
+function $afa781ff67c1cd08$export$fa142eb1681c520(props, ref) {
+  const { "aria-label": ariaLabel, "aria-labelledby": ariaLabelledBy, orientation = "horizontal" } = props;
+  let [isInToolbar, setInToolbar] = (0, import_react45.useState)(false);
+  (0, $c4867b2f328c2698$export$e5c5a5f917a5871c)(() => {
+    setInToolbar(!!(ref.current && ref.current.parentElement?.closest('[role="toolbar"]')));
+  });
+  const { direction } = (0, $2eb8e6d23f3d0cb0$export$43bb16f9c6d9e3f7)();
+  const shouldReverse = direction === "rtl" && orientation === "horizontal";
+  let focusManager = (0, $535772f9d2c1f38d$export$c5251b9e124bf29)(ref);
+  const onKeyDown = (e) => {
+    if (!(0, $23f2114a1b82827e$export$4282f70798064fe0)(e.currentTarget, (0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e))) return;
+    if (orientation === "horizontal" && e.key === "ArrowRight" || orientation === "vertical" && e.key === "ArrowDown") {
+      if (shouldReverse) focusManager.focusPrevious();
+      else focusManager.focusNext();
+    } else if (orientation === "horizontal" && e.key === "ArrowLeft" || orientation === "vertical" && e.key === "ArrowUp") {
+      if (shouldReverse) focusManager.focusNext();
+      else focusManager.focusPrevious();
+    } else if (e.key === "Tab") {
+      lastFocused.current = (0, $23f2114a1b82827e$export$cd4e5573fbe2b576)();
+      if (e.shiftKey) focusManager.focusFirst();
+      else focusManager.focusLast();
+      return;
+    } else
+      return;
+    e.stopPropagation();
+    e.preventDefault();
+  };
+  const lastFocused = (0, import_react45.useRef)(null);
+  const onBlur = (e) => {
+    if (!(0, $23f2114a1b82827e$export$4282f70798064fe0)(e.currentTarget, e.relatedTarget) && !lastFocused.current) lastFocused.current = (0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e);
+  };
+  const onFocus = (e) => {
+    if (lastFocused.current && !(0, $23f2114a1b82827e$export$4282f70798064fe0)(e.currentTarget, e.relatedTarget) && (0, $23f2114a1b82827e$export$4282f70798064fe0)(ref.current, (0, $23f2114a1b82827e$export$e58f029f0fbfdb29)(e))) {
+      lastFocused.current?.focus();
+      lastFocused.current = null;
+    }
+  };
+  return {
+    toolbarProps: {
+      ...(0, $8e9d2fae0ecb9001$export$457c3d6518dd4c6f)(props, {
+        labelable: true
+      }),
+      role: !isInToolbar ? "toolbar" : "group",
+      "aria-orientation": orientation,
+      "aria-label": ariaLabel,
+      "aria-labelledby": ariaLabel == null ? ariaLabelledBy : void 0,
+      onKeyDownCapture: !isInToolbar ? onKeyDown : void 0,
+      onFocusCapture: !isInToolbar ? onFocus : void 0,
+      onBlurCapture: !isInToolbar ? onBlur : void 0
+    }
+  };
+}
+
+// node_modules/react-aria/dist/private/button/useToggleButtonGroup.mjs
+function $162557ba4d6f08dd$export$dd5580ae642f110f(props, state, ref) {
+  let { isDisabled } = props;
+  let { toolbarProps } = (0, $afa781ff67c1cd08$export$fa142eb1681c520)(props, ref);
+  return {
+    groupProps: {
+      ...toolbarProps,
+      role: state.selectionMode === "single" ? "radiogroup" : toolbarProps.role,
+      "aria-disabled": isDisabled
+    }
+  };
+}
+function $162557ba4d6f08dd$export$bc53712daae3d6e6(props, state, ref) {
+  let toggleState = {
+    isSelected: state.selectedKeys.has(props.id),
+    defaultSelected: false,
+    setSelected(isSelected2) {
+      state.setSelected(props.id, isSelected2);
+    },
+    toggle() {
+      state.toggleKey(props.id);
+    }
+  };
+  let { isPressed, isSelected, isDisabled, buttonProps } = (0, $b54a524c670b905d$export$51e84d46ca0bc451)({
+    ...props,
+    id: void 0,
+    isDisabled: props.isDisabled || state.isDisabled
+  }, toggleState, ref);
+  if (state.selectionMode === "single") {
+    buttonProps.role = "radio";
+    buttonProps["aria-checked"] = toggleState.isSelected;
+    delete buttonProps["aria-pressed"];
+  }
+  return {
+    isPressed,
+    isSelected,
+    isDisabled,
+    buttonProps
+  };
+}
+
+// node_modules/react-aria-components/dist/private/ToggleButtonGroup.mjs
+var import_react47 = __toESM(require_react(), 1);
+
+// node_modules/react-stately/dist/private/toggle/useToggleGroupState.mjs
+var import_react46 = __toESM(require_react(), 1);
+function $3d8ad31c4c1725e9$export$8deac67f4addf270(props) {
+  let { selectionMode = "single", disallowEmptySelection, isDisabled = false } = props;
+  let [selectedKeys, setSelectedKeys] = (0, $3e6197669829fe11$export$40bfa8c7b0832715)((0, import_react46.useMemo)(() => props.selectedKeys ? new Set(props.selectedKeys) : void 0, [
+    props.selectedKeys
+  ]), (0, import_react46.useMemo)(() => props.defaultSelectedKeys ? new Set(props.defaultSelectedKeys) : /* @__PURE__ */ new Set(), [
+    props.defaultSelectedKeys
+  ]), props.onSelectionChange);
+  return {
+    selectionMode,
+    isDisabled,
+    selectedKeys,
+    setSelectedKeys,
+    toggleKey(key) {
+      let keys;
+      if (selectionMode === "multiple") {
+        keys = new Set(selectedKeys);
+        if (keys.has(key) && (!disallowEmptySelection || keys.size > 1)) keys.delete(key);
+        else keys.add(key);
+      } else keys = new Set(selectedKeys.has(key) && !disallowEmptySelection ? [] : [
+        key
+      ]);
+      setSelectedKeys(keys);
+    },
+    setSelected(key, isSelected) {
+      if (isSelected !== selectedKeys.has(key)) this.toggleKey(key);
+    }
+  };
+}
+
+// node_modules/react-aria-components/dist/private/ToggleButtonGroup.mjs
+var $bc25b811ec97a172$export$298258635ae0dd97 = /* @__PURE__ */ (0, import_react47.createContext)({});
+var $bc25b811ec97a172$export$a8a71863db173133 = /* @__PURE__ */ (0, import_react47.createContext)(null);
+var $bc25b811ec97a172$export$40258cc1d95ff477 = /* @__PURE__ */ (0, import_react47.forwardRef)(function ToggleButtonGroup(props, ref) {
+  [props, ref] = (0, $7230ffa83bc0c2cf$export$29f1550f4b0d4415)(props, ref, $bc25b811ec97a172$export$298258635ae0dd97);
+  let state = (0, $3d8ad31c4c1725e9$export$8deac67f4addf270)(props);
+  let { groupProps } = (0, $162557ba4d6f08dd$export$dd5580ae642f110f)(props, state, ref);
+  let renderProps2 = (0, $7230ffa83bc0c2cf$export$4d86445c2cf5e3)({
+    ...props,
+    values: {
+      orientation: props.orientation || "horizontal",
+      isDisabled: state.isDisabled,
+      state
+    },
+    defaultClassName: "react-aria-ToggleButtonGroup"
+  });
+  let DOMProps = (0, $8e9d2fae0ecb9001$export$457c3d6518dd4c6f)(props, {
+    global: true
+  });
+  return /* @__PURE__ */ (0, import_react47.default).createElement((0, $7230ffa83bc0c2cf$export$df3a06d6289f983e).div, {
+    ...(0, $bbaa08b3cd72f041$export$9d1611c77c2fe928)(DOMProps, renderProps2, groupProps),
+    ref,
+    slot: props.slot || void 0,
+    "data-orientation": props.orientation || "horizontal",
+    "data-disabled": props.isDisabled || void 0
+  }, /* @__PURE__ */ (0, import_react47.default).createElement($bc25b811ec97a172$export$a8a71863db173133.Provider, {
+    value: state
+  }, /* @__PURE__ */ (0, import_react47.default).createElement((0, $792f28e438b9ad5f$export$758399f318e6385a), null, renderProps2.children)));
+});
+
+// node_modules/react-aria-components/dist/private/ToggleButton.mjs
+var import_react48 = __toESM(require_react(), 1);
+var $75afe627ae0cc0fa$export$43506d75ebd2e218 = /* @__PURE__ */ (0, import_react48.createContext)({});
+var $75afe627ae0cc0fa$export$d2b052e7b4be1756 = /* @__PURE__ */ (0, import_react48.forwardRef)(function ToggleButton(props, ref) {
+  [props, ref] = (0, $7230ffa83bc0c2cf$export$29f1550f4b0d4415)(props, ref, $75afe627ae0cc0fa$export$43506d75ebd2e218);
+  let groupState = (0, import_react48.useContext)((0, $bc25b811ec97a172$export$a8a71863db173133));
+  let state = (0, $fd3c5e01e837dc20$export$8042c6c013fd5226)(groupState && props.id != null ? {
+    isSelected: groupState.selectedKeys.has(props.id),
+    onChange(isSelected2) {
+      groupState.setSelected(props.id, isSelected2);
+    }
+  } : props);
+  let { buttonProps, isPressed, isSelected, isDisabled } = groupState && props.id != null ? (0, $162557ba4d6f08dd$export$bc53712daae3d6e6)({
+    ...props,
+    id: props.id
+  }, groupState, ref) : (0, $b54a524c670b905d$export$51e84d46ca0bc451)({
+    ...props,
+    id: props.id != null ? String(props.id) : void 0
+  }, state, ref);
+  let { focusProps, isFocused, isFocusVisible } = (0, $0c4a58759813079a$export$4e328f61c538687f)(props);
+  let { hoverProps, isHovered } = (0, $e969f22b6713ca4a$export$ae780daf29e6d456)({
+    ...props,
+    isDisabled
+  });
+  let renderProps2 = (0, $7230ffa83bc0c2cf$export$4d86445c2cf5e3)({
+    ...props,
+    id: void 0,
+    values: {
+      isHovered,
+      isPressed,
+      isFocused,
+      isSelected: state.isSelected,
+      isFocusVisible,
+      isDisabled,
+      state
+    },
+    defaultClassName: "react-aria-ToggleButton"
+  });
+  let DOMProps = (0, $8e9d2fae0ecb9001$export$457c3d6518dd4c6f)(props, {
+    global: true
+  });
+  delete DOMProps.id;
+  delete DOMProps.onClick;
+  return /* @__PURE__ */ (0, import_react48.default).createElement((0, $7230ffa83bc0c2cf$export$df3a06d6289f983e).button, {
+    ...(0, $bbaa08b3cd72f041$export$9d1611c77c2fe928)(DOMProps, renderProps2, buttonProps, focusProps, hoverProps),
+    ref,
+    slot: props.slot || void 0,
+    "data-focused": isFocused || void 0,
+    "data-disabled": isDisabled || void 0,
+    "data-pressed": isPressed || void 0,
+    "data-selected": isSelected || void 0,
+    "data-hovered": isHovered || void 0,
+    "data-focus-visible": isFocusVisible || void 0
+  }, /* @__PURE__ */ (0, import_react48.default).createElement((0, $91fe5e721c7f36c1$export$c9549807523555e0).Provider, {
+    value: {
+      isSelected
+    }
+  }, renderProps2.children));
+});
+
+// src/react/components/base/buttons/close-button.tsx
+var import_jsx_runtime6 = __toESM(require_jsx_runtime(), 1);
+var GLYPH_SIZE = {
+  "2xs": 6.8,
+  xs: 10.8,
+  sm: 12.6,
+  md: 16.2
+};
+var STROKE_WIDTH = {
+  "2xs": 1.6,
+  xs: 2,
+  sm: 2,
+  md: 2.5
+};
+var GLYPH_INSET = {
+  // Figma's 8px bars rotate inside a 6.8px square, leaving ~0.57px at
+  // each corner once projected onto the diagonal.
+  "2xs": 0.57,
+  xs: 2,
+  sm: 2,
+  md: 2
+};
+var styles6 = sortCx({
+  base: [
+    "inline-flex shrink-0 items-center justify-center rounded-full",
+    "bg-background-tertiary-default text-foreground-icon-secondary",
+    "select-none cursor-pointer",
+    "transition-colors duration-150 ease",
+    "hover:text-text-primary",
+    "outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-border-focus-ring"
+  ].join(" "),
+  container: {
+    "2xs": "size-4",
+    xs: "size-5",
+    sm: "size-6",
+    md: "size-8"
+  }
+});
+function CloseButton({
+  size = "xs",
+  className,
+  type = "button",
+  ref,
+  ...props
+}) {
+  const glyph = GLYPH_SIZE[size];
+  const strokeWidth = STROKE_WIDTH[size];
+  const inset = GLYPH_INSET[size];
+  return /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
+    "button",
+    {
+      ref,
+      type,
+      className: cx(styles6.base, styles6.container[size], className),
+      ...props,
+      children: /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("svg", { width: glyph, height: glyph, viewBox: `0 0 ${glyph} ${glyph}`, fill: "none", "aria-hidden": true, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
+          "path",
+          {
+            d: `M${inset} ${inset}L${glyph - inset} ${glyph - inset}`,
+            stroke: "currentColor",
+            strokeWidth,
+            strokeLinecap: "round"
+          }
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
+          "path",
+          {
+            d: `M${glyph - inset} ${inset}L${inset} ${glyph - inset}`,
+            stroke: "currentColor",
+            strokeWidth,
+            strokeLinecap: "round"
+          }
+        )
+      ] })
+    }
+  );
+}
+
+// src/react/components/base/input/hint-text.tsx
+var import_jsx_runtime7 = __toESM(require_jsx_runtime(), 1);
+function hintTextClassName(isInvalid, className) {
+  return cx(
+    "pt-px text-caption-1-medium text-text-secondary",
+    isInvalid && "text-text-error-primary",
+    className
+  );
+}
+function HintText({
+  isInvalid = false,
+  className,
+  ...props
+}) {
+  return /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
+    $efe09c6d1c304b50$export$5f1af8db9871e1d6,
+    {
+      slot: isInvalid ? "errorMessage" : "description",
+      ...props,
+      className: hintTextClassName(isInvalid, className)
+    }
+  );
+}
+
+// src/react/components/base/input/input.tsx
+var import_react50 = __toESM(require_react(), 1);
+
+// src/react/components/base/input/label.tsx
+var import_jsx_runtime8 = __toESM(require_jsx_runtime(), 1);
+function Label2({
+  isRequired = false,
+  isInvalid: _isInvalid,
+  tooltip,
+  className,
+  children,
+  ...props
+}) {
+  return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(
+    $43a3b93638fe5db9$export$b04be29aa201d4f5,
+    {
+      "data-label": "true",
+      ...props,
+      className: cx(
+        "flex cursor-default items-center gap-0.5",
+        "text-body-medium text-text-primary",
+        className
+      ),
+      children: [
+        children,
+        isRequired && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+          "span",
+          {
+            "aria-hidden": "true",
+            className: "text-body-medium text-text-error-primary",
+            children: "*"
+          }
+        ),
+        tooltip && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+          ya,
+          {
+            className: "size-4 shrink-0 text-foreground-icon-quaternary",
+            "aria-hidden": true
+          }
+        )
+      ]
+    }
+  );
+}
+
+// src/react/components/base/input/input.tsx
+var import_jsx_runtime9 = __toESM(require_jsx_runtime(), 1);
+var TextFieldContext = (0, import_react50.createContext)({});
+function TextField2({
+  size = "medium",
+  fieldClassName,
+  inputClassName,
+  className,
+  children,
+  ...props
+}) {
+  return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(TextFieldContext.Provider, { value: { size, fieldClassName, inputClassName }, children: /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
+    $b8dcdc58eeae0d40$export$2c73285ae9390cec,
+    {
+      ...props,
+      "data-input-size": size,
+      className: cx(
+        "group flex h-max w-full flex-col items-start gap-1",
+        className
+      ),
+      children
+    }
+  ) });
+}
+TextField2.displayName = "TextField";
+var inputStyles = sortCx({
+  field: [
+    "relative flex w-full items-center",
+    "rounded-2lg",
+    "bg-background-tertiary-default text-foreground-icon-tertiary",
+    "ring-2 ring-inset ring-transparent",
+    "transition-[background-color,box-shadow,color] duration-[var(--input-transition-ms)] ease"
+  ].join(" "),
+  fieldSize: {
+    medium: "p-2",
+    // 8px all sides → h auto = 36
+    small: "h-8 px-1.5 py-2"
+    // 32 / 6 / 8
+  },
+  // When a leadingAddon is present (Phone basic): tighten left padding.
+  fieldWithAddonSize: {
+    medium: "h-9 ps-1 pe-2 py-2",
+    // 36 / 4 / 8 / 8
+    small: "h-8 ps-1 pe-1.5 py-2"
+  },
+  content: "flex w-full items-center gap-2 min-w-0",
+  leftSection: "flex flex-1 items-center gap-0.5 min-w-0",
+  input: [
+    "min-w-0 flex-1 bg-transparent border-0 outline-none p-0 m-0",
+    "font-sans text-body-regular text-text-primary",
+    "placeholder:text-text-tertiary",
+    "focus:placeholder:text-text-primary",
+    "disabled:text-input-disabled-text disabled:placeholder:text-input-disabled-text",
+    "disabled:cursor-not-allowed",
+    "aria-invalid:placeholder:text-text-error-placeholder"
+  ].join(" "),
+  icon: "size-5 shrink-0"
+});
+var inputElementClassName = inputStyles.input;
+function inputFieldClassName({ isFocusWithin, isHovered, isDisabled, isInvalid }, size = "medium", hasAddon = false) {
+  return cx(
+    inputStyles.field,
+    hasAddon ? inputStyles.fieldWithAddonSize[size] : inputStyles.fieldSize[size],
+    // Hover: idle, no focus, no disabled, no invalid
+    isHovered && !isFocusWithin && !isDisabled && !isInvalid && "ring-border-button-hover",
+    // Focus wins over hover
+    isFocusWithin && !isDisabled && !isInvalid && "ring-border-button-active",
+    // Disabled
+    isDisabled && "bg-input-disabled-background text-input-disabled-foreground",
+    // Invalid
+    isInvalid && "bg-background-tertiary-error text-foreground-icon-error"
+  );
+}
+function InputBase({
+  size: sizeProp,
+  leadingIcon: Leading,
+  trailingIcon: Trailing,
+  leadingAddon,
+  trailingAddon,
+  fieldClassName,
+  className,
+  ref,
+  groupRef,
+  ...inputProps
+}) {
+  const { direction } = $2eb8e6d23f3d0cb0$export$43bb16f9c6d9e3f7();
+  const ctx = (0, import_react50.useContext)(TextFieldContext);
+  const size = sizeProp ?? ctx.size ?? "medium";
+  const hasAddon = leadingAddon !== void 0 && leadingAddon !== null;
+  return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
+    $3a442827418ebe87$export$eb2fcfdbd7ba97d4,
+    {
+      ref: groupRef,
+      className: (state) => cx(inputFieldClassName(state, size, hasAddon), ctx.fieldClassName, fieldClassName),
+      children: /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: inputStyles.content, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: inputStyles.leftSection, children: [
+          hasAddon ? leadingAddon : Leading ? /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(Leading, { className: inputStyles.icon, "aria-hidden": true }) : null,
+          /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
+            $41fb335299a4a39e$export$f5b8910cec6cf069,
+            {
+              ref,
+              ...inputProps,
+              className: cx(inputStyles.input, direction === "rtl" ? "pr-1 text-right" : "pl-1 text-left", ctx.inputClassName, className)
+            }
+          )
+        ] }),
+        trailingAddon ?? (Trailing ? /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(Trailing, { className: inputStyles.icon, "aria-hidden": true }) : null)
+      ] })
+    }
+  );
+}
+InputBase.displayName = "InputBase";
+function Input2({
+  label,
+  hint,
+  errorMessage,
+  tooltip,
+  placeholder,
+  inputDir,
+  leadingIcon,
+  trailingIcon,
+  leadingAddon,
+  fieldClassName,
+  ref,
+  groupRef,
+  className,
+  ...textFieldProps
+}) {
+  return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
+    TextField2,
+    {
+      ...textFieldProps,
+      className,
+      "aria-label": textFieldProps["aria-label"] ?? (!label && typeof placeholder === "string" ? placeholder : void 0),
+      children: ({ isRequired, isInvalid }) => /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(import_jsx_runtime9.Fragment, { children: [
+        label && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
+          Label2,
+          {
+            isRequired,
+            isInvalid,
+            tooltip,
+            children: label
+          }
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
+          InputBase,
+          {
+            dir: inputDir ?? (["email", "url", "tel"].includes(textFieldProps.type ?? "") ? "ltr" : void 0),
+            ref,
+            groupRef,
+            placeholder,
+            leadingIcon,
+            trailingIcon,
+            leadingAddon,
+            fieldClassName
+          }
+        ),
+        isInvalid && errorMessage != null ? /* @__PURE__ */ (0, import_jsx_runtime9.jsx)($1f3c3b1a70cec653$export$f551688fc98f2e09, { className: hintTextClassName(true), children: errorMessage }) : hint && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(HintText, { isInvalid, children: hint })
+      ] })
+    }
+  );
+}
+Input2.displayName = "Input";
+
+// src/react/components/base/spinner/spinner.tsx
+var import_jsx_runtime10 = __toESM(require_jsx_runtime(), 1);
+var SIZES = {
+  xs: { box: 12, line: 1.5 },
+  sm: { box: 16, line: 2 },
+  md: { box: 20, line: 2 },
+  lg: { box: 24, line: 2.5 },
+  xl: { box: 32, line: 3 }
+};
+function Arc({
+  box,
+  line,
+  width,
+  blur,
+  opacity,
+  arc,
+  lag
+}) {
+  const center = box / 2 - line / 2;
+  const inner = center - width / 2;
+  const outer = center + width / 2;
+  const bleed = Math.max(0, outer + blur * 2 - box / 2);
+  const ring = `radial-gradient(circle, transparent ${inner}px, #000 ${inner + 0.5}px, #000 ${outer - 0.5}px, transparent ${outer}px)`;
+  const style = {
+    inset: -bleed,
+    filter: blur > 0 ? `blur(${blur}px)` : void 0,
+    opacity,
+    rotate: `${-lag}deg`
+  };
+  return /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("span", { "aria-hidden": true, className: "absolute", style, children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+    "span",
+    {
+      className: "absolute inset-0",
+      style: {
+        background: `conic-gradient(transparent ${360 - arc}deg, currentColor 360deg)`,
+        maskImage: ring,
+        WebkitMaskImage: ring
+      }
+    }
+  ) });
+}
+function SpinnerGlyph({ size = "md", track = true, className }) {
+  const { box, line } = SIZES[size];
+  return /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(
+    "span",
+    {
+      "aria-hidden": true,
+      className: cx("relative inline-flex shrink-0 text-accent-500", className),
+      style: { width: box, height: box },
+      children: [
+        track ? /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("span", { className: "absolute inset-0 rounded-full border-current opacity-15", style: { borderWidth: line } }) : null,
+        /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("span", { className: "absolute inset-0 animate-spin [animation-duration:900ms] motion-reduce:[animation-duration:2400ms]", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Arc, { box, line, width: line * 4, blur: line * 1.6, opacity: 0.32, arc: 110, lag: 22 }),
+          /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Arc, { box, line, width: line * 2, blur: line * 0.6, opacity: 0.6, arc: 200, lag: 9 }),
+          /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Arc, { box, line, width: line, blur: 0, opacity: 1, arc: 290, lag: 0 }),
+          /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+            "span",
+            {
+              className: "absolute left-1/2 top-0 rounded-full bg-current",
+              style: { width: line, height: line, translate: "-50% 0" }
+            }
+          )
+        ] })
+      ]
+    }
+  );
+}
+
+// src/react/components/foundations/template-copy/template-copy.tsx
+var import_react51 = __toESM(require_react(), 1);
+var import_jsx_runtime11 = __toESM(require_jsx_runtime(), 1);
+var CopyContext = (0, import_react51.createContext)(null);
+var MenuContext = (0, import_react51.createContext)(null);
+var textProps = /* @__PURE__ */ new Set([
+  "children",
+  "title",
+  "subtitle",
+  "description",
+  "label",
+  "textValue",
+  "placeholder",
+  "alt",
+  "aria-label",
+  "aria-description",
+  "metricLabel",
+  "emptyMessage",
+  "caption",
+  "heading",
+  "text",
+  "content",
+  "renderValue"
+]);
+var dataProps = /* @__PURE__ */ new Set(["items", "options", "tabs", "columns", "series", "ranges", "stats", "data", "nodes", "bar", "line"]);
+var dataText = /* @__PURE__ */ new Set(["label", "title", "description", "subtitle", "header", "role", "joined"]);
+var renderProps = /* @__PURE__ */ new Set(["children", "cell", "header", "formatter", "tickFormatter", "labelFormatter", "renderItem", "node", "link", "tick", "label", "content", "renderValue"]);
+function translateTemplateCopy(value, translate) {
+  function visit(value2, data = false) {
+    if (typeof value2 === "string") return data ? value2 : translate(value2);
+    if (Array.isArray(value2)) {
+      const result = value2.map((item) => visit(item, data));
+      return result.every((item, index) => item === value2[index]) ? value2 : result;
+    }
+    if ((0, import_react51.isValidElement)(value2)) {
+      if (typeof value2.type === "string" && ["pre", "code", "kbd", "script", "style"].includes(value2.type)) return value2;
+      const updates = {};
+      for (const [key, original] of Object.entries(value2.props)) {
+        if (textProps.has(key)) updates[key] = renderProps.has(key) && typeof original === "function" ? (...args) => visit(original(...args)) : visit(original);
+        else if (dataProps.has(key)) updates[key] = visit(original, true);
+        else if (renderProps.has(key) && typeof original === "function") updates[key] = (...args) => visit(original(...args));
+      }
+      return Object.entries(updates).some(([key, result]) => result !== value2.props[key]) ? (0, import_react51.cloneElement)(value2, updates) : value2;
+    }
+    if (data && value2 && typeof value2 === "object" && Object.getPrototypeOf(value2) === Object.prototype) {
+      const result = { ...value2 };
+      for (const [key, original] of Object.entries(result)) {
+        if (renderProps.has(key) && typeof original === "function") result[key] = (...args) => visit(original(...args));
+        else if (dataText.has(key)) result[key] = visit(original);
+        else if (original && typeof original === "object") result[key] = visit(original, true);
+      }
+      return Object.entries(result).some(([key, item]) => item !== value2[key]) ? result : value2;
+    }
+    return value2;
+  }
+  return visit(value);
+}
+function useTemplateCopy() {
+  const settings = (0, import_react51.useContext)(CopyContext);
+  return (0, import_react51.useMemo)(() => (node) => settings?.render ? settings.render(node) : settings ? translateTemplateCopy(node, settings.translate) : node, [settings]);
+}
+
+// src/react/components/base/search-field/search-field.tsx
+var import_jsx_runtime12 = __toESM(require_jsx_runtime(), 1);
+function SearchField2({
+  label,
+  hint,
+  placeholder,
+  size = "medium",
+  shape = "pill",
+  isLoading = false,
+  icon: Icon = pv,
+  clearLabel = "Clear search",
+  value: controlledValue,
+  defaultValue = "",
+  onChange,
+  onClear,
+  "aria-label": ariaLabel,
+  className,
+  fieldClassName,
+  ...props
+}) {
+  const localize = useTemplateCopy();
+  const inputRef = (0, import_react52.useRef)(null);
+  const [uncontrolledValue, setUncontrolledValue] = (0, import_react52.useState)(defaultValue);
+  const value = controlledValue ?? uncontrolledValue;
+  const change = (next) => {
+    setUncontrolledValue(next);
+    onChange?.(next);
+  };
+  const clear = () => {
+    change("");
+    onClear?.();
+    inputRef.current?.focus();
+  };
+  return /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
+    $29a5029ff43c9612$export$b94867ecbd698f21,
+    {
+      ...props,
+      value,
+      onChange: change,
+      onClear,
+      "aria-label": ariaLabel ?? (!label ? placeholder : void 0),
+      className: cx("group flex w-full flex-col items-start gap-1", className),
+      children: ({ isEmpty, isDisabled, isInvalid }) => /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)(import_jsx_runtime12.Fragment, { children: [
+        label ? /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(Label2, { isRequired: props.isRequired, isInvalid, children: label }) : null,
+        /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
+          InputBase,
+          {
+            ref: inputRef,
+            size,
+            placeholder,
+            fieldClassName: cx(shape === "pill" && "rounded-full", fieldClassName),
+            className: "[&::-webkit-search-cancel-button]:hidden",
+            leadingAddon: (
+              // The icon and the light share one 20px box and cross-fade.
+              /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)("span", { "aria-hidden": true, className: "relative ms-1 size-5 shrink-0", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
+                  Icon,
+                  {
+                    className: cx(
+                      "absolute inset-0 size-5 transition-[opacity,scale] duration-200 ease-out",
+                      isLoading && "scale-75 opacity-0"
+                    )
+                  }
+                ),
+                /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
+                  "span",
+                  {
+                    className: cx(
+                      "absolute inset-0 flex items-center justify-center transition-[opacity,scale] duration-200 ease-out",
+                      // Hidden, the light stays mounted for the fade but stops turning.
+                      !isLoading && "scale-75 opacity-0 [&_*]:[animation-play-state:paused]"
+                    ),
+                    children: /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(SpinnerGlyph, { size: "sm" })
+                  }
+                )
+              ] })
+            ),
+            trailingAddon: /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
+              CloseButton,
+              {
+                size: "2xs",
+                "aria-label": localize(clearLabel),
+                "aria-hidden": isEmpty || void 0,
+                tabIndex: -1,
+                disabled: isDisabled,
+                onMouseDown: (event) => event.preventDefault(),
+                onClick: clear,
+                className: cx(
+                  "me-0.5 bg-background-tertiary-hover transition-[opacity,scale,color] duration-150 ease-out",
+                  isEmpty || isDisabled ? "pointer-events-none scale-50 opacity-0" : "scale-100 opacity-100"
+                )
+              }
+            )
+          }
+        ),
+        hint ? /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(HintText, { isInvalid, children: hint }) : null
+      ] })
+    }
+  );
+}
+
+// src/react/components/foundations/direction/direction.tsx
+var import_jsx_runtime13 = __toESM(require_jsx_runtime(), 1);
+function DirectionProvider({ locale, ...props }) {
+  return /* @__PURE__ */ (0, import_jsx_runtime13.jsx)($2eb8e6d23f3d0cb0$export$a54013f0d02a8f82, { locale, children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(DirectionBoundary, { ...props }) });
+}
+function DirectionBoundary({ children, className, ...props }) {
+  const { locale, direction } = $2eb8e6d23f3d0cb0$export$43bb16f9c6d9e3f7();
+  return /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("div", { ...props, lang: locale, dir: direction, className: cx("contents", className), children });
+}
+function useDirection() {
+  return $2eb8e6d23f3d0cb0$export$43bb16f9c6d9e3f7().direction;
+}
+
+// src/react/components/base/segmented-control/segmented-control.tsx
+var import_react54 = __toESM(require_react(), 1);
+var import_jsx_runtime14 = __toESM(require_jsx_runtime(), 1);
+var useIsomorphicLayoutEffect = typeof window !== "undefined" ? import_react54.useLayoutEffect : import_react54.useEffect;
+function SegmentedControl({ className, children, variant = "solid", ref, ...props }) {
+  const direction = useDirection();
+  const innerRef = (0, import_react54.useRef)(null);
+  const [thumb, setThumb] = (0, import_react54.useState)(null);
+  useIsomorphicLayoutEffect(() => {
+    const el = innerRef.current;
+    if (!el) return;
+    const measure = () => {
+      const selected = el.querySelector("[data-selected]");
+      if (selected) {
+        setThumb({
+          left: selected.offsetLeft,
+          top: selected.offsetTop,
+          width: selected.offsetWidth,
+          height: selected.offsetHeight
+        });
+      }
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    const observeItems = () => el.querySelectorAll("button").forEach((item) => ro.observe(item));
+    observeItems();
+    const mo = new MutationObserver(() => {
+      observeItems();
+      measure();
+    });
+    mo.observe(el, { attributes: true, childList: true, characterData: true, subtree: true, attributeFilter: ["data-selected"] });
+    return () => {
+      mo.disconnect();
+      ro.disconnect();
+    };
+  }, [direction]);
+  const setRefs = (node) => {
+    innerRef.current = node;
+    if (typeof ref === "function") ref(node);
+    else if (ref) ref.current = node;
+  };
+  return /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)(
+    $bc25b811ec97a172$export$40258cc1d95ff477,
+    {
+      ref: setRefs,
+      selectionMode: "single",
+      disallowEmptySelection: true,
+      ...props,
+      className: (state) => cx(
+        "relative inline-flex items-start gap-0.5 rounded-2lg",
+        variant === "solid" && "bg-segmented-control-background p-1",
+        typeof className === "function" ? className(state) : className
+      ),
+      children: [
+        variant === "solid" && thumb && /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+          "span",
+          {
+            "aria-hidden": true,
+            className: "pointer-events-none absolute left-0 top-0 rounded-md bg-segmented-control-selected-background shadow-2xs transition-[transform,width,height] duration-200 ease",
+            style: {
+              transform: `translate(${thumb.left}px, ${thumb.top}px)`,
+              width: thumb.width,
+              height: thumb.height
+            }
+          }
+        ),
+        children
+      ]
+    }
+  );
+}
+function SegmentedControlItem({
+  className,
+  children,
+  ref,
+  ...props
+}) {
+  return /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+    $75afe627ae0cc0fa$export$d2b052e7b4be1756,
+    {
+      ref,
+      ...props,
+      className: (state) => cx(
+        "relative z-10 inline-flex cursor-pointer items-center justify-center rounded-md px-2.5 py-1 text-center whitespace-nowrap",
+        "transition-colors duration-200 ease",
+        "outline-none focus-visible:ring-2 focus-visible:ring-border-focus-ring",
+        state.isSelected ? "text-body-medium text-text-primary" : "text-body-regular text-text-secondary hover:text-text-primary",
+        state.isDisabled && "cursor-not-allowed opacity-50",
+        typeof className === "function" ? className(state) : className
+      ),
+      children
+    }
+  );
+}
+
+// src/react/components/base/skeleton/skeleton.tsx
+var import_jsx_runtime15 = __toESM(require_jsx_runtime(), 1);
+var styles7 = sortCx({
+  block: "bui-skeleton block bg-text-primary/8",
+  shape: {
+    rect: "rounded-xl",
+    text: "rounded-md",
+    circle: "rounded-full"
+  }
+});
+var FADE = "transition-[opacity,filter] duration-300 ease-out motion-reduce:transition-none";
+function Skeleton({ shape = "rect", isLoaded = false, className, style, children }) {
+  if (children === void 0) {
+    return /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("span", { "aria-hidden": true, className: cx(styles7.block, "relative", styles7.shape[shape], className), style });
+  }
+  return /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("span", { className: cx("relative block", className), style, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
+      "span",
+      {
+        "aria-hidden": !isLoaded || void 0,
+        inert: !isLoaded,
+        className: cx("block", FADE, isLoaded ? "opacity-100 blur-[0px]" : "opacity-0 motion-safe:blur-[4px]"),
+        children
+      }
+    ),
+    /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
+      "span",
+      {
+        "aria-hidden": true,
+        className: cx(styles7.block, styles7.shape[shape], "pointer-events-none absolute inset-0", FADE, isLoaded && "opacity-0")
+      }
+    )
+  ] });
+}
+
 // src/react/VideoJs10Player.tsx
-var import_react135 = __toESM(require_react(), 1);
+var import_react189 = __toESM(require_react(), 1);
 
 // node_modules/@videojs/react/dist/default/utils/use-composed-refs.js
-var import_react = __toESM(require_react(), 1);
+var import_react55 = __toESM(require_react(), 1);
 init_predicate2();
 function setRef(ref, value) {
   if (isFunction(ref)) return ref(value);
@@ -15261,7 +24128,7 @@ function composeRefs(...refs) {
   };
 }
 function useComposedRefs(...refs) {
-  return (0, import_react.useCallback)(composeRefs(...refs), [...refs]);
+  return (0, import_react55.useCallback)(composeRefs(...refs), [...refs]);
 }
 
 // node_modules/@videojs/store/dist/default/core/shallow-equal.js
@@ -15269,11 +24136,11 @@ init_object();
 
 // node_modules/@videojs/store/dist/default/react/hooks/use-selector.js
 var import_react_compiler_runtime = __toESM(require_dist(), 1);
-var import_react2 = __toESM(require_react(), 1);
+var import_react56 = __toESM(require_react(), 1);
 function useSelector(subscribe, getSnapshot, selector, t0) {
   const $ = (0, import_react_compiler_runtime.c)(4);
   const isEqual = t0 === void 0 ? shallowEqual : t0;
-  const cache = (0, import_react2.useRef)(void 0);
+  const cache = (0, import_react56.useRef)(void 0);
   let t1;
   if ($[0] !== getSnapshot || $[1] !== isEqual || $[2] !== selector) {
     t1 = () => {
@@ -15288,7 +24155,7 @@ function useSelector(subscribe, getSnapshot, selector, t0) {
     $[3] = t1;
   } else t1 = $[3];
   const getSelectedSnapshot = t1;
-  return (0, import_react2.useSyncExternalStore)(subscribe, getSelectedSnapshot, getSelectedSnapshot);
+  return (0, import_react56.useSyncExternalStore)(subscribe, getSelectedSnapshot, getSelectedSnapshot);
 }
 
 // node_modules/@videojs/utils/dist/function/noop.js
@@ -15372,9 +24239,9 @@ function useStore(store, selector, isEqual) {
 
 // node_modules/@videojs/react/dist/default/player/context.js
 var import_react_compiler_runtime3 = __toESM(require_dist(), 1);
-var import_react4 = __toESM(require_react(), 1);
-var import_jsx_runtime = __toESM(require_jsx_runtime(), 1);
-var PlayerContext = (0, import_react4.createContext)(null);
+var import_react58 = __toESM(require_react(), 1);
+var import_jsx_runtime16 = __toESM(require_jsx_runtime(), 1);
+var PlayerContext = (0, import_react58.createContext)(null);
 var EMPTY_UNSUBSCRIBE = () => {
 };
 var EMPTY_STORE = {
@@ -15386,7 +24253,7 @@ function PlayerContextProvider(t0) {
   const { value, children } = t0;
   let t1;
   if ($[0] !== children || $[1] !== value) {
-    t1 = /* @__PURE__ */ (0, import_jsx_runtime.jsx)(PlayerContext.Provider, {
+    t1 = /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(PlayerContext.Provider, {
       value,
       children
     });
@@ -15397,7 +24264,7 @@ function PlayerContextProvider(t0) {
   return t1;
 }
 function usePlayerContext() {
-  const ctx = (0, import_react4.useContext)(PlayerContext);
+  const ctx = (0, import_react58.useContext)(PlayerContext);
   if (!ctx) throw new Error("usePlayerContext must be used within a Player");
   return ctx;
 }
@@ -15406,7 +24273,7 @@ function usePlayer(selector) {
   return useStore(store, selector);
 }
 function useOptionalPlayer(selector) {
-  const ctx = (0, import_react4.useContext)(PlayerContext);
+  const ctx = (0, import_react58.useContext)(PlayerContext);
   const store = ctx?.store ?? EMPTY_STORE;
   const value = useStore(store, ctx ? selector : void 0);
   return ctx ? value : void 0;
@@ -15420,28 +24287,28 @@ function useContainer() {
   return container;
 }
 function useOptionalContainer() {
-  return (0, import_react4.useContext)(PlayerContext)?.container ?? null;
+  return (0, import_react58.useContext)(PlayerContext)?.container ?? null;
 }
 function useMediaAttach() {
-  return (0, import_react4.useContext)(PlayerContext)?.setMedia;
+  return (0, import_react58.useContext)(PlayerContext)?.setMedia;
 }
 function useContainerAttach() {
-  return (0, import_react4.useContext)(PlayerContext)?.setContainer;
+  return (0, import_react58.useContext)(PlayerContext)?.setContainer;
 }
 
 // node_modules/@videojs/react/dist/default/media/fallback.js
-var import_jsx_runtime2 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime17 = __toESM(require_jsx_runtime(), 1);
 var MEDIA_HELP_URL = "https://videojs.org/help";
-var videoFallback = /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("a", {
+var videoFallback = /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("a", {
   href: MEDIA_HELP_URL,
   children: "Video player not working?"
 });
 
 // node_modules/@videojs/react/dist/default/media/video.js
 var import_react_compiler_runtime4 = __toESM(require_dist(), 1);
-var import_react5 = __toESM(require_react(), 1);
-var import_jsx_runtime3 = __toESM(require_jsx_runtime(), 1);
-var Video = (0, import_react5.forwardRef)(function Video2(t0, ref) {
+var import_react59 = __toESM(require_react(), 1);
+var import_jsx_runtime18 = __toESM(require_jsx_runtime(), 1);
+var Video = (0, import_react59.forwardRef)(function Video2(t0, ref) {
   const $ = (0, import_react_compiler_runtime4.c)(10);
   let children;
   let mediaRef;
@@ -15465,7 +24332,7 @@ var Video = (0, import_react5.forwardRef)(function Video2(t0, ref) {
   const composedRef = useComposedRefs(ref, mediaRef, setMedia);
   let t2;
   if ($[5] !== children || $[6] !== composedRef || $[7] !== fallback || $[8] !== props) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("video", {
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)("video", {
       ref: composedRef,
       ...props,
       children: [children, fallback]
@@ -15624,13 +24491,13 @@ function createTranslator(translations, locale) {
 
 // node_modules/@videojs/react/dist/default/i18n/context.js
 var import_react_compiler_runtime5 = __toESM(require_dist(), 1);
-var import_react6 = __toESM(require_react(), 1);
-var I18nContext = (0, import_react6.createContext)(null);
-var LocaleRootContext = (0, import_react6.createContext)(void 0);
+var import_react60 = __toESM(require_react(), 1);
+var I18nContext = (0, import_react60.createContext)(null);
+var LocaleRootContext = (0, import_react60.createContext)(void 0);
 function useTranslator() {
   const $ = (0, import_react_compiler_runtime5.c)(3);
-  const ctx = (0, import_react6.useContext)(I18nContext);
-  const [registryEpoch, invalidateRegistry] = (0, import_react6.useReducer)(_temp, 0);
+  const ctx = (0, import_react60.useContext)(I18nContext);
+  const [registryEpoch, invalidateRegistry] = (0, import_react60.useReducer)(_temp, 0);
   let t0;
   let t1;
   if ($[0] === Symbol.for("react.memo_cache_sentinel")) {
@@ -15642,7 +24509,7 @@ function useTranslator() {
     t0 = $[0];
     t1 = $[1];
   }
-  (0, import_react6.useEffect)(t0, t1);
+  (0, import_react60.useEffect)(t0, t1);
   let t2;
   if ($[2] === Symbol.for("react.memo_cache_sentinel")) {
     t2 = createTranslator(getI18nTranslations(DEFAULT_LOCALE), DEFAULT_LOCALE);
@@ -15656,20 +24523,20 @@ function _temp(epoch) {
   return epoch + 1;
 }
 function useLocale() {
-  return (0, import_react6.useContext)(I18nContext)?.locale ?? DEFAULT_LOCALE;
+  return (0, import_react60.useContext)(I18nContext)?.locale ?? DEFAULT_LOCALE;
 }
 
 // node_modules/@videojs/react/dist/default/player/popup-group-context.js
 var import_react_compiler_runtime6 = __toESM(require_dist(), 1);
-var import_react7 = __toESM(require_react(), 1);
-var import_jsx_runtime4 = __toESM(require_jsx_runtime(), 1);
-var PopupGroupContext = (0, import_react7.createContext)(void 0);
+var import_react61 = __toESM(require_react(), 1);
+var import_jsx_runtime19 = __toESM(require_jsx_runtime(), 1);
+var PopupGroupContext = (0, import_react61.createContext)(void 0);
 function PopupGroupProvider(t0) {
   const $ = (0, import_react_compiler_runtime6.c)(3);
   const { value, children } = t0;
   let t1;
   if ($[0] !== children || $[1] !== value) {
-    t1 = /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(PopupGroupContext.Provider, {
+    t1 = /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(PopupGroupContext.Provider, {
       value,
       children
     });
@@ -15680,7 +24547,7 @@ function PopupGroupProvider(t0) {
   return t1;
 }
 function useOptionalPopupGroup() {
-  return (0, import_react7.useContext)(PopupGroupContext);
+  return (0, import_react61.useContext)(PopupGroupContext);
 }
 
 // node_modules/@videojs/core/dist/default/core/feature.js
@@ -16014,7 +24881,7 @@ function getDurationFormatter(locale, style = "long", hoursDisplay) {
   return formatter;
 }
 function isValidTime(value) {
-  return isNumber(value) && Number.isFinite(value);
+  return isNumber2(value) && Number.isFinite(value);
 }
 function formatTime(seconds, guide, options) {
   if (!isValidTime(seconds)) return "0:00";
@@ -17243,8 +26110,8 @@ function getAnchorNames(element) {
   if (!value || value === "none") return [];
   return value.split(",").map((name) => name.trim()).filter(Boolean);
 }
-function applyStyles(element, styles) {
-  for (const [prop, value] of Object.entries(styles)) if (typeof value === "string") element.style.setProperty(normalizeStyleProperty(prop), value);
+function applyStyles(element, styles8) {
+  for (const [prop, value] of Object.entries(styles8)) if (typeof value === "string") element.style.setProperty(normalizeStyleProperty(prop), value);
 }
 function snapshotInlineStyles(element, properties) {
   return [...properties].map((property) => {
@@ -17260,10 +26127,10 @@ function restoreInlineStyles(element, snapshot) {
   for (const { property, value, priority } of snapshot) if (value) element.style.setProperty(property, value, priority);
   else element.style.removeProperty(property);
 }
-function withInlineStyles(element, styles, callback) {
-  const snapshot = snapshotInlineStyles(element, Object.keys(styles));
+function withInlineStyles(element, styles8, callback) {
+  const snapshot = snapshotInlineStyles(element, Object.keys(styles8));
   try {
-    applyStyles(element, styles);
+    applyStyles(element, styles8);
     return callback();
   } finally {
     restoreInlineStyles(element, snapshot);
@@ -17331,9 +26198,9 @@ function isPointInElement(element, point) {
   return rect.width > 0 && rect.height > 0 && point.clientX >= rect.left && point.clientX < rect.right && point.clientY >= rect.top && point.clientY < rect.bottom;
 }
 function measureElement(element, options = {}) {
-  const { styles, ...sizeOptions } = options;
+  const { styles: styles8, ...sizeOptions } = options;
   const measure = () => getElementSize(element, sizeOptions);
-  return styles ? withInlineStyles(element, styles, measure) : measure();
+  return styles8 ? withInlineStyles(element, styles8, measure) : measure();
 }
 function getElementPadding(element) {
   const style = getComputedStyle(element);
@@ -20145,12 +29012,12 @@ function parseMediaFragment(text, baseURL) {
   for (let i = 0; i < keys.length; i++) {
     const key = keys[i];
     const value = values[i];
-    if (key && isNumber(value) && !Number.isNaN(value)) data[key] = value;
+    if (key && isNumber2(value) && !Number.isNaN(value)) data[key] = value;
   }
   const result = { url };
-  if (isNumber(data.w)) result.width = data.w;
-  if (isNumber(data.h)) result.height = data.h;
-  if (isNumber(data.x) && isNumber(data.y)) result.coords = {
+  if (isNumber2(data.w)) result.width = data.w;
+  if (isNumber2(data.h)) result.height = data.h;
+  if (isNumber2(data.x) && isNumber2(data.y)) result.coords = {
     x: data.x,
     y: data.y
   };
@@ -20896,7 +29763,7 @@ function formatFallback(fraction) {
   return `${Math.round(Math.min(1, Math.max(0, fraction)) * 100)}%`;
 }
 function formatPercent(fraction, locale) {
-  const value = !isNumber(fraction) || !Number.isFinite(fraction) ? 0 : Math.min(1, Math.max(0, fraction));
+  const value = !isNumber2(fraction) || !Number.isFinite(fraction) ? 0 : Math.min(1, Math.max(0, fraction));
   try {
     const formatter = getFormatter(locale) ?? getFormatter(void 0);
     if (formatter) return formatter.format(value);
@@ -25306,8 +34173,8 @@ function toDataAttrName(key) {
 
 // node_modules/@videojs/react/dist/default/player/container.js
 var import_react_compiler_runtime7 = __toESM(require_dist(), 1);
-var import_react8 = __toESM(require_react(), 1);
-var import_jsx_runtime5 = __toESM(require_jsx_runtime(), 1);
+var import_react62 = __toESM(require_react(), 1);
+var import_jsx_runtime20 = __toESM(require_jsx_runtime(), 1);
 
 // node_modules/@videojs/core/dist/default/i18n/text/container.js
 var labelText2 = {
@@ -25316,7 +34183,7 @@ var labelText2 = {
 };
 
 // node_modules/@videojs/react/dist/default/player/container.js
-var Container = (0, import_react8.forwardRef)(function Container2(t0, ref) {
+var Container = (0, import_react62.forwardRef)(function Container2(t0, ref) {
   const $ = (0, import_react_compiler_runtime7.c)(40);
   let ariaLabel;
   let ariaLabelledBy;
@@ -25351,11 +34218,11 @@ var Container = (0, import_react8.forwardRef)(function Container2(t0, ref) {
   const role = t2 === void 0 ? DEFAULT_CONTAINER_ROLE : t2;
   const setContainer = useContainerAttach();
   const translator = useTranslator();
-  const i18n = (0, import_react8.useContext)(I18nContext);
+  const i18n = (0, import_react62.useContext)(I18nContext);
   const controls = usePlayer(selectControls);
-  const [core] = (0, import_react8.useState)(_temp2);
-  const [popupGroup] = (0, import_react8.useState)(_temp22);
-  const internalRef = (0, import_react8.useRef)(null);
+  const [core] = (0, import_react62.useState)(_temp2);
+  const [popupGroup] = (0, import_react62.useState)(_temp22);
+  const internalRef = (0, import_react62.useRef)(null);
   const composedRef = useComposedRefs(ref, internalRef);
   let t3;
   let t4;
@@ -25372,7 +34239,7 @@ var Container = (0, import_react8.forwardRef)(function Container2(t0, ref) {
     t3 = $[10];
     t4 = $[11];
   }
-  (0, import_react8.useEffect)(t3, t4);
+  (0, import_react62.useEffect)(t3, t4);
   let t5;
   if ($[12] !== props) {
     t5 = (event) => {
@@ -25427,7 +34294,7 @@ var Container = (0, import_react8.forwardRef)(function Container2(t0, ref) {
   const stateAttrs = t9;
   let t10;
   if ($[27] !== children || $[28] !== popupGroup) {
-    t10 = /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(PopupGroupProvider, {
+    t10 = /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(PopupGroupProvider, {
       value: popupGroup,
       children
     });
@@ -25437,7 +34304,7 @@ var Container = (0, import_react8.forwardRef)(function Container2(t0, ref) {
   } else t10 = $[29];
   let t11;
   if ($[30] !== accessibleNameProps || $[31] !== composedRef || $[32] !== handlePointerUp || $[33] !== localeProps || $[34] !== props || $[35] !== role || $[36] !== stateAttrs || $[37] !== t10 || $[38] !== tabIndex) {
-    t11 = /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", {
+    t11 = /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("div", {
       ref: composedRef,
       role,
       tabIndex,
@@ -25513,7 +34380,7 @@ function mergeProps(...propSets) {
 }
 
 // node_modules/@videojs/react/dist/default/utils/use-render.js
-var import_react9 = __toESM(require_react(), 1);
+var import_react63 = __toESM(require_react(), 1);
 init_predicate2();
 
 // node_modules/@videojs/utils/dist/style/cn.js
@@ -25538,7 +34405,7 @@ function getElementRef(element) {
   const elementAny = element;
   return elementAny.ref ?? elementAny.props?.ref;
 }
-var REF_AS_PROP = Number.parseInt(import_react9.version, 10) >= 19;
+var REF_AS_PROP = Number.parseInt(import_react63.version, 10) >= 19;
 var REACT_MEMO_TYPE = Symbol.for("react.memo");
 var refForwardingCache = /* @__PURE__ */ new WeakMap();
 function isPlainFunctionComponent(type) {
@@ -25552,7 +34419,7 @@ function isMemoComponent(type) {
 function withForwardedRef(component) {
   const cached = refForwardingCache.get(component);
   if (cached) return cached;
-  const ForwardedComponent = (0, import_react9.forwardRef)((props, ref) => {
+  const ForwardedComponent = (0, import_react63.forwardRef)((props, ref) => {
     return component({
       ...props,
       ref
@@ -25567,7 +34434,7 @@ function ensureRefForwarding(type) {
   if (!isMemoComponent(type) || !isPlainFunctionComponent(type.type)) return type;
   const cached = refForwardingCache.get(type);
   if (cached) return cached;
-  const forwarded = (0, import_react9.memo)(withForwardedRef(type.type), type.compare);
+  const forwarded = (0, import_react63.memo)(withForwardedRef(type.type), type.compare);
   refForwardingCache.set(type, forwarded);
   return forwarded;
 }
@@ -25596,36 +34463,36 @@ function renderElement(element, componentProps, params) {
       ref: mergedRef
     }, state);
   }
-  if ((0, import_react9.isValidElement)(render)) {
+  if ((0, import_react63.isValidElement)(render)) {
     const elementRef = getElementRef(render);
     const mergedRef = mergeRefs(ref, mergedProps.ref, elementRef);
     const elementProps = mergeProps(mergedProps, render.props);
     elementProps.ref = mergedRef;
     const type = ensureRefForwarding(render.type);
-    if (type === render.type) return (0, import_react9.cloneElement)(render, elementProps);
+    if (type === render.type) return (0, import_react63.cloneElement)(render, elementProps);
     if (render.key != null) elementProps.key = render.key;
-    return (0, import_react9.createElement)(type, elementProps);
+    return (0, import_react63.createElement)(type, elementProps);
   }
   mergedProps.ref = mergeRefs(ref, mergedProps.ref);
-  return (0, import_react9.createElement)(element, mergedProps);
+  return (0, import_react63.createElement)(element, mergedProps);
 }
 
 // node_modules/@videojs/react/dist/default/ui/dialog/context.js
-var import_react10 = __toESM(require_react(), 1);
-var DialogContext = (0, import_react10.createContext)(null);
+var import_react64 = __toESM(require_react(), 1);
+var DialogContext = (0, import_react64.createContext)(null);
 var DialogContextProvider = DialogContext.Provider;
 function useDialogContext() {
   return useDialogContextFor("Dialog");
 }
 function useDialogContextFor(componentName) {
-  const ctx = (0, import_react10.useContext)(DialogContext);
+  const ctx = (0, import_react64.useContext)(DialogContext);
   if (!ctx) throw new Error(`${componentName} compound components must be used within a ${componentName}.Root`);
   return ctx;
 }
 
 // node_modules/@videojs/react/dist/default/ui/dialog/backdrop.js
-var import_react11 = __toESM(require_react(), 1);
-var DialogBackdrop = (0, import_react11.forwardRef)(function DialogBackdrop2({ render, className, style, ...elementProps }, forwardedRef) {
+var import_react65 = __toESM(require_react(), 1);
+var DialogBackdrop = (0, import_react65.forwardRef)(function DialogBackdrop2({ render, className, style, ...elementProps }, forwardedRef) {
   const { state, stateAttrMap } = useDialogContext();
   if (!state.open) return null;
   return renderElement("div", {
@@ -25644,10 +34511,10 @@ var DialogBackdrop = (0, import_react11.forwardRef)(function DialogBackdrop2({ r
 });
 
 // node_modules/@videojs/react/dist/default/ui/dialog/popup.js
-var import_react12 = __toESM(require_react(), 1);
-var DialogPopup = (0, import_react12.forwardRef)(function DialogPopup2({ render, className, style, ...elementProps }, forwardedRef) {
+var import_react66 = __toESM(require_react(), 1);
+var DialogPopup = (0, import_react66.forwardRef)(function DialogPopup2({ render, className, style, ...elementProps }, forwardedRef) {
   const { core, dialog, state, stateAttrMap, popupId } = useDialogContext();
-  const popupRef = (0, import_react12.useCallback)((element) => dialog.setPopupElement(element), [dialog]);
+  const popupRef = (0, import_react66.useCallback)((element) => dialog.setPopupElement(element), [dialog]);
   if (!state.open) return null;
   return renderElement("div", {
     render,
@@ -25666,15 +34533,15 @@ var DialogPopup = (0, import_react12.forwardRef)(function DialogPopup2({ render,
 });
 
 // node_modules/@videojs/react/dist/default/ui/error-dialog/close.js
-var import_react13 = __toESM(require_react(), 1);
-var ErrorDialogClose = (0, import_react13.forwardRef)(function ErrorDialogClose2({ render, className, style, disabled, children, ...elementProps }, forwardedRef) {
-  const t = useTranslator();
+var import_react67 = __toESM(require_react(), 1);
+var ErrorDialogClose = (0, import_react67.forwardRef)(function ErrorDialogClose2({ render, className, style, disabled, children, ...elementProps }, forwardedRef) {
+  const t2 = useTranslator();
   const { dialog, state, stateAttrMap } = useDialogContext();
-  const handleClick = (0, import_react13.useCallback)(() => {
+  const handleClick = (0, import_react67.useCallback)(() => {
     if (disabled) return;
     dialog.close();
   }, [dialog, disabled]);
-  const content = children ?? translateText(getErrorDialogDismissText(), t);
+  const content = children ?? translateText(getErrorDialogDismissText(), t2);
   return renderElement("button", {
     render,
     className,
@@ -25693,23 +34560,23 @@ var ErrorDialogClose = (0, import_react13.forwardRef)(function ErrorDialogClose2
 });
 
 // node_modules/@videojs/react/dist/default/ui/error-dialog/context.js
-var import_react14 = __toESM(require_react(), 1);
-var ErrorDialogContext = (0, import_react14.createContext)(null);
+var import_react68 = __toESM(require_react(), 1);
+var ErrorDialogContext = (0, import_react68.createContext)(null);
 var ErrorDialogContextProvider = ErrorDialogContext.Provider;
 function useErrorDialogContext() {
-  const ctx = (0, import_react14.useContext)(ErrorDialogContext);
+  const ctx = (0, import_react68.useContext)(ErrorDialogContext);
   if (!ctx) throw new Error("ErrorDialog compound components must be used within an ErrorDialog.Root");
   return ctx;
 }
 
 // node_modules/@videojs/react/dist/default/ui/error-dialog/description.js
-var import_react15 = __toESM(require_react(), 1);
-var ErrorDialogDescription = (0, import_react15.forwardRef)(function ErrorDialogDescription2({ render, className, style, children, ...elementProps }, forwardedRef) {
-  const t = useTranslator();
+var import_react69 = __toESM(require_react(), 1);
+var ErrorDialogDescription = (0, import_react69.forwardRef)(function ErrorDialogDescription2({ render, className, style, children, ...elementProps }, forwardedRef) {
+  const t2 = useTranslator();
   const { state, stateAttrMap } = useDialogContext();
   const { lastError } = useErrorDialogContext();
   const description = resolveErrorDialogDescription(lastError);
-  const content = children ?? translateText(description, t);
+  const content = children ?? translateText(description, t2);
   return renderElement("p", {
     render,
     className,
@@ -25726,19 +34593,19 @@ var ErrorDialogDescription = (0, import_react15.forwardRef)(function ErrorDialog
 });
 
 // node_modules/@videojs/react/dist/default/utils/use-latest-ref.js
-var import_react16 = __toESM(require_react(), 1);
+var import_react70 = __toESM(require_react(), 1);
 function useLatestRef(value) {
-  const ref = (0, import_react16.useRef)(value);
+  const ref = (0, import_react70.useRef)(value);
   ref.current = value;
   return ref;
 }
 
 // node_modules/@videojs/react/dist/default/utils/use-destroy.js
 var import_react_compiler_runtime8 = __toESM(require_dist(), 1);
-var import_react17 = __toESM(require_react(), 1);
+var import_react71 = __toESM(require_react(), 1);
 function useDestroy(instance, setup, teardown) {
   const $ = (0, import_react_compiler_runtime8.c)(6);
-  const pendingRef = (0, import_react17.useRef)(null);
+  const pendingRef = (0, import_react71.useRef)(null);
   const setupRef = useLatestRef(setup);
   const teardownRef = useLatestRef(teardown);
   let t0;
@@ -25766,16 +34633,16 @@ function useDestroy(instance, setup, teardown) {
     $[4] = instance;
     $[5] = t1;
   } else t1 = $[5];
-  (0, import_react17.useEffect)(t0, t1);
+  (0, import_react71.useEffect)(t0, t1);
 }
 
 // node_modules/@videojs/react/dist/default/utils/use-safe-id.js
 var import_react_compiler_runtime9 = __toESM(require_dist(), 1);
-var import_react18 = __toESM(require_react(), 1);
+var import_react72 = __toESM(require_react(), 1);
 var UNSAFE_CHARS = /[^a-zA-Z0-9_-]/g;
 function useSafeId(prefix14) {
   const $ = (0, import_react_compiler_runtime9.c)(2);
-  const t0 = (0, import_react18.useId)();
+  const t0 = (0, import_react72.useId)();
   let t1;
   if ($[0] !== t0) {
     t1 = t0.replace(UNSAFE_CHARS, "");
@@ -25787,9 +34654,9 @@ function useSafeId(prefix14) {
 }
 
 // node_modules/@videojs/react/dist/default/ui/dialog/use-dialog-root.js
-var import_react20 = __toESM(require_react(), 1);
+var import_react74 = __toESM(require_react(), 1);
 function useDialogRoot({ open: controlledOpen, defaultOpen = DialogCore.defaultProps.defaultOpen, closeOnEscape = DialogCore.defaultProps.closeOnEscape, onOpenChange: onOpenChangeProp, onOpenChangeComplete: onOpenChangeCompleteProp, coreFactory = createDialogCore, stateAttrMap = DialogDataAttrs, idPrefix = "dialog" }) {
-  const [core] = (0, import_react20.useState)(coreFactory);
+  const [core] = (0, import_react74.useState)(coreFactory);
   const interactionRoot = useOptionalContainer();
   core.setProps({
     open: controlledOpen,
@@ -25800,7 +34667,7 @@ function useDialogRoot({ open: controlledOpen, defaultOpen = DialogCore.defaultP
   const onOpenChangeRef = useLatestRef(onOpenChangeProp);
   const onOpenChangeCompleteRef = useLatestRef(onOpenChangeCompleteProp);
   const closeOnEscapeRef = useLatestRef(closeOnEscape);
-  const [dialog] = (0, import_react20.useState)(() => {
+  const [dialog] = (0, import_react74.useState)(() => {
     const instance = createDialog({
       transition: createTransition(),
       onOpenChange: (nextOpen) => onOpenChangeRef.current?.(nextOpen),
@@ -25815,14 +34682,14 @@ function useDialogRoot({ open: controlledOpen, defaultOpen = DialogCore.defaultP
   const descriptionId = useSafeId(`${idPrefix}-desc`);
   core.setTitleId(titleId);
   core.setDescriptionId(descriptionId);
-  (0, import_react20.useEffect)(() => {
+  (0, import_react74.useEffect)(() => {
     if (controlledOpen === void 0) return;
     const { active: inputOpen } = dialog.input.current;
     if (controlledOpen === inputOpen) return;
     if (controlledOpen) dialog.open();
     else dialog.close();
   }, [controlledOpen, dialog]);
-  (0, import_react20.useLayoutEffect)(() => {
+  (0, import_react74.useLayoutEffect)(() => {
     dialog.setInteractionRoot(interactionRoot);
   }, [dialog, interactionRoot]);
   useDestroy(dialog);
@@ -25844,13 +34711,13 @@ function createDialogCore() {
 
 // node_modules/@videojs/react/dist/default/ui/error-dialog/root.js
 var import_react_compiler_runtime10 = __toESM(require_dist(), 1);
-var import_react21 = __toESM(require_react(), 1);
-var import_jsx_runtime6 = __toESM(require_jsx_runtime(), 1);
+var import_react75 = __toESM(require_react(), 1);
+var import_jsx_runtime21 = __toESM(require_jsx_runtime(), 1);
 function ErrorDialogRoot(t0) {
   const $ = (0, import_react_compiler_runtime10.c)(11);
   const { children } = t0;
   const errorState = usePlayer(selectError);
-  const [lastError, setLastError] = (0, import_react21.useState)(errorState?.error ?? null);
+  const [lastError, setLastError] = (0, import_react75.useState)(errorState?.error ?? null);
   if (errorState?.error && errorState.error !== lastError) setLastError(errorState.error);
   const errorStateRef = useLatestRef(errorState);
   const t1 = Boolean(errorState?.error);
@@ -25879,7 +34746,7 @@ function ErrorDialogRoot(t0) {
   } else t3 = $[4];
   let t4;
   if ($[5] !== children || $[6] !== dialogContext) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(DialogContextProvider, {
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(DialogContextProvider, {
       value: dialogContext,
       children
     });
@@ -25889,7 +34756,7 @@ function ErrorDialogRoot(t0) {
   } else t4 = $[7];
   let t5;
   if ($[8] !== t3 || $[9] !== t4) {
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(ErrorDialogContextProvider, {
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(ErrorDialogContextProvider, {
       value: t3,
       children: t4
     });
@@ -25904,11 +34771,11 @@ function createErrorDialogCore() {
 }
 
 // node_modules/@videojs/react/dist/default/ui/error-dialog/title.js
-var import_react22 = __toESM(require_react(), 1);
-var ErrorDialogTitle = (0, import_react22.forwardRef)(function ErrorDialogTitle2({ render, className, style, children, ...elementProps }, forwardedRef) {
-  const t = useTranslator();
+var import_react76 = __toESM(require_react(), 1);
+var ErrorDialogTitle = (0, import_react76.forwardRef)(function ErrorDialogTitle2({ render, className, style, children, ...elementProps }, forwardedRef) {
+  const t2 = useTranslator();
   const { state, stateAttrMap } = useDialogContext();
-  const content = children ?? translateText(getErrorDialogTitleText(), t);
+  const content = children ?? translateText(getErrorDialogTitleText(), t2);
   return renderElement("h2", {
     render,
     className,
@@ -25925,13 +34792,13 @@ var ErrorDialogTitle = (0, import_react22.forwardRef)(function ErrorDialogTitle2
 });
 
 // node_modules/@videojs/react/dist/default/ui/status-announcer/component.js
-var import_react23 = __toESM(require_react(), 1);
-var import_jsx_runtime7 = __toESM(require_jsx_runtime(), 1);
-var StatusAnnouncer = (0, import_react23.forwardRef)(function StatusAnnouncer2(componentProps, forwardedRef) {
+var import_react77 = __toESM(require_react(), 1);
+var import_jsx_runtime22 = __toESM(require_jsx_runtime(), 1);
+var StatusAnnouncer = (0, import_react77.forwardRef)(function StatusAnnouncer2(componentProps, forwardedRef) {
   const { render, className, style, closeDelay, labels, ...elementProps } = componentProps;
   const translator = useTranslator();
   const locale = useLocale();
-  const [core] = (0, import_react23.useState)(() => new StatusAnnouncerCore());
+  const [core] = (0, import_react77.useState)(() => new StatusAnnouncerCore());
   const store = usePlayer();
   const container = useContainer();
   useDestroy(core);
@@ -25943,8 +34810,8 @@ var StatusAnnouncer = (0, import_react23.forwardRef)(function StatusAnnouncer2(c
     },
     shouldAnnounce: () => shouldAnnounceStatusChange(container)
   });
-  (0, import_react23.useEffect)(() => subscribeToStatusAnnouncer(store, core), [core, store]);
-  const state = (0, import_react23.useSyncExternalStore)((callback) => core.state.subscribe(callback), () => core.state.current, () => core.state.current);
+  (0, import_react77.useEffect)(() => subscribeToStatusAnnouncer(store, core), [core, store]);
+  const state = (0, import_react77.useSyncExternalStore)((callback) => core.state.subscribe(callback), () => core.state.current, () => core.state.current);
   return renderElement("div", {
     render,
     className,
@@ -25954,7 +34821,7 @@ var StatusAnnouncer = (0, import_react23.forwardRef)(function StatusAnnouncer2(c
     ref: forwardedRef,
     props: [elementProps, {
       role: "status",
-      children: /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", {
+      children: /* @__PURE__ */ (0, import_jsx_runtime22.jsx)("span", {
         "data-status-announcer-content": "",
         children: state.label ?? ""
       }, state.generation)
@@ -25964,19 +34831,19 @@ var StatusAnnouncer = (0, import_react23.forwardRef)(function StatusAnnouncer2(c
 
 // node_modules/@videojs/react/dist/default/ui/input-indicator/use-indicator-visibility.js
 var import_react_compiler_runtime11 = __toESM(require_dist(), 1);
-var import_react24 = __toESM(require_react(), 1);
+var import_react78 = __toESM(require_react(), 1);
 function useIndicatorVisibility(close) {
   const $ = (0, import_react_compiler_runtime11.c)(8);
   const container = useContainer();
   const closeRef = useLatestRef(close);
-  const coordinatorRef = (0, import_react24.useRef)(null);
+  const coordinatorRef = (0, import_react78.useRef)(null);
   let t0;
   if ($[0] !== closeRef) {
     t0 = () => ({ close: () => closeRef.current() });
     $[0] = closeRef;
     $[1] = t0;
   } else t0 = $[1];
-  const [handle] = (0, import_react24.useState)(t0);
+  const [handle] = (0, import_react78.useState)(t0);
   let t1;
   let t2;
   if ($[2] !== container || $[3] !== handle) {
@@ -25995,7 +34862,7 @@ function useIndicatorVisibility(close) {
     t1 = $[4];
     t2 = $[5];
   }
-  (0, import_react24.useEffect)(t1, t2);
+  (0, import_react78.useEffect)(t1, t2);
   let t3;
   if ($[6] !== handle) {
     t3 = () => {
@@ -26009,7 +34876,7 @@ function useIndicatorVisibility(close) {
 
 // node_modules/@videojs/react/dist/default/ui/input-indicator/use-input-action-subscription.js
 var import_react_compiler_runtime12 = __toESM(require_dist(), 1);
-var import_react25 = __toESM(require_react(), 1);
+var import_react79 = __toESM(require_react(), 1);
 function useInputActionSubscription(callback) {
   const $ = (0, import_react_compiler_runtime12.c)(6);
   const container = useContainer();
@@ -26035,21 +34902,21 @@ function useInputActionSubscription(callback) {
     $[4] = container;
     $[5] = t1;
   } else t1 = $[5];
-  (0, import_react25.useEffect)(t0, t1);
+  (0, import_react79.useEffect)(t0, t1);
 }
 
 // node_modules/@videojs/react/dist/default/ui/input-indicator/use-rendered-indicator-state.js
-var import_react26 = __toESM(require_react(), 1);
+var import_react80 = __toESM(require_react(), 1);
 function useRenderedIndicatorState(currentState, options = {}) {
-  const elementRef = (0, import_react26.useRef)(null);
-  const currentStateRef = (0, import_react26.useRef)(currentState);
-  const snapshotRef = (0, import_react26.useRef)(currentState);
-  const [transition] = (0, import_react26.useState)(() => createTransition());
+  const elementRef = (0, import_react80.useRef)(null);
+  const currentStateRef = (0, import_react80.useRef)(currentState);
+  const snapshotRef = (0, import_react80.useRef)(currentState);
+  const [transition] = (0, import_react80.useState)(() => createTransition());
   useDestroy(transition);
   currentStateRef.current = currentState;
-  const transitionState = (0, import_react26.useSyncExternalStore)((callback) => transition.state.subscribe(callback), () => transition.state.current, () => transition.state.current);
+  const transitionState = (0, import_react80.useSyncExternalStore)((callback) => transition.state.subscribe(callback), () => transition.state.current, () => transition.state.current);
   const { generation, open } = currentState;
-  (0, import_react26.useLayoutEffect)(() => {
+  (0, import_react80.useLayoutEffect)(() => {
     if (open) {
       const nextState = currentStateRef.current;
       if (nextState.generation !== generation) return;
@@ -26076,10 +34943,10 @@ function useRenderedIndicatorState(currentState, options = {}) {
 
 // node_modules/@videojs/react/dist/default/ui/input-indicator/use-input-indicator-root.js
 var import_react_compiler_runtime13 = __toESM(require_dist(), 1);
-var import_react27 = __toESM(require_react(), 1);
+var import_react81 = __toESM(require_react(), 1);
 function useInputIndicatorRoot(createCore, props, options) {
   const $ = (0, import_react_compiler_runtime13.c)(10);
-  const [core] = (0, import_react27.useState)(createCore);
+  const [core] = (0, import_react81.useState)(createCore);
   useDestroy(core);
   core.setProps(props);
   let t0;
@@ -26117,21 +34984,21 @@ function useInputIndicatorRoot(createCore, props, options) {
     t3 = $[8];
     t4 = $[9];
   }
-  const currentState = (0, import_react27.useSyncExternalStore)(t2, t3, t4);
+  const currentState = (0, import_react81.useSyncExternalStore)(t2, t3, t4);
   return useRenderedIndicatorState(currentState, options);
 }
 
 // node_modules/@videojs/react/dist/default/ui/status-indicator/context.js
 var import_react_compiler_runtime14 = __toESM(require_dist(), 1);
-var import_react28 = __toESM(require_react(), 1);
-var import_jsx_runtime8 = __toESM(require_jsx_runtime(), 1);
-var StatusIndicatorContext = (0, import_react28.createContext)(null);
+var import_react82 = __toESM(require_react(), 1);
+var import_jsx_runtime23 = __toESM(require_jsx_runtime(), 1);
+var StatusIndicatorContext = (0, import_react82.createContext)(null);
 function StatusIndicatorProvider(t0) {
   const $ = (0, import_react_compiler_runtime14.c)(3);
   const { value, children } = t0;
   let t1;
   if ($[0] !== children || $[1] !== value) {
-    t1 = /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(StatusIndicatorContext.Provider, {
+    t1 = /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(StatusIndicatorContext.Provider, {
       value,
       children
     });
@@ -26142,16 +35009,16 @@ function StatusIndicatorProvider(t0) {
   return t1;
 }
 function useStatusIndicatorContext() {
-  const ctx = (0, import_react28.useContext)(StatusIndicatorContext);
+  const ctx = (0, import_react82.useContext)(StatusIndicatorContext);
   if (!ctx) throw new Error("StatusIndicator child compounds must be used within a StatusIndicator.Root");
   return ctx;
 }
 
 // node_modules/@videojs/react/dist/default/ui/status-indicator/root.js
 var import_react_compiler_runtime15 = __toESM(require_dist(), 1);
-var import_react29 = __toESM(require_react(), 1);
-var import_jsx_runtime9 = __toESM(require_jsx_runtime(), 1);
-var StatusIndicatorRoot = (0, import_react29.forwardRef)(function StatusIndicatorRoot2(componentProps, forwardedRef) {
+var import_react83 = __toESM(require_react(), 1);
+var import_jsx_runtime24 = __toESM(require_jsx_runtime(), 1);
+var StatusIndicatorRoot = (0, import_react83.forwardRef)(function StatusIndicatorRoot2(componentProps, forwardedRef) {
   const $ = (0, import_react_compiler_runtime15.c)(14);
   const { render, className, style, actions, closeDelay, deriveCustomStatus, ...elementProps } = componentProps;
   const translator = useTranslator();
@@ -26201,7 +35068,7 @@ var StatusIndicatorRoot = (0, import_react29.forwardRef)(function StatusIndicato
   });
   let t5;
   if ($[10] !== T0 || $[11] !== t3 || $[12] !== t4) {
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(T0, {
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(T0, {
       value: t3,
       children: t4
     });
@@ -26217,8 +35084,8 @@ function _temp3() {
 }
 
 // node_modules/@videojs/react/dist/default/ui/status-indicator/value.js
-var import_react30 = __toESM(require_react(), 1);
-var StatusIndicatorValue = (0, import_react30.forwardRef)(function StatusIndicatorValue2(componentProps, forwardedRef) {
+var import_react84 = __toESM(require_react(), 1);
+var StatusIndicatorValue = (0, import_react84.forwardRef)(function StatusIndicatorValue2(componentProps, forwardedRef) {
   const { render, className, style, ...elementProps } = componentProps;
   const { state } = useStatusIndicatorContext();
   return renderElement("span", {
@@ -26234,15 +35101,15 @@ var StatusIndicatorValue = (0, import_react30.forwardRef)(function StatusIndicat
 
 // node_modules/@videojs/react/dist/default/ui/volume-indicator/context.js
 var import_react_compiler_runtime16 = __toESM(require_dist(), 1);
-var import_react31 = __toESM(require_react(), 1);
-var import_jsx_runtime10 = __toESM(require_jsx_runtime(), 1);
-var VolumeIndicatorContext = (0, import_react31.createContext)(null);
+var import_react85 = __toESM(require_react(), 1);
+var import_jsx_runtime25 = __toESM(require_jsx_runtime(), 1);
+var VolumeIndicatorContext = (0, import_react85.createContext)(null);
 function VolumeIndicatorProvider(t0) {
   const $ = (0, import_react_compiler_runtime16.c)(3);
   const { value, children } = t0;
   let t1;
   if ($[0] !== children || $[1] !== value) {
-    t1 = /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(VolumeIndicatorContext.Provider, {
+    t1 = /* @__PURE__ */ (0, import_jsx_runtime25.jsx)(VolumeIndicatorContext.Provider, {
       value,
       children
     });
@@ -26253,15 +35120,15 @@ function VolumeIndicatorProvider(t0) {
   return t1;
 }
 function useVolumeIndicatorContext() {
-  const ctx = (0, import_react31.useContext)(VolumeIndicatorContext);
+  const ctx = (0, import_react85.useContext)(VolumeIndicatorContext);
   if (!ctx) throw new Error("VolumeIndicator child compounds must be used within a VolumeIndicator.Root");
   return ctx;
 }
 
 // node_modules/@videojs/react/dist/default/ui/volume-indicator/fill.js
-var import_react32 = __toESM(require_react(), 1);
+var import_react86 = __toESM(require_react(), 1);
 init_predicate2();
-var VolumeIndicatorFill = (0, import_react32.forwardRef)(function VolumeIndicatorFill2(componentProps, forwardedRef) {
+var VolumeIndicatorFill = (0, import_react86.forwardRef)(function VolumeIndicatorFill2(componentProps, forwardedRef) {
   const { render, className, style, ...elementProps } = componentProps;
   const { state } = useVolumeIndicatorContext();
   const fillStyle = getVolumeIndicatorFillStyle(state, style);
@@ -26290,9 +35157,9 @@ function getVolumeIndicatorFillStyle(state, style) {
 
 // node_modules/@videojs/react/dist/default/ui/volume-indicator/root.js
 var import_react_compiler_runtime17 = __toESM(require_dist(), 1);
-var import_react33 = __toESM(require_react(), 1);
-var import_jsx_runtime11 = __toESM(require_jsx_runtime(), 1);
-var VolumeIndicatorRoot = (0, import_react33.forwardRef)(function VolumeIndicatorRoot2(componentProps, forwardedRef) {
+var import_react87 = __toESM(require_react(), 1);
+var import_jsx_runtime26 = __toESM(require_jsx_runtime(), 1);
+var VolumeIndicatorRoot = (0, import_react87.forwardRef)(function VolumeIndicatorRoot2(componentProps, forwardedRef) {
   const $ = (0, import_react_compiler_runtime17.c)(12);
   const { render, className, style, closeDelay, ...elementProps } = componentProps;
   const translator = useTranslator();
@@ -26338,7 +35205,7 @@ var VolumeIndicatorRoot = (0, import_react33.forwardRef)(function VolumeIndicato
   });
   let t5;
   if ($[8] !== T0 || $[9] !== t3 || $[10] !== t4) {
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(T0, {
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime26.jsx)(T0, {
       value: t3,
       children: t4
     });
@@ -26354,8 +35221,8 @@ function _temp4() {
 }
 
 // node_modules/@videojs/react/dist/default/ui/volume-indicator/value.js
-var import_react34 = __toESM(require_react(), 1);
-var VolumeIndicatorValue = (0, import_react34.forwardRef)(function VolumeIndicatorValue2(componentProps, forwardedRef) {
+var import_react88 = __toESM(require_react(), 1);
+var VolumeIndicatorValue = (0, import_react88.forwardRef)(function VolumeIndicatorValue2(componentProps, forwardedRef) {
   const { render, className, style, ...elementProps } = componentProps;
   const { state } = useVolumeIndicatorContext();
   return renderElement("span", {
@@ -26370,12 +35237,12 @@ var VolumeIndicatorValue = (0, import_react34.forwardRef)(function VolumeIndicat
 });
 
 // node_modules/@videojs/react/dist/default/ui/title/component.js
-var import_react35 = __toESM(require_react(), 1);
-var Title = (0, import_react35.forwardRef)(function Title2(componentProps, forwardedRef) {
+var import_react89 = __toESM(require_react(), 1);
+var Title = (0, import_react89.forwardRef)(function Title2(componentProps, forwardedRef) {
   const { render, className, style, ...elementProps } = componentProps;
   const metadata = usePlayer(selectMetadata);
   const controls = usePlayer(selectControls);
-  const [core] = (0, import_react35.useState)(() => new TitleCore());
+  const [core] = (0, import_react89.useState)(() => new TitleCore());
   if (!metadata) return null;
   const state = core.getState(metadata, controls);
   if (state.hidden) return null;
@@ -26392,15 +35259,15 @@ var Title = (0, import_react35.forwardRef)(function Title2(componentProps, forwa
 });
 
 // node_modules/@videojs/react/dist/default/ui/buffering-indicator/component.js
-var import_react36 = __toESM(require_react(), 1);
-var BufferingIndicator = (0, import_react36.forwardRef)(function BufferingIndicator2(componentProps, forwardedRef) {
+var import_react90 = __toESM(require_react(), 1);
+var BufferingIndicator = (0, import_react90.forwardRef)(function BufferingIndicator2(componentProps, forwardedRef) {
   const { render, className, style, delay, ...elementProps } = componentProps;
   const playback = usePlayer(selectPlayback);
-  const [core] = (0, import_react36.useState)(() => new BufferingIndicatorCore());
+  const [core] = (0, import_react90.useState)(() => new BufferingIndicatorCore());
   useDestroy(core);
   core.setProps({ delay });
   if (playback) core.update(playback);
-  const state = (0, import_react36.useSyncExternalStore)((cb) => core.state.subscribe(cb), () => core.state.current, () => core.state.current);
+  const state = (0, import_react90.useSyncExternalStore)((cb) => core.state.subscribe(cb), () => core.state.current, () => core.state.current);
   if (!playback) return null;
   return renderElement("div", {
     render,
@@ -26416,15 +35283,15 @@ var BufferingIndicator = (0, import_react36.forwardRef)(function BufferingIndica
 
 // node_modules/@videojs/react/dist/default/ui/poster/context.js
 var import_react_compiler_runtime18 = __toESM(require_dist(), 1);
-var import_react37 = __toESM(require_react(), 1);
-var import_jsx_runtime12 = __toESM(require_jsx_runtime(), 1);
-var PosterContext = (0, import_react37.createContext)(null);
+var import_react91 = __toESM(require_react(), 1);
+var import_jsx_runtime27 = __toESM(require_jsx_runtime(), 1);
+var PosterContext = (0, import_react91.createContext)(null);
 function PosterProvider(t0) {
   const $ = (0, import_react_compiler_runtime18.c)(3);
   const { value, children } = t0;
   let t1;
   if ($[0] !== children || $[1] !== value) {
-    t1 = /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(PosterContext.Provider, {
+    t1 = /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(PosterContext.Provider, {
       value,
       children
     });
@@ -26435,27 +35302,27 @@ function PosterProvider(t0) {
   return t1;
 }
 function usePosterContext() {
-  const ctx = (0, import_react37.useContext)(PosterContext);
+  const ctx = (0, import_react91.useContext)(PosterContext);
   if (!ctx) throw new Error("Poster compound components must be used within a Poster.Root");
   return ctx;
 }
 
 // node_modules/@videojs/react/dist/default/ui/poster/image.js
 var import_react_compiler_runtime19 = __toESM(require_dist(), 1);
-var import_react38 = __toESM(require_react(), 1);
-var PosterImage = (0, import_react38.forwardRef)(function PosterImage2(componentProps, forwardedRef) {
+var import_react92 = __toESM(require_react(), 1);
+var PosterImage = (0, import_react92.forwardRef)(function PosterImage2(componentProps, forwardedRef) {
   const $ = (0, import_react_compiler_runtime19.c)(13);
   const { render, className, style, ...elementProps } = componentProps;
   const { state, setImageLoadState } = usePosterContext();
   const { src: authoredSrc, srcSet: authoredSrcSet } = elementProps;
   const src = authoredSrc ?? (authoredSrcSet === void 0 ? state.src : "");
   const initialLoadState = !src && authoredSrcSet === void 0 ? "none" : "loading";
-  const [request, setRequest] = (0, import_react38.useState)(() => ({
+  const [request, setRequest] = (0, import_react92.useState)(() => ({
     src,
     srcSet: authoredSrcSet,
     state: initialLoadState
   }));
-  const didCheckInitialImageRef = (0, import_react38.useRef)(false);
+  const didCheckInitialImageRef = (0, import_react92.useRef)(false);
   let t0;
   if ($[0] !== authoredSrcSet || $[1] !== src) {
     t0 = {
@@ -26498,7 +35365,7 @@ var PosterImage = (0, import_react38.forwardRef)(function PosterImage2(component
     $[9] = src;
     $[10] = t2;
   } else t2 = $[10];
-  (0, import_react38.useLayoutEffect)(t1, t2);
+  (0, import_react92.useLayoutEffect)(t1, t2);
   let t3;
   if ($[11] !== requested) {
     t3 = (img) => {
@@ -26550,14 +35417,14 @@ var PosterImage = (0, import_react38.forwardRef)(function PosterImage2(component
 });
 
 // node_modules/@videojs/react/dist/default/ui/poster/root.js
-var import_react39 = __toESM(require_react(), 1);
-var import_jsx_runtime13 = __toESM(require_jsx_runtime(), 1);
-var PosterRoot = (0, import_react39.forwardRef)(function PosterRoot2(componentProps, forwardedRef) {
+var import_react93 = __toESM(require_react(), 1);
+var import_jsx_runtime28 = __toESM(require_jsx_runtime(), 1);
+var PosterRoot = (0, import_react93.forwardRef)(function PosterRoot2(componentProps, forwardedRef) {
   const { render, className, style, ...elementProps } = componentProps;
   const playback = usePlayer(selectPlayback);
   const metadata = usePlayer(selectMetadata);
-  const [core] = (0, import_react39.useState)(_temp5);
-  const [reportedLoadState, setImageLoadState] = (0, import_react39.useState)(null);
+  const [core] = (0, import_react93.useState)(_temp5);
+  const [reportedLoadState, setImageLoadState] = (0, import_react93.useState)(null);
   if (!playback) return null;
   core.setMedia({
     started: playback.started,
@@ -26565,7 +35432,7 @@ var PosterRoot = (0, import_react39.forwardRef)(function PosterRoot2(componentPr
   });
   core.setImageLoadState(reportedLoadState ?? (metadata?.poster ? "loading" : "none"));
   const state = core.getState();
-  return /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(PosterProvider, {
+  return /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(PosterProvider, {
     value: {
       state,
       setImageLoadState
@@ -26588,15 +35455,15 @@ function _temp5() {
 
 // node_modules/@videojs/react/dist/default/ui/seek-indicator/context.js
 var import_react_compiler_runtime20 = __toESM(require_dist(), 1);
-var import_react40 = __toESM(require_react(), 1);
-var import_jsx_runtime14 = __toESM(require_jsx_runtime(), 1);
-var SeekIndicatorContext = (0, import_react40.createContext)(null);
+var import_react94 = __toESM(require_react(), 1);
+var import_jsx_runtime29 = __toESM(require_jsx_runtime(), 1);
+var SeekIndicatorContext = (0, import_react94.createContext)(null);
 function SeekIndicatorProvider(t0) {
   const $ = (0, import_react_compiler_runtime20.c)(3);
   const { value, children } = t0;
   let t1;
   if ($[0] !== children || $[1] !== value) {
-    t1 = /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(SeekIndicatorContext.Provider, {
+    t1 = /* @__PURE__ */ (0, import_jsx_runtime29.jsx)(SeekIndicatorContext.Provider, {
       value,
       children
     });
@@ -26607,16 +35474,16 @@ function SeekIndicatorProvider(t0) {
   return t1;
 }
 function useSeekIndicatorContext() {
-  const ctx = (0, import_react40.useContext)(SeekIndicatorContext);
+  const ctx = (0, import_react94.useContext)(SeekIndicatorContext);
   if (!ctx) throw new Error("SeekIndicator child compounds must be used within a SeekIndicator.Root");
   return ctx;
 }
 
 // node_modules/@videojs/react/dist/default/ui/seek-indicator/root.js
 var import_react_compiler_runtime21 = __toESM(require_dist(), 1);
-var import_react41 = __toESM(require_react(), 1);
-var import_jsx_runtime15 = __toESM(require_jsx_runtime(), 1);
-var SeekIndicatorRoot = (0, import_react41.forwardRef)(function SeekIndicatorRoot2(componentProps, forwardedRef) {
+var import_react95 = __toESM(require_react(), 1);
+var import_jsx_runtime30 = __toESM(require_jsx_runtime(), 1);
+var SeekIndicatorRoot = (0, import_react95.forwardRef)(function SeekIndicatorRoot2(componentProps, forwardedRef) {
   const $ = (0, import_react_compiler_runtime21.c)(9);
   const { render, className, style, closeDelay, ...elementProps } = componentProps;
   const locale = useLocale();
@@ -26651,7 +35518,7 @@ var SeekIndicatorRoot = (0, import_react41.forwardRef)(function SeekIndicatorRoo
   });
   let t3;
   if ($[5] !== T0 || $[6] !== t1 || $[7] !== t2) {
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(T0, {
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(T0, {
       value: t1,
       children: t2
     });
@@ -26667,8 +35534,8 @@ function _temp6() {
 }
 
 // node_modules/@videojs/react/dist/default/ui/seek-indicator/value.js
-var import_react42 = __toESM(require_react(), 1);
-var SeekIndicatorValue = (0, import_react42.forwardRef)(function SeekIndicatorValue2(componentProps, forwardedRef) {
+var import_react96 = __toESM(require_react(), 1);
+var SeekIndicatorValue = (0, import_react96.forwardRef)(function SeekIndicatorValue2(componentProps, forwardedRef) {
   const { render, className, style, ...elementProps } = componentProps;
   const { state } = useSeekIndicatorContext();
   return renderElement("div", {
@@ -26684,7 +35551,7 @@ var SeekIndicatorValue = (0, import_react42.forwardRef)(function SeekIndicatorVa
 
 // node_modules/@videojs/react/dist/default/ui/gesture/component.js
 var import_react_compiler_runtime22 = __toESM(require_dist(), 1);
-var import_react43 = __toESM(require_react(), 1);
+var import_react97 = __toESM(require_react(), 1);
 function Gesture(t0) {
   const $ = (0, import_react_compiler_runtime22.c)(10);
   const { type, action, value, pointer, region, disabled } = t0;
@@ -26743,13 +35610,13 @@ function Gesture(t0) {
     t1 = $[8];
     t2 = $[9];
   }
-  (0, import_react43.useEffect)(t1, t2);
+  (0, import_react97.useEffect)(t1, t2);
   return null;
 }
 
 // node_modules/@videojs/react/dist/default/internal/skins/shared/skins/shared/video/behaviors/gestures.js
 var import_react_compiler_runtime23 = __toESM(require_dist(), 1);
-var import_jsx_runtime16 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime31 = __toESM(require_jsx_runtime(), 1);
 function VideoGestures(t0) {
   const $ = (0, import_react_compiler_runtime23.c)(4);
   let t1;
@@ -26762,33 +35629,33 @@ function VideoGestures(t0) {
   const disabled = t2 === void 0 ? false : t2;
   let t3;
   if ($[2] !== disabled) {
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)(import_jsx_runtime16.Fragment, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(Gesture, {
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime31.jsxs)(import_jsx_runtime31.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(Gesture, {
         disabled,
         type: "tap",
         action: "togglePaused",
         pointer: "mouse",
         region: "center"
       }),
-      /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(Gesture, {
+      /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(Gesture, {
         disabled,
         type: "tap",
         action: "toggleControls",
         pointer: "touch"
       }),
-      /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(Gesture, {
+      /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(Gesture, {
         disabled,
         type: "doubletap",
         action: "seekStep",
         region: "left"
       }),
-      /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(Gesture, {
+      /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(Gesture, {
         disabled,
         type: "doubletap",
         action: "toggleFullscreen",
         region: "center"
       }),
-      /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(Gesture, {
+      /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(Gesture, {
         disabled,
         type: "doubletap",
         action: "seekStep",
@@ -26803,7 +35670,7 @@ function VideoGestures(t0) {
 
 // node_modules/@videojs/react/dist/default/ui/hotkey/component.js
 var import_react_compiler_runtime24 = __toESM(require_dist(), 1);
-var import_react44 = __toESM(require_react(), 1);
+var import_react98 = __toESM(require_react(), 1);
 function Hotkey(t0) {
   const $ = (0, import_react_compiler_runtime24.c)(9);
   const { keys, action, value, disabled, target } = t0;
@@ -26854,13 +35721,13 @@ function Hotkey(t0) {
     t1 = $[7];
     t2 = $[8];
   }
-  (0, import_react44.useEffect)(t1, t2);
+  (0, import_react98.useEffect)(t1, t2);
   return null;
 }
 
 // node_modules/@videojs/react/dist/default/internal/skins/shared/skins/shared/behaviors/playback-hotkeys.js
 var import_react_compiler_runtime25 = __toESM(require_dist(), 1);
-var import_jsx_runtime17 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime32 = __toESM(require_jsx_runtime(), 1);
 function PlaybackHotkeys(t0) {
   const $ = (0, import_react_compiler_runtime25.c)(4);
   let t1;
@@ -26873,75 +35740,75 @@ function PlaybackHotkeys(t0) {
   const disabled = t2 === void 0 ? false : t2;
   let t3;
   if ($[2] !== disabled) {
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)(import_jsx_runtime17.Fragment, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(Hotkey, {
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime32.jsxs)(import_jsx_runtime32.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(Hotkey, {
         disabled,
         keys: "Space",
         action: "togglePaused"
       }),
-      /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(Hotkey, {
+      /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(Hotkey, {
         disabled,
         keys: "k",
         action: "togglePaused"
       }),
-      /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(Hotkey, {
+      /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(Hotkey, {
         disabled,
         keys: "m",
         action: "toggleMuted"
       }),
-      /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(Hotkey, {
+      /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(Hotkey, {
         disabled,
         keys: "ArrowRight",
         action: "seekStep"
       }),
-      /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(Hotkey, {
+      /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(Hotkey, {
         disabled,
         keys: "ArrowLeft",
         action: "seekStep"
       }),
-      /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(Hotkey, {
+      /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(Hotkey, {
         disabled,
         keys: "l",
         action: "seekStep"
       }),
-      /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(Hotkey, {
+      /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(Hotkey, {
         disabled,
         keys: "j",
         action: "seekStep"
       }),
-      /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(Hotkey, {
+      /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(Hotkey, {
         disabled,
         keys: "ArrowUp",
         action: "volumeStep"
       }),
-      /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(Hotkey, {
+      /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(Hotkey, {
         disabled,
         keys: "ArrowDown",
         action: "volumeStep"
       }),
-      /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(Hotkey, {
+      /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(Hotkey, {
         disabled,
         keys: "0-9",
         action: "seekToPercent"
       }),
-      /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(Hotkey, {
+      /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(Hotkey, {
         disabled,
         keys: "Home",
         action: "seekToPercent",
         value: 0
       }),
-      /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(Hotkey, {
+      /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(Hotkey, {
         disabled,
         keys: "End",
         action: "seekToPercent",
         value: 100
       }),
-      /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(Hotkey, {
+      /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(Hotkey, {
         disabled,
         keys: ">",
         action: "speedUp"
       }),
-      /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(Hotkey, {
+      /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(Hotkey, {
         disabled,
         keys: "<",
         action: "speedDown"
@@ -26955,7 +35822,7 @@ function PlaybackHotkeys(t0) {
 
 // node_modules/@videojs/react/dist/default/internal/skins/shared/skins/shared/video/behaviors/hotkeys.js
 var import_react_compiler_runtime26 = __toESM(require_dist(), 1);
-var import_jsx_runtime18 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime33 = __toESM(require_jsx_runtime(), 1);
 function VideoHotkeys(t0) {
   const $ = (0, import_react_compiler_runtime26.c)(4);
   let t1;
@@ -26968,19 +35835,19 @@ function VideoHotkeys(t0) {
   const disabled = t2 === void 0 ? false : t2;
   let t3;
   if ($[2] !== disabled) {
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)(import_jsx_runtime18.Fragment, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime18.jsx)(PlaybackHotkeys, { disabled }),
-      /* @__PURE__ */ (0, import_jsx_runtime18.jsx)(Hotkey, {
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime33.jsxs)(import_jsx_runtime33.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime33.jsx)(PlaybackHotkeys, { disabled }),
+      /* @__PURE__ */ (0, import_jsx_runtime33.jsx)(Hotkey, {
         disabled,
         keys: "f",
         action: "toggleFullscreen"
       }),
-      /* @__PURE__ */ (0, import_jsx_runtime18.jsx)(Hotkey, {
+      /* @__PURE__ */ (0, import_jsx_runtime33.jsx)(Hotkey, {
         disabled,
         keys: "c",
         action: "toggleSubtitles"
       }),
-      /* @__PURE__ */ (0, import_jsx_runtime18.jsx)(Hotkey, {
+      /* @__PURE__ */ (0, import_jsx_runtime33.jsx)(Hotkey, {
         disabled,
         keys: "i",
         action: "togglePictureInPicture"
@@ -26993,32 +35860,32 @@ function VideoHotkeys(t0) {
 }
 
 // node_modules/@videojs/react/dist/default/ui/controls/context.js
-var import_react45 = __toESM(require_react(), 1);
-var ControlsContext = (0, import_react45.createContext)(null);
+var import_react99 = __toESM(require_react(), 1);
+var ControlsContext = (0, import_react99.createContext)(null);
 var ControlsContextProvider = ControlsContext.Provider;
 function useControlsContext() {
-  const ctx = (0, import_react45.useContext)(ControlsContext);
+  const ctx = (0, import_react99.useContext)(ControlsContext);
   if (!ctx) throw new Error("Controls compound components must be used within a Controls.Root");
   return ctx;
 }
 function useOptionalControlsContext() {
-  return (0, import_react45.useContext)(ControlsContext);
+  return (0, import_react99.useContext)(ControlsContext);
 }
 
 // node_modules/@videojs/react/dist/default/ui/controls/root.js
-var import_react46 = __toESM(require_react(), 1);
-var import_jsx_runtime19 = __toESM(require_jsx_runtime(), 1);
+var import_react100 = __toESM(require_react(), 1);
+var import_jsx_runtime34 = __toESM(require_jsx_runtime(), 1);
 function ControlsRoot({ children, visibility = ControlsCore.defaultProps.visibility }) {
   "use no memo";
   const controls = usePlayer(selectControls);
   const playback = usePlayer(selectPlayback);
-  const [core] = (0, import_react46.useState)(() => new ControlsCore());
+  const [core] = (0, import_react100.useState)(() => new ControlsCore());
   core.setProps({ visibility });
   core.setMedia(controls ?? null);
   core.setPlayback(playback ?? null);
   const state = core.getState();
   if (!state) return null;
-  return /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(ControlsContextProvider, {
+  return /* @__PURE__ */ (0, import_jsx_runtime34.jsx)(ControlsContextProvider, {
     value: {
       state,
       stateAttrMap: ControlsDataAttrs
@@ -27069,7 +35936,7 @@ function useButton(params) {
 
 // node_modules/@videojs/react/dist/default/ui/hotkey/use-hotkey-shortcut.js
 var import_react_compiler_runtime28 = __toESM(require_dist(), 1);
-var import_react47 = __toESM(require_react(), 1);
+var import_react101 = __toESM(require_react(), 1);
 function useHotkeyShortcut(action, value) {
   const $ = (0, import_react_compiler_runtime28.c)(6);
   const container = useContainer();
@@ -27078,7 +35945,7 @@ function useHotkeyShortcut(action, value) {
     t0 = {};
     $[0] = t0;
   } else t0 = $[0];
-  const [shortcut, setShortcut] = (0, import_react47.useState)(t0);
+  const [shortcut, setShortcut] = (0, import_react101.useState)(t0);
   let t1;
   let t2;
   if ($[1] !== action || $[2] !== container || $[3] !== value) {
@@ -27106,27 +35973,27 @@ function useHotkeyShortcut(action, value) {
     t1 = $[4];
     t2 = $[5];
   }
-  (0, import_react47.useEffect)(t1, t2);
+  (0, import_react101.useEffect)(t1, t2);
   return shortcut;
 }
 
 // node_modules/@videojs/react/dist/default/ui/menu/context.js
 var import_react_compiler_runtime29 = __toESM(require_dist(), 1);
-var import_react48 = __toESM(require_react(), 1);
-var MenuContext = (0, import_react48.createContext)(null);
-var MenuContextProvider = MenuContext.Provider;
+var import_react102 = __toESM(require_react(), 1);
+var MenuContext2 = (0, import_react102.createContext)(null);
+var MenuContextProvider = MenuContext2.Provider;
 function useMenuContext() {
-  const ctx = (0, import_react48.useContext)(MenuContext);
+  const ctx = (0, import_react102.useContext)(MenuContext2);
   if (!ctx) throw new Error("Menu compound components must be used within a Menu.Root");
   return ctx;
 }
 function useOptionalMenuContext() {
-  return (0, import_react48.useContext)(MenuContext);
+  return (0, import_react102.useContext)(MenuContext2);
 }
 function useMenuOptionState(state) {
   const $ = (0, import_react_compiler_runtime29.c)(8);
   const setOptionState = useOptionalMenuContext()?.setOptionState;
-  const [source] = (0, import_react48.useState)(_temp7);
+  const [source] = (0, import_react102.useState)(_temp7);
   const { value, disabled, hidden, availability } = state;
   let t0;
   let t1;
@@ -27161,53 +36028,53 @@ function useMenuOptionState(state) {
     t0 = $[6];
     t1 = $[7];
   }
-  (0, import_react48.useLayoutEffect)(t0, t1);
+  (0, import_react102.useLayoutEffect)(t0, t1);
 }
 function _temp7() {
   return Symbol("menu-option");
 }
-var MenuPopupContext = (0, import_react48.createContext)(null);
+var MenuPopupContext = (0, import_react102.createContext)(null);
 var MenuPopupContextProvider = MenuPopupContext.Provider;
 function useMenuPopupContext() {
-  const ctx = (0, import_react48.useContext)(MenuPopupContext);
+  const ctx = (0, import_react102.useContext)(MenuPopupContext);
   if (!ctx) throw new Error("Menu.Content must be used within a Menu.Popup");
   return ctx;
 }
-var MenuGroupContext = (0, import_react48.createContext)(null);
+var MenuGroupContext = (0, import_react102.createContext)(null);
 var MenuGroupContextProvider = MenuGroupContext.Provider;
-var MenuRadioGroupContext = (0, import_react48.createContext)(null);
+var MenuRadioGroupContext = (0, import_react102.createContext)(null);
 var MenuRadioGroupContextProvider = MenuRadioGroupContext.Provider;
 function useMenuRadioGroupContext() {
-  const ctx = (0, import_react48.useContext)(MenuRadioGroupContext);
+  const ctx = (0, import_react102.useContext)(MenuRadioGroupContext);
   if (!ctx) throw new Error("Menu.RadioItem must be used within a Menu.RadioGroup");
   return ctx;
 }
-var MenuRadioItemContext = (0, import_react48.createContext)(false);
+var MenuRadioItemContext = (0, import_react102.createContext)(false);
 var MenuRadioItemContextProvider = MenuRadioItemContext.Provider;
 function useOptionalMenuRadioItemContext() {
-  return (0, import_react48.useContext)(MenuRadioItemContext);
+  return (0, import_react102.useContext)(MenuRadioItemContext);
 }
-var MenuTriggerChildContext = (0, import_react48.createContext)(false);
+var MenuTriggerChildContext = (0, import_react102.createContext)(false);
 var MenuTriggerChildContextProvider = MenuTriggerChildContext.Provider;
 function useOptionalMenuTriggerChildContext() {
-  return (0, import_react48.useContext)(MenuTriggerChildContext);
+  return (0, import_react102.useContext)(MenuTriggerChildContext);
 }
 
 // node_modules/@videojs/react/dist/default/ui/tooltip/context.js
-var import_react49 = __toESM(require_react(), 1);
-var TooltipContext = (0, import_react49.createContext)(null);
+var import_react103 = __toESM(require_react(), 1);
+var TooltipContext = (0, import_react103.createContext)(null);
 var TooltipContextProvider = TooltipContext.Provider;
 function useTooltipContext() {
-  const ctx = (0, import_react49.useContext)(TooltipContext);
+  const ctx = (0, import_react103.useContext)(TooltipContext);
   if (!ctx) throw new Error("Tooltip compound components must be used within a Tooltip.Root");
   return ctx;
 }
 function useOptionalTooltipContext() {
-  return (0, import_react49.useContext)(TooltipContext);
+  return (0, import_react103.useContext)(TooltipContext);
 }
 
 // node_modules/@videojs/react/dist/default/ui/create-media-button.js
-var import_react50 = __toESM(require_react(), 1);
+var import_react104 = __toESM(require_react(), 1);
 init_predicate2();
 function getLabelParams(core, state) {
   return core.getLabelParams?.(state);
@@ -27230,7 +36097,7 @@ function withCSSVars(core, state, style) {
 function createMediaButton(config) {
   const { displayName, core: CoreClass, stateAttrMap, selector, action, hotkeyAction, hotkeyValue, isSupported, focusContainerOnPointerActivation } = config;
   const corePropKeys = new Set(Object.keys(CoreClass.defaultProps));
-  const Component = (0, import_react50.forwardRef)(function MediaButton(componentProps, forwardedRef) {
+  const Component = (0, import_react104.forwardRef)(function MediaButton(componentProps, forwardedRef) {
     const { render, className, style, ...rest } = componentProps;
     const coreProps = {};
     const elementProps = {};
@@ -27243,7 +36110,7 @@ function createMediaButton(config) {
     const container = useContainer();
     const shortcut = useHotkeyShortcut(hotkeyAction, hotkeyValue?.(coreProps));
     const translator = useTranslator();
-    const [core] = (0, import_react50.useState)(() => new CoreClass());
+    const [core] = (0, import_react104.useState)(() => new CoreClass());
     if (corePropKeys.has("menuTrigger") && isUndefined(coreProps.menuTrigger)) coreProps.menuTrigger = menuTriggerChild;
     core.setProps(coreProps);
     const { getButtonProps, buttonRef } = useButton({
@@ -27261,7 +36128,7 @@ function createMediaButton(config) {
     const label = state && supported ? translateText(core.getLabel(state), translator, getLabelParams(core, state)) : void 0;
     const tooltipLabel = state && supported ? getTooltipLabel(core, state) : void 0;
     const tooltipText = isUndefined(tooltipLabel) ? label : translateText(tooltipLabel, translator);
-    (0, import_react50.useLayoutEffect)(() => {
+    (0, import_react104.useLayoutEffect)(() => {
       if (!setTooltipContent) return;
       setTooltipContent(tooltipText ? {
         label: tooltipText,
@@ -27313,8 +36180,8 @@ var SeekButton = createMediaButton({
 });
 
 // node_modules/@videojs/react/dist/default/ui/tooltip/label.js
-var import_react51 = __toESM(require_react(), 1);
-var TooltipLabel = (0, import_react51.forwardRef)(function TooltipLabel2({ render, className, style, children, ...elementProps }, forwardedRef) {
+var import_react105 = __toESM(require_react(), 1);
+var TooltipLabel = (0, import_react105.forwardRef)(function TooltipLabel2({ render, className, style, children, ...elementProps }, forwardedRef) {
   const { state, stateAttrMap, content } = useTooltipContext();
   const body = children !== void 0 ? children : content?.label ?? "";
   return renderElement("span", {
@@ -27330,8 +36197,8 @@ var TooltipLabel = (0, import_react51.forwardRef)(function TooltipLabel2({ rende
 });
 
 // node_modules/@videojs/react/dist/default/ui/tooltip/shortcut.js
-var import_react52 = __toESM(require_react(), 1);
-var TooltipShortcut = (0, import_react52.forwardRef)(function TooltipShortcut2({ render, className, style, children, ...elementProps }, forwardedRef) {
+var import_react106 = __toESM(require_react(), 1);
+var TooltipShortcut = (0, import_react106.forwardRef)(function TooltipShortcut2({ render, className, style, children, ...elementProps }, forwardedRef) {
   const { state, stateAttrMap, content } = useTooltipContext();
   const shortcut = children !== void 0 && children !== null ? children : content?.shortcut ?? null;
   if (!shortcut) return null;
@@ -27349,7 +36216,7 @@ var TooltipShortcut = (0, import_react52.forwardRef)(function TooltipShortcut2({
 
 // node_modules/@videojs/react/dist/default/ui/popover/use-popup-position.js
 var import_react_compiler_runtime30 = __toESM(require_dist(), 1);
-var import_react53 = __toESM(require_react(), 1);
+var import_react107 = __toESM(require_react(), 1);
 var POPOVER_RESET = {
   position: "fixed",
   inset: "auto",
@@ -27358,7 +36225,7 @@ var POPOVER_RESET = {
 function usePopupPosition(t0) {
   const $ = (0, import_react_compiler_runtime30.c)(15);
   const { open, anchorName, position, triggerSource, popupRef, boundary, container, cssVars, trackResize, onSideChange } = t0;
-  const [positioner] = (0, import_react53.useState)(_temp8);
+  const [positioner] = (0, import_react107.useState)(_temp8);
   let t1;
   if ($[0] !== anchorName || $[1] !== boundary || $[2] !== container || $[3] !== cssVars || $[4] !== onSideChange || $[5] !== open || $[6] !== popupRef || $[7] !== position || $[8] !== positioner || $[9] !== trackResize || $[10] !== triggerSource) {
     t1 = () => {
@@ -27391,7 +36258,7 @@ function usePopupPosition(t0) {
     $[10] = triggerSource;
     $[11] = t1;
   } else t1 = $[11];
-  (0, import_react53.useLayoutEffect)(t1);
+  (0, import_react107.useLayoutEffect)(t1);
   let t2;
   let t3;
   if ($[12] !== positioner) {
@@ -27404,7 +36271,7 @@ function usePopupPosition(t0) {
     t2 = $[13];
     t3 = $[14];
   }
-  (0, import_react53.useLayoutEffect)(t2, t3);
+  (0, import_react107.useLayoutEffect)(t2, t3);
   return POPOVER_RESET;
 }
 function _temp8() {
@@ -27413,13 +36280,13 @@ function _temp8() {
 
 // node_modules/@videojs/react/dist/default/ui/tooltip/popup.js
 var import_react_compiler_runtime31 = __toESM(require_dist(), 1);
-var import_react54 = __toESM(require_react(), 1);
-var import_jsx_runtime20 = __toESM(require_jsx_runtime(), 1);
-var TooltipPopup = (0, import_react54.forwardRef)(function TooltipPopup2(t0, forwardedRef) {
+var import_react108 = __toESM(require_react(), 1);
+var import_jsx_runtime35 = __toESM(require_jsx_runtime(), 1);
+var TooltipPopup = (0, import_react108.forwardRef)(function TooltipPopup2(t0, forwardedRef) {
   const $ = (0, import_react_compiler_runtime31.c)(15);
   const { render, className, style, children, ...elementProps } = t0;
   const { core, tooltip, state, preferredSide, setPositionedSide, stateAttrMap, anchorName, popupId, boundary, container } = useTooltipContext();
-  const internalRef = (0, import_react54.useRef)(null);
+  const internalRef = (0, import_react108.useRef)(null);
   let t1;
   if ($[0] !== tooltip) {
     t1 = (el) => {
@@ -27466,7 +36333,7 @@ var TooltipPopup = (0, import_react54.forwardRef)(function TooltipPopup2(t0, for
   if (!state.open) return null;
   let t4;
   if ($[13] !== children) {
-    t4 = children !== void 0 ? children : /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(import_jsx_runtime20.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime20.jsx)(TooltipLabel, {}), /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(TooltipShortcut, {})] });
+    t4 = children !== void 0 ? children : /* @__PURE__ */ (0, import_jsx_runtime35.jsxs)(import_jsx_runtime35.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime35.jsx)(TooltipLabel, {}), /* @__PURE__ */ (0, import_jsx_runtime35.jsx)(TooltipShortcut, {})] });
     $[13] = children;
     $[14] = t4;
   } else t4 = $[14];
@@ -27498,7 +36365,7 @@ var TooltipPopup = (0, import_react54.forwardRef)(function TooltipPopup2(t0, for
 
 // node_modules/@videojs/react/dist/default/ui/hooks/use-positioned-state.js
 var import_react_compiler_runtime32 = __toESM(require_dist(), 1);
-var import_react55 = __toESM(require_react(), 1);
+var import_react109 = __toESM(require_react(), 1);
 function usePositionedState(preferredState) {
   const $ = (0, import_react_compiler_runtime32.c)(17);
   const preferredSide = preferredState.side;
@@ -27511,7 +36378,7 @@ function usePositionedState(preferredState) {
     $[0] = preferredSide;
     $[1] = t0;
   } else t0 = $[1];
-  const [position, setPosition] = (0, import_react55.useState)(t0);
+  const [position, setPosition] = (0, import_react109.useState)(t0);
   const side = preferredState.open && position.preferred === preferredSide ? position.side : preferredSide;
   let t1;
   if ($[2] !== preferredSide || $[3] !== preferredState || $[4] !== side) {
@@ -27555,7 +36422,7 @@ function usePositionedState(preferredState) {
     t3 = $[11];
     t4 = $[12];
   }
-  (0, import_react55.useEffect)(t3, t4);
+  (0, import_react109.useEffect)(t3, t4);
   let t5;
   if ($[13] !== preferredSide || $[14] !== setPositionedSide || $[15] !== state) {
     t5 = {
@@ -27572,22 +36439,22 @@ function usePositionedState(preferredState) {
 }
 
 // node_modules/@videojs/react/dist/default/ui/tooltip/group-context.js
-var import_react56 = __toESM(require_react(), 1);
-var TooltipGroupContext = (0, import_react56.createContext)(null);
+var import_react110 = __toESM(require_react(), 1);
+var TooltipGroupContext = (0, import_react110.createContext)(null);
 var TooltipGroupContextProvider = TooltipGroupContext.Provider;
 function useTooltipGroup() {
-  return (0, import_react56.useContext)(TooltipGroupContext)?.group;
+  return (0, import_react110.useContext)(TooltipGroupContext)?.group;
 }
 
 // node_modules/@videojs/react/dist/default/ui/tooltip/root.js
-var import_react58 = __toESM(require_react(), 1);
-var import_jsx_runtime21 = __toESM(require_jsx_runtime(), 1);
+var import_react112 = __toESM(require_react(), 1);
+var import_jsx_runtime36 = __toESM(require_jsx_runtime(), 1);
 init_predicate2();
 function TooltipRoot({ open: controlledOpen, defaultOpen = TooltipCore.defaultProps.defaultOpen, onOpenChange: onOpenChangeProp, onOpenChangeComplete: onOpenChangeCompleteProp, delay = TooltipCore.defaultProps.delay, closeDelay = TooltipCore.defaultProps.closeDelay, disableHoverablePopup = TooltipCore.defaultProps.disableHoverablePopup, disabled = TooltipCore.defaultProps.disabled, sticky = TooltipCore.defaultProps.sticky, boundary = "container", children, ...coreProps }) {
   const container = useOptionalContainer();
   const popupGroup = useOptionalPopupGroup();
   const controls = useOptionalControlsContext();
-  const [core] = (0, import_react58.useState)(() => new TooltipCore(coreProps));
+  const [core] = (0, import_react112.useState)(() => new TooltipCore(coreProps));
   core.setProps(coreProps);
   const isControlled = !isUndefined(controlledOpen);
   const groupFromContext = useTooltipGroup();
@@ -27600,7 +36467,7 @@ function TooltipRoot({ open: controlledOpen, defaultOpen = TooltipCore.defaultPr
   const stickyRef = useLatestRef(sticky);
   const groupRef = useLatestRef(groupFromContext);
   const popupGroupRef = useLatestRef(popupGroup);
-  const [tooltip] = (0, import_react58.useState)(() => {
+  const [tooltip] = (0, import_react112.useState)(() => {
     const instance = createTooltip({
       transition: createTransition(),
       onOpenChange: (nextOpen, details) => {
@@ -27620,17 +36487,17 @@ function TooltipRoot({ open: controlledOpen, defaultOpen = TooltipCore.defaultPr
     if (!isControlled && defaultOpen) instance.open();
     return instance;
   });
-  const [content, setContent] = (0, import_react58.useState)();
+  const [content, setContent] = (0, import_react112.useState)();
   const anchorName = useSafeId();
   const popupId = useSafeId("tooltip");
-  (0, import_react58.useEffect)(() => {
+  (0, import_react112.useEffect)(() => {
     if (isUndefined(controlledOpen)) return;
     const { active: inputOpen } = tooltip.input.current;
     if (controlledOpen === inputOpen) return;
     if (controlledOpen) tooltip.open();
     else tooltip.close();
   }, [controlledOpen, tooltip]);
-  (0, import_react58.useEffect)(() => {
+  (0, import_react112.useEffect)(() => {
     if (isUndefined(controls?.state.visible)) return;
     if (controls.state.visible) return;
     tooltip.close("imperative-action");
@@ -27639,7 +36506,7 @@ function TooltipRoot({ open: controlledOpen, defaultOpen = TooltipCore.defaultPr
   const input = useSnapshot(tooltip.input);
   core.setInput(input);
   const { state, preferredSide, setPositionedSide } = usePositionedState(core.getState());
-  return /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(TooltipContextProvider, {
+  return /* @__PURE__ */ (0, import_jsx_runtime36.jsx)(TooltipContextProvider, {
     value: {
       core,
       tooltip,
@@ -27659,10 +36526,10 @@ function TooltipRoot({ open: controlledOpen, defaultOpen = TooltipCore.defaultPr
 }
 
 // node_modules/@videojs/react/dist/default/ui/tooltip/trigger.js
-var import_react59 = __toESM(require_react(), 1);
-var TooltipTrigger = (0, import_react59.forwardRef)(function TooltipTrigger2({ render, className, style, ...elementProps }, forwardedRef) {
+var import_react113 = __toESM(require_react(), 1);
+var TooltipTrigger = (0, import_react113.forwardRef)(function TooltipTrigger2({ render, className, style, ...elementProps }, forwardedRef) {
   const { tooltip, state, stateAttrMap } = useTooltipContext();
-  const triggerRef = (0, import_react59.useCallback)((el) => {
+  const triggerRef = (0, import_react113.useCallback)((el) => {
     tooltip.setTriggerElement(el);
   }, [tooltip]);
   const { onFocusIn, onFocusOut, ...restTriggerProps } = tooltip.triggerProps;
@@ -27687,8 +36554,8 @@ var TooltipTrigger = (0, import_react59.forwardRef)(function TooltipTrigger2({ r
 });
 
 // node_modules/@videojs/react/dist/default/ui/controls/backdrop.js
-var import_react60 = __toESM(require_react(), 1);
-var ControlsBackdrop = (0, import_react60.forwardRef)(function ControlsBackdrop2({ render, className, style, ...elementProps }, forwardedRef) {
+var import_react114 = __toESM(require_react(), 1);
+var ControlsBackdrop = (0, import_react114.forwardRef)(function ControlsBackdrop2({ render, className, style, ...elementProps }, forwardedRef) {
   const { state, stateAttrMap } = useControlsContext();
   return renderElement("div", {
     render,
@@ -27706,8 +36573,8 @@ var ControlsBackdrop = (0, import_react60.forwardRef)(function ControlsBackdrop2
 });
 
 // node_modules/@videojs/react/dist/default/ui/controls/content.js
-var import_react61 = __toESM(require_react(), 1);
-var ControlsContent = (0, import_react61.forwardRef)(function ControlsContent2(componentProps, forwardedRef) {
+var import_react115 = __toESM(require_react(), 1);
+var ControlsContent = (0, import_react115.forwardRef)(function ControlsContent2(componentProps, forwardedRef) {
   const { render, className, style, children, ...elementProps } = componentProps;
   const { state, stateAttrMap } = useControlsContext();
   return renderElement("div", {
@@ -27727,8 +36594,8 @@ var ControlsContent = (0, import_react61.forwardRef)(function ControlsContent2(c
 });
 
 // node_modules/@videojs/react/dist/default/ui/controls/group.js
-var import_react62 = __toESM(require_react(), 1);
-var ControlsGroup = (0, import_react62.forwardRef)(function ControlsGroup2(componentProps, forwardedRef) {
+var import_react116 = __toESM(require_react(), 1);
+var ControlsGroup = (0, import_react116.forwardRef)(function ControlsGroup2(componentProps, forwardedRef) {
   const { render, className, style, children, ...elementProps } = componentProps;
   const { state, stateAttrMap } = useControlsContext();
   const role = elementProps["aria-label"] || elementProps["aria-labelledby"] ? "group" : void 0;
@@ -27748,18 +36615,18 @@ var ControlsGroup = (0, import_react62.forwardRef)(function ControlsGroup2(compo
 });
 
 // node_modules/@videojs/react/dist/default/ui/time/value.js
-var import_react63 = __toESM(require_react(), 1);
-var import_jsx_runtime22 = __toESM(require_jsx_runtime(), 1);
-var Value = (0, import_react63.forwardRef)(function Value2(componentProps, forwardedRef) {
+var import_react117 = __toESM(require_react(), 1);
+var import_jsx_runtime37 = __toESM(require_jsx_runtime(), 1);
+var Value = (0, import_react117.forwardRef)(function Value2(componentProps, forwardedRef) {
   const { render, className, style, type, negativeSign, label, toggle = false, ...elementProps } = componentProps;
   const time = usePlayer(selectTime);
   const buffer = usePlayer(selectBuffer);
   const translator = useTranslator();
   const locale = useLocale();
-  const [core] = (0, import_react63.useState)(() => new TimeCore());
+  const [core] = (0, import_react117.useState)(() => new TimeCore());
   const defaultType = type ?? TimeCore.defaultProps.type;
-  const [activeType, setActiveType] = (0, import_react63.useState)(defaultType);
-  (0, import_react63.useEffect)(() => {
+  const [activeType, setActiveType] = (0, import_react117.useState)(defaultType);
+  (0, import_react117.useEffect)(() => {
     setActiveType(defaultType);
   }, [defaultType, toggle]);
   core.setProps({
@@ -27783,7 +36650,7 @@ var Value = (0, import_react63.forwardRef)(function Value2(componentProps, forwa
     remaining: remainingSuffixText
   }[state.type];
   const resolvedLabelParams = labelParams ? { duration: translateText(suffixText, translator, { duration: formatTimeAsPhrase(Math.abs(state.seconds), { locale }) }) } : void 0;
-  const content = state.negative ? /* @__PURE__ */ (0, import_jsx_runtime22.jsxs)(import_jsx_runtime22.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime22.jsx)("span", {
+  const content = state.negative ? /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)(import_jsx_runtime37.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime37.jsx)("span", {
     "aria-hidden": "true",
     children: negativeSign ?? TimeCore.defaultProps.negativeSign
   }), state.text] }) : state.text;
@@ -27827,8 +36694,8 @@ var Value = (0, import_react63.forwardRef)(function Value2(componentProps, forwa
 
 // node_modules/@videojs/react/dist/default/ui/tooltip/provider.js
 var import_react_compiler_runtime33 = __toESM(require_dist(), 1);
-var import_react64 = __toESM(require_react(), 1);
-var import_jsx_runtime23 = __toESM(require_jsx_runtime(), 1);
+var import_react118 = __toESM(require_react(), 1);
+var import_jsx_runtime38 = __toESM(require_jsx_runtime(), 1);
 function TooltipProvider(t0) {
   const $ = (0, import_react_compiler_runtime33.c)(9);
   const { delay, closeDelay, timeout, children } = t0;
@@ -27844,7 +36711,7 @@ function TooltipProvider(t0) {
     $[2] = timeout;
     $[3] = t1;
   } else t1 = $[3];
-  const [group] = (0, import_react64.useState)(t1);
+  const [group] = (0, import_react118.useState)(t1);
   group.setProps({
     delay,
     closeDelay,
@@ -27858,7 +36725,7 @@ function TooltipProvider(t0) {
   } else t2 = $[5];
   let t3;
   if ($[6] !== children || $[7] !== t2) {
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(TooltipGroupContextProvider, {
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime38.jsx)(TooltipGroupContextProvider, {
       value: t2,
       children
     });
@@ -27871,8 +36738,8 @@ function TooltipProvider(t0) {
 
 // node_modules/@videojs/react/dist/default/i18n/text.js
 var import_react_compiler_runtime34 = __toESM(require_dist(), 1);
-var import_jsx_runtime24 = __toESM(require_jsx_runtime(), 1);
-function Text(t0) {
+var import_jsx_runtime39 = __toESM(require_jsx_runtime(), 1);
+function Text2(t0) {
   const $ = (0, import_react_compiler_runtime34.c)(12);
   let children;
   let props;
@@ -27888,31 +36755,31 @@ function Text(t0) {
     props = $[2];
     token = $[3];
   }
-  const t = useTranslator();
+  const t2 = useTranslator();
   const fallback = typeof children === "string" || typeof children === "number" ? String(children) : void 0;
   let t1;
-  if ($[4] !== children || $[5] !== fallback || $[6] !== t || $[7] !== token) {
-    t1 = token ? t({
+  if ($[4] !== children || $[5] !== fallback || $[6] !== t2 || $[7] !== token) {
+    t1 = token ? t2({
       key: token,
       text: fallback ?? token
     }) : children;
     $[4] = children;
     $[5] = fallback;
-    $[6] = t;
+    $[6] = t2;
     $[7] = token;
     $[8] = t1;
   } else t1 = $[8];
-  let t2;
+  let t22;
   if ($[9] !== props || $[10] !== t1) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime24.jsx)("span", {
+    t22 = /* @__PURE__ */ (0, import_jsx_runtime39.jsx)("span", {
       ...props,
       children: t1
     });
     $[9] = props;
     $[10] = t1;
-    $[11] = t2;
-  } else t2 = $[11];
-  return t2;
+    $[11] = t22;
+  } else t22 = $[11];
+  return t22;
 }
 
 // node_modules/@videojs/react/dist/default/ui/play-button/component.js
@@ -27926,12 +36793,12 @@ var PlayButton = createMediaButton({
 });
 
 // node_modules/@videojs/react/dist/default/ui/create-context-part.js
-var import_react65 = __toESM(require_react(), 1);
+var import_react119 = __toESM(require_react(), 1);
 function createContextPart(config) {
-  const { displayName, tag, useContext: useContext23, staticProps, getProps } = config;
-  const Component = (0, import_react65.forwardRef)(function ContextPart(componentProps, forwardedRef) {
+  const { displayName, tag, useContext: useContext25, staticProps, getProps } = config;
+  const Component = (0, import_react119.forwardRef)(function ContextPart(componentProps, forwardedRef) {
     const { render, className, style, ...elementProps } = componentProps;
-    const context = useContext23();
+    const context = useContext25();
     const dynamicProps = getProps?.(context.state);
     return renderElement(tag, {
       render,
@@ -27954,15 +36821,15 @@ function createContextPart(config) {
 
 // node_modules/@videojs/react/dist/default/ui/slider/context.js
 var import_react_compiler_runtime35 = __toESM(require_dist(), 1);
-var import_react66 = __toESM(require_react(), 1);
-var import_jsx_runtime25 = __toESM(require_jsx_runtime(), 1);
-var SliderContext = (0, import_react66.createContext)(null);
+var import_react120 = __toESM(require_react(), 1);
+var import_jsx_runtime40 = __toESM(require_jsx_runtime(), 1);
+var SliderContext = (0, import_react120.createContext)(null);
 function SliderProvider(t0) {
   const $ = (0, import_react_compiler_runtime35.c)(3);
   const { value, children } = t0;
   let t1;
   if ($[0] !== children || $[1] !== value) {
-    t1 = /* @__PURE__ */ (0, import_jsx_runtime25.jsx)(SliderContext.Provider, {
+    t1 = /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(SliderContext.Provider, {
       value,
       children
     });
@@ -27973,7 +36840,7 @@ function SliderProvider(t0) {
   return t1;
 }
 function useSliderContext() {
-  const ctx = (0, import_react66.useContext)(SliderContext);
+  const ctx = (0, import_react120.useContext)(SliderContext);
   if (!ctx) throw new Error("Slider compound components must be used within a Slider.Root");
   return ctx;
 }
@@ -28000,7 +36867,7 @@ function useSliderPointerValue(t0) {
     t2 = $[4];
     t3 = $[5];
   }
-  const percent = (0, import_react66.useSyncExternalStore)(t1, t2, t3);
+  const percent = (0, import_react120.useSyncExternalStore)(t1, t2, t3);
   let t4;
   if ($[6] !== context || $[7] !== percent) {
     t4 = percent === null ? context.pointerValue : context.getPointerValue?.(percent) ?? context.pointerValue;
@@ -28028,14 +36895,14 @@ var SliderFill = createContextPart({
 });
 
 // node_modules/@videojs/react/dist/default/ui/slider/preview.js
-var import_react67 = __toESM(require_react(), 1);
-var SliderPreview = (0, import_react67.forwardRef)(function SliderPreview2(componentProps, forwardedRef) {
+var import_react121 = __toESM(require_react(), 1);
+var SliderPreview = (0, import_react121.forwardRef)(function SliderPreview2(componentProps, forwardedRef) {
   const { render, className, style, overflow = "clamp", ...elementProps } = componentProps;
   const context = useSliderContext();
   const { state } = context;
-  const measureRef = (0, import_react67.useRef)(null);
-  const [width, setWidth] = (0, import_react67.useState)(0);
-  (0, import_react67.useEffect)(() => {
+  const measureRef = (0, import_react121.useRef)(null);
+  const [width, setWidth] = (0, import_react121.useState)(0);
+  (0, import_react121.useEffect)(() => {
     const el = measureRef.current;
     if (!el) return;
     return observeResize(el, ([entry]) => {
@@ -28056,8 +36923,8 @@ var SliderPreview = (0, import_react67.forwardRef)(function SliderPreview2(compo
 });
 
 // node_modules/@videojs/react/dist/default/ui/slider/thumb.js
-var import_react68 = __toESM(require_react(), 1);
-var SliderThumb = (0, import_react68.forwardRef)(function SliderThumb2(componentProps, forwardedRef) {
+var import_react122 = __toESM(require_react(), 1);
+var SliderThumb = (0, import_react122.forwardRef)(function SliderThumb2(componentProps, forwardedRef) {
   const { render, className, style, ...elementProps } = componentProps;
   const context = useSliderContext();
   const { state, thumbRef, thumbProps, getAttrs } = context;
@@ -28080,15 +36947,15 @@ var SliderThumb = (0, import_react68.forwardRef)(function SliderThumb2(component
 
 // node_modules/@videojs/react/dist/default/ui/thumbnail/context.js
 var import_react_compiler_runtime36 = __toESM(require_dist(), 1);
-var import_react69 = __toESM(require_react(), 1);
-var import_jsx_runtime26 = __toESM(require_jsx_runtime(), 1);
-var ThumbnailContext = (0, import_react69.createContext)(null);
+var import_react123 = __toESM(require_react(), 1);
+var import_jsx_runtime41 = __toESM(require_jsx_runtime(), 1);
+var ThumbnailContext = (0, import_react123.createContext)(null);
 function ThumbnailProvider(t0) {
   const $ = (0, import_react_compiler_runtime36.c)(3);
   const { value, children } = t0;
   let t1;
   if ($[0] !== children || $[1] !== value) {
-    t1 = /* @__PURE__ */ (0, import_jsx_runtime26.jsx)(ThumbnailContext.Provider, {
+    t1 = /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(ThumbnailContext.Provider, {
       value,
       children
     });
@@ -28099,14 +36966,14 @@ function ThumbnailProvider(t0) {
   return t1;
 }
 function useThumbnailContext() {
-  const ctx = (0, import_react69.useContext)(ThumbnailContext);
+  const ctx = (0, import_react123.useContext)(ThumbnailContext);
   if (!ctx) throw new Error("Thumbnail compound components must be used within a Thumbnail.Root");
   return ctx;
 }
 
 // node_modules/@videojs/react/dist/default/ui/thumbnail/image.js
-var import_react70 = __toESM(require_react(), 1);
-var ThumbnailImage = (0, import_react70.forwardRef)(function ThumbnailImage2(componentProps, forwardedRef) {
+var import_react124 = __toESM(require_react(), 1);
+var ThumbnailImage = (0, import_react124.forwardRef)(function ThumbnailImage2(componentProps, forwardedRef) {
   const { render, className, style, crossOrigin, loading, fetchPriority, ...elementProps } = componentProps;
   const { core, state, src, imageStyle, inheritedCrossOrigin, imageRef } = useThumbnailContext();
   const ref = useComposedRefs(forwardedRef, imageRef);
@@ -28136,35 +37003,35 @@ var ThumbnailImage = (0, import_react70.forwardRef)(function ThumbnailImage2(com
 });
 
 // node_modules/@videojs/react/dist/default/ui/thumbnail/root.js
-var import_react71 = __toESM(require_react(), 1);
-var import_jsx_runtime27 = __toESM(require_jsx_runtime(), 1);
-var ThumbnailRoot = (0, import_react71.forwardRef)(function ThumbnailRoot2(componentProps, forwardedRef) {
+var import_react125 = __toESM(require_react(), 1);
+var import_jsx_runtime42 = __toESM(require_jsx_runtime(), 1);
+var ThumbnailRoot = (0, import_react125.forwardRef)(function ThumbnailRoot2(componentProps, forwardedRef) {
   "use no memo";
   const { render, className, style, time = 0, thumbnails: externalThumbnails, ...elementProps } = componentProps;
-  const [core] = (0, import_react71.useState)(() => new ThumbnailCore());
-  const divRef = (0, import_react71.useRef)(null);
-  const imgRef = (0, import_react71.useRef)(null);
+  const [core] = (0, import_react125.useState)(() => new ThumbnailCore());
+  const divRef = (0, import_react125.useRef)(null);
+  const imgRef = (0, import_react125.useRef)(null);
   const textTrack = useOptionalPlayer(selectTextTrack);
   useOptionalPlayer(selectFullscreen);
-  const [, setRenderToken] = (0, import_react71.useState)(0);
-  const [handle] = (0, import_react71.useState)(() => createThumbnail({
+  const [, setRenderToken] = (0, import_react125.useState)(0);
+  const [handle] = (0, import_react125.useState)(() => createThumbnail({
     getContainer: () => divRef.current,
     getImg: () => imgRef.current,
     onStateChange: () => setRenderToken((token) => token + 1)
   }));
   useDestroy(handle, () => handle.connect());
-  const imageRef = (0, import_react71.useCallback)((img) => {
+  const imageRef = (0, import_react125.useCallback)((img) => {
     const previous = imgRef.current;
     imgRef.current = img;
     if (img) handle.connect();
     else if (previous) handle.disconnectImg(previous);
   }, [handle]);
-  const thumbnails = (0, import_react71.useMemo)(() => {
+  const thumbnails = (0, import_react125.useMemo)(() => {
     if (externalThumbnails && externalThumbnails.length > 0) return externalThumbnails;
     const thumbnailsTrack = textTrack?.thumbnailsTrack;
     return thumbnailsTrack && thumbnailsTrack.cues.length > 0 ? mapCuesToThumbnails(thumbnailsTrack.cues, thumbnailsTrack.src ?? void 0) : [];
   }, [externalThumbnails, textTrack]);
-  const thumbnail = (0, import_react71.useMemo)(() => core.findActiveThumbnail(thumbnails, time), [
+  const thumbnail = (0, import_react125.useMemo)(() => core.findActiveThumbnail(thumbnails, time), [
     core,
     thumbnails,
     time
@@ -28190,7 +37057,7 @@ var ThumbnailRoot = (0, import_react71.forwardRef)(function ThumbnailRoot2(compo
       };
     }
   }
-  return /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(ThumbnailProvider, {
+  return /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(ThumbnailProvider, {
     value: {
       core,
       state,
@@ -28218,14 +37085,14 @@ var ThumbnailRoot = (0, import_react71.forwardRef)(function ThumbnailRoot2(compo
 
 // node_modules/@videojs/react/dist/default/ui/slider/thumbnail/root.js
 var import_react_compiler_runtime37 = __toESM(require_dist(), 1);
-var import_react72 = __toESM(require_react(), 1);
-var import_jsx_runtime28 = __toESM(require_jsx_runtime(), 1);
-var SliderThumbnailRoot = (0, import_react72.forwardRef)(function SliderThumbnailRoot2(componentProps, forwardedRef) {
+var import_react126 = __toESM(require_react(), 1);
+var import_jsx_runtime43 = __toESM(require_jsx_runtime(), 1);
+var SliderThumbnailRoot = (0, import_react126.forwardRef)(function SliderThumbnailRoot2(componentProps, forwardedRef) {
   const $ = (0, import_react_compiler_runtime37.c)(4);
   const pointerValue = useSliderPointerValue();
   let t0;
   if ($[0] !== componentProps || $[1] !== forwardedRef || $[2] !== pointerValue) {
-    t0 = /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(ThumbnailRoot, {
+    t0 = /* @__PURE__ */ (0, import_jsx_runtime43.jsx)(ThumbnailRoot, {
       ref: forwardedRef,
       ...componentProps,
       time: pointerValue
@@ -28246,8 +37113,8 @@ var SliderTrack = createContextPart({
 });
 
 // node_modules/@videojs/react/dist/default/ui/slider/value.js
-var import_react73 = __toESM(require_react(), 1);
-var SliderValue = (0, import_react73.forwardRef)(function SliderValue2(componentProps, forwardedRef) {
+var import_react127 = __toESM(require_react(), 1);
+var SliderValue = (0, import_react127.forwardRef)(function SliderValue2(componentProps, forwardedRef) {
   const { render, className, style, type = "current", format, ...elementProps } = componentProps;
   const context = useSliderContext();
   const { state, formatValue } = context;
@@ -28270,15 +37137,15 @@ var SliderValue = (0, import_react73.forwardRef)(function SliderValue2(component
 });
 
 // node_modules/@videojs/react/dist/default/ui/time-slider/chapter-title.js
-var import_react74 = __toESM(require_react(), 1);
-var TimeSliderChapterTitle = (0, import_react74.forwardRef)(function TimeSliderChapterTitle2(componentProps, ref) {
+var import_react128 = __toESM(require_react(), 1);
+var TimeSliderChapterTitle = (0, import_react128.forwardRef)(function TimeSliderChapterTitle2(componentProps, ref) {
   const { render, className, style, ...elementProps } = componentProps;
   const slider = useSliderContext();
   const pointerValue = useSliderPointerValue();
   const textTrack = usePlayer(selectTextTrack);
   const time = usePlayer(selectTime);
-  const [core] = (0, import_react74.useState)(() => new TimeSliderChaptersCore());
-  const { chapters } = (0, import_react74.useMemo)(() => core.getRanges(textTrack?.chaptersCues ?? [], 0, time?.duration ?? 0), [
+  const [core] = (0, import_react128.useState)(() => new TimeSliderChaptersCore());
+  const { chapters } = (0, import_react128.useMemo)(() => core.getRanges(textTrack?.chaptersCues ?? [], 0, time?.duration ?? 0), [
     core,
     textTrack?.chaptersCues,
     time?.duration
@@ -28306,14 +37173,14 @@ var TimeSliderChapterTitle = (0, import_react74.forwardRef)(function TimeSliderC
 });
 
 // node_modules/@videojs/react/dist/default/ui/time-slider/segments.js
-var import_react75 = __toESM(require_react(), 1);
-var import_jsx_runtime29 = __toESM(require_jsx_runtime(), 1);
-var SliderSegments = (0, import_react75.forwardRef)(function SliderSegments2(componentProps, ref) {
+var import_react129 = __toESM(require_react(), 1);
+var import_jsx_runtime44 = __toESM(require_jsx_runtime(), 1);
+var SliderSegments = (0, import_react129.forwardRef)(function SliderSegments2(componentProps, ref) {
   const { ranges, min, max, renderSegment, render, className, style, ...elementProps } = componentProps;
   const slider = useSliderContext();
   const pointerValue = useSliderPointerValue();
-  const [core] = (0, import_react75.useState)(() => new SliderSegmentsCore());
-  const geometry = (0, import_react75.useMemo)(() => core.getGeometry({
+  const [core] = (0, import_react129.useState)(() => new SliderSegmentsCore());
+  const geometry = (0, import_react129.useMemo)(() => core.getGeometry({
     ranges,
     min,
     max,
@@ -28334,7 +37201,7 @@ var SliderSegments = (0, import_react75.forwardRef)(function SliderSegments2(com
       [TimeSliderChapterCSSVars.width]: state2.width ?? state2.height,
       [TimeSliderChapterCSSVars.fill]: `${state2.fillPercent}%`
     };
-    return /* @__PURE__ */ (0, import_jsx_runtime29.jsx)(import_react75.Fragment, { children: renderSegment({
+    return /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(import_react129.Fragment, { children: renderSegment({
       ...sliderAttrs,
       style: segmentStyle
     }, state2) }, state2.key);
@@ -28359,10 +37226,10 @@ var SliderSegments = (0, import_react75.forwardRef)(function SliderSegments2(com
 
 // node_modules/@videojs/react/dist/default/ui/time-slider/chapters.js
 var import_react_compiler_runtime38 = __toESM(require_dist(), 1);
-var import_react76 = __toESM(require_react(), 1);
-var import_jsx_runtime30 = __toESM(require_jsx_runtime(), 1);
+var import_react130 = __toESM(require_react(), 1);
+var import_jsx_runtime45 = __toESM(require_jsx_runtime(), 1);
 init_predicate2();
-var TimeSliderChapters = (0, import_react76.forwardRef)(function TimeSliderChapters2(componentProps, ref) {
+var TimeSliderChapters = (0, import_react130.forwardRef)(function TimeSliderChapters2(componentProps, ref) {
   const $ = (0, import_react_compiler_runtime38.c)(39);
   let className;
   let props;
@@ -28387,7 +37254,7 @@ var TimeSliderChapters = (0, import_react76.forwardRef)(function TimeSliderChapt
   const textTrack = usePlayer(selectTextTrack);
   const buffer = usePlayer(selectBuffer);
   const duration = usePlayer(selectTime)?.duration ?? 0;
-  const [core] = (0, import_react76.useState)(_temp10);
+  const [core] = (0, import_react130.useState)(_temp10);
   textTrack?.chaptersCues;
   let t0;
   if ($[6] !== core || $[7] !== duration || $[8] !== textTrack?.chaptersCues) {
@@ -28437,7 +37304,7 @@ var TimeSliderChapters = (0, import_react76.forwardRef)(function TimeSliderChapt
   } else t4 = $[23];
   let t5;
   if ($[24] !== render || $[25] !== state) {
-    t5 = isFunction(render) ? (renderProps) => render(renderProps, state) : render;
+    t5 = isFunction(render) ? (renderProps2) => render(renderProps2, state) : render;
     $[24] = render;
     $[25] = state;
     $[26] = t5;
@@ -28463,7 +37330,7 @@ var TimeSliderChapters = (0, import_react76.forwardRef)(function TimeSliderChapt
   } else t6 = $[29];
   let t7;
   if ($[30] !== max || $[31] !== props || $[32] !== ranges || $[33] !== ref || $[34] !== t3 || $[35] !== t4 || $[36] !== t5 || $[37] !== t6) {
-    t7 = /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(SliderSegments, {
+    t7 = /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(SliderSegments, {
       ref,
       ...props,
       className: t3,
@@ -28491,9 +37358,9 @@ function _temp10() {
 }
 
 // node_modules/@videojs/react/dist/default/utils/use-force-render.js
-var import_react77 = __toESM(require_react(), 1);
+var import_react131 = __toESM(require_react(), 1);
 function useForceRender() {
-  const [, forceRender] = (0, import_react77.useReducer)(_temp11, 0);
+  const [, forceRender] = (0, import_react131.useReducer)(_temp11, 0);
   return forceRender;
 }
 function _temp11(c89) {
@@ -28501,20 +37368,20 @@ function _temp11(c89) {
 }
 
 // node_modules/@videojs/react/dist/default/ui/hooks/use-slider.js
-var import_react79 = __toESM(require_react(), 1);
+var import_react133 = __toESM(require_react(), 1);
 function useSlider(options) {
   const optionsRef = useLatestRef(options);
   const requestControlsLock = useOptionalPlayer(selectControls)?.requestControlsLock;
-  const releaseControlsLockRef = (0, import_react79.useRef)(null);
-  const releaseControlsLock = (0, import_react79.useCallback)(() => {
+  const releaseControlsLockRef = (0, import_react133.useRef)(null);
+  const releaseControlsLock = (0, import_react133.useCallback)(() => {
     releaseControlsLockRef.current?.();
     releaseControlsLockRef.current = null;
   }, []);
-  (0, import_react79.useEffect)(() => releaseControlsLock, [releaseControlsLock]);
-  const rootElementRef = (0, import_react79.useRef)(null);
-  const thumbElementRef = (0, import_react79.useRef)(null);
+  (0, import_react133.useEffect)(() => releaseControlsLock, [releaseControlsLock]);
+  const rootElementRef = (0, import_react133.useRef)(null);
+  const thumbElementRef = (0, import_react133.useRef)(null);
   const forceRender = useForceRender();
-  const [slider] = (0, import_react79.useState)(() => {
+  const [slider] = (0, import_react133.useState)(() => {
     const stableOptions = {
       getElement: () => rootElementRef.current,
       getThumbElement: () => thumbElementRef.current,
@@ -28551,12 +37418,12 @@ function useSlider(options) {
     ...interaction
   };
   const state = options.computeState(input);
-  (0, import_react79.useLayoutEffect)(() => {
+  (0, import_react133.useLayoutEffect)(() => {
     if (state.thumbAlignment === "edge" && rootElementRef.current && thumbElementRef.current) forceRender();
   }, [state.thumbAlignment]);
   const styleState = options.getStyleState?.(state) ?? state;
   const cssVars = options.getCSSVars(slider.adjustForAlignment(styleState));
-  const syncStyles = (0, import_react79.useCallback)((element = rootElementRef.current) => {
+  const syncStyles = (0, import_react133.useCallback)((element = rootElementRef.current) => {
     if (!element) return;
     const { dragging, pointing } = slider.input.current;
     if (!dragging && !pointing) return;
@@ -28564,15 +37431,15 @@ function useSlider(options) {
     const visual = optionsRef.current.getStyleState?.(next) ?? next;
     applyStyles(element, optionsRef.current.getCSSVars(slider.adjustForAlignment(visual)));
   }, [slider]);
-  (0, import_react79.useLayoutEffect)(() => {
+  (0, import_react133.useLayoutEffect)(() => {
     syncStyles();
     return slider.input.subscribe(syncStyles);
   }, [slider, syncStyles]);
-  const rootRef = (0, import_react79.useCallback)((element) => {
+  const rootRef = (0, import_react133.useCallback)((element) => {
     rootElementRef.current = element;
     syncStyles(element);
   }, [syncStyles]);
-  const thumbRef = (0, import_react79.useCallback)((element) => {
+  const thumbRef = (0, import_react133.useCallback)((element) => {
     thumbElementRef.current = element;
   }, []);
   return {
@@ -28589,10 +37456,10 @@ function useSlider(options) {
 
 // node_modules/@videojs/react/dist/default/ui/time-slider/root.js
 var import_react_compiler_runtime39 = __toESM(require_dist(), 1);
-var import_react81 = __toESM(require_react(), 1);
-var import_jsx_runtime31 = __toESM(require_jsx_runtime(), 1);
+var import_react135 = __toESM(require_react(), 1);
+var import_jsx_runtime46 = __toESM(require_jsx_runtime(), 1);
 var noopSeek = () => Promise.resolve(0);
-var TimeSliderRoot = (0, import_react81.forwardRef)(function TimeSliderRoot2(componentProps, forwardedRef) {
+var TimeSliderRoot = (0, import_react135.forwardRef)(function TimeSliderRoot2(componentProps, forwardedRef) {
   const $ = (0, import_react_compiler_runtime39.c)(73);
   const { render, className, style, label, changeThrottle: t0, step: t1, largeStep: t2, orientation, disabled, thumbAlignment, onDragStart, onDragEnd, pauseOnDrag, ...elementProps } = componentProps;
   const changeThrottle = t0 === void 0 ? TimeSliderCore.defaultProps.changeThrottle : t0;
@@ -28601,12 +37468,12 @@ var TimeSliderRoot = (0, import_react81.forwardRef)(function TimeSliderRoot2(com
   const time = usePlayer(selectTime);
   const buffer = usePlayer(selectBuffer);
   const playback = usePlayer(selectPlayback);
-  const [seek] = (0, import_react81.useState)(_temp12);
+  const [seek] = (0, import_react135.useState)(_temp12);
   const target = useSnapshot(seek.state);
-  const element = (0, import_react81.useRef)(null);
+  const element = (0, import_react135.useRef)(null);
   const translator = useTranslator();
   const locale = useLocale();
-  const [core] = (0, import_react81.useState)(_temp23);
+  const [core] = (0, import_react135.useState)(_temp23);
   core.setProps({
     label,
     step,
@@ -28647,8 +37514,8 @@ var TimeSliderRoot = (0, import_react81.forwardRef)(function TimeSliderRoot2(com
     $[6] = core;
     $[7] = t5;
   } else t5 = $[7];
-  (0, import_react81.useEffect)(t4, t5);
-  const dragSeekPercentRef = (0, import_react81.useRef)(void 0);
+  (0, import_react135.useEffect)(t4, t5);
+  const dragSeekPercentRef = (0, import_react135.useRef)(void 0);
   let t6;
   if ($[8] !== core || $[9] !== mediaRef || $[10] !== seek) {
     t6 = (percent) => {
@@ -28799,7 +37666,7 @@ var TimeSliderRoot = (0, import_react81.forwardRef)(function TimeSliderRoot2(com
     $[44] = t19;
     $[45] = t20;
   } else t20 = $[45];
-  (0, import_react81.useLayoutEffect)(t18, t20);
+  (0, import_react135.useLayoutEffect)(t18, t20);
   let t21;
   let t22;
   if ($[46] !== seek) {
@@ -28812,7 +37679,7 @@ var TimeSliderRoot = (0, import_react81.forwardRef)(function TimeSliderRoot2(com
     t21 = $[47];
     t22 = $[48];
   }
-  (0, import_react81.useEffect)(t21, t22);
+  (0, import_react135.useEffect)(t21, t22);
   const playing = isMediaPlaying(playback) && !state_0.disabled && !state_0.dragging && !time?.seeking && target.percent === void 0;
   let t23;
   if ($[49] !== core || $[50] !== state_0.pointerPercent) {
@@ -28900,7 +37767,7 @@ var TimeSliderRoot = (0, import_react81.forwardRef)(function TimeSliderRoot2(com
   });
   let t29;
   if ($[69] !== T0 || $[70] !== context || $[71] !== t28) {
-    t29 = /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(T0, {
+    t29 = /* @__PURE__ */ (0, import_jsx_runtime46.jsx)(T0, {
       value: context,
       children: t28
     });
@@ -28919,23 +37786,23 @@ function _temp23() {
 }
 
 // node_modules/@videojs/react/dist/default/ui/popover/context.js
-var import_react82 = __toESM(require_react(), 1);
-var PopoverContext = (0, import_react82.createContext)(null);
+var import_react136 = __toESM(require_react(), 1);
+var PopoverContext = (0, import_react136.createContext)(null);
 var PopoverContextProvider = PopoverContext.Provider;
 function usePopoverContext() {
-  const ctx = (0, import_react82.useContext)(PopoverContext);
+  const ctx = (0, import_react136.useContext)(PopoverContext);
   if (!ctx) throw new Error("Popover compound components must be used within a Popover.Root");
   return ctx;
 }
 
 // node_modules/@videojs/react/dist/default/ui/popover/popup.js
 var import_react_compiler_runtime40 = __toESM(require_dist(), 1);
-var import_react83 = __toESM(require_react(), 1);
-var PopoverPopup = (0, import_react83.forwardRef)(function PopoverPopup2(t0, forwardedRef) {
+var import_react137 = __toESM(require_react(), 1);
+var PopoverPopup = (0, import_react137.forwardRef)(function PopoverPopup2(t0, forwardedRef) {
   const $ = (0, import_react_compiler_runtime40.c)(13);
   const { render, className, style, ...elementProps } = t0;
   const { core, popover, state, preferredSide, setPositionedSide, stateAttrMap, anchorName, popupId, boundary, container } = usePopoverContext();
-  const internalRef = (0, import_react83.useRef)(null);
+  const internalRef = (0, import_react137.useRef)(null);
   let t1;
   if ($[0] !== popover) {
     t1 = (el) => {
@@ -29004,20 +37871,20 @@ var PopoverPopup = (0, import_react83.forwardRef)(function PopoverPopup2(t0, for
 });
 
 // node_modules/@videojs/react/dist/default/ui/volume-popover/context.js
-var import_react84 = __toESM(require_react(), 1);
-var VolumePopoverContext = (0, import_react84.createContext)(null);
+var import_react138 = __toESM(require_react(), 1);
+var VolumePopoverContext = (0, import_react138.createContext)(null);
 var VolumePopoverContextProvider = VolumePopoverContext.Provider;
 function useVolumePopoverContext() {
-  const context = (0, import_react84.useContext)(VolumePopoverContext);
+  const context = (0, import_react138.useContext)(VolumePopoverContext);
   if (!context) throw new Error("VolumePopover compound components must be used within a VolumePopover.Root");
   return context;
 }
 
 // node_modules/@videojs/react/dist/default/ui/volume-popover/popup.js
 var import_react_compiler_runtime41 = __toESM(require_dist(), 1);
-var import_react85 = __toESM(require_react(), 1);
-var import_jsx_runtime32 = __toESM(require_jsx_runtime(), 1);
-var VolumePopoverPopup = (0, import_react85.forwardRef)(function VolumePopoverPopup2(props, forwardedRef) {
+var import_react139 = __toESM(require_react(), 1);
+var import_jsx_runtime47 = __toESM(require_jsx_runtime(), 1);
+var VolumePopoverPopup = (0, import_react139.forwardRef)(function VolumePopoverPopup2(props, forwardedRef) {
   const $ = (0, import_react_compiler_runtime41.c)(6);
   const { state } = useVolumePopoverContext();
   if (state.hidden) return null;
@@ -29029,7 +37896,7 @@ var VolumePopoverPopup = (0, import_react85.forwardRef)(function VolumePopoverPo
   } else t0 = $[1];
   let t1;
   if ($[2] !== forwardedRef || $[3] !== props || $[4] !== t0) {
-    t1 = /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(PopoverPopup, {
+    t1 = /* @__PURE__ */ (0, import_jsx_runtime47.jsx)(PopoverPopup, {
       ref: forwardedRef,
       ...t0,
       ...props
@@ -29043,14 +37910,14 @@ var VolumePopoverPopup = (0, import_react85.forwardRef)(function VolumePopoverPo
 });
 
 // node_modules/@videojs/react/dist/default/ui/popover/root.js
-var import_react87 = __toESM(require_react(), 1);
-var import_jsx_runtime33 = __toESM(require_jsx_runtime(), 1);
+var import_react141 = __toESM(require_react(), 1);
+var import_jsx_runtime48 = __toESM(require_jsx_runtime(), 1);
 init_predicate2();
 function PopoverRoot({ open: controlledOpen, defaultOpen = PopoverCore.defaultProps.defaultOpen, onOpenChange: onOpenChangeProp, onOpenChangeComplete: onOpenChangeCompleteProp, openOnHover = PopoverCore.defaultProps.openOnHover, delay = PopoverCore.defaultProps.delay, closeDelay = PopoverCore.defaultProps.closeDelay, boundary = "container", children, ...coreProps }) {
   const container = useOptionalContainer();
   const popupGroup = useOptionalPopupGroup();
   const controls = useOptionalControlsContext();
-  const [core] = (0, import_react87.useState)(() => new PopoverCore(coreProps));
+  const [core] = (0, import_react141.useState)(() => new PopoverCore(coreProps));
   core.setProps(coreProps);
   const isControlled = !isUndefined(controlledOpen);
   const onOpenChangeRef = useLatestRef(onOpenChangeProp);
@@ -29061,7 +37928,7 @@ function PopoverRoot({ open: controlledOpen, defaultOpen = PopoverCore.defaultPr
   const delayRef = useLatestRef(delay);
   const closeDelayRef = useLatestRef(closeDelay);
   const popupGroupRef = useLatestRef(popupGroup);
-  const [popover] = (0, import_react87.useState)(() => {
+  const [popover] = (0, import_react141.useState)(() => {
     const instance = createPopover({
       transition: createTransition(),
       onOpenChange: (nextOpen, details) => {
@@ -29082,14 +37949,14 @@ function PopoverRoot({ open: controlledOpen, defaultOpen = PopoverCore.defaultPr
   });
   const anchorName = useSafeId();
   const popupId = useSafeId("popup");
-  (0, import_react87.useEffect)(() => {
+  (0, import_react141.useEffect)(() => {
     if (isUndefined(controlledOpen)) return;
     const { active: inputOpen } = popover.input.current;
     if (controlledOpen === inputOpen) return;
     if (controlledOpen) popover.open("click");
     else popover.close("click");
   }, [controlledOpen, popover]);
-  (0, import_react87.useEffect)(() => {
+  (0, import_react141.useEffect)(() => {
     if (isUndefined(controls?.state.visible)) return;
     if (controls.state.visible) return;
     popover.close("imperative-action");
@@ -29098,7 +37965,7 @@ function PopoverRoot({ open: controlledOpen, defaultOpen = PopoverCore.defaultPr
   const input = useSnapshot(popover.input);
   core.setInput(input);
   const { state, preferredSide, setPositionedSide } = usePositionedState(core.getState());
-  return /* @__PURE__ */ (0, import_jsx_runtime33.jsx)(PopoverContextProvider, {
+  return /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(PopoverContextProvider, {
     value: {
       core,
       popover,
@@ -29117,8 +37984,8 @@ function PopoverRoot({ open: controlledOpen, defaultOpen = PopoverCore.defaultPr
 
 // node_modules/@videojs/react/dist/default/ui/volume-popover/root.js
 var import_react_compiler_runtime42 = __toESM(require_dist(), 1);
-var import_react88 = __toESM(require_react(), 1);
-var import_jsx_runtime34 = __toESM(require_jsx_runtime(), 1);
+var import_react142 = __toESM(require_react(), 1);
+var import_jsx_runtime49 = __toESM(require_jsx_runtime(), 1);
 var unavailableVolume = {
   volume: 0,
   muted: false,
@@ -29142,7 +38009,7 @@ function VolumePopoverRoot(t0) {
   }
   let t1;
   if ($[3] !== children || $[4] !== props) {
-    t1 = /* @__PURE__ */ (0, import_jsx_runtime34.jsx)(VolumePopoverState, {
+    t1 = /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(VolumePopoverState, {
       ...props,
       children
     });
@@ -29152,7 +38019,7 @@ function VolumePopoverRoot(t0) {
   } else t1 = $[5];
   let t2;
   if ($[6] !== props || $[7] !== t1) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime34.jsx)(PopoverRoot, {
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(PopoverRoot, {
       ...props,
       children: t1
     });
@@ -29166,7 +38033,7 @@ function VolumePopoverState({ children, ...props }) {
   "use no memo";
   const volume = usePlayer(selectVolume);
   const { popover, state: popoverState } = usePopoverContext();
-  const [core] = (0, import_react88.useState)(() => new VolumePopoverCore(props));
+  const [core] = (0, import_react142.useState)(() => new VolumePopoverCore(props));
   core.setProps(props);
   core.setMedia(volume ?? unavailableVolume);
   core.setInput({
@@ -29174,21 +38041,21 @@ function VolumePopoverState({ children, ...props }) {
     status: popoverState.status
   });
   const state = core.getState();
-  (0, import_react88.useEffect)(() => {
+  (0, import_react142.useEffect)(() => {
     if (state.hidden) popover.close("imperative-action");
   }, [popover, state.hidden]);
-  return /* @__PURE__ */ (0, import_jsx_runtime34.jsx)(VolumePopoverContextProvider, {
+  return /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(VolumePopoverContextProvider, {
     value: { state },
     children
   });
 }
 
 // node_modules/@videojs/react/dist/default/ui/popover/trigger.js
-var import_react89 = __toESM(require_react(), 1);
-var PopoverTrigger = (0, import_react89.forwardRef)(function PopoverTrigger2({ render, className, style, ...elementProps }, forwardedRef) {
+var import_react143 = __toESM(require_react(), 1);
+var PopoverTrigger = (0, import_react143.forwardRef)(function PopoverTrigger2({ render, className, style, ...elementProps }, forwardedRef) {
   const { core, popover, state, stateAttrMap, popupId } = usePopoverContext();
   const controlledId = state.open ? popupId : void 0;
-  const triggerRef = (0, import_react89.useCallback)((el) => {
+  const triggerRef = (0, import_react143.useCallback)((el) => {
     popover.setTriggerElement(el);
   }, [popover]);
   const { onFocusIn, onFocusOut, ...restTriggerProps } = popover.triggerProps;
@@ -29216,12 +38083,12 @@ var PopoverTrigger = (0, import_react89.forwardRef)(function PopoverTrigger2({ r
 });
 
 // node_modules/@videojs/react/dist/default/ui/volume-popover/trigger.js
-var import_react90 = __toESM(require_react(), 1);
-var import_jsx_runtime35 = __toESM(require_jsx_runtime(), 1);
-var VolumePopoverTrigger = (0, import_react90.forwardRef)(function VolumePopoverTrigger2({ render, className, style, ...elementProps }, forwardedRef) {
+var import_react144 = __toESM(require_react(), 1);
+var import_jsx_runtime50 = __toESM(require_jsx_runtime(), 1);
+var VolumePopoverTrigger = (0, import_react144.forwardRef)(function VolumePopoverTrigger2({ render, className, style, ...elementProps }, forwardedRef) {
   const { state: popoverState } = usePopoverContext();
   const { state } = useVolumePopoverContext();
-  if (!state.hidden) return /* @__PURE__ */ (0, import_jsx_runtime35.jsx)(PopoverTrigger, {
+  if (!state.hidden) return /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(PopoverTrigger, {
     ref: forwardedRef,
     render,
     className,
@@ -29240,8 +38107,8 @@ var VolumePopoverTrigger = (0, import_react90.forwardRef)(function VolumePopover
 });
 
 // node_modules/@videojs/react/dist/default/ui/volume-slider/root.js
-var import_react91 = __toESM(require_react(), 1);
-var import_jsx_runtime36 = __toESM(require_jsx_runtime(), 1);
+var import_react145 = __toESM(require_react(), 1);
+var import_jsx_runtime51 = __toESM(require_jsx_runtime(), 1);
 var noopVolume = {
   volume: 0,
   muted: false,
@@ -29250,14 +38117,14 @@ var noopVolume = {
   setVolume: () => 0,
   setMuted: () => false
 };
-var VolumeSliderRoot = (0, import_react91.forwardRef)(function VolumeSliderRoot2(componentProps, forwardedRef) {
+var VolumeSliderRoot = (0, import_react145.forwardRef)(function VolumeSliderRoot2(componentProps, forwardedRef) {
   const { render, className, style, label, orientation, step = VolumeSliderCore.defaultProps.step, largeStep = VolumeSliderCore.defaultProps.largeStep, wheelStep = VolumeSliderCore.defaultProps.wheelStep, disabled, thumbAlignment, onDragStart, onDragEnd, ...elementProps } = componentProps;
   const volume = usePlayer(selectVolume);
   const translator = useTranslator();
   const locale = useLocale();
   const isUnavailable = volume?.volumeAvailability !== "available";
   const isDisabled = Boolean(disabled) || isUnavailable;
-  const [core] = (0, import_react91.useState)(() => new VolumeSliderCore());
+  const [core] = (0, import_react145.useState)(() => new VolumeSliderCore());
   core.setProps({
     label,
     orientation,
@@ -29291,21 +38158,21 @@ var VolumeSliderRoot = (0, import_react91.forwardRef)(function VolumeSliderRoot2
     onDragStart,
     onDragEnd
   });
-  const [wheelHandler] = (0, import_react91.useState)(() => createWheelStep({
+  const [wheelHandler] = (0, import_react145.useState)(() => createWheelStep({
     isDisabled: () => disabledRef.current,
     getPercent: () => (volumeRef.current?.volume ?? 0) * 100,
     getStepPercent: () => core.getWheelStepPercent(),
     onValueChange: (percent) => volumeRef.current?.setVolume(core.rawValueFromPercent(percent) / 100)
   }));
-  const wheelCleanupRef = (0, import_react91.useRef)(null);
-  const wheelRef = (0, import_react91.useCallback)((element) => {
+  const wheelCleanupRef = (0, import_react145.useRef)(null);
+  const wheelRef = (0, import_react145.useCallback)((element) => {
     wheelCleanupRef.current?.();
     wheelCleanupRef.current = null;
     if (element) wheelCleanupRef.current = listen2(element, "wheel", wheelHandler.onWheel, { passive: false });
   }, [wheelHandler]);
   if (!volume) return null;
   if (state.hidden) return null;
-  return /* @__PURE__ */ (0, import_jsx_runtime36.jsx)(SliderProvider, {
+  return /* @__PURE__ */ (0, import_jsx_runtime51.jsx)(SliderProvider, {
     value: {
       state,
       pointerValue: core.valueFromPercent(state.pointerPercent),
@@ -29414,16 +38281,16 @@ var AirPlayButton = createMediaButton({
 });
 
 // node_modules/@videojs/react/dist/default/ui/hooks/create-radio-options-hook.js
-var import_react92 = __toESM(require_react(), 1);
+var import_react146 = __toESM(require_react(), 1);
 init_predicate2();
 function createRadioOptionsHook({ name, feature, selector, createCore }) {
   return function useRadioOptions(props) {
     "use no memo";
     const media = usePlayer(selector);
-    const t = useTranslator();
-    const [core] = (0, import_react92.useState)(createCore);
+    const t2 = useTranslator();
+    const [core] = (0, import_react146.useState)(createCore);
     core.setProps(props ?? {});
-    const setValue = (0, import_react92.useCallback)((value) => core.selectValue(media, value), [core, media]);
+    const setValue = (0, import_react146.useCallback)((value) => core.selectValue(media, value), [core, media]);
     if (!media) return null;
     core.setMedia(media);
     const state = core.getState();
@@ -29431,14 +38298,14 @@ function createRadioOptionsHook({ name, feature, selector, createCore }) {
       const { label, labelParams, ariaLabel, ariaLabelParams, disabled, ...rest } = option;
       return {
         ...rest,
-        label: translateText(label, t, labelParams),
-        ariaLabel: isUndefined(ariaLabel) ? void 0 : translateText(ariaLabel, t, ariaLabelParams),
+        label: translateText(label, t2, labelParams),
+        ariaLabel: isUndefined(ariaLabel) ? void 0 : translateText(ariaLabel, t2, ariaLabelParams),
         disabled: state.disabled || disabled
       };
     });
     return {
       state,
-      label: translateText(core.getLabel(state), t, core.getLabelParams?.(state)),
+      label: translateText(core.getLabel(state), t2, core.getLabelParams?.(state)),
       value: state.value,
       selectedLabel: options.find((option) => option.value === state.value)?.label ?? "",
       options,
@@ -29463,8 +38330,8 @@ function useAudioTrackOptions(props) {
 
 // node_modules/@videojs/react/dist/default/ui/menu/use-menu-group.js
 var import_react_compiler_runtime43 = __toESM(require_dist(), 1);
-var import_react93 = __toESM(require_react(), 1);
-var import_jsx_runtime37 = __toESM(require_jsx_runtime(), 1);
+var import_react147 = __toESM(require_react(), 1);
+var import_jsx_runtime52 = __toESM(require_jsx_runtime(), 1);
 function hasExplicitLabel(elementProps) {
   return elementProps["aria-label"] !== void 0 || elementProps["aria-labelledby"] !== void 0;
 }
@@ -29477,7 +38344,7 @@ function getMenuGroupProps(labelId, elementProps) {
 function MenuGroupProvider(t0) {
   const $ = (0, import_react_compiler_runtime43.c)(7);
   const { children } = t0;
-  const [labelId, setLabelId] = (0, import_react93.useState)();
+  const [labelId, setLabelId] = (0, import_react147.useState)();
   let t1;
   if ($[0] === Symbol.for("react.memo_cache_sentinel")) {
     t1 = (id) => {
@@ -29504,7 +38371,7 @@ function MenuGroupProvider(t0) {
   } else t3 = $[4];
   let t4;
   if ($[5] !== t3) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(MenuGroupContextProvider, {
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(MenuGroupContextProvider, {
       value,
       children: t3
     });
@@ -29516,9 +38383,9 @@ function MenuGroupProvider(t0) {
 
 // node_modules/@videojs/react/dist/default/ui/menu/radio-group.js
 var import_react_compiler_runtime44 = __toESM(require_dist(), 1);
-var import_react94 = __toESM(require_react(), 1);
-var import_jsx_runtime38 = __toESM(require_jsx_runtime(), 1);
-var MenuRadioGroup = (0, import_react94.forwardRef)(function MenuRadioGroup2(t0, forwardedRef) {
+var import_react148 = __toESM(require_react(), 1);
+var import_jsx_runtime53 = __toESM(require_jsx_runtime(), 1);
+var MenuRadioGroup = (0, import_react148.forwardRef)(function MenuRadioGroup2(t0, forwardedRef) {
   const $ = (0, import_react_compiler_runtime44.c)(16);
   let className;
   let elementProps;
@@ -29546,7 +38413,7 @@ var MenuRadioGroup = (0, import_react94.forwardRef)(function MenuRadioGroup2(t0,
   const { state } = useMenuContext();
   let t1;
   if ($[7] !== className || $[8] !== elementProps || $[9] !== forwardedRef || $[10] !== onValueChange || $[11] !== render || $[12] !== state || $[13] !== style || $[14] !== value) {
-    t1 = /* @__PURE__ */ (0, import_jsx_runtime38.jsx)(MenuGroupProvider, { children: (labelId) => /* @__PURE__ */ (0, import_jsx_runtime38.jsx)(MenuRadioGroupContextProvider, {
+    t1 = /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(MenuGroupProvider, { children: (labelId) => /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(MenuRadioGroupContextProvider, {
       value: {
         value,
         onValueChange
@@ -29576,10 +38443,10 @@ var MenuRadioGroup = (0, import_react94.forwardRef)(function MenuRadioGroup2(t0,
 
 // node_modules/@videojs/react/dist/default/ui/audio-track-radio-group/component.js
 var import_react_compiler_runtime45 = __toESM(require_dist(), 1);
-var import_react95 = __toESM(require_react(), 1);
-var import_jsx_runtime39 = __toESM(require_jsx_runtime(), 1);
+var import_react149 = __toESM(require_react(), 1);
+var import_jsx_runtime54 = __toESM(require_jsx_runtime(), 1);
 init_predicate2();
-var AudioTrackRadioGroupContext = (0, import_react95.createContext)(void 0);
+var AudioTrackRadioGroupContext = (0, import_react149.createContext)(void 0);
 function AudioTrackRadioGroupRoot(t0) {
   const $ = (0, import_react_compiler_runtime45.c)(8);
   let children;
@@ -29603,7 +38470,7 @@ function AudioTrackRadioGroupRoot(t0) {
   useMenuOptionState(t1);
   let t2;
   if ($[5] !== audioTrack || $[6] !== children) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime39.jsx)(AudioTrackRadioGroupContext.Provider, {
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(AudioTrackRadioGroupContext.Provider, {
       value: audioTrack,
       children
     });
@@ -29613,7 +38480,7 @@ function AudioTrackRadioGroupRoot(t0) {
   } else t2 = $[7];
   return t2;
 }
-var AudioTrackRadioGroupValue = (0, import_react95.forwardRef)(function AudioTrackRadioGroupValue2({ render, className, style, ...elementProps }, forwardedRef) {
+var AudioTrackRadioGroupValue = (0, import_react149.forwardRef)(function AudioTrackRadioGroupValue2({ render, className, style, ...elementProps }, forwardedRef) {
   const audioTrack = useAudioTrackRadioGroupContext();
   if (!audioTrack) return null;
   return renderElement("span", {
@@ -29626,7 +38493,7 @@ var AudioTrackRadioGroupValue = (0, import_react95.forwardRef)(function AudioTra
     props: [elementProps, { children: audioTrack.selectedLabel }]
   });
 });
-var AudioTrackRadioGroupOptions = (0, import_react95.forwardRef)(function AudioTrackRadioGroupOptions2(componentProps, forwardedRef) {
+var AudioTrackRadioGroupOptions = (0, import_react149.forwardRef)(function AudioTrackRadioGroupOptions2(componentProps, forwardedRef) {
   const $ = (0, import_react_compiler_runtime45.c)(40);
   let ariaLabelProp;
   let ariaLabelledBy;
@@ -29696,7 +38563,7 @@ var AudioTrackRadioGroupOptions = (0, import_react95.forwardRef)(function AudioT
           ...option,
           checked: option.value === value
         };
-        return /* @__PURE__ */ (0, import_jsx_runtime39.jsx)(import_react95.Fragment, { children: renderItem({
+        return /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react149.Fragment, { children: renderItem({
           value: option.value,
           disabled: option.disabled,
           "data-track": option.value,
@@ -29715,7 +38582,7 @@ var AudioTrackRadioGroupOptions = (0, import_react95.forwardRef)(function AudioT
   } else t6 = $[22];
   let t7;
   if ($[26] !== ariaLabel || $[27] !== ariaLabelledBy || $[28] !== elementProps || $[29] !== forwardedRef || $[30] !== setValue || $[31] !== state.hidden || $[32] !== t0 || $[33] !== t1 || $[34] !== t2 || $[35] !== t3 || $[36] !== t4 || $[37] !== t6 || $[38] !== value) {
-    t7 = /* @__PURE__ */ (0, import_jsx_runtime39.jsx)(MenuRadioGroup, {
+    t7 = /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(MenuRadioGroup, {
       ...t0,
       ...elementProps,
       ref: forwardedRef,
@@ -29748,7 +38615,7 @@ var AudioTrackRadioGroupOptions = (0, import_react95.forwardRef)(function AudioT
   return t7;
 });
 function useAudioTrackRadioGroupContext() {
-  const audioTrack = (0, import_react95.useContext)(AudioTrackRadioGroupContext);
+  const audioTrack = (0, import_react149.useContext)(AudioTrackRadioGroupContext);
   if (audioTrack === void 0) throw new Error("AudioTrackRadioGroup parts must be used within AudioTrackRadioGroup.Root");
   return audioTrack;
 }
@@ -29780,10 +38647,10 @@ function useCaptionsOptions(props) {
 
 // node_modules/@videojs/react/dist/default/ui/captions-radio-group/component.js
 var import_react_compiler_runtime46 = __toESM(require_dist(), 1);
-var import_react96 = __toESM(require_react(), 1);
-var import_jsx_runtime40 = __toESM(require_jsx_runtime(), 1);
+var import_react150 = __toESM(require_react(), 1);
+var import_jsx_runtime55 = __toESM(require_jsx_runtime(), 1);
 init_predicate2();
-var CaptionsRadioGroupContext = (0, import_react96.createContext)(void 0);
+var CaptionsRadioGroupContext = (0, import_react150.createContext)(void 0);
 function CaptionsRadioGroupRoot(t0) {
   const $ = (0, import_react_compiler_runtime46.c)(8);
   let children;
@@ -29807,7 +38674,7 @@ function CaptionsRadioGroupRoot(t0) {
   useMenuOptionState(t1);
   let t2;
   if ($[5] !== captions || $[6] !== children) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(CaptionsRadioGroupContext.Provider, {
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime55.jsx)(CaptionsRadioGroupContext.Provider, {
       value: captions,
       children
     });
@@ -29817,7 +38684,7 @@ function CaptionsRadioGroupRoot(t0) {
   } else t2 = $[7];
   return t2;
 }
-var CaptionsRadioGroupValue = (0, import_react96.forwardRef)(function CaptionsRadioGroupValue2({ render, className, style, ...elementProps }, forwardedRef) {
+var CaptionsRadioGroupValue = (0, import_react150.forwardRef)(function CaptionsRadioGroupValue2({ render, className, style, ...elementProps }, forwardedRef) {
   const captions = useCaptionsRadioGroupContext();
   if (!captions) return null;
   return renderElement("span", {
@@ -29830,7 +38697,7 @@ var CaptionsRadioGroupValue = (0, import_react96.forwardRef)(function CaptionsRa
     props: [elementProps, { children: captions.selectedLabel }]
   });
 });
-var CaptionsRadioGroupOptions = (0, import_react96.forwardRef)(function CaptionsRadioGroupOptions2(componentProps, forwardedRef) {
+var CaptionsRadioGroupOptions = (0, import_react150.forwardRef)(function CaptionsRadioGroupOptions2(componentProps, forwardedRef) {
   const $ = (0, import_react_compiler_runtime46.c)(40);
   let ariaLabelProp;
   let ariaLabelledBy;
@@ -29900,7 +38767,7 @@ var CaptionsRadioGroupOptions = (0, import_react96.forwardRef)(function Captions
           ...option,
           checked: option.value === value
         };
-        return /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_react96.Fragment, { children: renderItem({
+        return /* @__PURE__ */ (0, import_jsx_runtime55.jsx)(import_react150.Fragment, { children: renderItem({
           value: option.value,
           disabled: option.disabled,
           "data-track": option.value,
@@ -29919,7 +38786,7 @@ var CaptionsRadioGroupOptions = (0, import_react96.forwardRef)(function Captions
   } else t6 = $[22];
   let t7;
   if ($[26] !== ariaLabel || $[27] !== ariaLabelledBy || $[28] !== elementProps || $[29] !== forwardedRef || $[30] !== setValue || $[31] !== state.hidden || $[32] !== t0 || $[33] !== t1 || $[34] !== t2 || $[35] !== t3 || $[36] !== t4 || $[37] !== t6 || $[38] !== value) {
-    t7 = /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(MenuRadioGroup, {
+    t7 = /* @__PURE__ */ (0, import_jsx_runtime55.jsx)(MenuRadioGroup, {
       ...t0,
       ...elementProps,
       ref: forwardedRef,
@@ -29952,7 +38819,7 @@ var CaptionsRadioGroupOptions = (0, import_react96.forwardRef)(function Captions
   return t7;
 });
 function useCaptionsRadioGroupContext() {
-  const captions = (0, import_react96.useContext)(CaptionsRadioGroupContext);
+  const captions = (0, import_react150.useContext)(CaptionsRadioGroupContext);
   if (captions === void 0) throw new Error("CaptionsRadioGroup parts must be used within CaptionsRadioGroup.Root");
   return captions;
 }
@@ -29994,17 +38861,17 @@ function callKeyDownHandler(handler, event) {
 
 // node_modules/@videojs/react/dist/default/ui/menu/content.js
 var import_react_compiler_runtime47 = __toESM(require_dist(), 1);
-var import_react97 = __toESM(require_react(), 1);
-var import_react_dom = __toESM(require_react_dom(), 1);
-var MenuContent = (0, import_react97.forwardRef)(function MenuContent2(t0, forwardedRef) {
+var import_react151 = __toESM(require_react(), 1);
+var import_react_dom3 = __toESM(require_react_dom(), 1);
+var MenuContent = (0, import_react151.forwardRef)(function MenuContent2(t0, forwardedRef) {
   const $ = (0, import_react_compiler_runtime47.c)(18);
   const { render, className, style, onKeyDown, onBlur, ...elementProps } = t0;
   const { core, menu, parent, state, contentId } = useMenuContext();
   const { popup, element: popupElement } = useMenuPopupContext();
   const isSubmenu = parent !== null;
   const isActive = isSubmenu && state.open;
-  const wasActiveRef = (0, import_react97.useRef)(false);
-  const cleanupRegistrationRef = (0, import_react97.useRef)(null);
+  const wasActiveRef = (0, import_react151.useRef)(false);
+  const cleanupRegistrationRef = (0, import_react151.useRef)(null);
   let t1;
   let t2;
   if ($[0] !== isActive || $[1] !== isSubmenu || $[2] !== menu) {
@@ -30031,7 +38898,7 @@ var MenuContent = (0, import_react97.forwardRef)(function MenuContent2(t0, forwa
     t1 = $[3];
     t2 = $[4];
   }
-  (0, import_react97.useLayoutEffect)(t1, t2);
+  (0, import_react151.useLayoutEffect)(t1, t2);
   let t3;
   if ($[5] !== isSubmenu || $[6] !== menu || $[7] !== parent?.menu || $[8] !== popup) {
     t3 = (element) => {
@@ -30107,14 +38974,14 @@ var MenuContent = (0, import_react97.forwardRef)(function MenuContent2(t0, forwa
       elementProps
     ]
   });
-  return isSubmenu && popupElement ? (0, import_react_dom.createPortal)(contentNode, popupElement) : contentNode;
+  return isSubmenu && popupElement ? (0, import_react_dom3.createPortal)(contentNode, popupElement) : contentNode;
 });
 
 // node_modules/@videojs/react/dist/default/ui/menu/item.js
 var import_react_compiler_runtime48 = __toESM(require_dist(), 1);
-var import_react98 = __toESM(require_react(), 1);
-var import_jsx_runtime41 = __toESM(require_jsx_runtime(), 1);
-var MenuItem = (0, import_react98.forwardRef)(function MenuItem2(t0, forwardedRef) {
+var import_react152 = __toESM(require_react(), 1);
+var import_jsx_runtime56 = __toESM(require_jsx_runtime(), 1);
+var MenuItem = (0, import_react152.forwardRef)(function MenuItem2(t0, forwardedRef) {
   const $ = (0, import_react_compiler_runtime48.c)(29);
   let className;
   let disabled;
@@ -30143,7 +39010,7 @@ var MenuItem = (0, import_react98.forwardRef)(function MenuItem2(t0, forwardedRe
     style = $[7];
   }
   const { menu, state } = useMenuContext();
-  const elementRef = (0, import_react98.useRef)(null);
+  const elementRef = (0, import_react152.useRef)(null);
   let t1;
   let t2;
   if ($[8] !== menu) {
@@ -30160,7 +39027,7 @@ var MenuItem = (0, import_react98.forwardRef)(function MenuItem2(t0, forwardedRe
     t1 = $[9];
     t2 = $[10];
   }
-  (0, import_react98.useEffect)(t1, t2);
+  (0, import_react152.useEffect)(t1, t2);
   let t3;
   if ($[11] !== disabled || $[12] !== menu || $[13] !== onClick || $[14] !== onSelect) {
     t3 = (event) => {
@@ -30194,7 +39061,7 @@ var MenuItem = (0, import_react98.forwardRef)(function MenuItem2(t0, forwardedRe
   const handlePointerEnter = t4;
   let t5;
   if ($[19] !== className || $[20] !== disabled || $[21] !== elementProps || $[22] !== forwardedRef || $[23] !== handleClick || $[24] !== handlePointerEnter || $[25] !== render || $[26] !== state || $[27] !== style) {
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(MenuItemContent, {
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(MenuItemContent, {
       disabled,
       elementProps,
       onClick: handleClick,
@@ -30238,16 +39105,16 @@ function MenuItemContent({ disabled, elementProps, onClick, onPointerEnter, rend
 
 // node_modules/@videojs/react/dist/default/ui/menu/popup.js
 var import_react_compiler_runtime49 = __toESM(require_dist(), 1);
-var import_react99 = __toESM(require_react(), 1);
-var import_jsx_runtime42 = __toESM(require_jsx_runtime(), 1);
-var MenuPopup = (0, import_react99.forwardRef)(function MenuPopup2(t0, forwardedRef) {
+var import_react153 = __toESM(require_react(), 1);
+var import_jsx_runtime57 = __toESM(require_jsx_runtime(), 1);
+var MenuPopup = (0, import_react153.forwardRef)(function MenuPopup2(t0, forwardedRef) {
   const $ = (0, import_react_compiler_runtime49.c)(23);
   const { render, className, style, onBlur, keepMounted: t1, ...elementProps } = t0;
   const keepMounted = t1 === void 0 ? false : t1;
   const { core, menu, parent, state, preferredSide, setPositionedSide, anchorName, boundary, container } = useMenuContext();
-  const [popup] = (0, import_react99.useState)(createMenuPopup);
-  const [popupElement, setPopupElement] = (0, import_react99.useState)(null);
-  const internalRef = (0, import_react99.useRef)(null);
+  const [popup] = (0, import_react153.useState)(createMenuPopup);
+  const [popupElement, setPopupElement] = (0, import_react153.useState)(null);
+  const internalRef = (0, import_react153.useRef)(null);
   let t2;
   if ($[0] !== menu || $[1] !== popup) {
     t2 = (element) => {
@@ -30338,7 +39205,7 @@ var MenuPopup = (0, import_react99.forwardRef)(function MenuPopup2(t0, forwarded
   } else t6 = $[19];
   let t7;
   if ($[20] !== popupNode || $[21] !== t6) {
-    t7 = /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(MenuPopupContextProvider, {
+    t7 = /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(MenuPopupContextProvider, {
       value: t6,
       children: popupNode
     });
@@ -30350,8 +39217,8 @@ var MenuPopup = (0, import_react99.forwardRef)(function MenuPopup2(t0, forwarded
 });
 
 // node_modules/@videojs/react/dist/default/ui/menu/root.js
-var import_react101 = __toESM(require_react(), 1);
-var import_jsx_runtime43 = __toESM(require_jsx_runtime(), 1);
+var import_react155 = __toESM(require_react(), 1);
+var import_jsx_runtime58 = __toESM(require_jsx_runtime(), 1);
 function MenuRoot({ open: controlledOpen, defaultOpen = MenuCore.defaultProps.defaultOpen, onOpenChange: onOpenChangeProp, onOpenChangeComplete: onOpenChangeCompleteProp, boundary = "container", children, ...coreProps }) {
   const parentMenu = useOptionalMenuContext();
   const controls = useOptionalControlsContext();
@@ -30360,9 +39227,9 @@ function MenuRoot({ open: controlledOpen, defaultOpen = MenuCore.defaultProps.de
   const popupGroup = useOptionalPopupGroup();
   const isSubmenu = parentMenu !== null;
   const { side, align, closeOnEscape, closeOnOutsideClick } = coreProps;
-  const [core] = (0, import_react101.useState)(() => new MenuCore(coreProps));
+  const [core] = (0, import_react155.useState)(() => new MenuCore(coreProps));
   const isControlled = controlledOpen !== void 0;
-  const [uncontrolledOpen, setUncontrolledOpen] = (0, import_react101.useState)(defaultOpen);
+  const [uncontrolledOpen, setUncontrolledOpen] = (0, import_react155.useState)(defaultOpen);
   const resolvedOpen = controlledOpen ?? uncontrolledOpen;
   const onOpenChangeRef = useLatestRef(onOpenChangeProp);
   const onOpenChangeCompleteRef = useLatestRef(onOpenChangeCompleteProp);
@@ -30370,7 +39237,7 @@ function MenuRoot({ open: controlledOpen, defaultOpen = MenuCore.defaultProps.de
   const closeOnOutsideClickRef = useLatestRef(closeOnOutsideClick);
   const popupGroupRef = useLatestRef(popupGroup);
   const isSubmenuRef = useLatestRef(isSubmenu);
-  const [menu] = (0, import_react101.useState)(() => {
+  const [menu] = (0, import_react155.useState)(() => {
     return createMenu({
       transition: createTransition(),
       onOpenChange(nextOpen, details) {
@@ -30387,11 +39254,11 @@ function MenuRoot({ open: controlledOpen, defaultOpen = MenuCore.defaultProps.de
   });
   const anchorName = useSafeId();
   const contentId = useSafeId("menu");
-  (0, import_react101.useLayoutEffect)(() => parentMenu?.menu.registerSubmenu(menu), [menu, parentMenu?.menu]);
-  (0, import_react101.useLayoutEffect)(() => {
+  (0, import_react155.useLayoutEffect)(() => parentMenu?.menu.registerSubmenu(menu), [menu, parentMenu?.menu]);
+  (0, import_react155.useLayoutEffect)(() => {
     menu.syncOpen(resolvedOpen);
   }, [menu, resolvedOpen]);
-  (0, import_react101.useEffect)(() => {
+  (0, import_react155.useEffect)(() => {
     if (isSubmenu || controls?.state.visible !== false) return;
     menu.close("imperative-action");
   }, [
@@ -30401,7 +39268,7 @@ function MenuRoot({ open: controlledOpen, defaultOpen = MenuCore.defaultProps.de
   ]);
   useDestroy(menu);
   const input = useSnapshot(menu.input);
-  (0, import_react101.useEffect)(() => {
+  (0, import_react155.useEffect)(() => {
     if (!input.active || isSubmenu) return;
     return controlsState?.requestControlsLock();
   }, [
@@ -30409,7 +39276,7 @@ function MenuRoot({ open: controlledOpen, defaultOpen = MenuCore.defaultProps.de
     input.active,
     isSubmenu
   ]);
-  const preferredState = (0, import_react101.useMemo)(() => {
+  const preferredState = (0, import_react155.useMemo)(() => {
     core.setProps({
       side,
       align,
@@ -30431,9 +39298,9 @@ function MenuRoot({ open: controlledOpen, defaultOpen = MenuCore.defaultProps.de
     isSubmenu
   ]);
   const { state, preferredSide, setPositionedSide } = usePositionedState(preferredState);
-  const [optionStates, setOptionStates] = (0, import_react101.useState)(() => /* @__PURE__ */ new Map());
-  const [optionSource] = (0, import_react101.useState)(() => Symbol("menu"));
-  const setOptionState = (0, import_react101.useCallback)((source, optionState2) => {
+  const [optionStates, setOptionStates] = (0, import_react155.useState)(() => /* @__PURE__ */ new Map());
+  const [optionSource] = (0, import_react155.useState)(() => Symbol("menu"));
+  const setOptionState = (0, import_react155.useCallback)((source, optionState2) => {
     setOptionStates((current) => {
       const previous = current.get(source);
       if (optionState2 && isSameOptionState(previous, optionState2)) return current;
@@ -30444,9 +39311,9 @@ function MenuRoot({ open: controlledOpen, defaultOpen = MenuCore.defaultProps.de
       return next;
     });
   }, []);
-  const optionState = (0, import_react101.useMemo)(() => resolveMenuOptionState(optionStates.values()), [optionStates]);
+  const optionState = (0, import_react155.useMemo)(() => resolveMenuOptionState(optionStates.values()), [optionStates]);
   const setParentOptionState = parentMenu?.setOptionState;
-  (0, import_react101.useEffect)(() => {
+  (0, import_react155.useEffect)(() => {
     if (!optionState?.disabled && !optionState?.hidden) return;
     menu.close("imperative-action");
   }, [
@@ -30454,7 +39321,7 @@ function MenuRoot({ open: controlledOpen, defaultOpen = MenuCore.defaultProps.de
     optionState?.disabled,
     optionState?.hidden
   ]);
-  (0, import_react101.useLayoutEffect)(() => {
+  (0, import_react155.useLayoutEffect)(() => {
     if (!setParentOptionState) return void 0;
     setParentOptionState(optionSource, optionState);
     return () => setParentOptionState(optionSource, null);
@@ -30463,7 +39330,7 @@ function MenuRoot({ open: controlledOpen, defaultOpen = MenuCore.defaultProps.de
     optionState,
     setParentOptionState
   ]);
-  const contextValue = (0, import_react101.useMemo)(() => ({
+  const contextValue = (0, import_react155.useMemo)(() => ({
     core,
     menu,
     parent: parentMenu,
@@ -30490,7 +39357,7 @@ function MenuRoot({ open: controlledOpen, defaultOpen = MenuCore.defaultProps.de
     optionState,
     setOptionState
   ]);
-  return /* @__PURE__ */ (0, import_jsx_runtime43.jsx)(MenuContextProvider, {
+  return /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(MenuContextProvider, {
     value: contextValue,
     children
   });
@@ -30500,8 +39367,8 @@ function isSameOptionState(a, b) {
 }
 
 // node_modules/@videojs/react/dist/default/ui/menu/separator.js
-var import_react102 = __toESM(require_react(), 1);
-var MenuSeparator = (0, import_react102.forwardRef)(function MenuSeparator2({ render, className, style, ...elementProps }, forwardedRef) {
+var import_react156 = __toESM(require_react(), 1);
+var MenuSeparator = (0, import_react156.forwardRef)(function MenuSeparator2({ render, className, style, ...elementProps }, forwardedRef) {
   const { state } = useMenuContext();
   return renderElement("div", {
     render,
@@ -30516,16 +39383,16 @@ var MenuSeparator = (0, import_react102.forwardRef)(function MenuSeparator2({ re
 
 // node_modules/@videojs/react/dist/default/ui/menu/trigger.js
 var import_react_compiler_runtime50 = __toESM(require_dist(), 1);
-var import_react103 = __toESM(require_react(), 1);
-var import_jsx_runtime44 = __toESM(require_jsx_runtime(), 1);
-var MenuTrigger = (0, import_react103.forwardRef)(function MenuTrigger2(t0, forwardedRef) {
+var import_react157 = __toESM(require_react(), 1);
+var import_jsx_runtime59 = __toESM(require_jsx_runtime(), 1);
+var MenuTrigger = (0, import_react157.forwardRef)(function MenuTrigger2(t0, forwardedRef) {
   const $ = (0, import_react_compiler_runtime50.c)(37);
   const { render, className, style, disabled, onClick, onKeyDown, ...elementProps } = t0;
   const { core, menu, parent, state, contentId, optionState } = useMenuContext();
   const resolvedDisabled = disabled || optionState?.disabled || false;
   const isSubMenuTrigger = parent !== null;
   const controlledId = state.open || state.status === "ending" ? contentId : void 0;
-  const elementRef = (0, import_react103.useRef)(null);
+  const elementRef = (0, import_react157.useRef)(null);
   const triggerId = useSafeId("sub-trigger");
   const parentMenuApi = parent?.menu ?? null;
   let t1;
@@ -30556,7 +39423,7 @@ var MenuTrigger = (0, import_react103.forwardRef)(function MenuTrigger2(t0, forw
     t1 = $[3];
     t2 = $[4];
   }
-  (0, import_react103.useEffect)(t1, t2);
+  (0, import_react157.useEffect)(t1, t2);
   let t3;
   if ($[5] !== menu || $[6] !== resolvedDisabled) {
     t3 = () => {
@@ -30667,7 +39534,7 @@ var MenuTrigger = (0, import_react103.forwardRef)(function MenuTrigger2(t0, forw
       $[32] = state;
       $[33] = t112;
     } else t112 = $[33];
-    return /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(MenuTriggerSubmenu, {
+    return /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(MenuTriggerSubmenu, {
       render,
       className,
       style,
@@ -30712,7 +39579,7 @@ var MenuTrigger = (0, import_react103.forwardRef)(function MenuTrigger2(t0, forw
   });
   let t13;
   if ($[34] !== T0 || $[35] !== t12) {
-    t13 = /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(T0, {
+    t13 = /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(T0, {
       value: t11,
       children: t12
     });
@@ -30753,7 +39620,7 @@ function _temp13(event_2) {
 }
 
 // node_modules/@videojs/react/dist/default/ui/playback-rate/use-playback-rate-options.js
-var import_react104 = __toESM(require_react(), 1);
+var import_react158 = __toESM(require_react(), 1);
 var usePlaybackRateRadioOptions = createRadioOptionsHook({
   name: "usePlaybackRateOptions",
   feature: "playbackRate",
@@ -30762,7 +39629,7 @@ var usePlaybackRateRadioOptions = createRadioOptionsHook({
 });
 function usePlaybackRateOptions(props) {
   const result = usePlaybackRateRadioOptions(props);
-  const setRate = (0, import_react104.useCallback)((rate) => result?.setValue(String(rate)), [result?.setValue]);
+  const setRate = (0, import_react158.useCallback)((rate) => result?.setValue(String(rate)), [result?.setValue]);
   if (!result) return null;
   return {
     ...result,
@@ -30773,10 +39640,10 @@ function usePlaybackRateOptions(props) {
 
 // node_modules/@videojs/react/dist/default/ui/playback-rate-radio-group/component.js
 var import_react_compiler_runtime51 = __toESM(require_dist(), 1);
-var import_react105 = __toESM(require_react(), 1);
-var import_jsx_runtime45 = __toESM(require_jsx_runtime(), 1);
+var import_react159 = __toESM(require_react(), 1);
+var import_jsx_runtime60 = __toESM(require_jsx_runtime(), 1);
 init_predicate2();
-var PlaybackRateRadioGroupContext = (0, import_react105.createContext)(void 0);
+var PlaybackRateRadioGroupContext = (0, import_react159.createContext)(void 0);
 function PlaybackRateRadioGroupRoot(t0) {
   const $ = (0, import_react_compiler_runtime51.c)(8);
   let children;
@@ -30800,7 +39667,7 @@ function PlaybackRateRadioGroupRoot(t0) {
   useMenuOptionState(t1);
   let t2;
   if ($[5] !== children || $[6] !== playbackRate) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(PlaybackRateRadioGroupContext.Provider, {
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(PlaybackRateRadioGroupContext.Provider, {
       value: playbackRate,
       children
     });
@@ -30810,7 +39677,7 @@ function PlaybackRateRadioGroupRoot(t0) {
   } else t2 = $[7];
   return t2;
 }
-var PlaybackRateRadioGroupValue = (0, import_react105.forwardRef)(function PlaybackRateRadioGroupValue2({ render, className, style, ...elementProps }, forwardedRef) {
+var PlaybackRateRadioGroupValue = (0, import_react159.forwardRef)(function PlaybackRateRadioGroupValue2({ render, className, style, ...elementProps }, forwardedRef) {
   const playbackRate = usePlaybackRateRadioGroupContext();
   if (!playbackRate) return null;
   return renderElement("span", {
@@ -30823,7 +39690,7 @@ var PlaybackRateRadioGroupValue = (0, import_react105.forwardRef)(function Playb
     props: [elementProps, { children: playbackRate.selectedLabel }]
   });
 });
-var PlaybackRateRadioGroupOptions = (0, import_react105.forwardRef)(function PlaybackRateRadioGroupOptions2(componentProps, forwardedRef) {
+var PlaybackRateRadioGroupOptions = (0, import_react159.forwardRef)(function PlaybackRateRadioGroupOptions2(componentProps, forwardedRef) {
   const $ = (0, import_react_compiler_runtime51.c)(40);
   let ariaLabelProp;
   let ariaLabelledBy;
@@ -30893,7 +39760,7 @@ var PlaybackRateRadioGroupOptions = (0, import_react105.forwardRef)(function Pla
           ...option,
           checked: option.value === value
         };
-        return /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_react105.Fragment, { children: renderItem({
+        return /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(import_react159.Fragment, { children: renderItem({
           value: option.value,
           disabled: option.disabled,
           "data-rate": option.value,
@@ -30914,7 +39781,7 @@ var PlaybackRateRadioGroupOptions = (0, import_react105.forwardRef)(function Pla
   } else t6 = $[22];
   let t7;
   if ($[26] !== ariaLabel || $[27] !== ariaLabelledBy || $[28] !== elementProps || $[29] !== forwardedRef || $[30] !== setValue || $[31] !== state.hidden || $[32] !== t0 || $[33] !== t1 || $[34] !== t2 || $[35] !== t3 || $[36] !== t4 || $[37] !== t6 || $[38] !== value) {
-    t7 = /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(MenuRadioGroup, {
+    t7 = /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(MenuRadioGroup, {
       ...t0,
       ...elementProps,
       ref: forwardedRef,
@@ -30947,7 +39814,7 @@ var PlaybackRateRadioGroupOptions = (0, import_react105.forwardRef)(function Pla
   return t7;
 });
 function usePlaybackRateRadioGroupContext() {
-  const playbackRate = (0, import_react105.useContext)(PlaybackRateRadioGroupContext);
+  const playbackRate = (0, import_react159.useContext)(PlaybackRateRadioGroupContext);
   if (playbackRate === void 0) throw new Error("PlaybackRateRadioGroup parts must be used within PlaybackRateRadioGroup.Root");
   return playbackRate;
 }
@@ -30974,10 +39841,10 @@ function useQualityOptions(props) {
 
 // node_modules/@videojs/react/dist/default/ui/quality-radio-group/component.js
 var import_react_compiler_runtime52 = __toESM(require_dist(), 1);
-var import_react106 = __toESM(require_react(), 1);
-var import_jsx_runtime46 = __toESM(require_jsx_runtime(), 1);
+var import_react160 = __toESM(require_react(), 1);
+var import_jsx_runtime61 = __toESM(require_jsx_runtime(), 1);
 init_predicate2();
-var QualityRadioGroupContext = (0, import_react106.createContext)(void 0);
+var QualityRadioGroupContext = (0, import_react160.createContext)(void 0);
 function QualityRadioGroupRoot(t0) {
   const $ = (0, import_react_compiler_runtime52.c)(8);
   let children;
@@ -31001,7 +39868,7 @@ function QualityRadioGroupRoot(t0) {
   useMenuOptionState(t1);
   let t2;
   if ($[5] !== children || $[6] !== quality) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime46.jsx)(QualityRadioGroupContext.Provider, {
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(QualityRadioGroupContext.Provider, {
       value: quality,
       children
     });
@@ -31011,7 +39878,7 @@ function QualityRadioGroupRoot(t0) {
   } else t2 = $[7];
   return t2;
 }
-var QualityRadioGroupValue = (0, import_react106.forwardRef)(function QualityRadioGroupValue2({ render, className, style, ...elementProps }, forwardedRef) {
+var QualityRadioGroupValue = (0, import_react160.forwardRef)(function QualityRadioGroupValue2({ render, className, style, ...elementProps }, forwardedRef) {
   const quality = useQualityRadioGroupContext();
   if (!quality) return null;
   return renderElement("span", {
@@ -31024,7 +39891,7 @@ var QualityRadioGroupValue = (0, import_react106.forwardRef)(function QualityRad
     props: [elementProps, { children: quality.selectedLabel }]
   });
 });
-var QualityRadioGroupOptions = (0, import_react106.forwardRef)(function QualityRadioGroupOptions2(componentProps, forwardedRef) {
+var QualityRadioGroupOptions = (0, import_react160.forwardRef)(function QualityRadioGroupOptions2(componentProps, forwardedRef) {
   const $ = (0, import_react_compiler_runtime52.c)(40);
   let ariaLabelProp;
   let ariaLabelledBy;
@@ -31094,7 +39961,7 @@ var QualityRadioGroupOptions = (0, import_react106.forwardRef)(function QualityR
           ...option,
           checked: option.value === value
         };
-        return /* @__PURE__ */ (0, import_jsx_runtime46.jsx)(import_react106.Fragment, { children: renderItem({
+        return /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(import_react160.Fragment, { children: renderItem({
           value: option.value,
           disabled: option.disabled,
           "data-rendition": option.value,
@@ -31113,7 +39980,7 @@ var QualityRadioGroupOptions = (0, import_react106.forwardRef)(function QualityR
   } else t6 = $[22];
   let t7;
   if ($[26] !== ariaLabel || $[27] !== ariaLabelledBy || $[28] !== elementProps || $[29] !== forwardedRef || $[30] !== setValue || $[31] !== state.hidden || $[32] !== t0 || $[33] !== t1 || $[34] !== t2 || $[35] !== t3 || $[36] !== t4 || $[37] !== t6 || $[38] !== value) {
-    t7 = /* @__PURE__ */ (0, import_jsx_runtime46.jsx)(MenuRadioGroup, {
+    t7 = /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(MenuRadioGroup, {
       ...t0,
       ...elementProps,
       ref: forwardedRef,
@@ -31146,7 +40013,7 @@ var QualityRadioGroupOptions = (0, import_react106.forwardRef)(function QualityR
   return t7;
 });
 function useQualityRadioGroupContext() {
-  const quality = (0, import_react106.useContext)(QualityRadioGroupContext);
+  const quality = (0, import_react160.useContext)(QualityRadioGroupContext);
   if (quality === void 0) throw new Error("QualityRadioGroup parts must be used within QualityRadioGroup.Root");
   return quality;
 }
@@ -31160,8 +40027,8 @@ function toMenuOptionState4(quality) {
 }
 
 // node_modules/@videojs/react/dist/default/ui/menu/item-indicator.js
-var import_react107 = __toESM(require_react(), 1);
-var MenuItemIndicator = (0, import_react107.forwardRef)(function MenuItemIndicator2({ render, className, style, checked, forceMount = false, ...elementProps }, forwardedRef) {
+var import_react161 = __toESM(require_react(), 1);
+var MenuItemIndicator = (0, import_react161.forwardRef)(function MenuItemIndicator2({ render, className, style, checked, forceMount = false, ...elementProps }, forwardedRef) {
   const { state } = useMenuContext();
   const itemChecked = useOptionalMenuRadioItemContext();
   if (!(checked ?? itemChecked) && !forceMount) return null;
@@ -31178,14 +40045,14 @@ var MenuItemIndicator = (0, import_react107.forwardRef)(function MenuItemIndicat
 
 // node_modules/@videojs/react/dist/default/ui/menu/radio-item.js
 var import_react_compiler_runtime53 = __toESM(require_dist(), 1);
-var import_react108 = __toESM(require_react(), 1);
-var import_jsx_runtime47 = __toESM(require_jsx_runtime(), 1);
-var MenuRadioItem = (0, import_react108.forwardRef)(function MenuRadioItem2(t0, forwardedRef) {
+var import_react162 = __toESM(require_react(), 1);
+var import_jsx_runtime62 = __toESM(require_jsx_runtime(), 1);
+var MenuRadioItem = (0, import_react162.forwardRef)(function MenuRadioItem2(t0, forwardedRef) {
   const $ = (0, import_react_compiler_runtime53.c)(16);
   const { render, className, style, value, disabled, onClick, ...elementProps } = t0;
   const { menu, state } = useMenuContext();
   const { value: groupValue, onValueChange } = useMenuRadioGroupContext();
-  const elementRef = (0, import_react108.useRef)(null);
+  const elementRef = (0, import_react162.useRef)(null);
   const checked = groupValue === value;
   let t1;
   let t2;
@@ -31203,7 +40070,7 @@ var MenuRadioItem = (0, import_react108.forwardRef)(function MenuRadioItem2(t0, 
     t1 = $[1];
     t2 = $[2];
   }
-  (0, import_react108.useEffect)(t1, t2);
+  (0, import_react162.useEffect)(t1, t2);
   let t3;
   if ($[3] !== disabled || $[4] !== menu || $[5] !== onClick || $[6] !== onValueChange || $[7] !== value) {
     t3 = (event) => {
@@ -31254,7 +40121,7 @@ var MenuRadioItem = (0, import_react108.forwardRef)(function MenuRadioItem2(t0, 
   });
   let t6;
   if ($[12] !== T0 || $[13] !== checked || $[14] !== t5) {
-    t6 = /* @__PURE__ */ (0, import_jsx_runtime47.jsx)(T0, {
+    t6 = /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(T0, {
       value: checked,
       children: t5
     });
@@ -31268,7 +40135,7 @@ var MenuRadioItem = (0, import_react108.forwardRef)(function MenuRadioItem2(t0, 
 
 // node_modules/@videojs/react/dist/default/internal/skins/shared/components/layout/container.js
 var import_react_compiler_runtime54 = __toESM(require_dist(), 1);
-var import_jsx_runtime48 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime63 = __toESM(require_jsx_runtime(), 1);
 function Container3(t0) {
   const $ = (0, import_react_compiler_runtime54.c)(10);
   let children;
@@ -31293,7 +40160,7 @@ function Container3(t0) {
   } else t1 = $[5];
   let t2;
   if ($[6] !== children || $[7] !== props || $[8] !== t1) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(Container, {
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime63.jsx)(Container, {
       className: t1,
       ...props,
       children
@@ -31308,8 +40175,8 @@ function Container3(t0) {
 
 // node_modules/@videojs/react/dist/default/internal/skins/shared/components/buttons/button.js
 var import_react_compiler_runtime55 = __toESM(require_dist(), 1);
-var import_jsx_runtime49 = __toESM(require_jsx_runtime(), 1);
-function Button(t0) {
+var import_jsx_runtime64 = __toESM(require_jsx_runtime(), 1);
+function Button2(t0) {
   const $ = (0, import_react_compiler_runtime55.c)(8);
   let className;
   let props;
@@ -31330,7 +40197,7 @@ function Button(t0) {
   } else t1 = $[4];
   let t2;
   if ($[5] !== props || $[6] !== t1) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime49.jsx)("button", {
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("button", {
       className: t1,
       ...props
     });
@@ -31343,30 +40210,30 @@ function Button(t0) {
 
 // node_modules/@videojs/react/dist/default/internal/skins/shared/components/dialogs/error-dialog.js
 var import_react_compiler_runtime56 = __toESM(require_dist(), 1);
-var import_jsx_runtime50 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime65 = __toESM(require_jsx_runtime(), 1);
 function ErrorDialog() {
   const $ = (0, import_react_compiler_runtime56.c)(3);
   let t0;
   if ($[0] === Symbol.for("react.memo_cache_sentinel")) {
-    t0 = /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(DialogBackdrop, { className: "media-dialog-backdrop" });
+    t0 = /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(DialogBackdrop, { className: "media-dialog-backdrop" });
     $[0] = t0;
   } else t0 = $[0];
   let t1;
   if ($[1] === Symbol.for("react.memo_cache_sentinel")) {
-    t1 = /* @__PURE__ */ (0, import_jsx_runtime50.jsxs)("div", {
+    t1 = /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("div", {
       className: "media-dialog-content",
-      children: [/* @__PURE__ */ (0, import_jsx_runtime50.jsx)(ErrorDialogTitle, { className: "media-dialog-title" }), /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(ErrorDialogDescription, { className: "media-dialog-description" })]
+      children: [/* @__PURE__ */ (0, import_jsx_runtime65.jsx)(ErrorDialogTitle, { className: "media-dialog-title" }), /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(ErrorDialogDescription, { className: "media-dialog-description" })]
     });
     $[1] = t1;
   } else t1 = $[1];
   let t2;
   if ($[2] === Symbol.for("react.memo_cache_sentinel")) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime50.jsxs)(ErrorDialogRoot, { children: [t0, /* @__PURE__ */ (0, import_jsx_runtime50.jsxs)(DialogPopup, {
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)(ErrorDialogRoot, { children: [t0, /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)(DialogPopup, {
       className: "media-dialog-popup",
-      children: [t1, /* @__PURE__ */ (0, import_jsx_runtime50.jsx)("div", {
+      children: [t1, /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", {
         className: "media-dialog-actions",
-        children: /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(ErrorDialogClose, {
-          render: /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(Button, {}),
+        children: /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(ErrorDialogClose, {
+          render: /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(Button2, {}),
           className: "media-dialog-close"
         })
       })]
@@ -31378,7 +40245,7 @@ function ErrorDialog() {
 
 // node_modules/@videojs/react/dist/default/internal/skins/shared/components/display/poster.js
 var import_react_compiler_runtime57 = __toESM(require_dist(), 1);
-var import_jsx_runtime51 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime66 = __toESM(require_jsx_runtime(), 1);
 function Poster(t0) {
   const $ = (0, import_react_compiler_runtime57.c)(16);
   let t1;
@@ -31412,7 +40279,7 @@ function Poster(t0) {
   } else t2 = $[8];
   let t3;
   if ($[9] !== props || $[10] !== renderImage) {
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime51.jsx)(PosterImage, {
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime66.jsx)(PosterImage, {
       render: renderImage,
       className: "media-poster-image",
       ...props
@@ -31423,7 +40290,7 @@ function Poster(t0) {
   } else t3 = $[11];
   let t4;
   if ($[12] !== children || $[13] !== t2 || $[14] !== t3) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime51.jsxs)(PosterRoot, {
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)(PosterRoot, {
       className: t2,
       children: [t3, children]
     });
@@ -31437,7 +40304,7 @@ function Poster(t0) {
 
 // node_modules/@videojs/react/dist/default/internal/skins/shared/components/display/title.js
 var import_react_compiler_runtime58 = __toESM(require_dist(), 1);
-var import_jsx_runtime52 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime67 = __toESM(require_jsx_runtime(), 1);
 function Title3(t0) {
   const $ = (0, import_react_compiler_runtime58.c)(10);
   let t1;
@@ -31465,7 +40332,7 @@ function Title3(t0) {
   } else t2 = $[6];
   let t3;
   if ($[7] !== props || $[8] !== t2) {
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Title, {
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime67.jsx)(Title, {
       className: t2,
       ...props
     });
@@ -31478,7 +40345,7 @@ function Title3(t0) {
 
 // node_modules/@videojs/react/dist/default/internal/skins/shared/components/buttons/button-tooltip.js
 var import_react_compiler_runtime59 = __toESM(require_dist(), 1);
-var import_jsx_runtime53 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime68 = __toESM(require_jsx_runtime(), 1);
 function ButtonTooltip(t0) {
   const $ = (0, import_react_compiler_runtime59.c)(18);
   let children;
@@ -31497,7 +40364,7 @@ function ButtonTooltip(t0) {
   }
   let t1;
   if ($[4] !== children) {
-    t1 = /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(TooltipTrigger, { render: children });
+    t1 = /* @__PURE__ */ (0, import_jsx_runtime68.jsx)(TooltipTrigger, { render: children });
     $[4] = children;
     $[5] = t1;
   } else t1 = $[5];
@@ -31508,19 +40375,19 @@ function ButtonTooltip(t0) {
   } else t2 = $[6];
   let t3;
   if ($[7] !== label) {
-    t3 = label ?? /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(TooltipLabel, {});
+    t3 = label ?? /* @__PURE__ */ (0, import_jsx_runtime68.jsx)(TooltipLabel, {});
     $[7] = label;
     $[8] = t3;
   } else t3 = $[8];
   let t4;
   if ($[9] !== label) {
-    t4 = !label && /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(TooltipShortcut, { className: "media-tooltip-shortcut" });
+    t4 = !label && /* @__PURE__ */ (0, import_jsx_runtime68.jsx)(TooltipShortcut, { className: "media-tooltip-shortcut" });
     $[9] = label;
     $[10] = t4;
   } else t4 = $[10];
   let t5;
   if ($[11] !== t3 || $[12] !== t4) {
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)(TooltipPopup, {
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime68.jsxs)(TooltipPopup, {
       className: t2,
       children: [t3, t4]
     });
@@ -31530,7 +40397,7 @@ function ButtonTooltip(t0) {
   } else t5 = $[13];
   let t6;
   if ($[14] !== props || $[15] !== t1 || $[16] !== t5) {
-    t6 = /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)(TooltipRoot, {
+    t6 = /* @__PURE__ */ (0, import_jsx_runtime68.jsxs)(TooltipRoot, {
       ...props,
       children: [t1, t5]
     });
@@ -31544,7 +40411,7 @@ function ButtonTooltip(t0) {
 
 // node_modules/@videojs/react/dist/default/internal/skins/shared/components/sliders/slider.js
 var import_react_compiler_runtime60 = __toESM(require_dist(), 1);
-var import_jsx_runtime54 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime69 = __toESM(require_jsx_runtime(), 1);
 function SliderTrack2(t0) {
   const $ = (0, import_react_compiler_runtime60.c)(8);
   let className;
@@ -31566,7 +40433,7 @@ function SliderTrack2(t0) {
   } else t1 = $[4];
   let t2;
   if ($[5] !== props || $[6] !== t1) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("div", {
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("div", {
       className: t1,
       ...props
     });
@@ -31597,7 +40464,7 @@ function SliderFill2(t0) {
   } else t1 = $[4];
   let t2;
   if ($[5] !== props || $[6] !== t1) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("div", {
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("div", {
       className: t1,
       ...props
     });
@@ -31628,7 +40495,7 @@ function SliderBuffer2(t0) {
   } else t1 = $[4];
   let t2;
   if ($[5] !== props || $[6] !== t1) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("div", {
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("div", {
       className: t1,
       ...props
     });
@@ -31659,7 +40526,7 @@ function SliderThumb3(t0) {
   } else t1 = $[4];
   let t2;
   if ($[5] !== props || $[6] !== t1) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("div", {
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("div", {
       className: t1,
       ...props
     });
@@ -31672,7 +40539,7 @@ function SliderThumb3(t0) {
 
 // node_modules/@videojs/react/dist/default/internal/skins/shared/components/sliders/volume-slider.js
 var import_react_compiler_runtime61 = __toESM(require_dist(), 1);
-var import_jsx_runtime55 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime70 = __toESM(require_jsx_runtime(), 1);
 function VolumeSlider(t0) {
   const $ = (0, import_react_compiler_runtime61.c)(13);
   let t1;
@@ -31700,28 +40567,28 @@ function VolumeSlider(t0) {
   } else t2 = $[6];
   let t3;
   if ($[7] === Symbol.for("react.memo_cache_sentinel")) {
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime55.jsx)(SliderTrack2, {});
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime70.jsx)(SliderTrack2, {});
     $[7] = t3;
   } else t3 = $[7];
   let t4;
   if ($[8] === Symbol.for("react.memo_cache_sentinel")) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime55.jsx)(SliderTrack, {
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime70.jsx)(SliderTrack, {
       render: t3,
-      children: /* @__PURE__ */ (0, import_jsx_runtime55.jsx)(SliderFill, { render: /* @__PURE__ */ (0, import_jsx_runtime55.jsx)(SliderFill2, {}) })
+      children: /* @__PURE__ */ (0, import_jsx_runtime70.jsx)(SliderFill, { render: /* @__PURE__ */ (0, import_jsx_runtime70.jsx)(SliderFill2, {}) })
     });
     $[8] = t4;
   } else t4 = $[8];
   let t5;
   if ($[9] === Symbol.for("react.memo_cache_sentinel")) {
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime55.jsx)(SliderThumb, {
-      render: /* @__PURE__ */ (0, import_jsx_runtime55.jsx)(SliderThumb3, {}),
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime70.jsx)(SliderThumb, {
+      render: /* @__PURE__ */ (0, import_jsx_runtime70.jsx)(SliderThumb3, {}),
       className: "media-volume-slider-thumb"
     });
     $[9] = t5;
   } else t5 = $[9];
   let t6;
   if ($[10] !== props || $[11] !== t2) {
-    t6 = /* @__PURE__ */ (0, import_jsx_runtime55.jsxs)(VolumeSliderRoot, {
+    t6 = /* @__PURE__ */ (0, import_jsx_runtime70.jsxs)(VolumeSliderRoot, {
       className: t2,
       thumbAlignment: "edge",
       ...props,
@@ -31736,7 +40603,7 @@ function VolumeSlider(t0) {
 
 // node_modules/@videojs/react/dist/default/internal/skins/shared/components/behaviors/status-announcer.js
 var import_react_compiler_runtime62 = __toESM(require_dist(), 1);
-var import_jsx_runtime56 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime71 = __toESM(require_jsx_runtime(), 1);
 function StatusAnnouncer3(t0) {
   const $ = (0, import_react_compiler_runtime62.c)(10);
   let t1;
@@ -31764,7 +40631,7 @@ function StatusAnnouncer3(t0) {
   } else t2 = $[6];
   let t3;
   if ($[7] !== props || $[8] !== t2) {
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(StatusAnnouncer, {
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime71.jsx)(StatusAnnouncer, {
       className: t2,
       ...props
     });
@@ -31776,8 +40643,8 @@ function StatusAnnouncer3(t0) {
 }
 
 // node_modules/@videojs/react/dist/default/player/create-player.js
-var import_react110 = __toESM(require_react(), 1);
-var import_jsx_runtime57 = __toESM(require_jsx_runtime(), 1);
+var import_react164 = __toESM(require_react(), 1);
+var import_jsx_runtime72 = __toESM(require_jsx_runtime(), 1);
 init_object();
 function createPlayer(config) {
   const slice = combine(...config.features);
@@ -31791,18 +40658,18 @@ function createPlayer(config) {
   function Player(props) {
     const { children } = props;
     const configValues = pick(props, configKeys);
-    const [store, setStore] = (0, import_react110.useState)(() => createConfiguredStore(configValues));
-    const syncedValues = (0, import_react110.useRef)({
+    const [store, setStore] = (0, import_react164.useState)(() => createConfiguredStore(configValues));
+    const syncedValues = (0, import_react164.useRef)({
       store,
       values: configValues
     });
-    const [media, setMedia] = (0, import_react110.useState)(null);
-    const [container, setContainer] = (0, import_react110.useState)(null);
-    const reattach = (0, import_react110.useRef)(null);
-    const [extensions] = (0, import_react110.useState)(() => new PlayerExtensionCoordinator(() => reattach.current?.()));
-    const registerExtension = (0, import_react110.useCallback)((extension) => extensions.register(extension), [extensions]);
+    const [media, setMedia] = (0, import_react164.useState)(null);
+    const [container, setContainer] = (0, import_react164.useState)(null);
+    const reattach = (0, import_react164.useRef)(null);
+    const [extensions] = (0, import_react164.useState)(() => new PlayerExtensionCoordinator(() => reattach.current?.()));
+    const registerExtension = (0, import_react164.useCallback)((extension) => extensions.register(extension), [extensions]);
     useDestroy(store);
-    (0, import_react110.useLayoutEffect)(() => {
+    (0, import_react164.useLayoutEffect)(() => {
       const previous = syncedValues.current;
       if (previous.store !== store) {
         syncedValues.current = {
@@ -31820,11 +40687,11 @@ function createPlayer(config) {
         values: configValues
       };
     });
-    (0, import_react110.useEffect)(() => {
+    (0, import_react164.useEffect)(() => {
       if (!media) return;
       return () => extensions.detach();
     }, [media, extensions]);
-    (0, import_react110.useEffect)(() => {
+    (0, import_react164.useEffect)(() => {
       if (!media) return;
       if (store.destroyed) {
         setStore(createConfiguredStore(syncedValues.current.values));
@@ -31856,7 +40723,7 @@ function createPlayer(config) {
       store,
       extensions
     ]);
-    const value = (0, import_react110.useMemo)(() => ({
+    const value = (0, import_react164.useMemo)(() => ({
       store,
       media,
       setMedia,
@@ -31869,7 +40736,7 @@ function createPlayer(config) {
       container,
       registerExtension
     ]);
-    return /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(PlayerContextProvider, {
+    return /* @__PURE__ */ (0, import_jsx_runtime72.jsx)(PlayerContextProvider, {
       value,
       children
     });
@@ -31895,9 +40762,9 @@ var { Player: VideoPlayer, usePlayer: usePlayer2 } = createPlayer({
 });
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/spinner.js
-var import_react111 = __toESM(require_react(), 1);
-var import_jsx_runtime58 = __toESM(require_jsx_runtime(), 1);
-var SpinnerIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)("svg", {
+var import_react165 = __toESM(require_react(), 1);
+var import_jsx_runtime73 = __toESM(require_jsx_runtime(), 1);
+var SpinnerIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime73.jsxs)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -31910,50 +40777,50 @@ var SpinnerIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)
   ref,
   ...props,
   children: [
-    /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("style", { children: "@keyframes media-spinner-fade{0%{opacity:1}to{opacity:0}}.media-spinner__segment{animation:var(--media-spinner-animation, media-spinner-fade 1s steps(8, end) infinite);animation-delay:var(--media-spinner-delay)}@media (prefers-reduced-motion:reduce){.media-spinner__segment{animation:none}}" }),
-    /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("path", {
+    /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("style", { children: "@keyframes media-spinner-fade{0%{opacity:1}to{opacity:0}}.media-spinner__segment{animation:var(--media-spinner-animation, media-spinner-fade 1s steps(8, end) infinite);animation-delay:var(--media-spinner-delay)}@media (prefers-reduced-motion:reduce){.media-spinner__segment{animation:none}}" }),
+    /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("path", {
       d: "M9 1.5v3",
       className: "media-spinner__segment",
       opacity: 0.5,
       style: { "--media-spinner-delay": "0s" }
     }),
-    /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("path", {
+    /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("path", {
       d: "m14.5 3.5-2 2",
       className: "media-spinner__segment",
       opacity: 0.45,
       style: { "--media-spinner-delay": "0.125s" }
     }),
-    /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("path", {
+    /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("path", {
       d: "M16.5 9h-3",
       className: "media-spinner__segment",
       opacity: 0.4,
       style: { "--media-spinner-delay": "0.25s" }
     }),
-    /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("path", {
+    /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("path", {
       d: "m14.5 14.5-2-2",
       className: "media-spinner__segment",
       opacity: 0.35,
       style: { "--media-spinner-delay": "0.375s" }
     }),
-    /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("path", {
+    /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("path", {
       d: "M9 16.5v-3",
       className: "media-spinner__segment",
       opacity: 0.3,
       style: { "--media-spinner-delay": "0.5s" }
     }),
-    /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("path", {
+    /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("path", {
       d: "m3.5 14.5 2-2",
       className: "media-spinner__segment",
       opacity: 0.25,
       style: { "--media-spinner-delay": "0.625s" }
     }),
-    /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("path", {
+    /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("path", {
       d: "M1.5 9h3",
       className: "media-spinner__segment",
       opacity: 0.15,
       style: { "--media-spinner-delay": "0.75s" }
     }),
-    /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("path", {
+    /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("path", {
       d: "m3.5 3.5 2 2",
       className: "media-spinner__segment",
       opacity: 0.1,
@@ -31961,11 +40828,11 @@ var SpinnerIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)
     })
   ]
 });
-var ForwardRef = (0, import_react111.forwardRef)(SpinnerIcon);
+var ForwardRef = (0, import_react165.forwardRef)(SpinnerIcon);
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/components/display/buffering-indicator.js
 var import_react_compiler_runtime63 = __toESM(require_dist(), 1);
-var import_jsx_runtime59 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime74 = __toESM(require_jsx_runtime(), 1);
 function BufferingIndicator3(t0) {
   const $ = (0, import_react_compiler_runtime63.c)(11);
   let t1;
@@ -31993,12 +40860,12 @@ function BufferingIndicator3(t0) {
   } else t2 = $[6];
   let t3;
   if ($[7] === Symbol.for("react.memo_cache_sentinel")) {
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(ForwardRef, { className: "media-buffering-indicator-spinner-icon" });
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime74.jsx)(ForwardRef, { className: "media-buffering-indicator-spinner-icon" });
     $[7] = t3;
   } else t3 = $[7];
   let t4;
   if ($[8] !== props || $[9] !== t2) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(BufferingIndicator, {
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime74.jsx)(BufferingIndicator, {
       className: t2,
       ...props,
       children: t3
@@ -32011,9 +40878,9 @@ function BufferingIndicator3(t0) {
 }
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/airplay-enter.js
-var import_react112 = __toESM(require_react(), 1);
-var import_jsx_runtime60 = __toESM(require_jsx_runtime(), 1);
-var AirPlayEnterIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("svg", {
+var import_react166 = __toESM(require_react(), 1);
+var import_jsx_runtime75 = __toESM(require_jsx_runtime(), 1);
+var AirPlayEnterIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime75.jsxs)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -32022,14 +40889,14 @@ var AirPlayEnterIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime60.
   viewBox: "0 0 18 18",
   ref,
   ...props,
-  children: [/* @__PURE__ */ (0, import_jsx_runtime60.jsx)("path", { d: "M14.5 2A3.5 3.5 0 0 1 18 5.5v5l-.005.18a3.5 3.5 0 0 1-3.027 3.288L13 12h1.5a1.5 1.5 0 0 0 1.5-1.5v-5A1.5 1.5 0 0 0 14.5 4h-11A1.5 1.5 0 0 0 2 5.5v5A1.5 1.5 0 0 0 3.5 12H5l-1.968 1.967A3.5 3.5 0 0 1 0 10.5v-5A3.5 3.5 0 0 1 3.5 2z" }), /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("path", { d: "M8.631 10.902a.5.5 0 0 1 .738 0l4.363 4.76a.5.5 0 0 1-.369.838H4.637a.5.5 0 0 1-.369-.838z" })]
+  children: [/* @__PURE__ */ (0, import_jsx_runtime75.jsx)("path", { d: "M14.5 2A3.5 3.5 0 0 1 18 5.5v5l-.005.18a3.5 3.5 0 0 1-3.027 3.288L13 12h1.5a1.5 1.5 0 0 0 1.5-1.5v-5A1.5 1.5 0 0 0 14.5 4h-11A1.5 1.5 0 0 0 2 5.5v5A1.5 1.5 0 0 0 3.5 12H5l-1.968 1.967A3.5 3.5 0 0 1 0 10.5v-5A3.5 3.5 0 0 1 3.5 2z" }), /* @__PURE__ */ (0, import_jsx_runtime75.jsx)("path", { d: "M8.631 10.902a.5.5 0 0 1 .738 0l4.363 4.76a.5.5 0 0 1-.369.838H4.637a.5.5 0 0 1-.369-.838z" })]
 });
-var ForwardRef2 = (0, import_react112.forwardRef)(AirPlayEnterIcon);
+var ForwardRef2 = (0, import_react166.forwardRef)(AirPlayEnterIcon);
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/airplay-exit.js
-var import_react113 = __toESM(require_react(), 1);
-var import_jsx_runtime61 = __toESM(require_jsx_runtime(), 1);
-var AirPlayExitIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("svg", {
+var import_react167 = __toESM(require_react(), 1);
+var import_jsx_runtime76 = __toESM(require_jsx_runtime(), 1);
+var AirPlayExitIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime76.jsxs)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -32039,23 +40906,23 @@ var AirPlayExitIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime61.j
   ref,
   ...props,
   children: [
-    /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("style", { children: "@keyframes media-icon-airplay-triangle{0%{translate:0 0}to{translate:0-2px}}@keyframes media-icon-airplay-fill{0%{opacity:0}to{opacity:.2}}@media (prefers-reduced-motion:reduce){:root{--media-icon-airplay-fill-animation:none;--media-icon-airplay-triangle-animation:none}}" }),
-    /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("path", {
+    /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("style", { children: "@keyframes media-icon-airplay-triangle{0%{translate:0 0}to{translate:0-2px}}@keyframes media-icon-airplay-fill{0%{opacity:0}to{opacity:.2}}@media (prefers-reduced-motion:reduce){:root{--media-icon-airplay-fill-animation:none;--media-icon-airplay-triangle-animation:none}}" }),
+    /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("path", {
       d: "M14.5 2A3.5 3.5 0 0 1 18 5.5v5a3.5 3.5 0 0 1-3.032 3.468L9.354 8.354a.5.5 0 0 0-.708 0l-5.615 5.614A3.5 3.5 0 0 1 0 10.5v-5A3.5 3.5 0 0 1 3.5 2z",
       style: { animation: "var(--media-icon-airplay-fill-animation, media-icon-airplay-fill 1s ease-in-out infinite alternate)" }
     }),
-    /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("path", { d: "M14.5 2A3.5 3.5 0 0 1 18 5.5v5l-.005.18a3.5 3.5 0 0 1-3.027 3.288L13 12h1.5a1.5 1.5 0 0 0 1.5-1.5v-5A1.5 1.5 0 0 0 14.5 4h-11A1.5 1.5 0 0 0 2 5.5v5A1.5 1.5 0 0 0 3.5 12H5l-1.968 1.967A3.5 3.5 0 0 1 0 10.5v-5A3.5 3.5 0 0 1 3.5 2z" }),
-    /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("path", {
+    /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("path", { d: "M14.5 2A3.5 3.5 0 0 1 18 5.5v5l-.005.18a3.5 3.5 0 0 1-3.027 3.288L13 12h1.5a1.5 1.5 0 0 0 1.5-1.5v-5A1.5 1.5 0 0 0 14.5 4h-11A1.5 1.5 0 0 0 2 5.5v5A1.5 1.5 0 0 0 3.5 12H5l-1.968 1.967A3.5 3.5 0 0 1 0 10.5v-5A3.5 3.5 0 0 1 3.5 2z" }),
+    /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("path", {
       d: "M8.631 10.902a.5.5 0 0 1 .738 0l4.363 4.76a.5.5 0 0 1-.369.838H4.637a.5.5 0 0 1-.369-.838z",
       style: { animation: "var(--media-icon-airplay-triangle-animation, media-icon-airplay-triangle 1s ease-in-out infinite alternate)" }
     })
   ]
 });
-var ForwardRef3 = (0, import_react113.forwardRef)(AirPlayExitIcon);
+var ForwardRef3 = (0, import_react167.forwardRef)(AirPlayExitIcon);
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/components/buttons/airplay-button.js
 var import_react_compiler_runtime64 = __toESM(require_dist(), 1);
-var import_jsx_runtime62 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime77 = __toESM(require_jsx_runtime(), 1);
 function AirPlayButton2(t0) {
   const $ = (0, import_react_compiler_runtime64.c)(13);
   let t1;
@@ -32077,7 +40944,7 @@ function AirPlayButton2(t0) {
   }
   let t2;
   if ($[5] === Symbol.for("react.memo_cache_sentinel")) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(Button, {});
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime77.jsx)(Button2, {});
     $[5] = t2;
   } else t2 = $[5];
   let t3;
@@ -32088,17 +40955,17 @@ function AirPlayButton2(t0) {
   } else t3 = $[7];
   let t4;
   if ($[8] === Symbol.for("react.memo_cache_sentinel")) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(ForwardRef2, { className: cn("media-button-icon", "media-airplay-button-enter-icon") });
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime77.jsx)(ForwardRef2, { className: cn("media-button-icon", "media-airplay-button-enter-icon") });
     $[8] = t4;
   } else t4 = $[8];
   let t5;
   if ($[9] === Symbol.for("react.memo_cache_sentinel")) {
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(ForwardRef3, { className: cn("media-button-icon", "media-airplay-button-exit-icon") });
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime77.jsx)(ForwardRef3, { className: cn("media-button-icon", "media-airplay-button-exit-icon") });
     $[9] = t5;
   } else t5 = $[9];
   let t6;
   if ($[10] !== props || $[11] !== t3) {
-    t6 = /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)(AirPlayButton, {
+    t6 = /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)(AirPlayButton, {
       render: t2,
       className: t3,
       ...props,
@@ -32112,9 +40979,9 @@ function AirPlayButton2(t0) {
 }
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/captions-off.js
-var import_react114 = __toESM(require_react(), 1);
-var import_jsx_runtime63 = __toESM(require_jsx_runtime(), 1);
-var CaptionsOffIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)("svg", {
+var import_react168 = __toESM(require_react(), 1);
+var import_jsx_runtime78 = __toESM(require_jsx_runtime(), 1);
+var CaptionsOffIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -32124,7 +40991,7 @@ var CaptionsOffIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime63.j
   ref,
   ...props,
   children: [
-    /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("rect", {
+    /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("rect", {
       width: 16,
       height: 12,
       x: 1,
@@ -32133,7 +41000,7 @@ var CaptionsOffIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime63.j
       strokeWidth: 2,
       rx: 3
     }),
-    /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("rect", {
+    /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("rect", {
       width: 3,
       height: 2,
       x: 3,
@@ -32142,7 +41009,7 @@ var CaptionsOffIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime63.j
       fillOpacity: 0.5,
       rx: 1
     }),
-    /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("rect", {
+    /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("rect", {
       width: 2,
       height: 2,
       x: 13,
@@ -32151,7 +41018,7 @@ var CaptionsOffIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime63.j
       fillOpacity: 0.5,
       rx: 1
     }),
-    /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("rect", {
+    /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("rect", {
       width: 4,
       height: 2,
       x: 11,
@@ -32160,7 +41027,7 @@ var CaptionsOffIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime63.j
       fillOpacity: 0.5,
       rx: 1
     }),
-    /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("rect", {
+    /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("rect", {
       width: 5,
       height: 2,
       x: 7,
@@ -32169,7 +41036,7 @@ var CaptionsOffIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime63.j
       fillOpacity: 0.5,
       rx: 1
     }),
-    /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("rect", {
+    /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("rect", {
       width: 7,
       height: 2,
       x: 3,
@@ -32180,12 +41047,12 @@ var CaptionsOffIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime63.j
     })
   ]
 });
-var ForwardRef4 = (0, import_react114.forwardRef)(CaptionsOffIcon);
+var ForwardRef4 = (0, import_react168.forwardRef)(CaptionsOffIcon);
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/captions-on.js
-var import_react115 = __toESM(require_react(), 1);
-var import_jsx_runtime64 = __toESM(require_jsx_runtime(), 1);
-var CaptionsOnIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("svg", {
+var import_react169 = __toESM(require_react(), 1);
+var import_jsx_runtime79 = __toESM(require_jsx_runtime(), 1);
+var CaptionsOnIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -32194,13 +41061,13 @@ var CaptionsOnIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime64.js
   viewBox: "0 0 18 18",
   ref,
   ...props,
-  children: /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("path", { d: "M15 2a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H3a3 3 0 0 1-3-3V5a3 3 0 0 1 3-3zM4 11a1 1 0 1 0 0 2h5a1 1 0 1 0 0-2zm8 0a1 1 0 1 0 0 2h2a1 1 0 1 0 0-2zM4 8a1 1 0 0 0 0 2h1a1 1 0 0 0 0-2zm4 0a1 1 0 0 0 0 2h3a1 1 0 1 0 0-2zm6 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2" })
+  children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("path", { d: "M15 2a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H3a3 3 0 0 1-3-3V5a3 3 0 0 1 3-3zM4 11a1 1 0 1 0 0 2h5a1 1 0 1 0 0-2zm8 0a1 1 0 1 0 0 2h2a1 1 0 1 0 0-2zM4 8a1 1 0 0 0 0 2h1a1 1 0 0 0 0-2zm4 0a1 1 0 0 0 0 2h3a1 1 0 1 0 0-2zm6 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2" })
 });
-var ForwardRef5 = (0, import_react115.forwardRef)(CaptionsOnIcon);
+var ForwardRef5 = (0, import_react169.forwardRef)(CaptionsOnIcon);
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/components/buttons/captions-button.js
 var import_react_compiler_runtime65 = __toESM(require_dist(), 1);
-var import_jsx_runtime65 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime80 = __toESM(require_jsx_runtime(), 1);
 function CaptionsButton2(t0) {
   const $ = (0, import_react_compiler_runtime65.c)(13);
   let t1;
@@ -32222,7 +41089,7 @@ function CaptionsButton2(t0) {
   }
   let t2;
   if ($[5] === Symbol.for("react.memo_cache_sentinel")) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(Button, {});
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime80.jsx)(Button2, {});
     $[5] = t2;
   } else t2 = $[5];
   let t3;
@@ -32233,17 +41100,17 @@ function CaptionsButton2(t0) {
   } else t3 = $[7];
   let t4;
   if ($[8] === Symbol.for("react.memo_cache_sentinel")) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(ForwardRef4, { className: cn("media-button-icon", "media-captions-button-off-icon") });
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime80.jsx)(ForwardRef4, { className: cn("media-button-icon", "media-captions-button-off-icon") });
     $[8] = t4;
   } else t4 = $[8];
   let t5;
   if ($[9] === Symbol.for("react.memo_cache_sentinel")) {
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(ForwardRef5, { className: cn("media-button-icon", "media-captions-button-on-icon") });
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime80.jsx)(ForwardRef5, { className: cn("media-button-icon", "media-captions-button-on-icon") });
     $[9] = t5;
   } else t5 = $[9];
   let t6;
   if ($[10] !== props || $[11] !== t3) {
-    t6 = /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)(CaptionsButton, {
+    t6 = /* @__PURE__ */ (0, import_jsx_runtime80.jsxs)(CaptionsButton, {
       render: t2,
       className: t3,
       ...props,
@@ -32257,9 +41124,9 @@ function CaptionsButton2(t0) {
 }
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/cast-enter.js
-var import_react116 = __toESM(require_react(), 1);
-var import_jsx_runtime66 = __toESM(require_jsx_runtime(), 1);
-var CastEnterIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)("svg", {
+var import_react170 = __toESM(require_react(), 1);
+var import_jsx_runtime81 = __toESM(require_jsx_runtime(), 1);
+var CastEnterIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime81.jsxs)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -32268,14 +41135,14 @@ var CastEnterIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime66.jsx
   viewBox: "0 0 18 18",
   ref,
   ...props,
-  children: [/* @__PURE__ */ (0, import_jsx_runtime66.jsx)("path", { d: "M14.5 2A3.5 3.5 0 0 1 18 5.5v7l-.005.18a3.5 3.5 0 0 1-3.315 3.315L14.5 16h-7c0-.693-.096-1.363-.271-2H14.5a1.5 1.5 0 0 0 1.5-1.5v-7A1.5 1.5 0 0 0 14.5 4h-11A1.5 1.5 0 0 0 2 5.5v3.271A7.5 7.5 0 0 0 0 8.5v-3A3.5 3.5 0 0 1 3.5 2zM0 12a4 4 0 0 1 4 4H2.5A2.5 2.5 0 0 0 0 13.5z" }), /* @__PURE__ */ (0, import_jsx_runtime66.jsx)("path", { d: "M0 9.5A6.5 6.5 0 0 1 6.5 16H5a5 5 0 0 0-5-5zm0 5A1.5 1.5 0 0 1 1.5 16h-1a.5.5 0 0 1-.5-.5z" })]
+  children: [/* @__PURE__ */ (0, import_jsx_runtime81.jsx)("path", { d: "M14.5 2A3.5 3.5 0 0 1 18 5.5v7l-.005.18a3.5 3.5 0 0 1-3.315 3.315L14.5 16h-7c0-.693-.096-1.363-.271-2H14.5a1.5 1.5 0 0 0 1.5-1.5v-7A1.5 1.5 0 0 0 14.5 4h-11A1.5 1.5 0 0 0 2 5.5v3.271A7.5 7.5 0 0 0 0 8.5v-3A3.5 3.5 0 0 1 3.5 2zM0 12a4 4 0 0 1 4 4H2.5A2.5 2.5 0 0 0 0 13.5z" }), /* @__PURE__ */ (0, import_jsx_runtime81.jsx)("path", { d: "M0 9.5A6.5 6.5 0 0 1 6.5 16H5a5 5 0 0 0-5-5zm0 5A1.5 1.5 0 0 1 1.5 16h-1a.5.5 0 0 1-.5-.5z" })]
 });
-var ForwardRef6 = (0, import_react116.forwardRef)(CastEnterIcon);
+var ForwardRef6 = (0, import_react170.forwardRef)(CastEnterIcon);
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/cast-exit.js
-var import_react117 = __toESM(require_react(), 1);
-var import_jsx_runtime67 = __toESM(require_jsx_runtime(), 1);
-var CastExitIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime67.jsxs)("svg", {
+var import_react171 = __toESM(require_react(), 1);
+var import_jsx_runtime82 = __toESM(require_jsx_runtime(), 1);
+var CastExitIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime82.jsxs)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -32285,16 +41152,16 @@ var CastExitIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime67.jsxs
   ref,
   ...props,
   children: [
-    /* @__PURE__ */ (0, import_jsx_runtime67.jsx)("path", { d: "M14.5 2A3.5 3.5 0 0 1 18 5.5v7a3.5 3.5 0 0 1-3.5 3.5h-7c0-.693-.096-1.363-.271-2H14.5a1.5 1.5 0 0 0 1.5-1.5v-7A1.5 1.5 0 0 0 14.5 4h-11A1.5 1.5 0 0 0 2 5.5v3.271A7.5 7.5 0 0 0 0 8.5v-3A3.5 3.5 0 0 1 3.5 2z" }),
-    /* @__PURE__ */ (0, import_jsx_runtime67.jsx)("path", { d: "M13.5 5.5a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H6.634A7.53 7.53 0 0 0 3.5 9.366V6.5a1 1 0 0 1 1-1zM0 12a4 4 0 0 1 4 4H2.5A2.5 2.5 0 0 0 0 13.5z" }),
-    /* @__PURE__ */ (0, import_jsx_runtime67.jsx)("path", { d: "M0 9.5A6.5 6.5 0 0 1 6.5 16H5a5 5 0 0 0-5-5zm0 5A1.5 1.5 0 0 1 1.5 16h-1a.5.5 0 0 1-.5-.5z" })
+    /* @__PURE__ */ (0, import_jsx_runtime82.jsx)("path", { d: "M14.5 2A3.5 3.5 0 0 1 18 5.5v7a3.5 3.5 0 0 1-3.5 3.5h-7c0-.693-.096-1.363-.271-2H14.5a1.5 1.5 0 0 0 1.5-1.5v-7A1.5 1.5 0 0 0 14.5 4h-11A1.5 1.5 0 0 0 2 5.5v3.271A7.5 7.5 0 0 0 0 8.5v-3A3.5 3.5 0 0 1 3.5 2z" }),
+    /* @__PURE__ */ (0, import_jsx_runtime82.jsx)("path", { d: "M13.5 5.5a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H6.634A7.53 7.53 0 0 0 3.5 9.366V6.5a1 1 0 0 1 1-1zM0 12a4 4 0 0 1 4 4H2.5A2.5 2.5 0 0 0 0 13.5z" }),
+    /* @__PURE__ */ (0, import_jsx_runtime82.jsx)("path", { d: "M0 9.5A6.5 6.5 0 0 1 6.5 16H5a5 5 0 0 0-5-5zm0 5A1.5 1.5 0 0 1 1.5 16h-1a.5.5 0 0 1-.5-.5z" })
   ]
 });
-var ForwardRef7 = (0, import_react117.forwardRef)(CastExitIcon);
+var ForwardRef7 = (0, import_react171.forwardRef)(CastExitIcon);
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/components/buttons/cast-button.js
 var import_react_compiler_runtime66 = __toESM(require_dist(), 1);
-var import_jsx_runtime68 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime83 = __toESM(require_jsx_runtime(), 1);
 function CastButton2(t0) {
   const $ = (0, import_react_compiler_runtime66.c)(13);
   let t1;
@@ -32316,7 +41183,7 @@ function CastButton2(t0) {
   }
   let t2;
   if ($[5] === Symbol.for("react.memo_cache_sentinel")) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime68.jsx)(Button, {});
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime83.jsx)(Button2, {});
     $[5] = t2;
   } else t2 = $[5];
   let t3;
@@ -32327,17 +41194,17 @@ function CastButton2(t0) {
   } else t3 = $[7];
   let t4;
   if ($[8] === Symbol.for("react.memo_cache_sentinel")) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime68.jsx)(ForwardRef6, { className: cn("media-button-icon", "media-cast-button-enter-icon") });
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime83.jsx)(ForwardRef6, { className: cn("media-button-icon", "media-cast-button-enter-icon") });
     $[8] = t4;
   } else t4 = $[8];
   let t5;
   if ($[9] === Symbol.for("react.memo_cache_sentinel")) {
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime68.jsx)(ForwardRef7, { className: cn("media-button-icon", "media-cast-button-exit-icon") });
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime83.jsx)(ForwardRef7, { className: cn("media-button-icon", "media-cast-button-exit-icon") });
     $[9] = t5;
   } else t5 = $[9];
   let t6;
   if ($[10] !== props || $[11] !== t3) {
-    t6 = /* @__PURE__ */ (0, import_jsx_runtime68.jsxs)(CastButton, {
+    t6 = /* @__PURE__ */ (0, import_jsx_runtime83.jsxs)(CastButton, {
       render: t2,
       className: t3,
       ...props,
@@ -32351,9 +41218,9 @@ function CastButton2(t0) {
 }
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/fullscreen-enter.js
-var import_react118 = __toESM(require_react(), 1);
-var import_jsx_runtime69 = __toESM(require_jsx_runtime(), 1);
-var FullscreenEnterIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("svg", {
+var import_react172 = __toESM(require_react(), 1);
+var import_jsx_runtime84 = __toESM(require_jsx_runtime(), 1);
+var FullscreenEnterIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime84.jsx)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -32362,14 +41229,14 @@ var FullscreenEnterIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime
   viewBox: "0 0 18 18",
   ref,
   ...props,
-  children: /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("path", { d: "M9.57 3.617A1 1 0 0 0 8.646 3H4c-.552 0-1 .449-1 1v4.646a.996.996 0 0 0 1.001 1 1 1 0 0 0 .706-.293l4.647-4.647a1 1 0 0 0 .216-1.089m4.812 4.812a1 1 0 0 0-1.089.217l-4.647 4.647a.998.998 0 0 0 .708 1.706H14c.552 0 1-.449 1-1V9.353a1 1 0 0 0-.618-.924" })
+  children: /* @__PURE__ */ (0, import_jsx_runtime84.jsx)("path", { d: "M9.57 3.617A1 1 0 0 0 8.646 3H4c-.552 0-1 .449-1 1v4.646a.996.996 0 0 0 1.001 1 1 1 0 0 0 .706-.293l4.647-4.647a1 1 0 0 0 .216-1.089m4.812 4.812a1 1 0 0 0-1.089.217l-4.647 4.647a.998.998 0 0 0 .708 1.706H14c.552 0 1-.449 1-1V9.353a1 1 0 0 0-.618-.924" })
 });
-var ForwardRef8 = (0, import_react118.forwardRef)(FullscreenEnterIcon);
+var ForwardRef8 = (0, import_react172.forwardRef)(FullscreenEnterIcon);
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/fullscreen-exit.js
-var import_react119 = __toESM(require_react(), 1);
-var import_jsx_runtime70 = __toESM(require_jsx_runtime(), 1);
-var FullscreenExitIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("svg", {
+var import_react173 = __toESM(require_react(), 1);
+var import_jsx_runtime85 = __toESM(require_jsx_runtime(), 1);
+var FullscreenExitIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime85.jsx)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -32378,13 +41245,13 @@ var FullscreenExitIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime7
   viewBox: "0 0 18 18",
   ref,
   ...props,
-  children: /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("path", { d: "M7.883 1.93a.99.99 0 0 0-1.09.217L2.146 6.793A.998.998 0 0 0 2.853 8.5H7.5c.551 0 1-.449 1-1V2.854a1 1 0 0 0-.617-.924m7.263 7.57H10.5c-.551 0-1 .449-1 1v4.646a.996.996 0 0 0 1.001 1.001 1 1 0 0 0 .706-.293l4.646-4.646a.998.998 0 0 0-.707-1.707z" })
+  children: /* @__PURE__ */ (0, import_jsx_runtime85.jsx)("path", { d: "M7.883 1.93a.99.99 0 0 0-1.09.217L2.146 6.793A.998.998 0 0 0 2.853 8.5H7.5c.551 0 1-.449 1-1V2.854a1 1 0 0 0-.617-.924m7.263 7.57H10.5c-.551 0-1 .449-1 1v4.646a.996.996 0 0 0 1.001 1.001 1 1 0 0 0 .706-.293l4.646-4.646a.998.998 0 0 0-.707-1.707z" })
 });
-var ForwardRef9 = (0, import_react119.forwardRef)(FullscreenExitIcon);
+var ForwardRef9 = (0, import_react173.forwardRef)(FullscreenExitIcon);
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/components/buttons/fullscreen-button.js
 var import_react_compiler_runtime67 = __toESM(require_dist(), 1);
-var import_jsx_runtime71 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime86 = __toESM(require_jsx_runtime(), 1);
 function FullscreenButton2(t0) {
   const $ = (0, import_react_compiler_runtime67.c)(13);
   let t1;
@@ -32406,7 +41273,7 @@ function FullscreenButton2(t0) {
   }
   let t2;
   if ($[5] === Symbol.for("react.memo_cache_sentinel")) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime71.jsx)(Button, {});
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime86.jsx)(Button2, {});
     $[5] = t2;
   } else t2 = $[5];
   let t3;
@@ -32417,17 +41284,17 @@ function FullscreenButton2(t0) {
   } else t3 = $[7];
   let t4;
   if ($[8] === Symbol.for("react.memo_cache_sentinel")) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime71.jsx)(ForwardRef8, { className: cn("media-button-icon", "media-fullscreen-button-enter-icon") });
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime86.jsx)(ForwardRef8, { className: cn("media-button-icon", "media-fullscreen-button-enter-icon") });
     $[8] = t4;
   } else t4 = $[8];
   let t5;
   if ($[9] === Symbol.for("react.memo_cache_sentinel")) {
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime71.jsx)(ForwardRef9, { className: cn("media-button-icon", "media-fullscreen-button-exit-icon") });
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime86.jsx)(ForwardRef9, { className: cn("media-button-icon", "media-fullscreen-button-exit-icon") });
     $[9] = t5;
   } else t5 = $[9];
   let t6;
   if ($[10] !== props || $[11] !== t3) {
-    t6 = /* @__PURE__ */ (0, import_jsx_runtime71.jsxs)(FullscreenButton, {
+    t6 = /* @__PURE__ */ (0, import_jsx_runtime86.jsxs)(FullscreenButton, {
       render: t2,
       className: t3,
       ...props,
@@ -32441,9 +41308,9 @@ function FullscreenButton2(t0) {
 }
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/pip-enter.js
-var import_react120 = __toESM(require_react(), 1);
-var import_jsx_runtime72 = __toESM(require_jsx_runtime(), 1);
-var PipEnterIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime72.jsxs)("svg", {
+var import_react174 = __toESM(require_react(), 1);
+var import_jsx_runtime87 = __toESM(require_jsx_runtime(), 1);
+var PipEnterIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime87.jsxs)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -32453,23 +41320,23 @@ var PipEnterIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime72.jsxs
   ref,
   ...props,
   children: [
-    /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("path", { d: "M13 2a4 4 0 0 1 4 4v2.036A3.5 3.5 0 0 0 16.5 8H15V6.273C15 5.018 13.96 4 12.679 4H4.32C3.04 4 2 5.018 2 6.273v5.454C2 12.982 3.04 14 4.321 14H6v1.5q0 .255.036.5H4a4 4 0 0 1-4-4V6a4 4 0 0 1 4-4z" }),
-    /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("rect", {
+    /* @__PURE__ */ (0, import_jsx_runtime87.jsx)("path", { d: "M13 2a4 4 0 0 1 4 4v2.036A3.5 3.5 0 0 0 16.5 8H15V6.273C15 5.018 13.96 4 12.679 4H4.32C3.04 4 2 5.018 2 6.273v5.454C2 12.982 3.04 14 4.321 14H6v1.5q0 .255.036.5H4a4 4 0 0 1-4-4V6a4 4 0 0 1 4-4z" }),
+    /* @__PURE__ */ (0, import_jsx_runtime87.jsx)("rect", {
       width: 10,
       height: 7,
       x: 8,
       y: 10,
       rx: 2
     }),
-    /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("path", { d: "M7.129 5.547a.6.6 0 0 0-.656.13L3.677 8.473A.6.6 0 0 0 4.102 9.5h2.796c.332 0 .602-.27.602-.602V6.103a.6.6 0 0 0-.371-.556" })
+    /* @__PURE__ */ (0, import_jsx_runtime87.jsx)("path", { d: "M7.129 5.547a.6.6 0 0 0-.656.13L3.677 8.473A.6.6 0 0 0 4.102 9.5h2.796c.332 0 .602-.27.602-.602V6.103a.6.6 0 0 0-.371-.556" })
   ]
 });
-var ForwardRef10 = (0, import_react120.forwardRef)(PipEnterIcon);
+var ForwardRef10 = (0, import_react174.forwardRef)(PipEnterIcon);
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/pip-exit.js
-var import_react121 = __toESM(require_react(), 1);
-var import_jsx_runtime73 = __toESM(require_jsx_runtime(), 1);
-var PipExitIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime73.jsxs)("svg", {
+var import_react175 = __toESM(require_react(), 1);
+var import_jsx_runtime88 = __toESM(require_jsx_runtime(), 1);
+var PipExitIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime88.jsxs)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -32479,22 +41346,22 @@ var PipExitIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime73.jsxs)
   ref,
   ...props,
   children: [
-    /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("path", { d: "M13 2a4 4 0 0 1 4 4v2.036A3.5 3.5 0 0 0 16.5 8H15V6.273C15 5.018 13.96 4 12.679 4H4.32C3.04 4 2 5.018 2 6.273v5.454C2 12.982 3.04 14 4.321 14H6v1.5q0 .255.036.5H4a4 4 0 0 1-4-4V6a4 4 0 0 1 4-4z" }),
-    /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("rect", {
+    /* @__PURE__ */ (0, import_jsx_runtime88.jsx)("path", { d: "M13 2a4 4 0 0 1 4 4v2.036A3.5 3.5 0 0 0 16.5 8H15V6.273C15 5.018 13.96 4 12.679 4H4.32C3.04 4 2 5.018 2 6.273v5.454C2 12.982 3.04 14 4.321 14H6v1.5q0 .255.036.5H4a4 4 0 0 1-4-4V6a4 4 0 0 1 4-4z" }),
+    /* @__PURE__ */ (0, import_jsx_runtime88.jsx)("rect", {
       width: 10,
       height: 7,
       x: 8,
       y: 10,
       rx: 2
     }),
-    /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("path", { d: "M4.871 10.454a.6.6 0 0 0 .656-.131l2.796-2.796A.6.6 0 0 0 7.898 6.5H5.102a.603.603 0 0 0-.602.602v2.795a.6.6 0 0 0 .371.556" })
+    /* @__PURE__ */ (0, import_jsx_runtime88.jsx)("path", { d: "M4.871 10.454a.6.6 0 0 0 .656-.131l2.796-2.796A.6.6 0 0 0 7.898 6.5H5.102a.603.603 0 0 0-.602.602v2.795a.6.6 0 0 0 .371.556" })
   ]
 });
-var ForwardRef11 = (0, import_react121.forwardRef)(PipExitIcon);
+var ForwardRef11 = (0, import_react175.forwardRef)(PipExitIcon);
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/components/buttons/pip-button.js
 var import_react_compiler_runtime68 = __toESM(require_dist(), 1);
-var import_jsx_runtime74 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime89 = __toESM(require_jsx_runtime(), 1);
 function PiPButton2(t0) {
   const $ = (0, import_react_compiler_runtime68.c)(13);
   let t1;
@@ -32516,7 +41383,7 @@ function PiPButton2(t0) {
   }
   let t2;
   if ($[5] === Symbol.for("react.memo_cache_sentinel")) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime74.jsx)(Button, {});
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime89.jsx)(Button2, {});
     $[5] = t2;
   } else t2 = $[5];
   let t3;
@@ -32527,17 +41394,17 @@ function PiPButton2(t0) {
   } else t3 = $[7];
   let t4;
   if ($[8] === Symbol.for("react.memo_cache_sentinel")) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime74.jsx)(ForwardRef10, { className: cn("media-button-icon", "media-pip-button-enter-icon") });
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime89.jsx)(ForwardRef10, { className: cn("media-button-icon", "media-pip-button-enter-icon") });
     $[8] = t4;
   } else t4 = $[8];
   let t5;
   if ($[9] === Symbol.for("react.memo_cache_sentinel")) {
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime74.jsx)(ForwardRef11, { className: cn("media-button-icon", "media-pip-button-exit-icon") });
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime89.jsx)(ForwardRef11, { className: cn("media-button-icon", "media-pip-button-exit-icon") });
     $[9] = t5;
   } else t5 = $[9];
   let t6;
   if ($[10] !== props || $[11] !== t3) {
-    t6 = /* @__PURE__ */ (0, import_jsx_runtime74.jsxs)(PiPButton, {
+    t6 = /* @__PURE__ */ (0, import_jsx_runtime89.jsxs)(PiPButton, {
       render: t2,
       className: t3,
       ...props,
@@ -32551,9 +41418,9 @@ function PiPButton2(t0) {
 }
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/pause.js
-var import_react122 = __toESM(require_react(), 1);
-var import_jsx_runtime75 = __toESM(require_jsx_runtime(), 1);
-var PauseIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime75.jsxs)("svg", {
+var import_react176 = __toESM(require_react(), 1);
+var import_jsx_runtime90 = __toESM(require_jsx_runtime(), 1);
+var PauseIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime90.jsxs)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -32562,13 +41429,13 @@ var PauseIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime75.jsxs)("
   viewBox: "0 0 18 18",
   ref,
   ...props,
-  children: [/* @__PURE__ */ (0, import_jsx_runtime75.jsx)("rect", {
+  children: [/* @__PURE__ */ (0, import_jsx_runtime90.jsx)("rect", {
     width: 5,
     height: 14,
     x: 2,
     y: 2,
     rx: 1.75
-  }), /* @__PURE__ */ (0, import_jsx_runtime75.jsx)("rect", {
+  }), /* @__PURE__ */ (0, import_jsx_runtime90.jsx)("rect", {
     width: 5,
     height: 14,
     x: 11,
@@ -32576,12 +41443,12 @@ var PauseIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime75.jsxs)("
     rx: 1.75
   })]
 });
-var ForwardRef12 = (0, import_react122.forwardRef)(PauseIcon);
+var ForwardRef12 = (0, import_react176.forwardRef)(PauseIcon);
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/play.js
-var import_react123 = __toESM(require_react(), 1);
-var import_jsx_runtime76 = __toESM(require_jsx_runtime(), 1);
-var PlayIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("svg", {
+var import_react177 = __toESM(require_react(), 1);
+var import_jsx_runtime91 = __toESM(require_jsx_runtime(), 1);
+var PlayIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime91.jsx)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -32590,14 +41457,14 @@ var PlayIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("sv
   viewBox: "0 0 18 18",
   ref,
   ...props,
-  children: /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("path", { d: "m14.051 10.723-7.985 4.964a1.98 1.98 0 0 1-2.758-.638A2.06 2.06 0 0 1 3 13.964V4.036C3 2.91 3.895 2 5 2c.377 0 .747.109 1.066.313l7.985 4.964a2.057 2.057 0 0 1 .627 2.808c-.16.257-.373.475-.627.637" })
+  children: /* @__PURE__ */ (0, import_jsx_runtime91.jsx)("path", { d: "m14.051 10.723-7.985 4.964a1.98 1.98 0 0 1-2.758-.638A2.06 2.06 0 0 1 3 13.964V4.036C3 2.91 3.895 2 5 2c.377 0 .747.109 1.066.313l7.985 4.964a2.057 2.057 0 0 1 .627 2.808c-.16.257-.373.475-.627.637" })
 });
-var ForwardRef13 = (0, import_react123.forwardRef)(PlayIcon);
+var ForwardRef13 = (0, import_react177.forwardRef)(PlayIcon);
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/restart.js
-var import_react124 = __toESM(require_react(), 1);
-var import_jsx_runtime77 = __toESM(require_jsx_runtime(), 1);
-var RestartIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)("svg", {
+var import_react178 = __toESM(require_react(), 1);
+var import_jsx_runtime92 = __toESM(require_jsx_runtime(), 1);
+var RestartIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -32606,13 +41473,13 @@ var RestartIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)
   viewBox: "0 0 18 18",
   ref,
   ...props,
-  children: [/* @__PURE__ */ (0, import_jsx_runtime77.jsx)("path", { d: "M9 1a7.98 7.98 0 0 0-6.132 2.867l-1.441-1.44A.25.25 0 0 0 1 2.604V6.75c0 .138.112.25.25.25h4.146a.25.25 0 0 0 .177-.427L4.29 5.29A5.99 5.99 0 0 1 9 3a6 6 0 1 1-6 6H1a8 8 0 1 0 8-8" }), /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("path", { d: "m11.61 9.639-3.331 2.07a.826.826 0 0 1-1.15-.266.86.86 0 0 1-.129-.452V6.849C7 6.38 7.374 6 7.834 6c.158 0 .312.045.445.13l3.331 2.071a.858.858 0 0 1 0 1.438" })]
+  children: [/* @__PURE__ */ (0, import_jsx_runtime92.jsx)("path", { d: "M9 1a7.98 7.98 0 0 0-6.132 2.867l-1.441-1.44A.25.25 0 0 0 1 2.604V6.75c0 .138.112.25.25.25h4.146a.25.25 0 0 0 .177-.427L4.29 5.29A5.99 5.99 0 0 1 9 3a6 6 0 1 1-6 6H1a8 8 0 1 0 8-8" }), /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("path", { d: "m11.61 9.639-3.331 2.07a.826.826 0 0 1-1.15-.266.86.86 0 0 1-.129-.452V6.849C7 6.38 7.374 6 7.834 6c.158 0 .312.045.445.13l3.331 2.071a.858.858 0 0 1 0 1.438" })]
 });
-var ForwardRef14 = (0, import_react124.forwardRef)(RestartIcon);
+var ForwardRef14 = (0, import_react178.forwardRef)(RestartIcon);
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/components/buttons/play-button.js
 var import_react_compiler_runtime69 = __toESM(require_dist(), 1);
-var import_jsx_runtime78 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime93 = __toESM(require_jsx_runtime(), 1);
 function PlayButton2(t0) {
   const $ = (0, import_react_compiler_runtime69.c)(27);
   let t1;
@@ -32637,7 +41504,7 @@ function PlayButton2(t0) {
   }
   let t2;
   if ($[6] === Symbol.for("react.memo_cache_sentinel")) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Button, {});
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Button2, {});
     $[6] = t2;
   } else t2 = $[6];
   let t3;
@@ -32654,7 +41521,7 @@ function PlayButton2(t0) {
   } else t4 = $[10];
   let t5;
   if ($[11] !== t4) {
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(ForwardRef14, { className: t4 });
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(ForwardRef14, { className: t4 });
     $[11] = t4;
     $[12] = t5;
   } else t5 = $[12];
@@ -32666,7 +41533,7 @@ function PlayButton2(t0) {
   } else t6 = $[14];
   let t7;
   if ($[15] !== t6) {
-    t7 = /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(ForwardRef13, { className: t6 });
+    t7 = /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(ForwardRef13, { className: t6 });
     $[15] = t6;
     $[16] = t7;
   } else t7 = $[16];
@@ -32678,13 +41545,13 @@ function PlayButton2(t0) {
   } else t8 = $[18];
   let t9;
   if ($[19] !== t8) {
-    t9 = /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(ForwardRef12, { className: t8 });
+    t9 = /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(ForwardRef12, { className: t8 });
     $[19] = t8;
     $[20] = t9;
   } else t9 = $[20];
   let t10;
   if ($[21] !== props || $[22] !== t3 || $[23] !== t5 || $[24] !== t7 || $[25] !== t9) {
-    t10 = /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)(PlayButton, {
+    t10 = /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)(PlayButton, {
       render: t2,
       className: t3,
       ...props,
@@ -32705,9 +41572,9 @@ function PlayButton2(t0) {
 }
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/seek.js
-var import_react125 = __toESM(require_react(), 1);
-var import_jsx_runtime79 = __toESM(require_jsx_runtime(), 1);
-var SeekIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("svg", {
+var import_react179 = __toESM(require_react(), 1);
+var import_jsx_runtime94 = __toESM(require_jsx_runtime(), 1);
+var SeekIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime94.jsx)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -32716,13 +41583,13 @@ var SeekIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("sv
   viewBox: "0 0 18 18",
   ref,
   ...props,
-  children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("path", { d: "M9 1a7.98 7.98 0 0 1 6.132 2.867l1.441-1.44a.25.25 0 0 1 .427.177V6.75a.25.25 0 0 1-.25.25h-4.146a.25.25 0 0 1-.177-.427L13.71 5.29A5.99 5.99 0 0 0 9 3a6 6 0 0 0-4.242 10.242l-1.415 1.415A8 8 0 0 1 9 1" })
+  children: /* @__PURE__ */ (0, import_jsx_runtime94.jsx)("path", { d: "M9 1a7.98 7.98 0 0 1 6.132 2.867l1.441-1.44a.25.25 0 0 1 .427.177V6.75a.25.25 0 0 1-.25.25h-4.146a.25.25 0 0 1-.177-.427L13.71 5.29A5.99 5.99 0 0 0 9 3a6 6 0 0 0-4.242 10.242l-1.415 1.415A8 8 0 0 1 9 1" })
 });
-var ForwardRef15 = (0, import_react125.forwardRef)(SeekIcon);
+var ForwardRef15 = (0, import_react179.forwardRef)(SeekIcon);
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/components/buttons/seek-button.js
 var import_react_compiler_runtime70 = __toESM(require_dist(), 1);
-var import_jsx_runtime80 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime95 = __toESM(require_jsx_runtime(), 1);
 function SeekButton2(t0) {
   const $ = (0, import_react_compiler_runtime70.c)(28);
   let t1;
@@ -32748,7 +41615,7 @@ function SeekButton2(t0) {
   const seconds = t2 === void 0 ? 10 : t2;
   let t3;
   if ($[6] === Symbol.for("react.memo_cache_sentinel")) {
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime80.jsx)(Button, {});
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime95.jsx)(Button2, {});
     $[6] = t3;
   } else t3 = $[6];
   let t4;
@@ -32766,7 +41633,7 @@ function SeekButton2(t0) {
   } else t6 = $[10];
   let t7;
   if ($[11] !== t6) {
-    t7 = /* @__PURE__ */ (0, import_jsx_runtime80.jsx)(ForwardRef15, { className: t6 });
+    t7 = /* @__PURE__ */ (0, import_jsx_runtime95.jsx)(ForwardRef15, { className: t6 });
     $[11] = t6;
     $[12] = t7;
   } else t7 = $[12];
@@ -32785,7 +41652,7 @@ function SeekButton2(t0) {
   } else t10 = $[16];
   let t11;
   if ($[17] !== t10 || $[18] !== t9) {
-    t11 = /* @__PURE__ */ (0, import_jsx_runtime80.jsx)("span", {
+    t11 = /* @__PURE__ */ (0, import_jsx_runtime95.jsx)("span", {
       className: t9,
       children: t10
     });
@@ -32795,7 +41662,7 @@ function SeekButton2(t0) {
   } else t11 = $[19];
   let t12;
   if ($[20] !== t11 || $[21] !== t7) {
-    t12 = /* @__PURE__ */ (0, import_jsx_runtime80.jsxs)("div", {
+    t12 = /* @__PURE__ */ (0, import_jsx_runtime95.jsxs)("div", {
       className: "media-seek-button-content",
       children: [t7, t11]
     });
@@ -32805,7 +41672,7 @@ function SeekButton2(t0) {
   } else t12 = $[22];
   let t13;
   if ($[23] !== props || $[24] !== seconds || $[25] !== t12 || $[26] !== t4) {
-    t13 = /* @__PURE__ */ (0, import_jsx_runtime80.jsx)(SeekButton, {
+    t13 = /* @__PURE__ */ (0, import_jsx_runtime95.jsx)(SeekButton, {
       render: t3,
       className: t4,
       seconds,
@@ -32822,9 +41689,9 @@ function SeekButton2(t0) {
 }
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/volume-high.js
-var import_react126 = __toESM(require_react(), 1);
-var import_jsx_runtime81 = __toESM(require_jsx_runtime(), 1);
-var VolumeHighIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime81.jsxs)("svg", {
+var import_react180 = __toESM(require_react(), 1);
+var import_jsx_runtime96 = __toESM(require_jsx_runtime(), 1);
+var VolumeHighIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime96.jsxs)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -32833,14 +41700,14 @@ var VolumeHighIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime81.js
   viewBox: "0 0 18 18",
   ref,
   ...props,
-  children: [/* @__PURE__ */ (0, import_jsx_runtime81.jsx)("path", { d: "M15.6 3.3c-.4-.4-1-.4-1.4 0s-.4 1 0 1.4C15.4 5.9 16 7.4 16 9s-.6 3.1-1.8 4.3c-.4.4-.4 1 0 1.4.2.2.5.3.7.3.3 0 .5-.1.7-.3C17.1 13.2 18 11.2 18 9s-.9-4.2-2.4-5.7" }), /* @__PURE__ */ (0, import_jsx_runtime81.jsx)("path", { d: "M.714 6.008h3.072l4.071-3.857c.5-.376 1.143 0 1.143.601V15.28c0 .602-.643.903-1.143.602l-4.071-3.858H.714c-.428 0-.714-.3-.714-.752V6.76c0-.451.286-.752.714-.752m10.568.59a.91.91 0 0 1 0-1.316.91.91 0 0 1 1.316 0c1.203 1.203 1.47 2.216 1.522 3.208q.012.255.011.51c0 1.16-.358 2.733-1.533 3.803a.7.7 0 0 1-.298.156c-.382.106-.873-.011-1.018-.156a.91.91 0 0 1 0-1.316c.57-.57.995-1.551.995-2.487 0-.944-.26-1.667-.995-2.402" })]
+  children: [/* @__PURE__ */ (0, import_jsx_runtime96.jsx)("path", { d: "M15.6 3.3c-.4-.4-1-.4-1.4 0s-.4 1 0 1.4C15.4 5.9 16 7.4 16 9s-.6 3.1-1.8 4.3c-.4.4-.4 1 0 1.4.2.2.5.3.7.3.3 0 .5-.1.7-.3C17.1 13.2 18 11.2 18 9s-.9-4.2-2.4-5.7" }), /* @__PURE__ */ (0, import_jsx_runtime96.jsx)("path", { d: "M.714 6.008h3.072l4.071-3.857c.5-.376 1.143 0 1.143.601V15.28c0 .602-.643.903-1.143.602l-4.071-3.858H.714c-.428 0-.714-.3-.714-.752V6.76c0-.451.286-.752.714-.752m10.568.59a.91.91 0 0 1 0-1.316.91.91 0 0 1 1.316 0c1.203 1.203 1.47 2.216 1.522 3.208q.012.255.011.51c0 1.16-.358 2.733-1.533 3.803a.7.7 0 0 1-.298.156c-.382.106-.873-.011-1.018-.156a.91.91 0 0 1 0-1.316c.57-.57.995-1.551.995-2.487 0-.944-.26-1.667-.995-2.402" })]
 });
-var ForwardRef16 = (0, import_react126.forwardRef)(VolumeHighIcon);
+var ForwardRef16 = (0, import_react180.forwardRef)(VolumeHighIcon);
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/volume-low.js
-var import_react127 = __toESM(require_react(), 1);
-var import_jsx_runtime82 = __toESM(require_jsx_runtime(), 1);
-var VolumeLowIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime82.jsx)("svg", {
+var import_react181 = __toESM(require_react(), 1);
+var import_jsx_runtime97 = __toESM(require_jsx_runtime(), 1);
+var VolumeLowIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -32849,14 +41716,14 @@ var VolumeLowIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime82.jsx
   viewBox: "0 0 18 18",
   ref,
   ...props,
-  children: /* @__PURE__ */ (0, import_jsx_runtime82.jsx)("path", { d: "M.714 6.008h3.072l4.071-3.857c.5-.376 1.143 0 1.143.601V15.28c0 .602-.643.903-1.143.602l-4.071-3.858H.714c-.428 0-.714-.3-.714-.752V6.76c0-.451.286-.752.714-.752m10.568.59a.91.91 0 0 1 0-1.316.91.91 0 0 1 1.316 0c1.203 1.203 1.47 2.216 1.522 3.208q.012.255.011.51c0 1.16-.358 2.733-1.533 3.803a.7.7 0 0 1-.298.156c-.382.106-.873-.011-1.018-.156a.91.91 0 0 1 0-1.316c.57-.57.995-1.551.995-2.487 0-.944-.26-1.667-.995-2.402" })
+  children: /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("path", { d: "M.714 6.008h3.072l4.071-3.857c.5-.376 1.143 0 1.143.601V15.28c0 .602-.643.903-1.143.602l-4.071-3.858H.714c-.428 0-.714-.3-.714-.752V6.76c0-.451.286-.752.714-.752m10.568.59a.91.91 0 0 1 0-1.316.91.91 0 0 1 1.316 0c1.203 1.203 1.47 2.216 1.522 3.208q.012.255.011.51c0 1.16-.358 2.733-1.533 3.803a.7.7 0 0 1-.298.156c-.382.106-.873-.011-1.018-.156a.91.91 0 0 1 0-1.316c.57-.57.995-1.551.995-2.487 0-.944-.26-1.667-.995-2.402" })
 });
-var ForwardRef17 = (0, import_react127.forwardRef)(VolumeLowIcon);
+var ForwardRef17 = (0, import_react181.forwardRef)(VolumeLowIcon);
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/volume-off.js
-var import_react128 = __toESM(require_react(), 1);
-var import_jsx_runtime83 = __toESM(require_jsx_runtime(), 1);
-var VolumeOffIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime83.jsx)("svg", {
+var import_react182 = __toESM(require_react(), 1);
+var import_jsx_runtime98 = __toESM(require_jsx_runtime(), 1);
+var VolumeOffIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime98.jsx)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -32865,13 +41732,13 @@ var VolumeOffIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime83.jsx
   viewBox: "0 0 18 18",
   ref,
   ...props,
-  children: /* @__PURE__ */ (0, import_jsx_runtime83.jsx)("path", { d: "M.714 6.008h3.072l4.071-3.857c.5-.376 1.143 0 1.143.601V15.28c0 .602-.643.903-1.143.602l-4.071-3.858H.714c-.428 0-.714-.3-.714-.752V6.76c0-.451.286-.752.714-.752M14.5 7.586l-1.768-1.768a1 1 0 1 0-1.414 1.414L13.085 9l-1.767 1.768a1 1 0 0 0 1.414 1.414l1.768-1.768 1.768 1.768a1 1 0 0 0 1.414-1.414L15.914 9l1.768-1.768a1 1 0 0 0-1.414-1.414z" })
+  children: /* @__PURE__ */ (0, import_jsx_runtime98.jsx)("path", { d: "M.714 6.008h3.072l4.071-3.857c.5-.376 1.143 0 1.143.601V15.28c0 .602-.643.903-1.143.602l-4.071-3.858H.714c-.428 0-.714-.3-.714-.752V6.76c0-.451.286-.752.714-.752M14.5 7.586l-1.768-1.768a1 1 0 1 0-1.414 1.414L13.085 9l-1.767 1.768a1 1 0 0 0 1.414 1.414l1.768-1.768 1.768 1.768a1 1 0 0 0 1.414-1.414L15.914 9l1.768-1.768a1 1 0 0 0-1.414-1.414z" })
 });
-var ForwardRef18 = (0, import_react128.forwardRef)(VolumeOffIcon);
+var ForwardRef18 = (0, import_react182.forwardRef)(VolumeOffIcon);
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/components/buttons/mute-button.js
 var import_react_compiler_runtime71 = __toESM(require_dist(), 1);
-var import_jsx_runtime84 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime99 = __toESM(require_jsx_runtime(), 1);
 function MuteButton2(t0) {
   const $ = (0, import_react_compiler_runtime71.c)(14);
   let t1;
@@ -32893,7 +41760,7 @@ function MuteButton2(t0) {
   }
   let t2;
   if ($[5] === Symbol.for("react.memo_cache_sentinel")) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime84.jsx)(Button, {});
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime99.jsx)(Button2, {});
     $[5] = t2;
   } else t2 = $[5];
   let t3;
@@ -32904,22 +41771,22 @@ function MuteButton2(t0) {
   } else t3 = $[7];
   let t4;
   if ($[8] === Symbol.for("react.memo_cache_sentinel")) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime84.jsx)(ForwardRef18, { className: cn("media-button-icon", "media-mute-button-off-icon") });
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime99.jsx)(ForwardRef18, { className: cn("media-button-icon", "media-mute-button-off-icon") });
     $[8] = t4;
   } else t4 = $[8];
   let t5;
   if ($[9] === Symbol.for("react.memo_cache_sentinel")) {
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime84.jsx)(ForwardRef17, { className: cn("media-button-icon", "media-mute-button-low-icon") });
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime99.jsx)(ForwardRef17, { className: cn("media-button-icon", "media-mute-button-low-icon") });
     $[9] = t5;
   } else t5 = $[9];
   let t6;
   if ($[10] === Symbol.for("react.memo_cache_sentinel")) {
-    t6 = /* @__PURE__ */ (0, import_jsx_runtime84.jsx)(ForwardRef16, { className: cn("media-button-icon", "media-mute-button-high-icon") });
+    t6 = /* @__PURE__ */ (0, import_jsx_runtime99.jsx)(ForwardRef16, { className: cn("media-button-icon", "media-mute-button-high-icon") });
     $[10] = t6;
   } else t6 = $[10];
   let t7;
   if ($[11] !== props || $[12] !== t3) {
-    t7 = /* @__PURE__ */ (0, import_jsx_runtime84.jsxs)(MuteButton, {
+    t7 = /* @__PURE__ */ (0, import_jsx_runtime99.jsxs)(MuteButton, {
       render: t2,
       className: t3,
       ...props,
@@ -32938,7 +41805,7 @@ function MuteButton2(t0) {
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/components/menus/volume-popover.js
 var import_react_compiler_runtime72 = __toESM(require_dist(), 1);
-var import_jsx_runtime85 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime100 = __toESM(require_jsx_runtime(), 1);
 function VolumePopover(t0) {
   const $ = (0, import_react_compiler_runtime72.c)(23);
   let t1;
@@ -32979,13 +41846,13 @@ function VolumePopover(t0) {
   } else t6 = $[9];
   let t7;
   if ($[10] !== t6) {
-    t7 = /* @__PURE__ */ (0, import_jsx_runtime85.jsx)(VolumePopoverTrigger, { render: /* @__PURE__ */ (0, import_jsx_runtime85.jsx)(MuteButton2, { className: t6 }) });
+    t7 = /* @__PURE__ */ (0, import_jsx_runtime100.jsx)(VolumePopoverTrigger, { render: /* @__PURE__ */ (0, import_jsx_runtime100.jsx)(MuteButton2, { className: t6 }) });
     $[10] = t6;
     $[11] = t7;
   } else t7 = $[11];
   let t8;
   if ($[12] !== t5 || $[13] !== t7) {
-    t8 = /* @__PURE__ */ (0, import_jsx_runtime85.jsx)(ButtonTooltip, {
+    t8 = /* @__PURE__ */ (0, import_jsx_runtime100.jsx)(ButtonTooltip, {
       delay: 0,
       disabled: t5,
       sticky: true,
@@ -33003,16 +41870,16 @@ function VolumePopover(t0) {
   } else t9 = $[15];
   let t10;
   if ($[16] !== orientation) {
-    t10 = /* @__PURE__ */ (0, import_jsx_runtime85.jsx)(VolumePopoverPopup, {
+    t10 = /* @__PURE__ */ (0, import_jsx_runtime100.jsx)(VolumePopoverPopup, {
       className: t9,
-      children: /* @__PURE__ */ (0, import_jsx_runtime85.jsx)(VolumeSlider, { orientation })
+      children: /* @__PURE__ */ (0, import_jsx_runtime100.jsx)(VolumeSlider, { orientation })
     });
     $[16] = orientation;
     $[17] = t10;
   } else t10 = $[17];
   let t11;
   if ($[18] !== props || $[19] !== side || $[20] !== t10 || $[21] !== t8) {
-    t11 = /* @__PURE__ */ (0, import_jsx_runtime85.jsxs)(VolumePopoverRoot, {
+    t11 = /* @__PURE__ */ (0, import_jsx_runtime100.jsxs)(VolumePopoverRoot, {
       openOnHover: true,
       delay: 200,
       closeDelay: 100,
@@ -33031,7 +41898,7 @@ function VolumePopover(t0) {
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/components/sliders/time-slider.js
 var import_react_compiler_runtime73 = __toESM(require_dist(), 1);
-var import_jsx_runtime86 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime101 = __toESM(require_jsx_runtime(), 1);
 function TimeSlider(t0) {
   const $ = (0, import_react_compiler_runtime73.c)(25);
   let t1;
@@ -33066,7 +41933,7 @@ function TimeSlider(t0) {
   } else t3 = $[8];
   let t4;
   if ($[9] === Symbol.for("react.memo_cache_sentinel")) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime86.jsx)(TimeSliderChapters, {
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(TimeSliderChapters, {
       className: "media-time-slider-chapters",
       renderChapter: _temp14
     });
@@ -33074,8 +41941,8 @@ function TimeSlider(t0) {
   } else t4 = $[9];
   let t5;
   if ($[10] === Symbol.for("react.memo_cache_sentinel")) {
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime86.jsx)(SliderThumb, {
-      render: /* @__PURE__ */ (0, import_jsx_runtime86.jsx)(SliderThumb3, {}),
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(SliderThumb, {
+      render: /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(SliderThumb3, {}),
       className: "media-time-slider-thumb"
     });
     $[10] = t5;
@@ -33087,7 +41954,7 @@ function TimeSlider(t0) {
   } else t6 = $[11];
   let t7;
   if ($[12] !== renderThumbnail) {
-    t7 = /* @__PURE__ */ (0, import_jsx_runtime86.jsx)(ThumbnailImage, {
+    t7 = /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(ThumbnailImage, {
       render: renderThumbnail,
       className: "media-slider-thumbnail-image"
     });
@@ -33096,12 +41963,12 @@ function TimeSlider(t0) {
   } else t7 = $[13];
   let t8;
   if ($[14] === Symbol.for("react.memo_cache_sentinel")) {
-    t8 = /* @__PURE__ */ (0, import_jsx_runtime86.jsx)(ForwardRef, { className: "media-slider-thumbnail-spinner-icon" });
+    t8 = /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(ForwardRef, { className: "media-slider-thumbnail-spinner-icon" });
     $[14] = t8;
   } else t8 = $[14];
   let t9;
   if ($[15] !== t7) {
-    t9 = /* @__PURE__ */ (0, import_jsx_runtime86.jsxs)(SliderThumbnailRoot, {
+    t9 = /* @__PURE__ */ (0, import_jsx_runtime101.jsxs)(SliderThumbnailRoot, {
       className: t6,
       children: [t7, t8]
     });
@@ -33110,9 +41977,9 @@ function TimeSlider(t0) {
   } else t9 = $[16];
   let t10;
   if ($[17] === Symbol.for("react.memo_cache_sentinel")) {
-    t10 = /* @__PURE__ */ (0, import_jsx_runtime86.jsxs)("div", {
+    t10 = /* @__PURE__ */ (0, import_jsx_runtime101.jsxs)("div", {
       className: cn("media-slider-preview-content", "media-time-slider-preview-content"),
-      children: [/* @__PURE__ */ (0, import_jsx_runtime86.jsx)(TimeSliderChapterTitle, { className: "media-time-slider-chapter-title" }), /* @__PURE__ */ (0, import_jsx_runtime86.jsx)(SliderValue, {
+      children: [/* @__PURE__ */ (0, import_jsx_runtime101.jsx)(TimeSliderChapterTitle, { className: "media-time-slider-chapter-title" }), /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(SliderValue, {
         className: "media-time-slider-value",
         type: "pointer"
       })]
@@ -33121,7 +41988,7 @@ function TimeSlider(t0) {
   } else t10 = $[17];
   let t11;
   if ($[18] !== previewOverflow || $[19] !== t9) {
-    t11 = /* @__PURE__ */ (0, import_jsx_runtime86.jsxs)(SliderPreview, {
+    t11 = /* @__PURE__ */ (0, import_jsx_runtime101.jsxs)(SliderPreview, {
       className: "media-slider-preview",
       overflow: previewOverflow,
       children: [t9, t10]
@@ -33132,7 +41999,7 @@ function TimeSlider(t0) {
   } else t11 = $[20];
   let t12;
   if ($[21] !== props || $[22] !== t11 || $[23] !== t3) {
-    t12 = /* @__PURE__ */ (0, import_jsx_runtime86.jsxs)(TimeSliderRoot, {
+    t12 = /* @__PURE__ */ (0, import_jsx_runtime101.jsxs)(TimeSliderRoot, {
       className: t3,
       ...props,
       children: [
@@ -33149,17 +42016,17 @@ function TimeSlider(t0) {
   return t12;
 }
 function _temp14(props_0) {
-  return /* @__PURE__ */ (0, import_jsx_runtime86.jsx)("div", {
+  return /* @__PURE__ */ (0, import_jsx_runtime101.jsx)("div", {
     className: "media-time-slider-chapter",
     ...props_0,
-    children: /* @__PURE__ */ (0, import_jsx_runtime86.jsxs)(SliderTrack, {
-      render: /* @__PURE__ */ (0, import_jsx_runtime86.jsx)(SliderTrack2, {}),
+    children: /* @__PURE__ */ (0, import_jsx_runtime101.jsxs)(SliderTrack, {
+      render: /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(SliderTrack2, {}),
       className: "media-time-slider-chapter-track",
-      children: [/* @__PURE__ */ (0, import_jsx_runtime86.jsx)(SliderBuffer, {
-        render: /* @__PURE__ */ (0, import_jsx_runtime86.jsx)(SliderBuffer2, {}),
+      children: [/* @__PURE__ */ (0, import_jsx_runtime101.jsx)(SliderBuffer, {
+        render: /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(SliderBuffer2, {}),
         className: "media-time-slider-chapter-layer"
-      }), /* @__PURE__ */ (0, import_jsx_runtime86.jsx)(SliderFill, {
-        render: /* @__PURE__ */ (0, import_jsx_runtime86.jsx)(SliderFill2, {}),
+      }), /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(SliderFill, {
+        render: /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(SliderFill2, {}),
         className: "media-time-slider-chapter-layer"
       })]
     })
@@ -33167,9 +42034,9 @@ function _temp14(props_0) {
 }
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/speech.js
-var import_react129 = __toESM(require_react(), 1);
-var import_jsx_runtime87 = __toESM(require_jsx_runtime(), 1);
-var SpeechIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime87.jsxs)("svg", {
+var import_react183 = __toESM(require_react(), 1);
+var import_jsx_runtime102 = __toESM(require_jsx_runtime(), 1);
+var SpeechIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime102.jsxs)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -33178,17 +42045,17 @@ var SpeechIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime87.jsxs)(
   viewBox: "0 0 18 18",
   ref,
   ...props,
-  children: [/* @__PURE__ */ (0, import_jsx_runtime87.jsx)("path", { d: "M6 12a5 5 0 0 1 4.511 2.843c.273.57-.203 1.157-.835 1.157H2.325c-.633 0-1.109-.587-.836-1.157A5 5 0 0 1 6.001 12M8.5 8.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0" }), /* @__PURE__ */ (0, import_jsx_runtime87.jsx)("path", {
+  children: [/* @__PURE__ */ (0, import_jsx_runtime102.jsx)("path", { d: "M6 12a5 5 0 0 1 4.511 2.843c.273.57-.203 1.157-.835 1.157H2.325c-.633 0-1.109-.587-.836-1.157A5 5 0 0 1 6.001 12M8.5 8.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0" }), /* @__PURE__ */ (0, import_jsx_runtime102.jsx)("path", {
     fillOpacity: 0.5,
     d: "M14.5 2A1.5 1.5 0 0 1 16 3.5v2A1.5 1.5 0 0 1 14.5 7H12l-1.146 1.146A.5.5 0 0 1 10 7.793v-.88A1.5 1.5 0 0 1 9 5.5v-2A1.5 1.5 0 0 1 10.5 2z"
   })]
 });
-var ForwardRef19 = (0, import_react129.forwardRef)(SpeechIcon);
+var ForwardRef19 = (0, import_react183.forwardRef)(SpeechIcon);
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/chevron.js
-var import_react130 = __toESM(require_react(), 1);
-var import_jsx_runtime88 = __toESM(require_jsx_runtime(), 1);
-var ChevronIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime88.jsx)("svg", {
+var import_react184 = __toESM(require_react(), 1);
+var import_jsx_runtime103 = __toESM(require_jsx_runtime(), 1);
+var ChevronIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime103.jsx)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -33197,18 +42064,18 @@ var ChevronIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime88.jsx)(
   viewBox: "0 0 18 18",
   ref,
   ...props,
-  children: /* @__PURE__ */ (0, import_jsx_runtime88.jsx)("path", {
+  children: /* @__PURE__ */ (0, import_jsx_runtime103.jsx)("path", {
     stroke: "currentColor",
     strokeLinecap: "round",
     strokeWidth: 2,
     d: "m11.964 9.014-4.95-4.95m0 9.9 4.95-4.95"
   })
 });
-var ForwardRef20 = (0, import_react130.forwardRef)(ChevronIcon);
+var ForwardRef20 = (0, import_react184.forwardRef)(ChevronIcon);
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/components/menus/menu-chevron.js
 var import_react_compiler_runtime74 = __toESM(require_dist(), 1);
-var import_jsx_runtime89 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime104 = __toESM(require_jsx_runtime(), 1);
 function MenuChevron(t0) {
   const $ = (0, import_react_compiler_runtime74.c)(7);
   let t1;
@@ -33228,7 +42095,7 @@ function MenuChevron(t0) {
   } else t4 = $[4];
   let t5;
   if ($[5] !== t4) {
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime89.jsx)(ForwardRef20, { className: t4 });
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime104.jsx)(ForwardRef20, { className: t4 });
     $[5] = t4;
     $[6] = t5;
   } else t5 = $[6];
@@ -33236,9 +42103,9 @@ function MenuChevron(t0) {
 }
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/check.js
-var import_react131 = __toESM(require_react(), 1);
-var import_jsx_runtime90 = __toESM(require_jsx_runtime(), 1);
-var CheckIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime90.jsx)("svg", {
+var import_react185 = __toESM(require_react(), 1);
+var import_jsx_runtime105 = __toESM(require_jsx_runtime(), 1);
+var CheckIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime105.jsx)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -33247,7 +42114,7 @@ var CheckIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime90.jsx)("s
   viewBox: "0 0 18 18",
   ref,
   ...props,
-  children: /* @__PURE__ */ (0, import_jsx_runtime90.jsx)("path", {
+  children: /* @__PURE__ */ (0, import_jsx_runtime105.jsx)("path", {
     stroke: "currentColor",
     strokeLinecap: "round",
     strokeLinejoin: "round",
@@ -33255,11 +42122,11 @@ var CheckIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime90.jsx)("s
     d: "M4 10.455 6.5 13 14 5"
   })
 });
-var ForwardRef21 = (0, import_react131.forwardRef)(CheckIcon);
+var ForwardRef21 = (0, import_react185.forwardRef)(CheckIcon);
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/components/menus/radio-item.js
 var import_react_compiler_runtime75 = __toESM(require_dist(), 1);
-var import_jsx_runtime91 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime106 = __toESM(require_jsx_runtime(), 1);
 function RadioItem(t0) {
   const $ = (0, import_react_compiler_runtime75.c)(11);
   let children;
@@ -33284,16 +42151,16 @@ function RadioItem(t0) {
   } else t1 = $[5];
   let t2;
   if ($[6] === Symbol.for("react.memo_cache_sentinel")) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime91.jsx)(MenuItemIndicator, {
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime106.jsx)(MenuItemIndicator, {
       forceMount: true,
       className: "media-menu-item-indicator",
-      children: /* @__PURE__ */ (0, import_jsx_runtime91.jsx)(ForwardRef21, { className: "media-menu-radio-item-icon" })
+      children: /* @__PURE__ */ (0, import_jsx_runtime106.jsx)(ForwardRef21, { className: "media-menu-radio-item-icon" })
     });
     $[6] = t2;
   } else t2 = $[6];
   let t3;
   if ($[7] !== children || $[8] !== props || $[9] !== t1) {
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime91.jsxs)(MenuRadioItem, {
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime106.jsxs)(MenuRadioItem, {
       className: t1,
       ...props,
       children: [children, t2]
@@ -33308,7 +42175,7 @@ function RadioItem(t0) {
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/components/menus/audio-track-menu.js
 var import_react_compiler_runtime76 = __toESM(require_dist(), 1);
-var import_jsx_runtime92 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime107 = __toESM(require_jsx_runtime(), 1);
 function AudioTrackMenu(t0) {
   const $ = (0, import_react_compiler_runtime76.c)(10);
   let t1;
@@ -33326,8 +42193,8 @@ function AudioTrackMenu(t0) {
   let t2;
   let t3;
   if ($[4] === Symbol.for("react.memo_cache_sentinel")) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(ForwardRef19, { className: "media-menu-trigger-item-icon" });
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(Text, {
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime107.jsx)(ForwardRef19, { className: "media-menu-trigger-item-icon" });
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime107.jsx)(Text2, {
       token: audioText.key,
       children: audioText.text
     });
@@ -33339,14 +42206,14 @@ function AudioTrackMenu(t0) {
   }
   let t4;
   if ($[6] === Symbol.for("react.memo_cache_sentinel")) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)(MenuTrigger, {
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime107.jsxs)(MenuTrigger, {
       className: "media-menu-trigger-item",
       children: [
         t2,
         t3,
-        /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("span", {
+        /* @__PURE__ */ (0, import_jsx_runtime107.jsxs)("span", {
           className: "media-menu-hint",
-          children: [/* @__PURE__ */ (0, import_jsx_runtime92.jsx)(AudioTrackRadioGroupValue, { className: "media-menu-hint-label" }), /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(MenuChevron, {})]
+          children: [/* @__PURE__ */ (0, import_jsx_runtime107.jsx)(AudioTrackRadioGroupValue, { className: "media-menu-hint-label" }), /* @__PURE__ */ (0, import_jsx_runtime107.jsx)(MenuChevron, {})]
         })
       ]
     });
@@ -33354,18 +42221,18 @@ function AudioTrackMenu(t0) {
   } else t4 = $[6];
   let t5;
   if ($[7] === Symbol.for("react.memo_cache_sentinel")) {
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)(AudioTrackRadioGroupRoot, { children: [t4, /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)(MenuContent, {
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime107.jsxs)(AudioTrackRadioGroupRoot, { children: [t4, /* @__PURE__ */ (0, import_jsx_runtime107.jsxs)(MenuContent, {
       className: "media-menu-content",
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)(MenuItem, {
+        /* @__PURE__ */ (0, import_jsx_runtime107.jsxs)(MenuItem, {
           className: "media-menu-back-item",
-          children: [/* @__PURE__ */ (0, import_jsx_runtime92.jsx)(MenuChevron, { back: true }), /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(Text, {
+          children: [/* @__PURE__ */ (0, import_jsx_runtime107.jsx)(MenuChevron, { back: true }), /* @__PURE__ */ (0, import_jsx_runtime107.jsx)(Text2, {
             token: audioText.key,
             children: audioText.text
           })]
         }),
-        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(MenuSeparator, { className: "media-menu-separator" }),
-        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(AudioTrackRadioGroupOptions, {
+        /* @__PURE__ */ (0, import_jsx_runtime107.jsx)(MenuSeparator, { className: "media-menu-separator" }),
+        /* @__PURE__ */ (0, import_jsx_runtime107.jsx)(AudioTrackRadioGroupOptions, {
           className: "media-menu-radio-group",
           renderItem: _temp15
         })
@@ -33375,7 +42242,7 @@ function AudioTrackMenu(t0) {
   } else t5 = $[7];
   let t6;
   if ($[8] !== props) {
-    t6 = /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(MenuRoot, {
+    t6 = /* @__PURE__ */ (0, import_jsx_runtime107.jsx)(MenuRoot, {
       ...props,
       children: t5
     });
@@ -33385,15 +42252,15 @@ function AudioTrackMenu(t0) {
   return t6;
 }
 function _temp15(props_0, item) {
-  return /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(RadioItem, {
+  return /* @__PURE__ */ (0, import_jsx_runtime107.jsx)(RadioItem, {
     ...props_0,
-    children: /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { children: item.label })
+    children: /* @__PURE__ */ (0, import_jsx_runtime107.jsx)("span", { children: item.label })
   });
 }
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/components/menus/captions-submenu.js
 var import_react_compiler_runtime77 = __toESM(require_dist(), 1);
-var import_jsx_runtime93 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime108 = __toESM(require_jsx_runtime(), 1);
 function CaptionsSubmenu(t0) {
   const $ = (0, import_react_compiler_runtime77.c)(10);
   let t1;
@@ -33411,8 +42278,8 @@ function CaptionsSubmenu(t0) {
   let t2;
   let t3;
   if ($[4] === Symbol.for("react.memo_cache_sentinel")) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(ForwardRef4, { className: "media-menu-trigger-item-icon" });
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Text, {
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime108.jsx)(ForwardRef4, { className: "media-menu-trigger-item-icon" });
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime108.jsx)(Text2, {
       token: captionsText.key,
       children: captionsText.text
     });
@@ -33424,14 +42291,14 @@ function CaptionsSubmenu(t0) {
   }
   let t4;
   if ($[6] === Symbol.for("react.memo_cache_sentinel")) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)(MenuTrigger, {
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime108.jsxs)(MenuTrigger, {
       className: "media-menu-trigger-item",
       children: [
         t2,
         t3,
-        /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("span", {
+        /* @__PURE__ */ (0, import_jsx_runtime108.jsxs)("span", {
           className: "media-menu-hint",
-          children: [/* @__PURE__ */ (0, import_jsx_runtime93.jsx)(CaptionsRadioGroupValue, { className: "media-menu-hint-label" }), /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(MenuChevron, {})]
+          children: [/* @__PURE__ */ (0, import_jsx_runtime108.jsx)(CaptionsRadioGroupValue, { className: "media-menu-hint-label" }), /* @__PURE__ */ (0, import_jsx_runtime108.jsx)(MenuChevron, {})]
         })
       ]
     });
@@ -33439,18 +42306,18 @@ function CaptionsSubmenu(t0) {
   } else t4 = $[6];
   let t5;
   if ($[7] === Symbol.for("react.memo_cache_sentinel")) {
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)(CaptionsRadioGroupRoot, { children: [t4, /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)(MenuContent, {
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime108.jsxs)(CaptionsRadioGroupRoot, { children: [t4, /* @__PURE__ */ (0, import_jsx_runtime108.jsxs)(MenuContent, {
       className: "media-menu-content",
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)(MenuItem, {
+        /* @__PURE__ */ (0, import_jsx_runtime108.jsxs)(MenuItem, {
           className: "media-menu-back-item",
-          children: [/* @__PURE__ */ (0, import_jsx_runtime93.jsx)(MenuChevron, { back: true }), /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Text, {
+          children: [/* @__PURE__ */ (0, import_jsx_runtime108.jsx)(MenuChevron, { back: true }), /* @__PURE__ */ (0, import_jsx_runtime108.jsx)(Text2, {
             token: captionsText.key,
             children: captionsText.text
           })]
         }),
-        /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(MenuSeparator, { className: "media-menu-separator" }),
-        /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(CaptionsRadioGroupOptions, {
+        /* @__PURE__ */ (0, import_jsx_runtime108.jsx)(MenuSeparator, { className: "media-menu-separator" }),
+        /* @__PURE__ */ (0, import_jsx_runtime108.jsx)(CaptionsRadioGroupOptions, {
           className: "media-menu-radio-group",
           renderItem: _temp16
         })
@@ -33460,7 +42327,7 @@ function CaptionsSubmenu(t0) {
   } else t5 = $[7];
   let t6;
   if ($[8] !== props) {
-    t6 = /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(MenuRoot, {
+    t6 = /* @__PURE__ */ (0, import_jsx_runtime108.jsx)(MenuRoot, {
       ...props,
       children: t5
     });
@@ -33470,9 +42337,9 @@ function CaptionsSubmenu(t0) {
   return t6;
 }
 function _temp16(props_0, item) {
-  return /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)(RadioItem, {
+  return /* @__PURE__ */ (0, import_jsx_runtime108.jsxs)(RadioItem, {
     ...props_0,
-    children: [/* @__PURE__ */ (0, import_jsx_runtime93.jsx)("span", { children: item.label }), item.badge ? /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("span", {
+    children: [/* @__PURE__ */ (0, import_jsx_runtime108.jsx)("span", { children: item.label }), item.badge ? /* @__PURE__ */ (0, import_jsx_runtime108.jsx)("span", {
       className: "media-menu-badge",
       children: item.badge
     }) : null]
@@ -33480,9 +42347,9 @@ function _temp16(props_0, item) {
 }
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/speed.js
-var import_react132 = __toESM(require_react(), 1);
-var import_jsx_runtime94 = __toESM(require_jsx_runtime(), 1);
-var SpeedIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime94.jsxs)("svg", {
+var import_react186 = __toESM(require_react(), 1);
+var import_jsx_runtime109 = __toESM(require_jsx_runtime(), 1);
+var SpeedIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime109.jsxs)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -33492,8 +42359,8 @@ var SpeedIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime94.jsxs)("
   ref,
   ...props,
   children: [
-    /* @__PURE__ */ (0, import_jsx_runtime94.jsx)("path", { d: "M9 18q-.213 0-.424-.012h.85Q9.214 18 9 18M9 2a8 8 0 0 1 8 8c0 1.975-.719 3.78-1.905 5.175a.75.75 0 0 1-1.204.018l-1.509-1.971a.75.75 0 0 1 .596-1.206h1.674a6 6 0 1 0-11.304 0h1.68a.75.75 0 0 1 .596 1.206l-1.507 1.971a.75.75 0 0 1-1.133.07l-.003.004A8 8 0 0 1 9 2" }),
-    /* @__PURE__ */ (0, import_jsx_runtime94.jsx)("rect", {
+    /* @__PURE__ */ (0, import_jsx_runtime109.jsx)("path", { d: "M9 18q-.213 0-.424-.012h.85Q9.214 18 9 18M9 2a8 8 0 0 1 8 8c0 1.975-.719 3.78-1.905 5.175a.75.75 0 0 1-1.204.018l-1.509-1.971a.75.75 0 0 1 .596-1.206h1.674a6 6 0 1 0-11.304 0h1.68a.75.75 0 0 1 .596 1.206l-1.507 1.971a.75.75 0 0 1-1.133.07l-.003.004A8 8 0 0 1 9 2" }),
+    /* @__PURE__ */ (0, import_jsx_runtime109.jsx)("rect", {
       width: 6,
       height: 2,
       x: 6,
@@ -33501,26 +42368,26 @@ var SpeedIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime94.jsxs)("
       fillOpacity: 0.5,
       rx: 1
     }),
-    /* @__PURE__ */ (0, import_jsx_runtime94.jsx)("path", { d: "M8.3 6.318c.246-.64 1.154-.64 1.4 0L10.732 9h-.002a2 2 0 1 1-3.46 0h-.001z" }),
-    /* @__PURE__ */ (0, import_jsx_runtime94.jsxs)("g", {
+    /* @__PURE__ */ (0, import_jsx_runtime109.jsx)("path", { d: "M8.3 6.318c.246-.64 1.154-.64 1.4 0L10.732 9h-.002a2 2 0 1 1-3.46 0h-.001z" }),
+    /* @__PURE__ */ (0, import_jsx_runtime109.jsxs)("g", {
       fillOpacity: 0.5,
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime94.jsx)("circle", {
+        /* @__PURE__ */ (0, import_jsx_runtime109.jsx)("circle", {
           cx: 5,
           cy: 10.25,
           r: 0.75
         }),
-        /* @__PURE__ */ (0, import_jsx_runtime94.jsx)("circle", {
+        /* @__PURE__ */ (0, import_jsx_runtime109.jsx)("circle", {
           cx: 13,
           cy: 10.25,
           r: 0.75
         }),
-        /* @__PURE__ */ (0, import_jsx_runtime94.jsx)("circle", {
+        /* @__PURE__ */ (0, import_jsx_runtime109.jsx)("circle", {
           cx: 6,
           cy: 7.25,
           r: 0.75
         }),
-        /* @__PURE__ */ (0, import_jsx_runtime94.jsx)("circle", {
+        /* @__PURE__ */ (0, import_jsx_runtime109.jsx)("circle", {
           cx: 12,
           cy: 7.25,
           r: 0.75
@@ -33529,11 +42396,11 @@ var SpeedIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime94.jsxs)("
     })
   ]
 });
-var ForwardRef22 = (0, import_react132.forwardRef)(SpeedIcon);
+var ForwardRef22 = (0, import_react186.forwardRef)(SpeedIcon);
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/components/menus/playback-rate-submenu.js
 var import_react_compiler_runtime78 = __toESM(require_dist(), 1);
-var import_jsx_runtime95 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime110 = __toESM(require_jsx_runtime(), 1);
 function PlaybackRateSubmenu(t0) {
   const $ = (0, import_react_compiler_runtime78.c)(10);
   let t1;
@@ -33551,8 +42418,8 @@ function PlaybackRateSubmenu(t0) {
   let t2;
   let t3;
   if ($[4] === Symbol.for("react.memo_cache_sentinel")) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime95.jsx)(ForwardRef22, { className: "media-menu-trigger-item-icon" });
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime95.jsx)(Text, {
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime110.jsx)(ForwardRef22, { className: "media-menu-trigger-item-icon" });
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime110.jsx)(Text2, {
       token: speedText.key,
       children: speedText.text
     });
@@ -33564,14 +42431,14 @@ function PlaybackRateSubmenu(t0) {
   }
   let t4;
   if ($[6] === Symbol.for("react.memo_cache_sentinel")) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime95.jsxs)(MenuTrigger, {
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime110.jsxs)(MenuTrigger, {
       className: "media-menu-trigger-item",
       children: [
         t2,
         t3,
-        /* @__PURE__ */ (0, import_jsx_runtime95.jsxs)("span", {
+        /* @__PURE__ */ (0, import_jsx_runtime110.jsxs)("span", {
           className: "media-menu-hint",
-          children: [/* @__PURE__ */ (0, import_jsx_runtime95.jsx)(PlaybackRateRadioGroupValue, { className: "media-menu-hint-label" }), /* @__PURE__ */ (0, import_jsx_runtime95.jsx)(MenuChevron, {})]
+          children: [/* @__PURE__ */ (0, import_jsx_runtime110.jsx)(PlaybackRateRadioGroupValue, { className: "media-menu-hint-label" }), /* @__PURE__ */ (0, import_jsx_runtime110.jsx)(MenuChevron, {})]
         })
       ]
     });
@@ -33579,18 +42446,18 @@ function PlaybackRateSubmenu(t0) {
   } else t4 = $[6];
   let t5;
   if ($[7] === Symbol.for("react.memo_cache_sentinel")) {
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime95.jsxs)(PlaybackRateRadioGroupRoot, { children: [t4, /* @__PURE__ */ (0, import_jsx_runtime95.jsxs)(MenuContent, {
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime110.jsxs)(PlaybackRateRadioGroupRoot, { children: [t4, /* @__PURE__ */ (0, import_jsx_runtime110.jsxs)(MenuContent, {
       className: "media-menu-content",
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime95.jsxs)(MenuItem, {
+        /* @__PURE__ */ (0, import_jsx_runtime110.jsxs)(MenuItem, {
           className: "media-menu-back-item",
-          children: [/* @__PURE__ */ (0, import_jsx_runtime95.jsx)(MenuChevron, { back: true }), /* @__PURE__ */ (0, import_jsx_runtime95.jsx)(Text, {
+          children: [/* @__PURE__ */ (0, import_jsx_runtime110.jsx)(MenuChevron, { back: true }), /* @__PURE__ */ (0, import_jsx_runtime110.jsx)(Text2, {
             token: speedText.key,
             children: speedText.text
           })]
         }),
-        /* @__PURE__ */ (0, import_jsx_runtime95.jsx)(MenuSeparator, { className: "media-menu-separator" }),
-        /* @__PURE__ */ (0, import_jsx_runtime95.jsx)(PlaybackRateRadioGroupOptions, {
+        /* @__PURE__ */ (0, import_jsx_runtime110.jsx)(MenuSeparator, { className: "media-menu-separator" }),
+        /* @__PURE__ */ (0, import_jsx_runtime110.jsx)(PlaybackRateRadioGroupOptions, {
           className: "media-menu-radio-group",
           renderItem: _temp17
         })
@@ -33600,7 +42467,7 @@ function PlaybackRateSubmenu(t0) {
   } else t5 = $[7];
   let t6;
   if ($[8] !== props) {
-    t6 = /* @__PURE__ */ (0, import_jsx_runtime95.jsx)(MenuRoot, {
+    t6 = /* @__PURE__ */ (0, import_jsx_runtime110.jsx)(MenuRoot, {
       ...props,
       children: t5
     });
@@ -33610,16 +42477,16 @@ function PlaybackRateSubmenu(t0) {
   return t6;
 }
 function _temp17(props_0, item) {
-  return /* @__PURE__ */ (0, import_jsx_runtime95.jsx)(RadioItem, {
+  return /* @__PURE__ */ (0, import_jsx_runtime110.jsx)(RadioItem, {
     ...props_0,
-    children: /* @__PURE__ */ (0, import_jsx_runtime95.jsx)("span", { children: item.label })
+    children: /* @__PURE__ */ (0, import_jsx_runtime110.jsx)("span", { children: item.label })
   });
 }
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/switches.js
-var import_react133 = __toESM(require_react(), 1);
-var import_jsx_runtime96 = __toESM(require_jsx_runtime(), 1);
-var SwitchesIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime96.jsxs)("svg", {
+var import_react187 = __toESM(require_react(), 1);
+var import_jsx_runtime111 = __toESM(require_jsx_runtime(), 1);
+var SwitchesIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime111.jsxs)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -33628,16 +42495,16 @@ var SwitchesIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime96.jsxs
   viewBox: "0 0 18 18",
   ref,
   ...props,
-  children: [/* @__PURE__ */ (0, import_jsx_runtime96.jsx)("path", { d: "M12.5 9.5a3.5 3.5 0 1 1 0 7h-7a3.5 3.5 0 1 1 0-7zm-2 1.5a2 2 0 1 0 0 4h2a2 2 0 1 0 0-4z" }), /* @__PURE__ */ (0, import_jsx_runtime96.jsx)("path", {
+  children: [/* @__PURE__ */ (0, import_jsx_runtime111.jsx)("path", { d: "M12.5 9.5a3.5 3.5 0 1 1 0 7h-7a3.5 3.5 0 1 1 0-7zm-2 1.5a2 2 0 1 0 0 4h2a2 2 0 1 0 0-4z" }), /* @__PURE__ */ (0, import_jsx_runtime111.jsx)("path", {
     fillOpacity: 0.5,
     d: "M12.5 1.5a3.5 3.5 0 1 1 0 7h-7a3.5 3.5 0 1 1 0-7zM5.5 3a2 2 0 1 0 0 4h2a2 2 0 1 0 0-4z"
   })]
 });
-var ForwardRef23 = (0, import_react133.forwardRef)(SwitchesIcon);
+var ForwardRef23 = (0, import_react187.forwardRef)(SwitchesIcon);
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/components/menus/quality-menu.js
 var import_react_compiler_runtime79 = __toESM(require_dist(), 1);
-var import_jsx_runtime97 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime112 = __toESM(require_jsx_runtime(), 1);
 function QualityMenu(t0) {
   const $ = (0, import_react_compiler_runtime79.c)(10);
   let t1;
@@ -33655,8 +42522,8 @@ function QualityMenu(t0) {
   let t2;
   let t3;
   if ($[4] === Symbol.for("react.memo_cache_sentinel")) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(ForwardRef23, { className: "media-menu-trigger-item-icon" });
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(Text, {
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime112.jsx)(ForwardRef23, { className: "media-menu-trigger-item-icon" });
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime112.jsx)(Text2, {
       token: qualityText.key,
       children: qualityText.text
     });
@@ -33668,14 +42535,14 @@ function QualityMenu(t0) {
   }
   let t4;
   if ($[6] === Symbol.for("react.memo_cache_sentinel")) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime97.jsxs)(MenuTrigger, {
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime112.jsxs)(MenuTrigger, {
       className: "media-menu-trigger-item",
       children: [
         t2,
         t3,
-        /* @__PURE__ */ (0, import_jsx_runtime97.jsxs)("span", {
+        /* @__PURE__ */ (0, import_jsx_runtime112.jsxs)("span", {
           className: "media-menu-hint",
-          children: [/* @__PURE__ */ (0, import_jsx_runtime97.jsx)(QualityRadioGroupValue, { className: "media-menu-hint-label" }), /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(MenuChevron, {})]
+          children: [/* @__PURE__ */ (0, import_jsx_runtime112.jsx)(QualityRadioGroupValue, { className: "media-menu-hint-label" }), /* @__PURE__ */ (0, import_jsx_runtime112.jsx)(MenuChevron, {})]
         })
       ]
     });
@@ -33683,18 +42550,18 @@ function QualityMenu(t0) {
   } else t4 = $[6];
   let t5;
   if ($[7] === Symbol.for("react.memo_cache_sentinel")) {
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime97.jsxs)(QualityRadioGroupRoot, { children: [t4, /* @__PURE__ */ (0, import_jsx_runtime97.jsxs)(MenuContent, {
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime112.jsxs)(QualityRadioGroupRoot, { children: [t4, /* @__PURE__ */ (0, import_jsx_runtime112.jsxs)(MenuContent, {
       className: "media-menu-content",
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime97.jsxs)(MenuItem, {
+        /* @__PURE__ */ (0, import_jsx_runtime112.jsxs)(MenuItem, {
           className: "media-menu-back-item",
-          children: [/* @__PURE__ */ (0, import_jsx_runtime97.jsx)(MenuChevron, { back: true }), /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(Text, {
+          children: [/* @__PURE__ */ (0, import_jsx_runtime112.jsx)(MenuChevron, { back: true }), /* @__PURE__ */ (0, import_jsx_runtime112.jsx)(Text2, {
             token: qualityText.key,
             children: qualityText.text
           })]
         }),
-        /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(MenuSeparator, { className: "media-menu-separator" }),
-        /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(QualityRadioGroupOptions, {
+        /* @__PURE__ */ (0, import_jsx_runtime112.jsx)(MenuSeparator, { className: "media-menu-separator" }),
+        /* @__PURE__ */ (0, import_jsx_runtime112.jsx)(QualityRadioGroupOptions, {
           className: "media-menu-radio-group",
           renderItem: _temp18
         })
@@ -33704,7 +42571,7 @@ function QualityMenu(t0) {
   } else t5 = $[7];
   let t6;
   if ($[8] !== props) {
-    t6 = /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(MenuRoot, {
+    t6 = /* @__PURE__ */ (0, import_jsx_runtime112.jsx)(MenuRoot, {
       ...props,
       children: t5
     });
@@ -33714,12 +42581,12 @@ function QualityMenu(t0) {
   return t6;
 }
 function _temp18(props_0, item) {
-  return /* @__PURE__ */ (0, import_jsx_runtime97.jsxs)(RadioItem, {
+  return /* @__PURE__ */ (0, import_jsx_runtime112.jsxs)(RadioItem, {
     ...props_0,
-    children: [/* @__PURE__ */ (0, import_jsx_runtime97.jsxs)("span", { children: [/* @__PURE__ */ (0, import_jsx_runtime97.jsx)("span", { children: item.label }), item.tier ? /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("sup", {
+    children: [/* @__PURE__ */ (0, import_jsx_runtime112.jsxs)("span", { children: [/* @__PURE__ */ (0, import_jsx_runtime112.jsx)("span", { children: item.label }), item.tier ? /* @__PURE__ */ (0, import_jsx_runtime112.jsx)("sup", {
       className: "media-menu-tier",
       children: item.tier
-    }) : null] }), item.badge ? /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("span", {
+    }) : null] }), item.badge ? /* @__PURE__ */ (0, import_jsx_runtime112.jsx)("span", {
       className: "media-menu-badge",
       children: item.badge
     }) : null]
@@ -33727,9 +42594,9 @@ function _temp18(props_0, item) {
 }
 
 // node_modules/@videojs/react/dist/default/icons/dist/react/default/gear.js
-var import_react134 = __toESM(require_react(), 1);
-var import_jsx_runtime98 = __toESM(require_jsx_runtime(), 1);
-var GearIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime98.jsx)("svg", {
+var import_react188 = __toESM(require_react(), 1);
+var import_jsx_runtime113 = __toESM(require_jsx_runtime(), 1);
+var GearIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime113.jsx)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: 18,
   height: 18,
@@ -33738,13 +42605,13 @@ var GearIcon = (props, ref) => /* @__PURE__ */ (0, import_jsx_runtime98.jsx)("sv
   viewBox: "0 0 18 18",
   ref,
   ...props,
-  children: /* @__PURE__ */ (0, import_jsx_runtime98.jsx)("path", { d: "M7.519 2.184c.357-1.578 2.605-1.579 2.962 0a1.518 1.518 0 0 0 2.292.949c1.368-.864 2.957.727 2.094 2.096-.56.886-.074 2.06.949 2.292 1.579.356 1.578 2.606 0 2.962a1.52 1.52 0 0 0-.95 2.293c.864 1.369-.725 2.96-2.093 2.095a1.52 1.52 0 0 0-2.292.95c-.357 1.578-2.606 1.578-2.962 0a1.52 1.52 0 0 0-2.292-.95c-1.368.864-2.957-.726-2.094-2.095a1.52 1.52 0 0 0-.949-2.293c-1.579-.356-1.579-2.606 0-2.962a1.52 1.52 0 0 0 .95-2.292c-.864-1.369.725-2.96 2.093-2.096.887.56 2.061.074 2.292-.95m1.48 3.474a3.343 3.343 0 1 0 .002 6.687 3.343 3.343 0 0 0-.002-6.687" })
+  children: /* @__PURE__ */ (0, import_jsx_runtime113.jsx)("path", { d: "M7.519 2.184c.357-1.578 2.605-1.579 2.962 0a1.518 1.518 0 0 0 2.292.949c1.368-.864 2.957.727 2.094 2.096-.56.886-.074 2.06.949 2.292 1.579.356 1.578 2.606 0 2.962a1.52 1.52 0 0 0-.95 2.293c.864 1.369-.725 2.96-2.093 2.095a1.52 1.52 0 0 0-2.292.95c-.357 1.578-2.606 1.578-2.962 0a1.52 1.52 0 0 0-2.292-.95c-1.368.864-2.957-.726-2.094-2.095a1.52 1.52 0 0 0-.949-2.293c-1.579-.356-1.579-2.606 0-2.962a1.52 1.52 0 0 0 .95-2.292c-.864-1.369.725-2.96 2.093-2.096.887.56 2.061.074 2.292-.95m1.48 3.474a3.343 3.343 0 1 0 .002 6.687 3.343 3.343 0 0 0-.002-6.687" })
 });
-var ForwardRef24 = (0, import_react134.forwardRef)(GearIcon);
+var ForwardRef24 = (0, import_react188.forwardRef)(GearIcon);
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/components/menus/settings-menu.js
 var import_react_compiler_runtime80 = __toESM(require_dist(), 1);
-var import_jsx_runtime99 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime114 = __toESM(require_jsx_runtime(), 1);
 function SettingsMenu(t0) {
   const $ = (0, import_react_compiler_runtime80.c)(19);
   let children;
@@ -33763,7 +42630,7 @@ function SettingsMenu(t0) {
   }
   let t1;
   if ($[4] === Symbol.for("react.memo_cache_sentinel")) {
-    t1 = /* @__PURE__ */ (0, import_jsx_runtime99.jsx)(Text, {
+    t1 = /* @__PURE__ */ (0, import_jsx_runtime114.jsx)(Text2, {
       token: settingsText.key,
       children: settingsText.text
     });
@@ -33771,7 +42638,7 @@ function SettingsMenu(t0) {
   } else t1 = $[4];
   let t2;
   if ($[5] === Symbol.for("react.memo_cache_sentinel")) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime99.jsx)(Button, {});
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime114.jsx)(Button2, {});
     $[5] = t2;
   } else t2 = $[5];
   let t3;
@@ -33783,8 +42650,8 @@ function SettingsMenu(t0) {
   let t4;
   let t5;
   if ($[8] === Symbol.for("react.memo_cache_sentinel")) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime99.jsx)(ForwardRef24, { className: cn("media-button-icon-base", "media-settings-menu-trigger-icon") });
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime99.jsx)(Text, {
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime114.jsx)(ForwardRef24, { className: cn("media-button-icon-base", "media-settings-menu-trigger-icon") });
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime114.jsx)(Text2, {
       className: "media-settings-menu-trigger-label",
       token: settingsText.key,
       children: settingsText.text
@@ -33797,10 +42664,10 @@ function SettingsMenu(t0) {
   }
   let t6;
   if ($[10] !== t3) {
-    t6 = /* @__PURE__ */ (0, import_jsx_runtime99.jsx)(ButtonTooltip, {
+    t6 = /* @__PURE__ */ (0, import_jsx_runtime114.jsx)(ButtonTooltip, {
       label: t1,
       side: "top",
-      children: /* @__PURE__ */ (0, import_jsx_runtime99.jsxs)(MenuTrigger, {
+      children: /* @__PURE__ */ (0, import_jsx_runtime114.jsxs)(MenuTrigger, {
         render: t2,
         className: t3,
         children: [t4, t5]
@@ -33816,10 +42683,10 @@ function SettingsMenu(t0) {
   } else t7 = $[12];
   let t8;
   if ($[13] !== children) {
-    t8 = /* @__PURE__ */ (0, import_jsx_runtime99.jsx)(MenuPopup, {
+    t8 = /* @__PURE__ */ (0, import_jsx_runtime114.jsx)(MenuPopup, {
       keepMounted: true,
       className: t7,
-      children: /* @__PURE__ */ (0, import_jsx_runtime99.jsx)(MenuContent, {
+      children: /* @__PURE__ */ (0, import_jsx_runtime114.jsx)(MenuContent, {
         className: "media-menu-content",
         children
       })
@@ -33829,7 +42696,7 @@ function SettingsMenu(t0) {
   } else t8 = $[14];
   let t9;
   if ($[15] !== props || $[16] !== t6 || $[17] !== t8) {
-    t9 = /* @__PURE__ */ (0, import_jsx_runtime99.jsxs)(MenuRoot, {
+    t9 = /* @__PURE__ */ (0, import_jsx_runtime114.jsxs)(MenuRoot, {
       side: "top",
       align: "center",
       ...props,
@@ -33845,7 +42712,7 @@ function SettingsMenu(t0) {
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/skins/shared/video/menus/settings-menu.js
 var import_react_compiler_runtime81 = __toESM(require_dist(), 1);
-var import_jsx_runtime100 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime115 = __toESM(require_jsx_runtime(), 1);
 function VideoSettingsMenu(t0) {
   const $ = (0, import_react_compiler_runtime81.c)(8);
   let t1;
@@ -33860,10 +42727,10 @@ function VideoSettingsMenu(t0) {
   let t4;
   let t5;
   if ($[2] === Symbol.for("react.memo_cache_sentinel")) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime100.jsx)(QualityMenu, {});
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime100.jsx)(AudioTrackMenu, {});
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime100.jsx)(PlaybackRateSubmenu, {});
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime100.jsx)(CaptionsSubmenu, {});
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime115.jsx)(QualityMenu, {});
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime115.jsx)(AudioTrackMenu, {});
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime115.jsx)(PlaybackRateSubmenu, {});
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime115.jsx)(CaptionsSubmenu, {});
     $[2] = t2;
     $[3] = t3;
     $[4] = t4;
@@ -33876,7 +42743,7 @@ function VideoSettingsMenu(t0) {
   }
   let t6;
   if ($[6] !== props) {
-    t6 = /* @__PURE__ */ (0, import_jsx_runtime100.jsxs)(SettingsMenu, {
+    t6 = /* @__PURE__ */ (0, import_jsx_runtime115.jsxs)(SettingsMenu, {
       ...props,
       children: [
         t2,
@@ -33893,7 +42760,7 @@ function VideoSettingsMenu(t0) {
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/layout/controls.js
 var import_react_compiler_runtime82 = __toESM(require_dist(), 1);
-var import_jsx_runtime101 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime116 = __toESM(require_jsx_runtime(), 1);
 function DefaultVideoControls(t0) {
   const $ = (0, import_react_compiler_runtime82.c)(27);
   let t1;
@@ -33905,7 +42772,7 @@ function DefaultVideoControls(t0) {
   const { renderThumbnail } = t1;
   let t2;
   if ($[2] === Symbol.for("react.memo_cache_sentinel")) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(SeekButton2, {
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(SeekButton2, {
       className: cn("video-controls-center-button", "video-controls-center-seek"),
       seconds: -10
     });
@@ -33913,7 +42780,7 @@ function DefaultVideoControls(t0) {
   } else t2 = $[2];
   let t3;
   if ($[3] === Symbol.for("react.memo_cache_sentinel")) {
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(PlayButton2, {
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(PlayButton2, {
       className: cn("video-controls-center-button", "video-controls-center-play"),
       iconClassName: "video-controls-center-play-icon"
     });
@@ -33922,21 +42789,21 @@ function DefaultVideoControls(t0) {
   let t4;
   let t5;
   if ($[4] === Symbol.for("react.memo_cache_sentinel")) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(BufferingIndicator, {
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(BufferingIndicator, {
       className: "video-controls-center-buffering",
-      children: /* @__PURE__ */ (0, import_jsx_runtime101.jsxs)(ControlsGroup, {
+      children: /* @__PURE__ */ (0, import_jsx_runtime116.jsxs)(ControlsGroup, {
         className: "video-controls-center",
         children: [
           t2,
           t3,
-          /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(SeekButton2, {
+          /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(SeekButton2, {
             className: cn("video-controls-center-button", "video-controls-center-seek"),
             seconds: 10
           })
         ]
       })
     });
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(ControlsBackdrop, { className: "video-controls-backdrop" });
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(ControlsBackdrop, { className: "video-controls-backdrop" });
     $[4] = t4;
     $[5] = t5;
   } else {
@@ -33956,11 +42823,11 @@ function DefaultVideoControls(t0) {
   let t8;
   let t9;
   if ($[8] === Symbol.for("react.memo_cache_sentinel")) {
-    t8 = /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(ButtonTooltip, {
+    t8 = /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(ButtonTooltip, {
       side: "top",
-      children: /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(PlayButton2, {})
+      children: /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(PlayButton2, {})
     });
-    t9 = /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(VolumePopover, { className: "video-controls-volume-button" });
+    t9 = /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(VolumePopover, { className: "video-controls-volume-button" });
     $[8] = t8;
     $[9] = t9;
   } else {
@@ -33969,7 +42836,7 @@ function DefaultVideoControls(t0) {
   }
   let t10;
   if ($[10] === Symbol.for("react.memo_cache_sentinel")) {
-    t10 = /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(Value, {
+    t10 = /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(Value, {
       className: cn("media-time-value", "video-controls-current-time-value"),
       type: "current"
     });
@@ -33977,7 +42844,7 @@ function DefaultVideoControls(t0) {
   } else t10 = $[10];
   let t11;
   if ($[11] !== renderThumbnail) {
-    t11 = /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(TimeSlider, {
+    t11 = /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(TimeSlider, {
       className: "video-controls-time-slider",
       renderThumbnail
     });
@@ -33986,7 +42853,7 @@ function DefaultVideoControls(t0) {
   } else t11 = $[12];
   let t12;
   if ($[13] === Symbol.for("react.memo_cache_sentinel")) {
-    t12 = /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(Value, {
+    t12 = /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(Value, {
       className: cn("media-time-toggle", "video-controls-remaining-time-value"),
       type: "remaining",
       toggle: true
@@ -33995,7 +42862,7 @@ function DefaultVideoControls(t0) {
   } else t12 = $[13];
   let t13;
   if ($[14] !== t11) {
-    t13 = /* @__PURE__ */ (0, import_jsx_runtime101.jsxs)(ControlsGroup, {
+    t13 = /* @__PURE__ */ (0, import_jsx_runtime116.jsxs)(ControlsGroup, {
       className: "video-time-slider-group",
       children: [
         t10,
@@ -34009,11 +42876,11 @@ function DefaultVideoControls(t0) {
   let t14;
   let t15;
   if ($[16] === Symbol.for("react.memo_cache_sentinel")) {
-    t14 = /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(ButtonTooltip, {
+    t14 = /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(ButtonTooltip, {
       side: "top",
-      children: /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(CaptionsButton2, { className: "video-controls-captions-button" })
+      children: /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(CaptionsButton2, { className: "video-controls-captions-button" })
     });
-    t15 = /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(VideoSettingsMenu, { className: "video-controls-settings-button" });
+    t15 = /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(VideoSettingsMenu, { className: "video-controls-settings-button" });
     $[16] = t14;
     $[17] = t15;
   } else {
@@ -34022,7 +42889,7 @@ function DefaultVideoControls(t0) {
   }
   let t16;
   if ($[18] !== t13) {
-    t16 = /* @__PURE__ */ (0, import_jsx_runtime101.jsxs)(ControlsGroup, {
+    t16 = /* @__PURE__ */ (0, import_jsx_runtime116.jsxs)(ControlsGroup, {
       className: t7,
       children: [
         t8,
@@ -34042,39 +42909,39 @@ function DefaultVideoControls(t0) {
   } else t17 = $[20];
   let t18;
   if ($[21] === Symbol.for("react.memo_cache_sentinel")) {
-    t18 = /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(ButtonTooltip, {
+    t18 = /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(ButtonTooltip, {
       side: "top",
-      children: /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(CastButton2, {})
+      children: /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(CastButton2, {})
     });
     $[21] = t18;
   } else t18 = $[21];
   let t19;
   if ($[22] === Symbol.for("react.memo_cache_sentinel")) {
-    t19 = /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(ButtonTooltip, {
+    t19 = /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(ButtonTooltip, {
       side: "top",
-      children: /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(AirPlayButton2, {})
+      children: /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(AirPlayButton2, {})
     });
     $[22] = t19;
   } else t19 = $[22];
   let t20;
   if ($[23] === Symbol.for("react.memo_cache_sentinel")) {
-    t20 = /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(ButtonTooltip, {
+    t20 = /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(ButtonTooltip, {
       side: "top",
-      children: /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(PiPButton2, {})
+      children: /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(PiPButton2, {})
     });
     $[23] = t20;
   } else t20 = $[23];
   let t21;
   if ($[24] === Symbol.for("react.memo_cache_sentinel")) {
-    t21 = /* @__PURE__ */ (0, import_jsx_runtime101.jsxs)(ControlsGroup, {
+    t21 = /* @__PURE__ */ (0, import_jsx_runtime116.jsxs)(ControlsGroup, {
       className: t17,
       children: [
         t18,
         t19,
         t20,
-        /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(ButtonTooltip, {
+        /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(ButtonTooltip, {
           side: "top",
-          children: /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(FullscreenButton2, {})
+          children: /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(FullscreenButton2, {})
         })
       ]
     });
@@ -34082,12 +42949,12 @@ function DefaultVideoControls(t0) {
   } else t21 = $[24];
   let t22;
   if ($[25] !== t16) {
-    t22 = /* @__PURE__ */ (0, import_jsx_runtime101.jsxs)(ControlsRoot, { children: [
+    t22 = /* @__PURE__ */ (0, import_jsx_runtime116.jsxs)(ControlsRoot, { children: [
       t4,
       t5,
-      /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(ControlsContent, {
+      /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(ControlsContent, {
         className: t6,
-        children: /* @__PURE__ */ (0, import_jsx_runtime101.jsxs)(TooltipProvider, { children: [t16, t21] })
+        children: /* @__PURE__ */ (0, import_jsx_runtime116.jsxs)(TooltipProvider, { children: [t16, t21] })
       })
     ] });
     $[25] = t16;
@@ -34098,7 +42965,7 @@ function DefaultVideoControls(t0) {
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/components/display/seek-indicator.js
 var import_react_compiler_runtime83 = __toESM(require_dist(), 1);
-var import_jsx_runtime102 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime117 = __toESM(require_jsx_runtime(), 1);
 function SeekIndicator(t0) {
   const $ = (0, import_react_compiler_runtime83.c)(12);
   let t1;
@@ -34127,8 +42994,8 @@ function SeekIndicator(t0) {
   let t3;
   let t4;
   if ($[7] === Symbol.for("react.memo_cache_sentinel")) {
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime102.jsx)(ForwardRef20, { className: "media-seek-indicator-icon" });
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime102.jsx)(SeekIndicatorValue, { className: "media-seek-indicator-value" });
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime117.jsx)(ForwardRef20, { className: "media-seek-indicator-icon" });
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime117.jsx)(SeekIndicatorValue, { className: "media-seek-indicator-value" });
     $[7] = t3;
     $[8] = t4;
   } else {
@@ -34137,7 +43004,7 @@ function SeekIndicator(t0) {
   }
   let t5;
   if ($[9] !== props || $[10] !== t2) {
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime102.jsxs)(SeekIndicatorRoot, {
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime117.jsxs)(SeekIndicatorRoot, {
       className: t2,
       ...props,
       children: [t3, t4]
@@ -34151,7 +43018,7 @@ function SeekIndicator(t0) {
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/components/display/status-indicator.js
 var import_react_compiler_runtime84 = __toESM(require_dist(), 1);
-var import_jsx_runtime103 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime118 = __toESM(require_jsx_runtime(), 1);
 var TOP_STATUS_ACTIONS = [
   "toggleSubtitles",
   "toggleFullscreen",
@@ -34185,23 +43052,23 @@ function StatusIndicator(t0) {
   } else t2 = $[6];
   let t3;
   if ($[7] === Symbol.for("react.memo_cache_sentinel")) {
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime103.jsxs)("div", {
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime118.jsxs)("div", {
       className: cn("media-indicator-content", "media-status-indicator-content"),
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime103.jsx)(ForwardRef5, { className: "media-status-indicator-captions-on-icon" }),
-        /* @__PURE__ */ (0, import_jsx_runtime103.jsx)(ForwardRef4, { className: "media-status-indicator-captions-off-icon" }),
-        /* @__PURE__ */ (0, import_jsx_runtime103.jsx)(ForwardRef8, { className: "media-status-indicator-fullscreen-enter-icon" }),
-        /* @__PURE__ */ (0, import_jsx_runtime103.jsx)(ForwardRef9, { className: "media-status-indicator-fullscreen-exit-icon" }),
-        /* @__PURE__ */ (0, import_jsx_runtime103.jsx)(ForwardRef10, { className: "media-status-indicator-pip-enter-icon" }),
-        /* @__PURE__ */ (0, import_jsx_runtime103.jsx)(ForwardRef11, { className: "media-status-indicator-pip-exit-icon" }),
-        /* @__PURE__ */ (0, import_jsx_runtime103.jsx)(StatusIndicatorValue, { className: "media-status-indicator-value" })
+        /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(ForwardRef5, { className: "media-status-indicator-captions-on-icon" }),
+        /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(ForwardRef4, { className: "media-status-indicator-captions-off-icon" }),
+        /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(ForwardRef8, { className: "media-status-indicator-fullscreen-enter-icon" }),
+        /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(ForwardRef9, { className: "media-status-indicator-fullscreen-exit-icon" }),
+        /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(ForwardRef10, { className: "media-status-indicator-pip-enter-icon" }),
+        /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(ForwardRef11, { className: "media-status-indicator-pip-exit-icon" }),
+        /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(StatusIndicatorValue, { className: "media-status-indicator-value" })
       ]
     });
     $[7] = t3;
   } else t3 = $[7];
   let t4;
   if ($[8] !== props || $[9] !== t2) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime103.jsx)(StatusIndicatorRoot, {
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(StatusIndicatorRoot, {
       actions: TOP_STATUS_ACTIONS,
       className: t2,
       ...props,
@@ -34241,8 +43108,8 @@ function PlaybackStatusIndicator(t0) {
   let t3;
   let t4;
   if ($[7] === Symbol.for("react.memo_cache_sentinel")) {
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime103.jsx)(ForwardRef13, { className: "media-playback-status-indicator-play-icon" });
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime103.jsx)(ForwardRef12, { className: "media-playback-status-indicator-pause-icon" });
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(ForwardRef13, { className: "media-playback-status-indicator-play-icon" });
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime118.jsx)(ForwardRef12, { className: "media-playback-status-indicator-pause-icon" });
     $[7] = t3;
     $[8] = t4;
   } else {
@@ -34251,7 +43118,7 @@ function PlaybackStatusIndicator(t0) {
   }
   let t5;
   if ($[9] !== props || $[10] !== t2) {
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime103.jsxs)(StatusIndicatorRoot, {
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime118.jsxs)(StatusIndicatorRoot, {
       actions: PLAYBACK_STATUS_ACTIONS,
       className: t2,
       ...props,
@@ -34266,7 +43133,7 @@ function PlaybackStatusIndicator(t0) {
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/components/display/volume-indicator.js
 var import_react_compiler_runtime85 = __toESM(require_dist(), 1);
-var import_jsx_runtime104 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime119 = __toESM(require_jsx_runtime(), 1);
 function VolumeIndicator(t0) {
   const $ = (0, import_react_compiler_runtime85.c)(11);
   let t1;
@@ -34294,20 +43161,20 @@ function VolumeIndicator(t0) {
   } else t2 = $[6];
   let t3;
   if ($[7] === Symbol.for("react.memo_cache_sentinel")) {
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime104.jsxs)(VolumeIndicatorFill, {
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime119.jsxs)(VolumeIndicatorFill, {
       className: cn("media-indicator-content", "media-volume-indicator-fill"),
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime104.jsx)(ForwardRef16, { className: "media-volume-indicator-high-icon" }),
-        /* @__PURE__ */ (0, import_jsx_runtime104.jsx)(ForwardRef17, { className: "media-volume-indicator-low-icon" }),
-        /* @__PURE__ */ (0, import_jsx_runtime104.jsx)(ForwardRef18, { className: "media-volume-indicator-off-icon" }),
-        /* @__PURE__ */ (0, import_jsx_runtime104.jsx)(VolumeIndicatorValue, { className: "media-volume-indicator-value" })
+        /* @__PURE__ */ (0, import_jsx_runtime119.jsx)(ForwardRef16, { className: "media-volume-indicator-high-icon" }),
+        /* @__PURE__ */ (0, import_jsx_runtime119.jsx)(ForwardRef17, { className: "media-volume-indicator-low-icon" }),
+        /* @__PURE__ */ (0, import_jsx_runtime119.jsx)(ForwardRef18, { className: "media-volume-indicator-off-icon" }),
+        /* @__PURE__ */ (0, import_jsx_runtime119.jsx)(VolumeIndicatorValue, { className: "media-volume-indicator-value" })
       ]
     });
     $[7] = t3;
   } else t3 = $[7];
   let t4;
   if ($[8] !== props || $[9] !== t2) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime104.jsx)(VolumeIndicatorRoot, {
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime119.jsx)(VolumeIndicatorRoot, {
       className: t2,
       ...props,
       children: t3
@@ -34321,7 +43188,7 @@ function VolumeIndicator(t0) {
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/skins/shared/video/display/status-indicators.js
 var import_react_compiler_runtime86 = __toESM(require_dist(), 1);
-var import_jsx_runtime105 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime120 = __toESM(require_jsx_runtime(), 1);
 function VideoStatusIndicators(t0) {
   const $ = (0, import_react_compiler_runtime86.c)(15);
   let t1;
@@ -34343,7 +43210,7 @@ function VideoStatusIndicators(t0) {
   }
   let t2;
   if ($[5] === Symbol.for("react.memo_cache_sentinel")) {
-    t2 = /* @__PURE__ */ (0, import_jsx_runtime105.jsx)(StatusAnnouncer3, {});
+    t2 = /* @__PURE__ */ (0, import_jsx_runtime120.jsx)(StatusAnnouncer3, {});
     $[5] = t2;
   } else t2 = $[5];
   let t3;
@@ -34357,10 +43224,10 @@ function VideoStatusIndicators(t0) {
   let t6;
   let t7;
   if ($[8] === Symbol.for("react.memo_cache_sentinel")) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime105.jsx)(VolumeIndicator, {});
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime105.jsx)(StatusIndicator, {});
-    t6 = /* @__PURE__ */ (0, import_jsx_runtime105.jsx)(SeekIndicator, {});
-    t7 = /* @__PURE__ */ (0, import_jsx_runtime105.jsx)(PlaybackStatusIndicator, {});
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime120.jsx)(VolumeIndicator, {});
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime120.jsx)(StatusIndicator, {});
+    t6 = /* @__PURE__ */ (0, import_jsx_runtime120.jsx)(SeekIndicator, {});
+    t7 = /* @__PURE__ */ (0, import_jsx_runtime120.jsx)(PlaybackStatusIndicator, {});
     $[8] = t4;
     $[9] = t5;
     $[10] = t6;
@@ -34373,7 +43240,7 @@ function VideoStatusIndicators(t0) {
   }
   let t8;
   if ($[12] !== props || $[13] !== t3) {
-    t8 = /* @__PURE__ */ (0, import_jsx_runtime105.jsxs)(import_jsx_runtime105.Fragment, { children: [t2, /* @__PURE__ */ (0, import_jsx_runtime105.jsxs)("div", {
+    t8 = /* @__PURE__ */ (0, import_jsx_runtime120.jsxs)(import_jsx_runtime120.Fragment, { children: [t2, /* @__PURE__ */ (0, import_jsx_runtime120.jsxs)("div", {
       className: t3,
       ...props,
       children: [
@@ -34392,7 +43259,7 @@ function VideoStatusIndicators(t0) {
 
 // node_modules/@videojs/react/dist/default/internal/skins/default-video/skin.js
 var import_react_compiler_runtime87 = __toESM(require_dist(), 1);
-var import_jsx_runtime106 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime121 = __toESM(require_jsx_runtime(), 1);
 function VideoSkin(t0) {
   const $ = (0, import_react_compiler_runtime87.c)(26);
   let t1;
@@ -34429,7 +43296,7 @@ function VideoSkin(t0) {
   } else t2 = $[9];
   let t3;
   if ($[10] !== renderPoster) {
-    t3 = /* @__PURE__ */ (0, import_jsx_runtime106.jsx)(Poster, { renderImage: renderPoster });
+    t3 = /* @__PURE__ */ (0, import_jsx_runtime121.jsx)(Poster, { renderImage: renderPoster });
     $[10] = renderPoster;
     $[11] = t3;
   } else t3 = $[11];
@@ -34437,9 +43304,9 @@ function VideoSkin(t0) {
   let t5;
   let t6;
   if ($[12] === Symbol.for("react.memo_cache_sentinel")) {
-    t4 = /* @__PURE__ */ (0, import_jsx_runtime106.jsx)(BufferingIndicator3, {});
-    t5 = /* @__PURE__ */ (0, import_jsx_runtime106.jsx)(ErrorDialog, {});
-    t6 = /* @__PURE__ */ (0, import_jsx_runtime106.jsx)(Title3, {});
+    t4 = /* @__PURE__ */ (0, import_jsx_runtime121.jsx)(BufferingIndicator3, {});
+    t5 = /* @__PURE__ */ (0, import_jsx_runtime121.jsx)(ErrorDialog, {});
+    t6 = /* @__PURE__ */ (0, import_jsx_runtime121.jsx)(Title3, {});
     $[12] = t4;
     $[13] = t5;
     $[14] = t6;
@@ -34450,7 +43317,7 @@ function VideoSkin(t0) {
   }
   let t7;
   if ($[15] !== renderThumbnail) {
-    t7 = /* @__PURE__ */ (0, import_jsx_runtime106.jsx)(DefaultVideoControls, { renderThumbnail });
+    t7 = /* @__PURE__ */ (0, import_jsx_runtime121.jsx)(DefaultVideoControls, { renderThumbnail });
     $[15] = renderThumbnail;
     $[16] = t7;
   } else t7 = $[16];
@@ -34458,9 +43325,9 @@ function VideoSkin(t0) {
   let t8;
   let t9;
   if ($[17] === Symbol.for("react.memo_cache_sentinel")) {
-    t8 = /* @__PURE__ */ (0, import_jsx_runtime106.jsx)(VideoHotkeys, {});
-    t9 = /* @__PURE__ */ (0, import_jsx_runtime106.jsx)(VideoGestures, {});
-    t10 = /* @__PURE__ */ (0, import_jsx_runtime106.jsx)(VideoStatusIndicators, {});
+    t8 = /* @__PURE__ */ (0, import_jsx_runtime121.jsx)(VideoHotkeys, {});
+    t9 = /* @__PURE__ */ (0, import_jsx_runtime121.jsx)(VideoGestures, {});
+    t10 = /* @__PURE__ */ (0, import_jsx_runtime121.jsx)(VideoStatusIndicators, {});
     $[17] = t10;
     $[18] = t8;
     $[19] = t9;
@@ -34471,7 +43338,7 @@ function VideoSkin(t0) {
   }
   let t11;
   if ($[20] !== children || $[21] !== props || $[22] !== t2 || $[23] !== t3 || $[24] !== t7) {
-    t11 = /* @__PURE__ */ (0, import_jsx_runtime106.jsxs)(Container3, {
+    t11 = /* @__PURE__ */ (0, import_jsx_runtime121.jsxs)(Container3, {
       className: t2,
       "data-theme": "default",
       "data-preset": "video",
@@ -34500,12 +43367,12 @@ function VideoSkin(t0) {
 
 // node_modules/@videojs/react/dist/default/presets/video/skin.js
 var import_react_compiler_runtime88 = __toESM(require_dist(), 1);
-var import_jsx_runtime107 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime122 = __toESM(require_jsx_runtime(), 1);
 function VideoSkin2(props) {
   const $ = (0, import_react_compiler_runtime88.c)(2);
   let t0;
   if ($[0] !== props) {
-    t0 = /* @__PURE__ */ (0, import_jsx_runtime107.jsx)(VideoSkin, { ...props });
+    t0 = /* @__PURE__ */ (0, import_jsx_runtime122.jsx)(VideoSkin, { ...props });
     $[0] = props;
     $[1] = t0;
   } else t0 = $[1];
@@ -34513,7 +43380,7 @@ function VideoSkin2(props) {
 }
 
 // src/react/VideoJs10Player.tsx
-var import_jsx_runtime108 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime123 = __toESM(require_jsx_runtime(), 1);
 var DEFAULT_STORAGE_KEY = "dtv_resume_history";
 function getStoredResume(episodeId, storageKey = DEFAULT_STORAGE_KEY) {
   if (typeof localStorage === "undefined" || !episodeId) return null;
@@ -34563,11 +43430,11 @@ var VideoJs10Player = ({
   onError,
   storageKey = DEFAULT_STORAGE_KEY
 }) => {
-  const videoRef = (0, import_react135.useRef)(null);
-  const [resumedNotice, setResumedNotice] = (0, import_react135.useState)(null);
-  const [hasResumed, setHasResumed] = (0, import_react135.useState)(false);
-  const lastSaveTimeRef = (0, import_react135.useRef)(0);
-  (0, import_react135.useEffect)(() => {
+  const videoRef = (0, import_react189.useRef)(null);
+  const [resumedNotice, setResumedNotice] = (0, import_react189.useState)(null);
+  const [hasResumed, setHasResumed] = (0, import_react189.useState)(false);
+  const lastSaveTimeRef = (0, import_react189.useRef)(0);
+  (0, import_react189.useEffect)(() => {
     setHasResumed(false);
     if (!episodeId) return;
     const saved = getStoredResume(episodeId, storageKey);
@@ -34591,7 +43458,7 @@ var VideoJs10Player = ({
       }
     }
   }, [src, episodeId, partIndex, storageKey]);
-  const handleTimeUpdate = (0, import_react135.useCallback)(() => {
+  const handleTimeUpdate = (0, import_react189.useCallback)(() => {
     const video = videoRef.current;
     if (!video) return;
     const currentTime = video.currentTime;
@@ -34618,7 +43485,7 @@ var VideoJs10Player = ({
       );
     }
   }, [episodeId, partIndex, onTimeUpdate, storageKey]);
-  const handleEnded = (0, import_react135.useCallback)(() => {
+  const handleEnded = (0, import_react189.useCallback)(() => {
     const video = videoRef.current;
     if (video && episodeId) {
       const dur = video.duration || 0;
@@ -34637,7 +43504,7 @@ var VideoJs10Player = ({
     }
     if (onEnded) onEnded();
   }, [episodeId, partIndex, onEnded, storageKey]);
-  const handleRestart = (0, import_react135.useCallback)(() => {
+  const handleRestart = (0, import_react189.useCallback)(() => {
     const video = videoRef.current;
     if (video) {
       video.currentTime = 0;
@@ -34649,7 +43516,7 @@ var VideoJs10Player = ({
     }
     setResumedNotice(null);
   }, [episodeId, storageKey]);
-  return /* @__PURE__ */ (0, import_jsx_runtime108.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime123.jsxs)(
     "div",
     {
       className: `vjs10-player-container ${className}`,
@@ -34664,7 +43531,7 @@ var VideoJs10Player = ({
         ...style
       },
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime108.jsx)(VideoPlayer, { title, poster, children: /* @__PURE__ */ (0, import_jsx_runtime108.jsx)(VideoSkin2, { style: { width: "100%", height: "100%", aspectRatio: "16 / 9" }, children: /* @__PURE__ */ (0, import_jsx_runtime108.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime123.jsx)(VideoPlayer, { title, poster, children: /* @__PURE__ */ (0, import_jsx_runtime123.jsx)(VideoSkin2, { style: { width: "100%", height: "100%", aspectRatio: "16 / 9" }, children: /* @__PURE__ */ (0, import_jsx_runtime123.jsx)(
           Video,
           {
             ref: videoRef,
@@ -34679,10 +43546,10 @@ var VideoJs10Player = ({
             onPlay,
             onPause,
             onError,
-            children: /* @__PURE__ */ (0, import_jsx_runtime108.jsx)("a", { href: "https://videojs.org/help", target: "_blank", rel: "noopener noreferrer", children: "Video player not working?" })
+            children: /* @__PURE__ */ (0, import_jsx_runtime123.jsx)("a", { href: "https://videojs.org/help", target: "_blank", rel: "noopener noreferrer", children: "Video player not working?" })
           }
         ) }) }),
-        resumedNotice && /* @__PURE__ */ (0, import_jsx_runtime108.jsxs)(
+        resumedNotice && /* @__PURE__ */ (0, import_jsx_runtime123.jsxs)(
           "div",
           {
             role: "status",
@@ -34704,8 +43571,8 @@ var VideoJs10Player = ({
               boxShadow: "0 6px 16px rgba(0, 0, 0, 0.6)"
             },
             children: [
-              /* @__PURE__ */ (0, import_jsx_runtime108.jsx)("span", { children: resumedNotice }),
-              /* @__PURE__ */ (0, import_jsx_runtime108.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime123.jsx)("span", { children: resumedNotice }),
+              /* @__PURE__ */ (0, import_jsx_runtime123.jsx)(
                 "button",
                 {
                   onClick: handleRestart,
@@ -34731,7 +43598,21 @@ var VideoJs10Player = ({
 };
 
 // src/react/demo.tsx
-var import_jsx_runtime109 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime124 = __toESM(require_jsx_runtime(), 1);
+var FALLBACK_EPISODES = [
+  {
+    id: "ep1",
+    title: "\u7D9C\u85DD\u73A9\u5F88\u5927 2026-11-08 \u53F0\u5317 \u6417\u86CB\u9B3C\u5230\u4F60\u5BB6",
+    date: "2026-11-08",
+    url: "https://srgoideas.com/ep1/",
+    duration: "1\u5C0F\u6642 48\u5206",
+    parts: [
+      { label: "Part 1", streamUrl: "./media/sample-part1.mp4", duration: "35\u5206" },
+      { label: "Part 2", streamUrl: "./media/sample-part2.mp4", duration: "35\u5206" },
+      { label: "Part 3", streamUrl: "./media/sample-part3.mp4", duration: "38\u5206" }
+    ]
+  }
+];
 function resolveStreamUrl(part) {
   if (!part) return "./media/sample-part1.mp4";
   const pageUrl = part.url || "";
@@ -34755,193 +43636,338 @@ function resolveEpisodeThumb(ep) {
   if (dateSlug) {
     return `../media/thumbnails/ep-${dateSlug}.svg`;
   }
-  return `../media/thumb-default.svg`;
+  return "../media/thumb-default.svg";
 }
 function App() {
-  const [episodes, setEpisodes] = (0, import_react136.useState)([]);
-  const [selectedEpIndex, setSelectedEpIndex] = (0, import_react136.useState)(0);
-  const [partIndex, setPartIndex] = (0, import_react136.useState)(0);
-  const [currentPage, setCurrentPage] = (0, import_react136.useState)(1);
-  const [isLoadingMore, setIsLoadingMore] = (0, import_react136.useState)(false);
-  (0, import_react136.useEffect)(() => {
-    fetch("../catalog.json").then((r) => r.json()).then((data) => {
-      if (data.episodes && data.episodes.length > 0) {
-        setEpisodes(data.episodes);
-      }
-    }).catch(() => {
-      setEpisodes([
-        {
-          id: "ep1",
-          title: "\u7D9C\u85DD\u73A9\u5F88\u5927 2026-11-08 \u53F0\u5317 \u6417\u86CB\u9B3C\u5230\u4F60\u5BB6",
-          date: "2026-11-08",
-          url: "https://srgoideas.com/ep1/",
-          duration: "1\u5C0F\u6642 48\u5206",
-          parts: [
-            { label: "Part 1", streamUrl: "./media/sample-part1.mp4", duration: "35\u5206" },
-            { label: "Part 2", streamUrl: "./media/sample-part2.mp4", duration: "35\u5206" },
-            { label: "Part 3", streamUrl: "./media/sample-part3.mp4", duration: "38\u5206" }
-          ]
-        }
-      ]);
-    });
-  }, []);
-  const activeEp = episodes[selectedEpIndex] || {
-    id: "default",
-    title: "\u7D9C\u85DD\u73A9\u5F88\u5927",
-    parts: [{ label: "Part 1", streamUrl: "./media/sample-part1.mp4" }]
+  const [episodes, setEpisodes] = (0, import_react190.useState)([]);
+  const [selectedEpId, setSelectedEpId] = (0, import_react190.useState)("");
+  const [partIndex, setPartIndex] = (0, import_react190.useState)(0);
+  const [currentPage, setCurrentPage] = (0, import_react190.useState)(1);
+  const [searchQuery, setSearchQuery] = (0, import_react190.useState)("");
+  const [isInitialLoading, setIsInitialLoading] = (0, import_react190.useState)(true);
+  const [catalogError, setCatalogError] = (0, import_react190.useState)(null);
+  const [loadMoreError, setLoadMoreError] = (0, import_react190.useState)(null);
+  const [isLoadingMore, setIsLoadingMore] = (0, import_react190.useState)(false);
+  const loadCatalog = async () => {
+    setIsInitialLoading(true);
+    setCatalogError(null);
+    try {
+      const res = await fetch("../catalog.json");
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      const loaded = data.episodes && data.episodes.length > 0 ? data.episodes : FALLBACK_EPISODES;
+      setEpisodes(loaded);
+      setSelectedEpId((prev) => prev || loaded[0]?.id || "");
+    } catch {
+      setEpisodes(FALLBACK_EPISODES);
+      setSelectedEpId((prev) => prev || FALLBACK_EPISODES[0].id);
+      setCatalogError("\u7121\u6CD5\u8F09\u5165\u5B8C\u6574\u9060\u7AEF\u76EE\u9304\uFF0C\u5DF2\u5207\u63DB\u70BA\u96E2\u7DDA\u7CBE\u9078\u96C6\u6578\u3002");
+    } finally {
+      setIsInitialLoading(false);
+    }
   };
-  const activePart = activeEp.parts?.[partIndex] || activeEp.parts?.[0] || { label: "Part 1", streamUrl: "./media/sample-part1.mp4" };
+  (0, import_react190.useEffect)(() => {
+    void loadCatalog();
+  }, []);
+  const filteredEpisodes = (0, import_react190.useMemo)(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return episodes;
+    return episodes.filter(
+      (ep) => ep.title.toLowerCase().includes(q) || ep.date && ep.date.toLowerCase().includes(q)
+    );
+  }, [episodes, searchQuery]);
+  const activeEp = (0, import_react190.useMemo)(
+    () => episodes.find((ep) => ep.id === selectedEpId) || episodes[0] || FALLBACK_EPISODES[0],
+    [episodes, selectedEpId]
+  );
+  const parts = activeEp.parts?.length ? activeEp.parts : FALLBACK_EPISODES[0].parts;
+  const safePartIndex = partIndex < parts.length ? partIndex : 0;
+  const activePart = parts[safePartIndex] || parts[0];
   const handleLoadMore = async () => {
     if (isLoadingMore || currentPage >= 64) return;
     setIsLoadingMore(true);
+    setLoadMoreError(null);
     const nextPage = currentPage + 1;
     try {
       const res = await fetch(`/api/episodes?page=${nextPage}`);
-      if (!res.ok) throw new Error("HTTP " + res.status);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       if (data.ok && data.episodes) {
-        const seen = new Set(episodes.map((e) => e.id));
-        const newItems = data.episodes.filter((e) => !seen.has(e.id));
-        setEpisodes((prev) => [...prev, ...newItems]);
+        setEpisodes((prev) => {
+          const seen = new Set(prev.map((e) => e.id));
+          const newItems = data.episodes.filter((e) => !seen.has(e.id));
+          return [...prev, ...newItems];
+        });
         setCurrentPage(nextPage);
       }
-    } catch (err) {
-      console.error("React loadMore error:", err);
+    } catch {
+      setLoadMoreError(`\u7B2C ${nextPage} \u9801\u96C6\u6578\u8F09\u5165\u5931\u6557\uFF0C\u8ACB\u6AA2\u67E5\u9023\u7DDA\u5F8C\u91CD\u8A66\u3002`);
     } finally {
       setIsLoadingMore(false);
     }
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime109.jsxs)("div", { style: { maxWidth: 1100, margin: "0 auto", padding: "2rem 1.5rem", color: "#f3e7d2", fontFamily: "Roboto, system-ui, sans-serif" }, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime109.jsxs)("header", { style: { marginBottom: "1.5rem", borderBottom: "1px solid rgba(255,255,255,0.1)", paddingBottom: "1rem", display: "flex", justifyContent: "space-between", alignItems: "center" }, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime109.jsxs)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime109.jsx)("h1", { style: { fontSize: "1.75rem", margin: "0 0 0.5rem 0", color: "#fff" }, children: "Video.js v10 React Player \u2014 \u7D9C\u85DD\u73A9\u5F88\u5927" }),
-        /* @__PURE__ */ (0, import_jsx_runtime109.jsx)("p", { style: { margin: 0, fontSize: "0.95rem", color: "rgba(255,255,255,0.7)" }, children: "\u5B98\u65B9 Video.js 10 React \u898F\u7BC4\u5BE6\u4F5C \u2022 \u652F\u63F4\u591A\u9801\u5206\u6BB5\u52D5\u614B\u8F09\u5165\u8207 LocalStorage \u65B7\u9EDE\u7E8C\u64AD" })
+  return /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(DirectionProvider, { locale: "zh-Hant", children: /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("div", { className: "min-h-screen bg-background-full text-text-primary", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("header", { className: "sticky top-0 z-30 border-b border-separator-border bg-background-secondary-default/90 backdrop-blur-md", children: /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("div", { className: "mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3.5 sm:px-6", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("div", { className: "flex items-center gap-3", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("div", { className: "flex size-9 items-center justify-center rounded-2lg bg-accent-500 text-white shadow-card", children: /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(tf, { className: "size-5", "aria-hidden": "true" }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("div", { className: "min-w-0", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("div", { className: "flex items-center gap-2", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("h1", { className: "text-title-3-semibold tracking-tight text-text-primary", children: "dTVSteams Studio" }),
+            /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(Counter, { color: "primary", className: "tabular-nums", children: "v10" })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("p", { className: "text-caption-1-regular text-text-secondary", children: "Video.js 10 React \u64AD\u653E\u5DE5\u4F5C\u53F0\u8207\u591A\u6BB5\u5287\u96C6\u700F\u89BD" })
+        ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime109.jsx)("a", { href: "../index.html", style: { color: "#3ea6ff", textDecoration: "none", fontSize: "0.9rem", border: "1px solid rgba(62,166,255,0.4)", padding: "6px 14px", borderRadius: "20px" }, children: "\u2190 \u56DE\u5230\u4E00\u822C\u7DB2\u9801\u7248" })
-    ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime109.jsxs)("main", { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime109.jsx)(
-        VideoJs10Player,
+      /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("div", { className: "flex items-center gap-3", children: /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(
+        LinkButton,
         {
-          src: resolveStreamUrl(activePart),
-          poster: "../preview.png",
-          title: `${activeEp.title} \xB7 ${activePart.label}`,
-          episodeId: activeEp.id,
-          partIndex,
-          autoPlay: false,
-          onEnded: () => {
-            if (activeEp.parts && partIndex < activeEp.parts.length - 1) {
-              setPartIndex(partIndex + 1);
+          href: "../index.html",
+          variant: "secondary",
+          size: "small",
+          leadingIcon: K1,
+          children: "\u8FD4\u56DE\u4E00\u822C\u7DB2\u9801\u7248"
+        }
+      ) })
+    ] }) }),
+    /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("main", { className: "mx-auto max-w-7xl px-4 py-6 sm:px-6", children: [
+      catalogError ? /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("div", { className: "mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border-button-default bg-background-secondary-default px-4 py-3", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("span", { className: "text-body-2-regular text-text-secondary", children: catalogError }),
+        /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(
+          Button,
+          {
+            variant: "secondary",
+            size: "small",
+            leadingIcon: dZ,
+            onClick: () => void loadCatalog(),
+            children: "\u91CD\u65B0\u9023\u7DDA\u76EE\u9304"
+          }
+        )
+      ] }) : null,
+      /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("section", { className: "grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_320px]", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("div", { className: "overflow-hidden rounded-3xl border border-separator-border bg-background-secondary-default p-2 shadow-card", children: /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("div", { className: "overflow-hidden rounded-2xl bg-black", children: /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(
+          VideoJs10Player,
+          {
+            src: resolveStreamUrl(activePart),
+            poster: "../preview.png",
+            title: `${activeEp.title} \xB7 ${activePart.label}`,
+            episodeId: activeEp.id,
+            partIndex: safePartIndex,
+            autoPlay: false,
+            onEnded: () => {
+              if (safePartIndex < parts.length - 1) {
+                setPartIndex(safePartIndex + 1);
+              }
             }
           }
-        }
-      ),
-      /* @__PURE__ */ (0, import_jsx_runtime109.jsxs)("div", { style: { display: "flex", gap: "10px", marginTop: "1.25rem", alignItems: "center" }, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime109.jsx)("span", { style: { fontWeight: 600, fontSize: "0.95rem", color: "#aaa" }, children: "\u5206\u6BB5\u5207\u63DB\uFF1A" }),
-        (activeEp.parts || []).map((p, idx) => /* @__PURE__ */ (0, import_jsx_runtime109.jsxs)(
-          "button",
+        ) }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("aside", { className: "flex flex-col justify-between gap-4 rounded-3xl border border-separator-border bg-background-secondary-default p-5 shadow-card", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("div", { className: "flex flex-col gap-3", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("div", { className: "flex items-center justify-between gap-2", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(Chip, { variant: "caption", color: "rose", children: "\u6B63\u5728\u64AD\u653E" }),
+              /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("span", { className: "inline-flex items-center gap-1 text-caption-1-medium tabular-nums text-text-secondary", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(R5, { className: "size-3.5 text-foreground-icon-secondary", "aria-hidden": "true" }),
+                activeEp.date || "\u6700\u65B0\u96C6\u6578"
+              ] })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("h2", { className: "text-title-2-medium text-balance tracking-tight text-text-primary", children: activeEp.title }),
+            /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("div", { className: "flex flex-wrap items-center gap-2", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(Chip, { variant: "caption", color: "soft", className: "tabular-nums", children: activeEp.duration || "1\u5C0F\u6642 48\u5206" }),
+              /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)(Chip, { variant: "caption", color: "neutral", className: "tabular-nums", children: [
+                parts.length,
+                " \u500B\u5206\u6BB5"
+              ] })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(Divider, { className: "my-1" }),
+            /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("div", { className: "flex flex-col gap-2", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("div", { className: "flex items-center justify-between", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("span", { className: "text-caption-1-semibold text-text-secondary", children: "\u5206\u6BB5\u5207\u63DB" }),
+                /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("span", { className: "text-caption-1-medium tabular-nums text-text-tertiary", children: [
+                  activePart.label,
+                  " / ",
+                  parts.length
+                ] })
+              ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(
+                SegmentedControl,
+                {
+                  "aria-label": "\u64AD\u653E\u5206\u6BB5\u5207\u63DB",
+                  selectedKeys: [String(safePartIndex)],
+                  onSelectionChange: (keys) => {
+                    const next = Number(Array.from(keys)[0] ?? 0);
+                    if (!Number.isNaN(next)) setPartIndex(next);
+                  },
+                  className: "w-full",
+                  children: parts.map((part, idx) => /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(
+                    SegmentedControlItem,
+                    {
+                      id: String(idx),
+                      className: "flex-1",
+                      children: part.label
+                    },
+                    part.label + idx
+                  ))
+                }
+              )
+            ] })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("div", { className: "flex flex-col gap-2 pt-2", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)(
+              Button,
+              {
+                variant: "primary",
+                size: "medium",
+                leadingIcon: Ug,
+                onClick: () => {
+                  const nextIdx = (safePartIndex + 1) % parts.length;
+                  setPartIndex(nextIdx);
+                },
+                children: [
+                  "\u5207\u63DB\u4E0B\u4E00\u6BB5 (",
+                  parts[(safePartIndex + 1) % parts.length]?.label || "Part 1",
+                  ")"
+                ]
+              }
+            ),
+            /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("span", { className: "text-caption-1-regular text-text-tertiary", children: "\u652F\u63F4\u81EA\u52D5\u7E8C\u64AD\u8207\u700F\u89BD\u5668\u672C\u6A5F\u65B7\u9EDE\u7D00\u9304" })
+          ] })
+        ] })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("section", { className: "mt-8 flex flex-col gap-5", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("div", { className: "flex flex-col justify-between gap-3 sm:flex-row sm:items-end", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("div", { className: "flex items-center gap-2.5", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("h2", { className: "text-title-2-medium tracking-tight text-text-primary", children: "\u96C6\u6578\u76EE\u9304" }),
+            /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(Counter, { color: "neutral", className: "tabular-nums", children: filteredEpisodes.length })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("div", { className: "flex w-full items-center gap-3 sm:w-80", children: /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(
+            SearchField2,
+            {
+              "aria-label": "\u641C\u5C0B\u96C6\u6578\u6216\u65E5\u671F",
+              placeholder: "\u641C\u5C0B\u96C6\u6578\u6A19\u984C\u3001\u5730\u9EDE\u6216\u65E5\u671F...",
+              shape: "rounded",
+              size: "medium",
+              value: searchQuery,
+              onChange: setSearchQuery
+            }
+          ) })
+        ] }),
+        isInitialLoading ? /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("div", { className: "grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4", children: Array.from({ length: 8 }).map((_, idx) => /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)(
+          "div",
           {
-            onClick: () => setPartIndex(idx),
-            style: {
-              padding: "8px 18px",
-              background: idx === partIndex ? "#ff0000" : "rgba(255,255,255,0.1)",
-              color: "#fff",
-              border: "1px solid " + (idx === partIndex ? "#ff0000" : "rgba(255,255,255,0.2)"),
-              borderRadius: "6px",
-              cursor: "pointer",
-              fontWeight: 600,
-              fontSize: "0.9rem",
-              transition: "all 0.2s ease"
-            },
+            className: "flex flex-col gap-3 rounded-2xl border border-separator-border bg-background-secondary-default p-3",
             children: [
-              "\u25B6 ",
-              p.label
+              /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(Skeleton, { className: "aspect-video w-full" }),
+              /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(Skeleton, { shape: "text", className: "h-4 w-4/5" }),
+              /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(Skeleton, { shape: "text", className: "h-3.5 w-1/2" })
             ]
           },
           idx
-        ))
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime109.jsxs)("section", { style: { marginTop: "2.5rem" }, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime109.jsxs)("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime109.jsx)("h2", { style: { fontSize: "1.3rem", color: "#fff" }, children: "\u96C6\u6578\u5217\u8868" }),
-          /* @__PURE__ */ (0, import_jsx_runtime109.jsxs)("span", { style: { fontSize: "0.9rem", color: "#aaa" }, children: [
-            "\u5DF2\u8F09\u5165 ",
-            episodes.length,
-            " \u96C6 (\u5171 640+ \u96C6)"
-          ] })
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime109.jsx)("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: "16px" }, children: episodes.map((ep, idx) => /* @__PURE__ */ (0, import_jsx_runtime109.jsxs)(
-          "div",
-          {
-            onClick: () => {
-              setSelectedEpIndex(idx);
-              setPartIndex(0);
+        )) }) : filteredEpisodes.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("div", { className: "flex flex-col items-center justify-center gap-3 rounded-3xl border border-separator-border bg-background-secondary-default px-6 py-12 text-center", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("div", { className: "flex size-12 items-center justify-center rounded-2xl bg-background-tertiary-default text-foreground-icon-secondary", children: /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(Xl, { className: "size-6", "aria-hidden": "true" }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("div", { className: "flex flex-col gap-1", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("h3", { className: "text-headline-medium text-text-primary", children: "\u627E\u4E0D\u5230\u7B26\u5408\u689D\u4EF6\u7684\u96C6\u6578" }),
+            /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("p", { className: "text-body-regular text-text-secondary", children: "\u8ACB\u5617\u8A66\u6E05\u9664\u641C\u5C0B\u95DC\u9375\u5B57\u6216\u8F09\u5165\u66F4\u591A\u6B77\u53F2\u96C6\u6578\u3002" })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(Button, { variant: "secondary", size: "small", onClick: () => setSearchQuery(""), children: "\u6E05\u9664\u641C\u5C0B" })
+        ] }) : /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("div", { className: "grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4", children: filteredEpisodes.map((ep, idx) => {
+          const isSelected = ep.id === activeEp.id;
+          return /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)(
+            "button",
+            {
+              type: "button",
+              onClick: () => {
+                setSelectedEpId(ep.id);
+                setPartIndex(0);
+              },
+              className: cx(
+                "group flex cursor-pointer flex-col gap-3 rounded-2xl border p-3 text-left transition-[background-color,border-color,box-shadow] duration-150 ease-out",
+                "outline-none focus-visible:ring-2 focus-visible:ring-border-focus-ring",
+                isSelected ? "border-accent-500 bg-background-primary-default shadow-card" : "border-separator-border bg-background-secondary-default hover:border-border-button-hover hover:bg-background-primary-default"
+              ),
+              children: [
+                /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("div", { className: "relative aspect-video w-full overflow-hidden rounded-xl bg-black", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(
+                    "img",
+                    {
+                      src: resolveEpisodeThumb(ep),
+                      alt: ep.title,
+                      loading: "lazy",
+                      onError: (e) => {
+                        e.currentTarget.src = "../media/thumb-default.svg";
+                      },
+                      className: "size-full object-cover transition-transform duration-300 ease-out group-hover:scale-[1.02]"
+                    }
+                  ),
+                  /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(
+                    Chip,
+                    {
+                      variant: "caption",
+                      color: "gray",
+                      className: "absolute right-2 bottom-2 bg-black/75 tabular-nums text-white",
+                      children: ep.duration || "1\u5C0F\u6642 48\u5206"
+                    }
+                  )
+                ] }),
+                /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("div", { className: "flex min-w-0 flex-1 flex-col justify-between gap-2 px-0.5", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("h3", { className: "line-clamp-2 text-body-medium text-text-primary", children: ep.title }),
+                  /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("div", { className: "flex items-center justify-between gap-2 text-caption-1-regular tabular-nums text-text-secondary", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("span", { children: ep.date || "\u6700\u65B0" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("span", { children: [
+                      ep.parts?.length || 3,
+                      " \u500B\u5206\u6BB5"
+                    ] })
+                  ] })
+                ] })
+              ]
             },
-            style: {
-              background: idx === selectedEpIndex ? "rgba(255,0,0,0.15)" : "#1f1f1f",
-              border: "1px solid " + (idx === selectedEpIndex ? "#ff0000" : "rgba(255,255,255,0.1)"),
-              borderRadius: "8px",
-              padding: "12px",
-              cursor: "pointer",
-              transition: "all 0.2s ease"
-            },
-            children: [
-              /* @__PURE__ */ (0, import_jsx_runtime109.jsxs)("div", { style: { position: "relative", width: "100%", aspectRatio: "16 / 9", borderRadius: "6px", overflow: "hidden", marginBottom: "8px", background: "#0a0a0a" }, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime109.jsx)(
-                  "img",
-                  {
-                    src: resolveEpisodeThumb(ep),
-                    alt: ep.title,
-                    loading: "lazy",
-                    onError: (e) => {
-                      e.currentTarget.src = "../media/thumb-default.svg";
-                    },
-                    style: { width: "100%", height: "100%", objectFit: "cover", display: "block" }
-                  }
-                ),
-                /* @__PURE__ */ (0, import_jsx_runtime109.jsx)("span", { style: { position: "absolute", bottom: "6px", right: "6px", background: "rgba(0,0,0,0.8)", color: "#fff", fontSize: "0.75rem", padding: "2px 6px", borderRadius: "4px", fontWeight: 600 }, children: ep.duration || "1\u5C0F\u6642 48\u5206" })
-              ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime109.jsx)("div", { style: { fontWeight: 600, fontSize: "0.95rem", marginBottom: "6px", color: idx === selectedEpIndex ? "#fff" : "#eee" }, children: ep.title }),
-              /* @__PURE__ */ (0, import_jsx_runtime109.jsxs)("div", { style: { fontSize: "0.8rem", color: "#888" }, children: [
-                ep.date || "\u6700\u65B0",
-                " \xB7 \u5171 ",
-                ep.parts?.length || 3,
-                " \u500B\u5206\u6BB5"
-              ] })
-            ]
-          },
-          ep.id + idx
-        )) }),
-        currentPage < 64 && /* @__PURE__ */ (0, import_jsx_runtime109.jsx)("div", { style: { textAlign: "center", marginTop: "2rem" }, children: /* @__PURE__ */ (0, import_jsx_runtime109.jsx)(
-          "button",
+            ep.id + idx
+          );
+        }) }),
+        loadMoreError ? /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("div", { className: "flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border-error-default bg-background-tertiary-error px-4 py-3", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("span", { className: "text-body-2-regular text-text-error-primary", children: loadMoreError }),
+          /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(
+            Button,
+            {
+              variant: "secondary",
+              size: "small",
+              leadingIcon: dZ,
+              onClick: () => void handleLoadMore(),
+              children: "\u91CD\u8A66\u8F09\u5165"
+            }
+          )
+        ] }) : null,
+        currentPage < 64 && !searchQuery.trim() ? /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("div", { className: "flex justify-center pt-2", children: /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(
+          Button,
           {
-            onClick: handleLoadMore,
+            variant: "secondary",
+            size: "medium",
+            leadingIcon: f1,
             disabled: isLoadingMore,
-            style: {
-              padding: "10px 28px",
-              background: "rgba(255,255,255,0.1)",
-              border: "1px solid rgba(255,255,255,0.25)",
-              color: "#fff",
-              borderRadius: "20px",
-              cursor: isLoadingMore ? "not-allowed" : "pointer",
-              fontSize: "0.95rem",
-              fontWeight: 600,
-              transition: "all 0.2s ease"
-            },
-            children: isLoadingMore ? "\u8F09\u5165\u4E2D..." : `\u25BC \u8F09\u5165\u66F4\u591A\u6B77\u53F2\u96C6\u6578 (\u7B2C ${currentPage + 1} \u9801 / \u5171 64 \u9801)`
+            onClick: () => void handleLoadMore(),
+            children: isLoadingMore ? "\u6B63\u5728\u8F09\u5165\u6B77\u53F2\u96C6\u6578..." : `\u8F09\u5165\u66F4\u591A\u96C6\u6578 (\u7B2C ${currentPage + 1} / 64 \u9801)`
           }
-        ) })
+        ) }) : null
       ] })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime109.jsx)("footer", { style: { marginTop: "3rem", paddingTop: "1rem", borderTop: "1px solid rgba(255,255,255,0.1)", fontSize: "0.85rem", color: "#888" }, children: /* @__PURE__ */ (0, import_jsx_runtime109.jsxs)("span", { children: [
-      "Video.js v10.4.0 \u2022 React 18 / 19 \u2022 ",
-      /* @__PURE__ */ (0, import_jsx_runtime109.jsx)("a", { href: "https://videojs.org/", target: "_blank", rel: "noreferrer", style: { color: "#aaa" }, children: "videojs.org" })
+    /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("footer", { className: "mt-10 border-t border-separator-border bg-background-secondary-default/40", children: /* @__PURE__ */ (0, import_jsx_runtime124.jsxs)("div", { className: "mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-5 text-caption-1-regular text-text-secondary sm:px-6", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime124.jsx)("span", { children: "dTVSteams \u2022 Video.js 10 + BoardUI Design System" }),
+      /* @__PURE__ */ (0, import_jsx_runtime124.jsx)(
+        LinkButton,
+        {
+          href: "https://videojs.org/",
+          target: "_blank",
+          rel: "noreferrer",
+          variant: "secondary",
+          size: "xs",
+          trailingIcon: Wt,
+          children: "videojs.org"
+        }
+      )
     ] }) })
-  ] });
+  ] }) });
 }
 var rootEl = document.getElementById("root");
 if (rootEl) {
-  (0, import_client.createRoot)(rootEl).render(/* @__PURE__ */ (0, import_jsx_runtime109.jsx)(App, {}));
+  (0, import_client.createRoot)(rootEl).render(/* @__PURE__ */ (0, import_jsx_runtime124.jsx)(App, {}));
 }
 /*! Bundled license information:
 
@@ -34989,6 +44015,17 @@ react-dom/cjs/react-dom-client.production.js:
    * LICENSE file in the root directory of this source tree.
    *)
 
+react/cjs/react-jsx-runtime.production.js:
+  (**
+   * @license React
+   * react-jsx-runtime.production.js
+   *
+   * Copyright (c) Meta Platforms, Inc. and affiliates.
+   *
+   * This source code is licensed under the MIT license found in the
+   * LICENSE file in the root directory of this source tree.
+   *)
+
 react-compiler-runtime/dist/index.js:
   (**
    * Copyright (c) Meta Platforms, Inc. and affiliates.
@@ -35001,16 +44038,5 @@ react-compiler-runtime/dist/index.js:
    * @nolint
    * @preventMunge
    * @preserve-invariant-messages
-   *)
-
-react/cjs/react-jsx-runtime.production.js:
-  (**
-   * @license React
-   * react-jsx-runtime.production.js
-   *
-   * Copyright (c) Meta Platforms, Inc. and affiliates.
-   *
-   * This source code is licensed under the MIT license found in the
-   * LICENSE file in the root directory of this source tree.
    *)
 */

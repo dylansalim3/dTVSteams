@@ -6,6 +6,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import '../catalog/parser.dart';
 import '../catalog/show_channel.dart';
 import '../services/share_service.dart';
+import 'app_tokens.dart';
 
 /// Unified Share Dialog displaying QR Code, Copy URL, System Share, and optional offline video file transfer.
 class ShareDialog extends StatefulWidget {
@@ -97,12 +98,15 @@ class _ShareDialogState extends State<ShareDialog> {
     final hasLocalFile = widget.localFilePath != null && File(widget.localFilePath!).existsSync();
 
     return Dialog(
-      backgroundColor: const Color(0xFF1E1E1E),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      backgroundColor: AppColors.surfaceSecondary,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadius.modal),
+        side: const BorderSide(color: AppColors.borderSeparator, width: 1),
+      ),
       insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       child: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(AppSpacing.lg + 4),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -111,14 +115,15 @@ class _ShareDialogState extends State<ShareDialog> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(AppSpacing.sm),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFE50914).withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(10),
+                      color: AppColors.accentSoft,
+                      borderRadius: BorderRadius.circular(AppRadius.control),
+                      border: Border.all(color: AppColors.accent.withValues(alpha: 0.35)),
                     ),
-                    child: const Icon(Icons.share, color: Color(0xFFE50914), size: 22),
+                    child: const Icon(Icons.share, color: AppColors.accent, size: 20),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppSpacing.md),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -126,11 +131,7 @@ class _ShareDialogState extends State<ShareDialog> {
                         if (showName.isNotEmpty) ...[
                           Text(
                             '$showEmoji $showName · $partLabel',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: Color(0xFFE50914),
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: AppType.caption1Semibold.copyWith(color: AppColors.accent),
                           ),
                           const SizedBox(height: 2),
                         ],
@@ -138,40 +139,31 @@ class _ShareDialogState extends State<ShareDialog> {
                           ep.title.isNotEmpty ? ep.title : '分享節目影片',
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
+                          style: AppType.headlineMedium.copyWith(fontWeight: FontWeight.w600),
                         ),
                       ],
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white54, size: 20),
+                    icon: const Icon(Icons.close, color: AppColors.textSecondary, size: 20),
                     padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+                    constraints: const BoxConstraints.tightFor(width: 44, height: 44),
+                    style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
                     onPressed: () => Navigator.of(context).pop(),
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
-              const Divider(color: Colors.white12, height: 1),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.lg),
+              const Divider(color: AppColors.borderSeparator, height: 1),
+              const SizedBox(height: AppSpacing.lg),
 
               // QR Code Container
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.4),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+                  borderRadius: BorderRadius.circular(AppRadius.card),
+                  boxShadow: AppShadows.dropdown,
                 ),
                 child: QrImageView(
                   data: shareUrl,
@@ -181,34 +173,33 @@ class _ShareDialogState extends State<ShareDialog> {
                   errorCorrectionLevel: QrErrorCorrectLevel.M,
                 ),
               ),
-              const SizedBox(height: 10),
-              const Text(
+              const SizedBox(height: AppSpacing.md - 2),
+              Text(
                 '使用手機相機或平板掃描 QR Code 即刻線上開播',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white54, fontSize: 11),
+                style: AppType.caption2Medium.copyWith(color: AppColors.textSecondary),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.lg),
 
               // Copy URL Bar
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md - 2, vertical: 6),
                 decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.4),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.white12),
+                  color: AppColors.canvas,
+                  borderRadius: BorderRadius.circular(AppRadius.control),
+                  border: Border.all(color: AppColors.borderSeparator),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.link, size: 16, color: Colors.white54),
-                    const SizedBox(width: 8),
+                    const Icon(Icons.link, size: 16, color: AppColors.textSecondary),
+                    const SizedBox(width: AppSpacing.sm),
                     Expanded(
                       child: Text(
                         shareUrl,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.white70,
+                        style: AppType.caption1Regular.copyWith(
+                          color: AppColors.textSecondary,
                           fontFamily: 'monospace',
                         ),
                       ),
@@ -216,7 +207,7 @@ class _ShareDialogState extends State<ShareDialog> {
                     const SizedBox(width: 6),
                     TextButton.icon(
                       style: TextButton.styleFrom(
-                        foregroundColor: _copied ? const Color(0xFF46D369) : const Color(0xFFE50914),
+                        foregroundColor: _copied ? AppColors.success : AppColors.accent,
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         minimumSize: Size.zero,
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -225,13 +216,15 @@ class _ShareDialogState extends State<ShareDialog> {
                       icon: Icon(_copied ? Icons.check : Icons.copy, size: 14),
                       label: Text(
                         _copied ? '已複製' : '複製',
-                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                        style: AppType.caption1Semibold.copyWith(
+                          color: _copied ? AppColors.success : AppColors.accent,
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.lg),
 
               // Action Buttons Row
               Row(
@@ -239,17 +232,18 @@ class _ShareDialogState extends State<ShareDialog> {
                   Expanded(
                     child: ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFE50914),
-                        foregroundColor: Colors.white,
+                        backgroundColor: AppColors.accent,
+                        foregroundColor: AppColors.textPrimary,
+                        elevation: 0,
+                        minimumSize: const Size(0, 44),
                         padding: const EdgeInsets.symmetric(vertical: 10),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(AppRadius.control),
+                        ),
                       ),
                       onPressed: _shareLink,
                       icon: const Icon(Icons.share, size: 16),
-                      label: const Text(
-                        '分享連結',
-                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
-                      ),
+                      label: const Text('分享連結', style: AppType.body2Medium),
                     ),
                   ),
                 ],
@@ -262,16 +256,19 @@ class _ShareDialogState extends State<ShareDialog> {
                   width: double.infinity,
                   child: OutlinedButton.icon(
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.white70,
-                      side: const BorderSide(color: Colors.white24),
+                      foregroundColor: AppColors.textPrimary,
+                      side: const BorderSide(color: AppColors.borderDefault),
+                      minimumSize: const Size(0, 44),
                       padding: const EdgeInsets.symmetric(vertical: 9),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppRadius.control),
+                      ),
                     ),
                     onPressed: _shareLocalFile,
-                    icon: const Icon(Icons.video_file_outlined, size: 16, color: Color(0xFF46D369)),
-                    label: const Text(
+                    icon: const Icon(Icons.video_file_outlined, size: 16, color: AppColors.success),
+                    label: Text(
                       '傳送本機離線影片檔 (MP4)',
-                      style: TextStyle(fontSize: 12),
+                      style: AppType.caption1Medium.copyWith(color: AppColors.textPrimary),
                     ),
                   ),
                 ),

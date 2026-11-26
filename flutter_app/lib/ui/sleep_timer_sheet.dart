@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import '../services/sleep_timer_manager.dart';
+import 'app_tokens.dart';
 
-/// Bottom Sheet for selecting Sleep Timer duration
+/// Bottom Sheet for selecting Sleep Timer duration (BoardUI surface & radio list tokens)
 void showSleepTimerSheet(BuildContext context, {VoidCallback? onTimerChanged}) {
   final manager = SleepTimerManager();
 
@@ -9,9 +10,10 @@ void showSleepTimerSheet(BuildContext context, {VoidCallback? onTimerChanged}) {
     context: context,
     isScrollControlled: true,
     useSafeArea: true,
-    backgroundColor: const Color(0xFF1E1E1E),
+    backgroundColor: AppColors.surfaceSecondary,
     shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.modal)),
+      side: BorderSide(color: AppColors.borderSeparator),
     ),
     builder: (ctx) {
       return AnimatedBuilder(
@@ -21,21 +23,26 @@ void showSleepTimerSheet(BuildContext context, {VoidCallback? onTimerChanged}) {
           return SafeArea(
             top: true,
             bottom: true,
-            minimum: const EdgeInsets.only(top: 8),
+            minimum: const EdgeInsets.only(top: AppSpacing.sm),
             child: SingleChildScrollView(
-              padding: EdgeInsets.fromLTRB(16.0, 8.0, 16.0, (bottomInset + 16.0) / 2),
+              padding: EdgeInsets.fromLTRB(
+                AppSpacing.lg,
+                AppSpacing.sm,
+                AppSpacing.lg,
+                (bottomInset + AppSpacing.lg) / 2,
+              ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Center(
                     child: Container(
-                      width: 38,
+                      width: 36,
                       height: 4,
-                      margin: const EdgeInsets.only(bottom: 12),
+                      margin: const EdgeInsets.only(bottom: AppSpacing.md),
                       decoration: BoxDecoration(
-                        color: Colors.white24,
-                        borderRadius: BorderRadius.circular(2),
+                        color: AppColors.borderDefault,
+                        borderRadius: BorderRadius.circular(AppRadius.pill),
                       ),
                     ),
                   ),
@@ -46,33 +53,29 @@ void showSleepTimerSheet(BuildContext context, {VoidCallback? onTimerChanged}) {
                       Row(
                         children: [
                           Container(
-                            padding: const EdgeInsets.all(8),
+                            width: 38,
+                            height: 38,
                             decoration: BoxDecoration(
-                              color: const Color(0xFFE50914).withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(8),
+                              color: AppColors.accentSoft,
+                              borderRadius: BorderRadius.circular(AppRadius.control),
+                              border: Border.all(
+                                color: AppColors.accent.withValues(alpha: 0.35),
+                              ),
                             ),
-                            child: const Icon(Icons.timer_outlined, color: Color(0xFFE50914), size: 22),
+                            child: const Icon(Icons.timer_outlined, color: AppColors.accent, size: 20),
                           ),
-                          const SizedBox(width: 10),
+                          const SizedBox(width: AppSpacing.md - 2),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                '睡眠定時器 (Sleep Timer)',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
+                              const Text('睡眠定時器 (Sleep Timer)', style: AppType.title3Semibold),
                               if (manager.isActive) ...[
                                 const SizedBox(height: 2),
                                 Text(
                                   '倒數中：${manager.formattedTime}',
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    color: Color(0xFFE50914),
-                                    fontWeight: FontWeight.w600,
+                                  style: AppType.caption1Semibold.copyWith(
+                                    color: AppColors.accent,
+                                    fontFeatures: AppType.tabular,
                                   ),
                                 ),
                               ],
@@ -81,19 +84,21 @@ void showSleepTimerSheet(BuildContext context, {VoidCallback? onTimerChanged}) {
                         ],
                       ),
                       IconButton(
-                        icon: const Icon(Icons.close, color: Colors.white70),
+                        icon: const Icon(Icons.close, color: AppColors.textSecondary, size: 20),
+                        constraints: const BoxConstraints.tightFor(width: 44, height: 44),
+                        style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
                         onPressed: () => Navigator.of(ctx).pop(),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppSpacing.md),
 
                   // Option Tiles
                   Material(
-                    color: const Color(0xFF2A2A2A),
+                    color: AppColors.surfaceRaised,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      side: const BorderSide(color: Colors.white12),
+                      borderRadius: BorderRadius.circular(AppRadius.card),
+                      side: const BorderSide(color: AppColors.borderSeparator),
                     ),
                     clipBehavior: Clip.antiAlias,
                     child: Column(
@@ -112,19 +117,20 @@ void showSleepTimerSheet(BuildContext context, {VoidCallback? onTimerChanged}) {
                                       : '已設定睡眠定時：${mode.label}',
                                 ),
                                 duration: const Duration(seconds: 2),
-                                backgroundColor: const Color(0xFF2A2A2A),
+                                backgroundColor: AppColors.surfacePrimary,
                               ),
                             );
                           },
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.lg,
+                              vertical: AppSpacing.md,
+                            ),
                             decoration: BoxDecoration(
-                              color: isSelected
-                                  ? const Color(0xFFE50914).withValues(alpha: 0.15)
-                                  : Colors.transparent,
+                              color: isSelected ? AppColors.accentSoft : Colors.transparent,
                               border: Border(
                                 bottom: mode != SleepTimerMode.values.last
-                                    ? const BorderSide(color: Colors.white10, width: 0.5)
+                                    ? const BorderSide(color: AppColors.borderSeparator, width: 1)
                                     : BorderSide.none,
                               ),
                             ),
@@ -133,26 +139,23 @@ void showSleepTimerSheet(BuildContext context, {VoidCallback? onTimerChanged}) {
                                 Icon(
                                   isSelected ? Icons.check_circle : Icons.radio_button_unchecked,
                                   size: 18,
-                                  color: isSelected ? const Color(0xFFE50914) : Colors.white38,
+                                  color: isSelected ? AppColors.accent : AppColors.textTertiary,
                                 ),
-                                const SizedBox(width: 12),
+                                const SizedBox(width: AppSpacing.md),
                                 Expanded(
                                   child: Text(
                                     mode.label,
-                                    style: TextStyle(
-                                      color: isSelected ? Colors.white : Colors.white70,
-                                      fontSize: 14,
-                                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                    style: (isSelected ? AppType.bodyMedium : AppType.bodyRegular).copyWith(
+                                      color: isSelected ? AppColors.textPrimary : AppColors.textSecondary,
                                     ),
                                   ),
                                 ),
                                 if (isSelected && manager.isActive)
                                   Text(
                                     manager.formattedTime,
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      color: Color(0xFFE50914),
-                                      fontWeight: FontWeight.bold,
+                                    style: AppType.caption1Semibold.copyWith(
+                                      color: AppColors.accent,
+                                      fontFeatures: AppType.tabular,
                                     ),
                                   ),
                               ],

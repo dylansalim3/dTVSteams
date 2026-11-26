@@ -196,6 +196,8 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
     _syncSystemUiMode();
     _currentPartIndex = widget.initialPartIndex;
     _pipManager.isInPipMode.addListener(_onPipUpdate);
+    _pipManager.onPipAction = _handlePipAction;
+    _pipManager.setPlaybackState(false);
     _pipManager.setAutoPip(true);
     _downloadManager.addListener(_onDownloadUpdate);
     _historyManager.init();
@@ -377,7 +379,7 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
     }
   }
 
-  void _syncPlaybackState() {
+  void _syncPlaybackState({bool? playingOverride}) {
     if (_isExiting) {
       _playbackBridge.setKeepScreenOn(false);
       _playbackBridge.stopBackgroundPlay();
@@ -385,8 +387,9 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
     }
 
     final value = _controller?.value;
-    final isPlaying = value?.isPlaying ?? false;
+    final isPlaying = playingOverride ?? (value?.isPlaying ?? false);
     final isActivePlayback = isPlaying || (value?.isBuffering ?? false);
+    _pipManager.setPlaybackState(isPlaying);
 
     // 1. Keep Screen Awake
     if (isActivePlayback && _settingsManager.keepScreenAwake) {
@@ -434,6 +437,40 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
 
   void _onPipUpdate() {
     if (mounted) setState(() {});
+  }
+
+  void _handlePipAction(String action) {
+    if (!mounted || _isExiting) return;
+    final c = _controller;
+    if (c == null) return;
+
+    if (action == 'pause') {
+      if (c.value.isPlaying) {
+        c.pause().then((_) {
+          if (mounted) _syncPlaybackState();
+        });
+      }
+      _syncPlaybackState(playingOverride: false);
+      setState(() => _showOsd = true);
+      _osdTimer?.cancel();
+      return;
+    }
+
+    if (action == 'play') {
+      if (!c.value.isPlaying) {
+        c.play().then((_) {
+          if (mounted) _syncPlaybackState();
+        });
+      }
+      _syncPlaybackState(playingOverride: true);
+      _resetOsdTimer();
+      setState(() {});
+      return;
+    }
+
+    if (action == 'togglePlayPause') {
+      _togglePlayPause();
+    }
   }
 
   void _onDownloadUpdate() {
@@ -1229,6 +1266,9 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
     AppSystemUi.restoreNormalChrome();
     _persistCurrentPosition(force: true);
     _pipManager.setAutoPip(false);
+    if (_pipManager.onPipAction == _handlePipAction) {
+      _pipManager.onPipAction = null;
+    }
     _pipManager.isInPipMode.removeListener(_onPipUpdate);
     _downloadManager.removeListener(_onDownloadUpdate);
     _osdTimer?.cancel();
@@ -1243,15 +1283,20 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
   void _togglePlayPause() {
     final c = _controller;
     if (c == null) return;
-    if (c.value.isPlaying) {
-      c.pause();
+    final nextPlaying = !c.value.isPlaying;
+    if (nextPlaying) {
+      c.play().then((_) {
+        if (mounted) _syncPlaybackState();
+      });
+      _resetOsdTimer();
+    } else {
+      c.pause().then((_) {
+        if (mounted) _syncPlaybackState();
+      });
       setState(() => _showOsd = true);
       _osdTimer?.cancel();
-    } else {
-      c.play();
-      _resetOsdTimer();
     }
-    _syncPlaybackState();
+    _syncPlaybackState(playingOverride: nextPlaying);
     setState(() {});
   }
 
@@ -2292,6 +2337,32 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
                             ),
                           ),
                         ),
+                        // Center Play / Pause Button
+                        if (!_isLoading && _errorMessage == null)
+                          Center(
+                            child: Semantics(
+                              button: true,
+                              label: isPlaying ? '暫停' : '播放',
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.black.withValues(alpha: 0.55),
+                                  border: Border.all(color: Colors.white24, width: 1),
+                                ),
+                                child: IconButton(
+                                  key: const ValueKey('center_play_pause_button'),
+                                  tooltip: isPlaying ? '暫停' : '播放',
+                                  padding: const EdgeInsets.all(14),
+                                  iconSize: 52,
+                                  icon: Icon(
+                                    isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                                    color: Colors.white,
+                                  ),
+                                  onPressed: _togglePlayPause,
+                                ),
+                              ),
+                            ),
+                          ),
                         // Top Gradient Header
                         Positioned(
                           top: 0,
@@ -2359,7 +2430,9 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
                                     IconButton(
                                       tooltip: '子母畫面 (Picture-in-Picture)',
                                       icon: const Icon(Icons.picture_in_picture_alt, color: Colors.white, size: 22),
-                                      onPressed: () => _pipManager.enterPip(),
+                                      onPressed: () => _pipManager.enterPip(
+                                        isPlaying: _controller?.value.isPlaying ?? false,
+                                      ),
                                     ),
 
                                     // Aspect Ratio Scale Mode Button in OSD
@@ -2630,51 +2703,13 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
                                     ),
                                   ),
 
-                                  // Playback Controls Row
-                                  Row(
-                                    children: [
-                                      IconButton(
-                                        icon: Icon(
-                                          isPlaying ? Icons.pause_circle_filled : Icons.play_circle_filled,
-                                          color: Colors.white,
-                                          size: 34,
-                                        ),
-                                        onPressed: _togglePlayPause,
-                                      ),
-                                      IconButton(
-                                        icon: const Icon(Icons.replay_10, color: Colors.white70, size: 24),
-                                        onPressed: () => _seekRelative(-10),
-                                      ),
-                                      IconButton(
-                                        icon: const Icon(Icons.forward_10, color: Colors.white70, size: 24),
-                                        onPressed: () => _seekRelative(10),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Expanded(
-                                        child: Text(
-                                          '${_formatDuration(position)} / ${_formatDuration(duration)}',
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(color: Colors.white70, fontSize: 13, fontFamily: 'monospace'),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                                        decoration: BoxDecoration(
-                                          border: Border.all(color: const Color(0xFFE50914)),
-                                          borderRadius: BorderRadius.circular(3),
-                                        ),
-                                        child: const Text(
-                                          '1080p FHD',
-                                          style: TextStyle(
-                                            color: Color(0xFFE50914),
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
+                                  // Playback Time Row
+                                  Text(
+                                    '${_formatDuration(position)} / ${_formatDuration(duration)}',
+                                    key: const ValueKey('player_time_display'),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(color: Colors.white70, fontSize: 13, fontFamily: 'monospace'),
                                   ),
                                 ],
                               ),

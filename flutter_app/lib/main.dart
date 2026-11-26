@@ -33,11 +33,13 @@ class DTVSteamsApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.dark,
-        scaffoldBackgroundColor: const Color(0xFF0F0F0F),
-        primaryColor: const Color(0xFFE50914),
+        scaffoldBackgroundColor: AppColors.canvas,
+        primaryColor: AppColors.accent,
+        dividerColor: AppColors.borderSeparator,
         colorScheme: const ColorScheme.dark(
-          primary: Color(0xFFE50914),
-          surface: Color(0xFF1E1E1E),
+          primary: AppColors.accent,
+          surface: AppColors.surfaceSecondary,
+          onSurface: AppColors.textPrimary,
         ),
       ),
       home: const HomeScreen(),
@@ -265,149 +267,165 @@ class _HomeScreenState extends State<HomeScreen> {
         final bottomInset = MediaQuery.of(ctx).padding.bottom;
         return Container(
           decoration: const BoxDecoration(
-            color: Color(0xFF1E1E1E),
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            color: AppColors.surfaceSecondary,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.modal)),
+            border: Border(
+              top: BorderSide(color: AppColors.borderSubtle),
+            ),
           ),
           child: SafeArea(
             top: true,
             bottom: true,
-            minimum: const EdgeInsets.only(top: 8),
+            minimum: const EdgeInsets.only(top: AppSpacing.sm),
             child: Padding(
-              padding: EdgeInsets.fromLTRB(20, 8, 20, (bottomInset + 24) / 2),
+              padding: EdgeInsets.fromLTRB(
+                AppSpacing.lg + 4,
+                AppSpacing.sm,
+                AppSpacing.lg + 4,
+                (bottomInset + AppSpacing.xl) / 2,
+              ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Center(
                     child: Container(
-                      width: 38,
+                      width: 36,
                       height: 4,
-                      margin: const EdgeInsets.only(bottom: 12),
+                      margin: const EdgeInsets.only(bottom: AppSpacing.md),
                       decoration: BoxDecoration(
-                        color: Colors.white24,
-                        borderRadius: BorderRadius.circular(2),
+                        color: AppColors.borderDefault,
+                        borderRadius: BorderRadius.circular(AppRadius.pill),
                       ),
                     ),
                   ),
                   // Header
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
                   Row(
-                    children: const [
-                      Icon(Icons.tv, color: Color(0xFFE50914), size: 22),
-                      SizedBox(width: 8),
-                      Text(
-                        '切換節目頻道 (Channels)',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            width: 32,
+                            height: 32,
+                            decoration: BoxDecoration(
+                              color: AppColors.accentSoft,
+                              borderRadius: BorderRadius.circular(AppRadius.sm),
+                              border: Border.all(
+                                color: AppColors.accent.withValues(alpha: 0.35),
+                              ),
+                            ),
+                            child: const Icon(Icons.tv_rounded, color: AppColors.accent, size: 18),
+                          ),
+                          const SizedBox(width: AppSpacing.md - 2),
+                          const Text('切換節目頻道 (Channels)', style: AppType.title3Semibold),
+                        ],
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close_rounded, color: AppColors.textSecondary, size: 20),
+                        onPressed: () => Navigator.pop(ctx),
                       ),
                     ],
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white70),
-                    onPressed: () => Navigator.pop(ctx),
+                  const SizedBox(height: AppSpacing.xs + 2),
+                  const Text(
+                    '選擇您想觀賞的綜藝節目，各頻道具備獨立集數清單與分頁快取',
+                    style: AppType.body2Medium,
                   ),
-                ],
-              ),
-              const SizedBox(height: 6),
-              const Text(
-                '選擇您想觀賞的綜藝節目，各頻道具備獨立集數清單與分頁快取',
-                style: TextStyle(color: Colors.white60, fontSize: 13),
-              ),
-              const SizedBox(height: 16),
-              // Channel List
-              ...ShowChannels.all.map((ch) {
-                final isSelected = ch.id == currentChannel.id;
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                  child: Material(
-                    color: isSelected
-                        ? const Color(0xFFE50914).withValues(alpha: 0.15)
-                        : const Color(0xFF2A2A2A),
-                    borderRadius: BorderRadius.circular(12),
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(12),
-                      onTap: () {
-                        Navigator.pop(ctx);
-                        _switchChannel(ch);
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: isSelected ? const Color(0xFFE50914) : Colors.transparent,
-                            width: 1.5,
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 38,
-                              height: 38,
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                color: isSelected
-                                    ? const Color(0xFFE50914).withValues(alpha: 0.3)
-                                    : Colors.white.withValues(alpha: 0.08),
-                                shape: BoxShape.circle,
-                              ),
-                              child: Text(ch.iconEmoji, style: const TextStyle(fontSize: 20)),
+                  const SizedBox(height: AppSpacing.lg),
+                  // Channel List
+                  ...ShowChannels.all.map((ch) {
+                    final isSelected = ch.id == currentChannel.id;
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                      child: Material(
+                        color: isSelected ? AppColors.accentSoft : AppColors.surfaceRaised,
+                        borderRadius: BorderRadius.circular(AppRadius.control + 2),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(AppRadius.control + 2),
+                          onTap: () {
+                            Navigator.pop(ctx);
+                            _switchChannel(ch);
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.lg,
+                              vertical: AppSpacing.md,
                             ),
-                            const SizedBox(width: 14),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(AppRadius.control + 2),
+                              border: Border.all(
+                                color: isSelected ? AppColors.accent : AppColors.borderSubtle,
+                                width: isSelected ? 1.5 : 1,
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 38,
+                                  height: 38,
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                    color: isSelected
+                                        ? AppColors.accent.withValues(alpha: 0.22)
+                                        : AppColors.surfacePrimary,
+                                    borderRadius: BorderRadius.circular(AppRadius.control),
+                                    border: Border.all(
+                                      color: isSelected
+                                          ? AppColors.accent.withValues(alpha: 0.45)
+                                          : AppColors.borderSubtle,
+                                    ),
+                                  ),
+                                  child: Text(ch.iconEmoji, style: const TextStyle(fontSize: 18)),
+                                ),
+                                const SizedBox(width: AppSpacing.md + 2),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        ch.name,
-                                        style: TextStyle(
-                                          color: isSelected ? Colors.white : Colors.white.withValues(alpha: 0.9),
-                                          fontSize: 16,
-                                          fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-                                        ),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            ch.name,
+                                            style: AppType.headlineMedium.copyWith(
+                                              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                                            ),
+                                          ),
+                                          const SizedBox(width: AppSpacing.sm),
+                                          Text(
+                                            ch.englishName,
+                                            style: AppType.caption1Regular.copyWith(
+                                              color: AppColors.textTertiary,
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      const SizedBox(width: 8),
+                                      const SizedBox(height: 2),
                                       Text(
-                                        ch.englishName,
-                                        style: const TextStyle(
-                                          color: Colors.white38,
-                                          fontSize: 12,
+                                        ch.tagline,
+                                        style: AppType.caption1Regular.copyWith(
+                                          color: isSelected
+                                              ? AppColors.textSecondary
+                                              : AppColors.textTertiary,
                                         ),
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    ch.tagline,
-                                    style: TextStyle(
-                                      color: isSelected ? Colors.white70 : Colors.white38,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                                ),
+                                if (isSelected)
+                                  const Icon(Icons.check_circle_rounded, color: AppColors.accent, size: 20),
+                              ],
                             ),
-                            if (isSelected)
-                              const Icon(Icons.check_circle, color: Color(0xFFE50914), size: 22),
-                          ],
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                );
-              }),
-            ],
+                    );
+                  }),
+                ],
+              ),
+            ),
           ),
-        ),
-      ),
-    );
+        );
   },
 );
   }
@@ -654,7 +672,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: CustomScrollView(
           controller: _scrollController,
           slivers: [
-            // Top App Bar with Logo, Download Folder Button, and Refresh
+            // Top App Bar (BoardUI dark secondary surface + hairline bottom separator)
             SliverToBoxAdapter(
               child: Builder(
                 builder: (context) {
@@ -663,14 +681,23 @@ class _HomeScreenState extends State<HomeScreen> {
                   final isMedium = screenWidth < 430;
                   final btnPadding = isCompact
                       ? const EdgeInsets.all(2)
-                      : (isMedium ? const EdgeInsets.all(3) : const EdgeInsets.all(6));
+                      : (isMedium ? const EdgeInsets.all(4) : const EdgeInsets.all(6));
                   final btnConstraints = BoxConstraints(
-                    minWidth: isCompact ? 28 : (isMedium ? 32 : 38),
-                    minHeight: isCompact ? 28 : (isMedium ? 32 : 38),
+                    minWidth: isCompact ? 32 : (isMedium ? 36 : 40),
+                    minHeight: isCompact ? 32 : (isMedium ? 36 : 40),
                   );
 
-                  return Padding(
-                    padding: EdgeInsets.symmetric(horizontal: isCompact ? 3.0 : (isMedium ? 6.0 : 10.0), vertical: 10.0),
+                  return Container(
+                    decoration: const BoxDecoration(
+                      color: AppColors.surfaceSecondary,
+                      border: Border(
+                        bottom: BorderSide(color: AppColors.borderSeparator),
+                      ),
+                    ),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: isCompact ? 8.0 : (isMedium ? 12.0 : 16.0),
+                      vertical: 10.0,
+                    ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -679,72 +706,67 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              // Brand Logo
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFE50914),
-                                  borderRadius: BorderRadius.circular(4),
+                                  color: AppColors.accent,
+                                  borderRadius: BorderRadius.circular(AppRadius.badge),
                                 ),
                                 child: const Text(
                                   'dTV',
                                   style: TextStyle(
                                     color: Colors.white,
-                                    fontWeight: FontWeight.w900,
-                                    fontSize: 15,
-                                    letterSpacing: 1.0,
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 14,
+                                    letterSpacing: 0.6,
                                   ),
                                 ),
                               ),
                               if (!isCompact) ...[
-                                const SizedBox(width: 5),
-                                const Text(
+                                const SizedBox(width: 6),
+                                Text(
                                   'STEAMS',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                    letterSpacing: 1.5,
+                                  style: AppType.body2Medium.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 1.2,
                                   ),
                                 ),
                               ],
-                              SizedBox(width: isCompact ? 3 : (isMedium ? 4 : 6)),
+                              SizedBox(width: isCompact ? 6 : 10),
 
-                              // Channel Switcher Selector Button
+                              // Channel Switcher Selector (BoardUI rounded-2lg control)
                               Flexible(
                                 child: ConstrainedBox(
-                                  constraints: BoxConstraints(maxWidth: isCompact ? 80 : (isMedium ? 120 : 155)),
+                                  constraints: BoxConstraints(maxWidth: isCompact ? 96 : (isMedium ? 132 : 165)),
                                   child: TvFocusableButton(
                                     onPressed: _showChannelPicker,
                                     child: Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
+                                      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFFE50914).withValues(alpha: 0.15),
-                                        borderRadius: BorderRadius.circular(16),
-                                        border: Border.all(
-                                          color: const Color(0xFFE50914).withValues(alpha: 0.6),
-                                          width: 1.2,
-                                        ),
+                                        color: AppColors.surfacePrimary,
+                                        borderRadius: BorderRadius.circular(AppRadius.control),
+                                        border: Border.all(color: AppColors.borderSubtle),
+                                        boxShadow: AppShadows.card,
                                       ),
                                       child: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Text(currentChannel.iconEmoji, style: const TextStyle(fontSize: 12)),
-                                          const SizedBox(width: 3),
+                                          const SizedBox(width: 5),
                                           Flexible(
                                             child: Text(
                                               currentChannel.name,
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 11,
-                                              ),
+                                              style: AppType.caption1Semibold,
                                             ),
                                           ),
-                                          const SizedBox(width: 1),
-                                          const Icon(Icons.arrow_drop_down, color: Colors.white70, size: 15),
+                                          const SizedBox(width: 2),
+                                          const Icon(
+                                            Icons.arrow_drop_down,
+                                            color: AppColors.textSecondary,
+                                            size: 16,
+                                          ),
                                         ],
                                       ),
                                     ),
@@ -759,7 +781,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            // Downloads / Library Icon Button (contains Downloads, Favorites, History)
                             TvFocusableButton(
                               onPressed: _openDownloads,
                               child: IconButton(
@@ -768,16 +789,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                 constraints: btnConstraints,
                                 icon: Icon(
                                   Icons.folder_special,
+                                  size: 20,
                                   color: (activeCount > 0 || downloadedCount > 0)
-                                      ? const Color(0xFFE50914)
-                                      : Colors.white70,
+                                      ? AppColors.accent
+                                      : AppColors.textSecondary,
                                 ),
                                 tooltip: '下載庫',
                                 onPressed: _openDownloads,
                               ),
                             ),
-
-                            // Refresh Icon Button
                             TvFocusableButton(
                               onPressed: () => refreshCatalog(),
                               child: IconButton(
@@ -790,16 +810,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                         height: 18,
                                         child: CircularProgressIndicator(
                                           strokeWidth: 2,
-                                          color: Color(0xFFE50914),
+                                          color: AppColors.accent,
                                         ),
                                       )
-                                    : const Icon(Icons.refresh, color: Colors.white70),
+                                    : const Icon(Icons.refresh, size: 20, color: AppColors.textSecondary),
                                 tooltip: '刷新',
                                 onPressed: () => refreshCatalog(),
                               ),
                             ),
-
-                            // Settings & Updates Icon Button
                             TvFocusableButton(
                               onPressed: () => AboutUpdateDialog.show(context, _updateManager),
                               child: IconButton(
@@ -810,9 +828,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                   _updateManager.updateAvailable
                                       ? Icons.system_update_alt
                                       : Icons.settings_outlined,
+                                  size: 20,
                                   color: _updateManager.updateAvailable
-                                      ? const Color(0xFFE50914)
-                                      : Colors.white70,
+                                      ? AppColors.accent
+                                      : AppColors.textSecondary,
                                 ),
                                 tooltip: '設定與關於',
                                 onPressed: () => AboutUpdateDialog.show(context, _updateManager),
@@ -827,42 +846,62 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
-            // Clean Search Bar (Category pills removed)
+            const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.md)),
+
+            // BoardUI SearchField (10px radius-2lg + hairline border)
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.xs),
                 child: Container(
-                  height: 42,
+                  height: 44,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF222222),
-                    borderRadius: BorderRadius.circular(22),
-                    border: Border.all(color: Colors.white12),
+                    color: AppColors.surfaceSecondary,
+                    borderRadius: BorderRadius.circular(AppRadius.control),
+                    border: Border.all(color: AppColors.borderDefault.withValues(alpha: 0.7)),
+                    boxShadow: AppShadows.card,
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
                   child: Row(
                     children: [
-                      const Icon(Icons.search, size: 20, color: Colors.white54),
-                      const SizedBox(width: 8),
+                      const Icon(Icons.search_rounded, size: 19, color: AppColors.textSecondary),
+                      const SizedBox(width: AppSpacing.sm),
                       Expanded(
                         child: TextField(
                           controller: _searchController,
-                          style: const TextStyle(color: Colors.white, fontSize: 14),
-                          decoration: const InputDecoration(
+                          style: AppType.bodyRegular.copyWith(color: AppColors.textPrimary),
+                          decoration: InputDecoration(
                             hintText: '搜尋集數、日期 (如 2026-11-08) 或地點 (台北、宜蘭)...',
-                            hintStyle: TextStyle(color: Colors.white38, fontSize: 13),
+                            hintStyle: AppType.body2Medium.copyWith(
+                              color: AppColors.textTertiary,
+                              fontWeight: FontWeight.w400,
+                            ),
                             border: InputBorder.none,
                             isDense: true,
                           ),
-                          onChanged: (val) => setState(() { searchQuery = val.trim(); currentPage = 1; }),
+                          onChanged: (val) => setState(() {
+                            searchQuery = val.trim();
+                            currentPage = 1;
+                          }),
                         ),
                       ),
                       if (searchQuery.isNotEmpty)
-                        GestureDetector(
+                        InkWell(
+                          borderRadius: BorderRadius.circular(AppRadius.pill),
                           onTap: () {
                             _searchController.clear();
-                            setState(() { searchQuery = ''; currentPage = 1; });
+                            setState(() {
+                              searchQuery = '';
+                              currentPage = 1;
+                            });
                           },
-                          child: const Icon(Icons.close, size: 18, color: Colors.white54),
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: const BoxDecoration(
+                              color: AppColors.surfacePrimary,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.close, size: 14, color: AppColors.textSecondary),
+                          ),
                         ),
                     ],
                   ),
@@ -870,13 +909,12 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
-            // Year Filter Chips & Sort Order Switcher
+            // Year Filter Chips & Sort Order Switcher (BoardUI Chip & Secondary Button styling)
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 2, 16, 6),
+                padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.xs + 2, AppSpacing.lg, AppSpacing.sm),
                 child: Row(
                   children: [
-                    // Year filter horizontal scrolling chips
                     Expanded(
                       child: SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
@@ -888,22 +926,21 @@ class _HomeScreenState extends State<HomeScreen> {
                               child: FilterChip(
                                 label: Text(
                                   year,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                                    color: isSelected ? Colors.white : Colors.white70,
+                                  style: (isSelected ? AppType.caption1Semibold : AppType.caption1Medium).copyWith(
+                                    fontFeatures: AppType.tabular,
+                                    color: isSelected ? Colors.white : AppColors.textSecondary,
                                   ),
                                 ),
                                 selected: isSelected,
-                                selectedColor: const Color(0xFFE50914),
-                                backgroundColor: const Color(0xFF222222),
+                                selectedColor: AppColors.accent,
+                                backgroundColor: AppColors.surfaceSecondary,
                                 checkmarkColor: Colors.white,
                                 showCheckmark: false,
-                                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
+                                  borderRadius: BorderRadius.circular(AppRadius.badge),
                                   side: BorderSide(
-                                    color: isSelected ? const Color(0xFFE50914) : Colors.white12,
+                                    color: isSelected ? AppColors.accent : AppColors.borderSubtle,
                                   ),
                                 ),
                                 onSelected: (val) {
@@ -918,21 +955,22 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    // Sort order toggle button
+                    const SizedBox(width: AppSpacing.sm),
                     InkWell(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(AppRadius.control),
                       onTap: () {
                         setState(() {
                           isSortAscending = !isSortAscending;
                         });
                       },
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF222222),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: Colors.white12),
+                          color: isSortAscending ? AppColors.accentSoft : AppColors.surfaceSecondary,
+                          borderRadius: BorderRadius.circular(AppRadius.control),
+                          border: Border.all(
+                            color: isSortAscending ? AppColors.accent : AppColors.borderSubtle,
+                          ),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -940,15 +978,13 @@ class _HomeScreenState extends State<HomeScreen> {
                             Icon(
                               isSortAscending ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded,
                               size: 14,
-                              color: isSortAscending ? const Color(0xFFE50914) : Colors.white70,
+                              color: isSortAscending ? AppColors.accent : AppColors.textSecondary,
                             ),
                             const SizedBox(width: 4),
                             Text(
                               isSortAscending ? '舊到新' : '新到舊',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: isSortAscending ? FontWeight.bold : FontWeight.w500,
-                                color: isSortAscending ? const Color(0xFFE50914) : Colors.white,
+                              style: AppType.caption1Semibold.copyWith(
+                                color: isSortAscending ? AppColors.accent : AppColors.textPrimary,
                               ),
                             ),
                           ],
@@ -960,12 +996,12 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
-            const SliverToBoxAdapter(child: SizedBox(height: 12)),
+            const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.sm)),
 
             // Section Status Strip
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.xs),
                 child: Row(
                   children: [
                     const Flexible(
@@ -973,27 +1009,33 @@ class _HomeScreenState extends State<HomeScreen> {
                         '最新劇集與節目 (Episodes)',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                        style: AppType.title3Semibold,
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: AppColors.surfacePrimary,
+                        borderRadius: BorderRadius.circular(AppRadius.xs),
+                      ),
+                      child: Text(
+                        '(${currentDisplayEpisodes.length} 集)',
+                        style: AppType.caption1Semibold.copyWith(
+                          color: AppColors.textSecondary,
+                          fontFeatures: AppType.tabular,
                         ),
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    Text(
-                      '(${currentDisplayEpisodes.length} 集)',
-                      style: const TextStyle(fontSize: 12, color: Colors.white54),
-                    ),
                     if (refreshStatus != null) ...[
-                      const SizedBox(width: 8),
+                      const SizedBox(width: AppSpacing.sm),
                       Flexible(
                         child: Text(
                           refreshStatus!,
                           textAlign: TextAlign.end,
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
-                          style: const TextStyle(fontSize: 11, color: Color(0xFF46D369)),
+                          style: AppType.caption2Medium.copyWith(color: AppColors.success),
                         ),
                       ),
                     ],
@@ -1002,9 +1044,9 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
-            const SliverToBoxAdapter(child: SizedBox(height: 8)),
+            const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.sm)),
 
-            // 1-by-1 Vertical Feed (YouTube Mobile App Style)
+            // 1-by-1 Vertical Feed
             if (isLoadingPage && currentDisplayEpisodes.isEmpty)
               const SliverFillRemaining(
                 hasScrollBody: false,
@@ -1012,9 +1054,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      CircularProgressIndicator(color: Color(0xFFE50914)),
-                      SizedBox(height: 16),
-                      Text('載入最新集數中...', style: TextStyle(color: Colors.white70)),
+                      CircularProgressIndicator(color: AppColors.accent),
+                      SizedBox(height: AppSpacing.lg),
+                      Text('載入最新集數中...', style: AppType.bodyRegular),
                     ],
                   ),
                 ),
@@ -1027,7 +1069,59 @@ class _HomeScreenState extends State<HomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Spacer(),
-                      const Text('無符合篩選條件之集數', style: TextStyle(color: Colors.white54)),
+                      Container(
+                        margin: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.xl,
+                          vertical: AppSpacing.xl,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.surfaceSecondary,
+                          borderRadius: BorderRadius.circular(AppRadius.modal),
+                          border: Border.all(color: AppColors.borderSeparator),
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: 44,
+                              height: 44,
+                              decoration: BoxDecoration(
+                                color: AppColors.surfacePrimary,
+                                borderRadius: BorderRadius.circular(AppRadius.control),
+                              ),
+                              child: const Icon(
+                                Icons.movie_filter_outlined,
+                                color: AppColors.textSecondary,
+                                size: 22,
+                              ),
+                            ),
+                            const SizedBox(height: AppSpacing.md),
+                            const Text('無符合篩選條件之集數', style: AppType.bodyMedium),
+                            if (searchQuery.isNotEmpty || selectedYear != '全部') ...[
+                              const SizedBox(height: AppSpacing.md),
+                              OutlinedButton(
+                                onPressed: () {
+                                  _searchController.clear();
+                                  setState(() {
+                                    searchQuery = '';
+                                    selectedYear = '全部';
+                                    currentPage = 1;
+                                  });
+                                },
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: AppColors.textPrimary,
+                                  side: const BorderSide(color: AppColors.borderDefault),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(AppRadius.control),
+                                  ),
+                                ),
+                                child: const Text('重設篩選條件', style: AppType.body2Medium),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
                       const Spacer(),
                       GooglePaginationBar(
                         currentPage: currentPage,
@@ -1121,12 +1215,10 @@ class GooglePaginationBar extends StatelessWidget {
                 height: 42,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: currentPage > 1
-                      ? const Color(0xFF222222)
-                      : const Color(0xFF161616),
-                  borderRadius: BorderRadius.circular(8),
+                  color: currentPage > 1 ? AppColors.surfaceSecondary : AppColors.surfaceSunken,
+                  borderRadius: BorderRadius.circular(AppRadius.sm),
                   border: Border.all(
-                    color: currentPage > 1 ? Colors.white24 : Colors.white10,
+                    color: currentPage > 1 ? AppColors.borderDefault : AppColors.borderSeparator,
                   ),
                 ),
                 child: Row(
@@ -1136,15 +1228,13 @@ class GooglePaginationBar extends StatelessWidget {
                     Icon(
                       Icons.arrow_back_ios_new,
                       size: 11,
-                      color: currentPage > 1 ? Colors.white : Colors.white24,
+                      color: currentPage > 1 ? AppColors.textPrimary : AppColors.textTertiary,
                     ),
                     const SizedBox(width: 4),
                     Text(
                       '上一頁',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: currentPage > 1 ? Colors.white : Colors.white24,
-                        fontWeight: FontWeight.w600,
+                      style: AppType.caption1Semibold.copyWith(
+                        color: currentPage > 1 ? AppColors.textPrimary : AppColors.textTertiary,
                       ),
                     ),
                   ],
@@ -1169,24 +1259,11 @@ class GooglePaginationBar extends StatelessWidget {
                     height: 42,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: p == currentPage
-                          ? const Color(0xFFE50914)
-                          : const Color(0xFF222222),
-                      borderRadius: BorderRadius.circular(8),
+                      color: p == currentPage ? AppColors.accent : AppColors.surfaceSecondary,
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
                       border: Border.all(
-                        color: p == currentPage
-                            ? const Color(0xFFE50914)
-                            : Colors.white24,
+                        color: p == currentPage ? AppColors.accent : AppColors.borderSubtle,
                       ),
-                      boxShadow: p == currentPage
-                          ? [
-                              BoxShadow(
-                                color: const Color(0xFFE50914).withValues(alpha: 0.5),
-                                blurRadius: 8,
-                                spreadRadius: 1,
-                              )
-                            ]
-                          : null,
                     ),
                     child: (isLoading && p == currentPage)
                         ? const SizedBox(
@@ -1199,12 +1276,10 @@ class GooglePaginationBar extends StatelessWidget {
                           )
                         : Text(
                             '$p',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: p == currentPage
-                                  ? FontWeight.w900
-                                  : FontWeight.w600,
-                              color: p == currentPage ? Colors.white : Colors.white70,
+                            style: AppType.bodyMedium.copyWith(
+                              fontFeatures: AppType.tabular,
+                              fontWeight: p == currentPage ? FontWeight.w700 : FontWeight.w500,
+                              color: p == currentPage ? Colors.white : AppColors.textSecondary,
                             ),
                           ),
                   ),
@@ -1227,13 +1302,13 @@ class GooglePaginationBar extends StatelessWidget {
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: currentPage < effectiveTotal
-                      ? const Color(0xFF222222)
-                      : const Color(0xFF161616),
-                  borderRadius: BorderRadius.circular(8),
+                      ? AppColors.surfaceSecondary
+                      : AppColors.surfaceSunken,
+                  borderRadius: BorderRadius.circular(AppRadius.sm),
                   border: Border.all(
                     color: currentPage < effectiveTotal
-                        ? Colors.white24
-                        : Colors.white10,
+                        ? AppColors.borderDefault
+                        : AppColors.borderSeparator,
                   ),
                 ),
                 child: Row(
@@ -1242,12 +1317,10 @@ class GooglePaginationBar extends StatelessWidget {
                   children: [
                     Text(
                       '下一頁',
-                      style: TextStyle(
-                        fontSize: 12,
+                      style: AppType.caption1Semibold.copyWith(
                         color: currentPage < effectiveTotal
-                            ? Colors.white
-                            : Colors.white24,
-                        fontWeight: FontWeight.w600,
+                            ? AppColors.textPrimary
+                            : AppColors.textTertiary,
                       ),
                     ),
                     const SizedBox(width: 4),
@@ -1255,8 +1328,8 @@ class GooglePaginationBar extends StatelessWidget {
                       Icons.arrow_forward_ios,
                       size: 11,
                       color: currentPage < effectiveTotal
-                          ? Colors.white
-                          : Colors.white24,
+                          ? AppColors.textPrimary
+                          : AppColors.textTertiary,
                     ),
                   ],
                 ),

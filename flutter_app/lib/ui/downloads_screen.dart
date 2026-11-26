@@ -214,11 +214,11 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
       child: Scaffold(
       backgroundColor: AppColors.canvas,
       appBar: AppBar(
-        backgroundColor: AppColors.surfaceOverlay,
+        backgroundColor: AppColors.surfaceSecondary,
         elevation: 0,
         bottom: const PreferredSize(
           preferredSize: Size.fromHeight(1),
-          child: Divider(color: AppColors.borderSubtle, height: 1),
+          child: Divider(color: AppColors.borderSeparator, height: 1),
         ),
         title: Row(
           children: [
@@ -227,25 +227,23 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                 appBarTitle,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                style: AppType.title3Semibold,
               ),
             ),
             if (_currentTabIndex == 1 && favoritesCount > 0) ...[
               const SizedBox(width: AppSpacing.sm),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: AppColors.accent.withValues(alpha: 0.16),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: AppColors.accent.withValues(alpha: 0.45)),
+                  color: AppColors.accentSoft,
+                  borderRadius: BorderRadius.circular(AppRadius.xs),
+                  border: Border.all(color: AppColors.accent.withValues(alpha: 0.4)),
                 ),
                 child: Text(
                   '$favoritesCount',
-                  style: const TextStyle(
+                  style: AppType.caption1Semibold.copyWith(
                     color: AppColors.accent,
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                    fontFeatures: [FontFeature.tabularFigures()],
+                    fontFeatures: AppType.tabular,
                   ),
                 ),
               ),
@@ -254,16 +252,14 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: AppColors.surfaceInteractive,
-                  borderRadius: BorderRadius.circular(10),
+                  color: AppColors.surfacePrimary,
+                  borderRadius: BorderRadius.circular(AppRadius.xs),
                 ),
                 child: Text(
                   '${historyRecords.length}',
-                  style: const TextStyle(
+                  style: AppType.caption1Semibold.copyWith(
                     color: AppColors.textSecondary,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    fontFeatures: [FontFeature.tabularFigures()],
+                    fontFeatures: AppType.tabular,
                   ),
                 ),
               ),
@@ -356,15 +352,16 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
         children: [
           CustomScrollView(
             slivers: [
-          // Storage Summary Card (4px grid aligned with YouTubeEpisodeCard)
+          // Storage Summary Card (BoardUI dark secondary surface + hairline border)
           SliverToBoxAdapter(
             child: Container(
               margin: const EdgeInsets.all(AppSpacing.md),
-              padding: const EdgeInsets.all(AppSpacing.md),
+              padding: const EdgeInsets.all(AppSpacing.lg),
               decoration: BoxDecoration(
-                color: AppColors.cardBg,
+                color: AppColors.surfaceSecondary,
                 borderRadius: BorderRadius.circular(AppRadius.card),
-                border: Border.all(color: AppColors.borderSubtle),
+                border: Border.all(color: AppColors.borderSeparator),
+                boxShadow: AppShadows.card,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -376,8 +373,8 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                         height: 40,
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
-                          color: AppColors.surfaceInteractive,
-                          borderRadius: BorderRadius.circular(AppRadius.chip),
+                          color: AppColors.surfacePrimary,
+                          borderRadius: BorderRadius.circular(AppRadius.control),
                           border: Border.all(color: AppColors.borderSubtle),
                         ),
                         child: const Icon(Icons.storage, color: AppColors.textSecondary, size: 20),
@@ -387,18 +384,13 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              '本機離線空間',
-                              style: TextStyle(fontSize: 12, color: AppColors.textMuted),
-                            ),
+                            Text('本機離線空間', style: AppType.caption1Medium),
                             const SizedBox(height: 2),
                             Text(
                               '$totalSize • ${episodes.length} 部節目${activeList.isNotEmpty ? " (${activeList.length} 個分段下載中)" : ""}',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimary,
-                                fontFeatures: [FontFeature.tabularFigures()],
+                              style: AppType.headlineMedium.copyWith(
+                                fontWeight: FontWeight.w600,
+                                fontFeatures: AppType.tabular,
                               ),
                             ),
                           ],
@@ -407,14 +399,14 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                     ],
                   ),
                   const SizedBox(height: AppSpacing.md),
-                  const Divider(color: AppColors.borderSubtle, height: 1),
+                  const Divider(color: AppColors.borderSeparator, height: 1),
                   const SizedBox(height: AppSpacing.sm),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Padding(
                         padding: EdgeInsets.only(top: 1),
-                        child: Icon(Icons.folder_open, size: 14, color: AppColors.textMuted),
+                        child: Icon(Icons.folder_open, size: 14, color: AppColors.textTertiary),
                       ),
                       const SizedBox(width: AppSpacing.xs),
                       Expanded(
@@ -424,9 +416,8 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                             folderPath.isNotEmpty ? folderPath : '正在載入儲存路徑...',
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 11,
-                              color: AppColors.textMuted,
+                            style: AppType.caption2Medium.copyWith(
+                              color: AppColors.textSecondary,
                               fontFamily: 'monospace',
                             ),
                           ),
@@ -444,7 +435,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                             foregroundColor: AppColors.textSecondary,
                             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
                             minimumSize: const Size(0, 44),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.chip)),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.control)),
                           ),
                           onPressed: () => StorageLocationHelper.handleResetStorage(
                             context,
@@ -453,7 +444,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                             },
                           ),
                           icon: const Icon(Icons.restore, size: 15),
-                          label: const Text('還原預設', style: TextStyle(fontSize: 12)),
+                          label: const Text('還原預設', style: AppType.caption1Medium),
                         ),
                         const SizedBox(width: AppSpacing.sm),
                       ],
@@ -461,9 +452,10 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.accent,
                           foregroundColor: AppColors.textPrimary,
+                          elevation: 0,
                           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
                           minimumSize: const Size(0, 44),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.chip)),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.control)),
                         ),
                         onPressed: () => StorageLocationHelper.showStoragePickerSheet(
                           context,
@@ -472,7 +464,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                           },
                         ),
                         icon: const Icon(Icons.drive_file_move_outlined, size: 15),
-                        label: const Text('變更位置', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+                        label: Text('變更位置', style: AppType.caption1Semibold.copyWith(color: Colors.white)),
                       ),
                     ],
                   ),
@@ -519,37 +511,38 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
-                        width: 72,
-                        height: 72,
+                        width: 56,
+                        height: 56,
                         decoration: BoxDecoration(
-                          color: AppColors.cardBg,
-                          shape: BoxShape.circle,
-                          border: Border.all(color: AppColors.borderSubtle),
+                          color: AppColors.surfaceSecondary,
+                          borderRadius: BorderRadius.circular(AppRadius.card),
+                          border: Border.all(color: AppColors.borderSeparator),
                         ),
-                        child: const Icon(Icons.download_for_offline_outlined, size: 36, color: AppColors.textMuted),
+                        child: const Icon(Icons.download_for_offline_outlined, size: 28, color: AppColors.textSecondary),
                       ),
                       const SizedBox(height: AppSpacing.lg),
-                      const Text(
-                        '尚無已下載的離線影片',
-                        style: TextStyle(color: AppColors.textPrimary, fontSize: 17, fontWeight: FontWeight.bold),
-                      ),
+                      const Text('尚無已下載的離線影片', style: AppType.title3Semibold),
                       const SizedBox(height: AppSpacing.sm),
-                      const Text(
+                      Text(
                         '在首頁或播放器中點擊「下載」按鈕，即可將節目儲存至本機資料夾隨時離線觀看。',
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: AppColors.textMuted, fontSize: 13, height: 1.4),
+                        style: AppType.body2Medium.copyWith(
+                          color: AppColors.textSecondary,
+                          fontWeight: FontWeight.w400,
+                        ),
                       ),
                       const SizedBox(height: AppSpacing.lg),
                       ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.accent,
                           foregroundColor: AppColors.textPrimary,
+                          elevation: 0,
                           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
                           minimumSize: const Size(0, 44),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.control)),
                         ),
                         icon: const Icon(Icons.explore_outlined, size: 18),
-                        label: const Text('瀏覽節目清單', style: TextStyle(fontWeight: FontWeight.bold)),
+                        label: const Text('瀏覽節目清單', style: AppType.bodyMedium),
                         onPressed: () => Navigator.of(context).pop(),
                       ),
                     ],

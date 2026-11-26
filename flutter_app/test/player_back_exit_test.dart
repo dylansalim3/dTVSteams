@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:dtvsteams/catalog/parser.dart';
+import 'package:dtvsteams/services/pip_manager.dart';
 import 'package:dtvsteams/ui/player_screen.dart';
 
 void main() {
@@ -200,6 +201,70 @@ void main() {
 
       expect(platformCalls.any((c) => c.arguments == 'SystemUiMode.edgeToEdge'), isFalse);
       expect(hasNormalBarsRestored(platformCalls), isTrue);
+    });
+
+    testWidgets('PipManager forwards playback state, enters PiP with state, and dispatches native PiP play/pause actions',
+        (WidgetTester tester) async {
+      final pipManager = PipManager();
+      final List<String> receivedActions = [];
+      pipManager.onPipAction = receivedActions.add;
+      addTearDown(() => pipManager.onPipAction = null);
+
+      await pipManager.setAutoPip(false);
+      pipCalls.clear();
+
+      await pipManager.setPlaybackState(true);
+      await pipManager.setPlaybackState(true); // Deduplicated identical state
+      await pipManager.setPlaybackState(false);
+      await pipManager.enterPip(isPlaying: true);
+
+      expect(
+        pipCalls.where((c) => c.method == 'setPipPlaybackState').map((c) => c.arguments['isPlaying']).toList(),
+        [true, false],
+      );
+      final enterCall = pipCalls.lastWhere((c) => c.method == 'enterPip');
+      expect(enterCall.arguments, {'isPlaying': true});
+
+      // Simulate native BroadcastReceiver invoking onPipAction from PiP RemoteAction
+      const codec = StandardMethodCodec();
+      await TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.handlePlatformMessage(
+        'com.dtvsteams.dtvsteams/pip',
+        codec.encodeMethodCall(const MethodCall('onPipAction', 'pause')),
+        (_) {},
+      );
+      await TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.handlePlatformMessage(
+        'com.dtvsteams.dtvsteams/pip',
+        codec.encodeMethodCall(const MethodCall('onPipAction', 'play')),
+        (_) {},
+      );
+      await tester.pump();
+
+      expect(receivedActions, ['pause', 'play']);
+
+      // Verify tapping OSD PiP icon sends current playing state into enterPip
+      final testEp = CatalogEpisode(
+        id: 'https://example.com/player_pip_button_test',
+        title: '綜藝玩很大 2026-11-08 台北 PiP 按鈕測試',
+        date: '2026-11-08',
+        url: 'https://example.com/player_pip_button_test',
+        parts: [
+          CatalogPart(label: 'Part 1', url: 'https://example.com/part1', streamUrl: 'https://example.com/stream.m3u8'),
+        ],
+      );
+      await tester.pumpWidget(MaterialApp(
+        home: NativePlayerScreen(episode: testEp, initialPartIndex: 0),
+      ));
+      await tester.pump();
+      pipCalls.clear();
+
+      await tester.tap(find.byIcon(Icons.picture_in_picture_alt));
+      await tester.pump();
+
+      expect(pipCalls.any((c) => c.method == 'enterPip' && c.arguments['isPlaying'] == false), isTrue);
+      expect(find.byKey(const ValueKey('player_time_display')), findsOneWidget);
+      expect(find.byIcon(Icons.replay_10), findsNothing);
+      expect(find.byIcon(Icons.forward_10), findsNothing);
+      expect(find.textContaining('1080p'), findsNothing);
     });
   });
 }

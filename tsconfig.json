@@ -6,7 +6,11 @@
     "jsx": "react-jsx",
     "strict": true,
     "skipLibCheck": true,
-    "types": ["node"]
+    "types": ["node"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/react/*"]
+    }
   },
   "include": ["catalog-core/src", "catalog-core/tests", "tests", "src"]
 }

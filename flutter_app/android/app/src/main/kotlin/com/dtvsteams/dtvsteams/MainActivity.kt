@@ -1,10 +1,16 @@
 package com.dtvsteams.dtvsteams
 
 import android.app.Activity
+import android.app.PendingIntent
 import android.app.PictureInPictureParams
+import android.app.RemoteAction
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.graphics.drawable.Icon
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
@@ -13,6 +19,8 @@ import android.provider.Settings
 import android.util.Rational
 import android.view.WindowManager
 import androidx.annotation.NonNull
+import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -26,6 +34,10 @@ class MainActivity : FlutterActivity() {
     private val STORAGE_CHANNEL = "com.dtvsteams.dtvsteams/storage"
     private val SHARE_CHANNEL = "com.dtvsteams.dtvsteams/share"
     private val REQUEST_CODE_PICK_DIR = 3001
+    private val ACTION_PIP_CONTROL = "com.dtvsteams.dtvsteams.ACTION_PIP_CONTROL"
+    private val EXTRA_CONTROL_TYPE = "control_type"
+    private val CONTROL_TYPE_PLAY = 1
+    private val CONTROL_TYPE_PAUSE = 2
 
     private var pipChannel: MethodChannel? = null
     private var updateChannel: MethodChannel? = null
@@ -34,9 +46,12 @@ class MainActivity : FlutterActivity() {
     private var shareChannel: MethodChannel? = null
     private var pendingDirResult: MethodChannel.Result? = null
     private var autoPipEnabled: Boolean = false
+    private var pipIsPlaying: Boolean = false
+    private var pipActionReceiver: BroadcastReceiver? = null
 
     override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+        registerPipActionReceiver()
         pipChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, PIP_CHANNEL)
         pipChannel?.setMethodCallHandler { call, result ->
             when (call.method) {
@@ -49,20 +64,22 @@ class MainActivity : FlutterActivity() {
                     }
                 }
                 "enterPip" -> {
+                    call.argument<Boolean>("isPlaying")?.let { pipIsPlaying = it }
                     val success = enterPipMode()
                     result.success(success)
                 }
                 "setAutoPip" -> {
                     val enabled = call.argument<Boolean>("enabled") ?: false
                     autoPipEnabled = enabled
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        try {
-                            val rational = Rational(16, 9)
-                            val builder = PictureInPictureParams.Builder()
-                                .setAspectRatio(rational)
-                                .setAutoEnterEnabled(enabled)
-                            setPictureInPictureParams(builder.build())
-                        } catch (e: Exception) {}
+                    call.argument<Boolean>("isPlaying")?.let { pipIsPlaying = it }
+                    updatePipParamsIfNeeded()
+                    result.success(true)
+                }
+                "setPipPlaybackState" -> {
+                    val playing = call.argument<Boolean>("isPlaying") ?: false
+                    if (pipIsPlaying != playing) {
+                        pipIsPlaying = playing
+                        updatePipParamsIfNeeded()
                     }
                     result.success(true)
                 }
@@ -517,16 +534,88 @@ class MainActivity : FlutterActivity() {
         return uri.path
     }
 
+    private fun registerPipActionReceiver() {
+        unregisterPipActionReceiver()
+        val receiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                if (intent?.action != ACTION_PIP_CONTROL) return
+                val controlType = intent.getIntExtra(EXTRA_CONTROL_TYPE, 0)
+                val actionName = when (controlType) {
+                    CONTROL_TYPE_PAUSE -> "pause"
+                    CONTROL_TYPE_PLAY -> "play"
+                    else -> "togglePlayPause"
+                }
+                pipChannel?.invokeMethod("onPipAction", actionName)
+            }
+        }
+        ContextCompat.registerReceiver(
+            this,
+            receiver,
+            IntentFilter(ACTION_PIP_CONTROL),
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
+        pipActionReceiver = receiver
+    }
+
+    private fun unregisterPipActionReceiver() {
+        try {
+            pipActionReceiver?.let { unregisterReceiver(it) }
+        } catch (_: Exception) {}
+        pipActionReceiver = null
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun buildPlayPauseRemoteAction(isPlaying: Boolean): RemoteAction {
+        val controlType = if (isPlaying) CONTROL_TYPE_PAUSE else CONTROL_TYPE_PLAY
+        val iconRes = if (isPlaying) {
+            android.R.drawable.ic_media_pause
+        } else {
+            android.R.drawable.ic_media_play
+        }
+        val title = if (isPlaying) "暫停" else "播放"
+        val intent = Intent(ACTION_PIP_CONTROL).apply {
+            setPackage(packageName)
+            putExtra(EXTRA_CONTROL_TYPE, controlType)
+        }
+        val flags = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        val pendingIntent = PendingIntent.getBroadcast(this, controlType, intent, flags)
+        return RemoteAction(
+            Icon.createWithResource(this, iconRes),
+            title,
+            title,
+            pendingIntent
+        )
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun buildPipParams(): PictureInPictureParams {
+        val builder = PictureInPictureParams.Builder()
+            .setAspectRatio(Rational(16, 9))
+            .setActions(listOf(buildPlayPauseRemoteAction(pipIsPlaying)))
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            builder.setAutoEnterEnabled(autoPipEnabled)
+        }
+        return builder.build()
+    }
+
+    private fun updatePipParamsIfNeeded() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
+        val shouldUpdate = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            isInPictureInPictureMode || autoPipEnabled
+        } else {
+            isInPictureInPictureMode
+        }
+        if (shouldUpdate) {
+            try {
+                setPictureInPictureParams(buildPipParams())
+            } catch (_: Exception) {}
+        }
+    }
+
     private fun enterPipMode(): Boolean {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             try {
-                val rational = Rational(16, 9)
-                val builder = PictureInPictureParams.Builder()
-                    .setAspectRatio(rational)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    builder.setAutoEnterEnabled(autoPipEnabled)
-                }
-                return enterPictureInPictureMode(builder.build())
+                return enterPictureInPictureMode(buildPipParams())
             } catch (e: Exception) {
                 return false
             }
@@ -543,10 +632,14 @@ class MainActivity : FlutterActivity() {
 
     override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration?) {
         super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
+        if (isInPictureInPictureMode) {
+            updatePipParamsIfNeeded()
+        }
         pipChannel?.invokeMethod("onPipModeChanged", isInPictureInPictureMode)
     }
 
     override fun onDestroy() {
+        unregisterPipActionReceiver()
         try {
             window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             val serviceIntent = Intent(this, BackgroundAudioService::class.java).apply {

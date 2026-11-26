@@ -482,24 +482,26 @@ void showDownloadSelectionSheet(
                   children: [
                     Center(
                       child: Container(
-                        width: 38,
+                        width: 36,
                         height: 4,
                         margin: const EdgeInsets.only(bottom: AppSpacing.md),
                         decoration: BoxDecoration(
-                          color: Colors.white24,
-                          borderRadius: BorderRadius.circular(2),
+                          color: AppColors.borderDefault,
+                          borderRadius: BorderRadius.circular(AppRadius.pill),
                         ),
                       ),
                     ),
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(AppSpacing.sm),
+                          width: 38,
+                          height: 38,
                           decoration: BoxDecoration(
-                            color: AppColors.accent.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(AppRadius.card),
+                            color: AppColors.accentSoft,
+                            borderRadius: BorderRadius.circular(AppRadius.control),
+                            border: Border.all(color: AppColors.accent.withValues(alpha: 0.35)),
                           ),
-                          child: const Icon(Icons.download_for_offline, color: AppColors.accent, size: 22),
+                          child: const Icon(Icons.download_for_offline, color: AppColors.accent, size: 20),
                         ),
                         const SizedBox(width: AppSpacing.md),
                         Expanded(
@@ -509,45 +511,32 @@ void showDownloadSelectionSheet(
                               if (showName.isNotEmpty) ...[
                                 Text(
                                   '$showEmoji $showName',
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    color: AppColors.accent,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                  style: AppType.caption1Semibold.copyWith(color: AppColors.accent),
                                 ),
                                 const SizedBox(height: 2),
                               ],
-                              const Text(
-                                '下載分段管理',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.textPrimary,
-                                ),
-                              ),
+                              const Text('下載分段管理', style: AppType.title3Semibold),
                               const SizedBox(height: 2),
                               Text(
                                 allDone
                                     ? '已下載全部分段 (${parts.length}/${parts.length}) • 可離線觀看'
                                     : '已下載 $downloadedCount/${parts.length} 個分段 • 點擊選擇分段下載',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: allDone ? AppColors.success : AppColors.textMuted,
-                                  fontWeight: FontWeight.w500,
-                                  fontFeatures: const [FontFeature.tabularFigures()],
+                                style: AppType.caption1Medium.copyWith(
+                                  color: allDone ? AppColors.success : AppColors.textSecondary,
+                                  fontFeatures: AppType.tabular,
                                 ),
                               ),
                             ],
                           ),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.close, color: AppColors.textMuted, size: 20),
+                          icon: const Icon(Icons.close, color: AppColors.textSecondary, size: 20),
                           onPressed: () => Navigator.of(ctx).pop(),
                         ),
                       ],
                     ),
                     const SizedBox(height: AppSpacing.md),
-                    const Divider(color: AppColors.borderSubtle, height: 1),
+                    const Divider(color: AppColors.borderSeparator, height: 1),
                     const SizedBox(height: AppSpacing.md),
 
                     // One-tap Batch Download All Parts Button
@@ -558,13 +547,14 @@ void showDownloadSelectionSheet(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.accent,
                             foregroundColor: AppColors.textPrimary,
+                            elevation: 0,
                             minimumSize: const Size(0, 44),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.card)),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.control)),
                           ),
                           icon: const Icon(Icons.download_for_offline, size: 18),
                           label: Text(
                             '一鍵下載全集 (剩餘 ${parts.length - downloadedCount} 個未下載分段)',
-                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                            style: AppType.body2Medium.copyWith(fontWeight: FontWeight.w600, fontFeatures: AppType.tabular),
                           ),
                           onPressed: () {
                             Navigator.of(ctx).pop();
@@ -848,7 +838,7 @@ void showDownloadSelectionSheet(
                                       ),
                                       icon: Icon(isFail ? Icons.refresh : Icons.download, size: 16),
                                       label: Text(
-                                        isFail ? '重試下載 (${p.label})' : '下載全集 (1080p FHD)',
+                                        isFail ? '重試下載 (${p.label})' : '下載全集',
                                         style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                                       ),
                                       onPressed: () {
@@ -1018,17 +1008,18 @@ class YouTubeEpisodeCard extends StatelessWidget {
     }
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
+      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs + 1),
       decoration: BoxDecoration(
-        color: AppColors.cardBg,
+        color: AppColors.surfaceSecondary,
         borderRadius: BorderRadius.circular(AppRadius.card),
         border: Border.all(
           color: downloadedParts > 0
-              ? AppColors.success.withValues(alpha: 0.35)
+              ? AppColors.success.withValues(alpha: 0.4)
               : (failedParts > 0
-                  ? AppColors.warning.withValues(alpha: 0.45)
-                  : AppColors.borderSubtle),
+                  ? AppColors.warning.withValues(alpha: 0.5)
+                  : AppColors.borderSeparator),
         ),
+        boxShadow: AppShadows.card,
       ),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.md),
@@ -1157,22 +1148,6 @@ class YouTubeEpisodeCard extends StatelessWidget {
                                 ],
                               ),
                             ],
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                              decoration: BoxDecoration(
-                                color: Colors.black45,
-                                borderRadius: BorderRadius.circular(AppRadius.badge),
-                                border: Border.all(color: AppColors.borderSubtle),
-                              ),
-                              child: const Text(
-                                '1080p FHD',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  color: AppColors.textSecondary,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
                             if (isEpDone) ...[
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
@@ -1381,7 +1356,7 @@ class YouTubeEpisodeCard extends StatelessWidget {
                           ? () => showDownloadSelectionSheet(context, episode, downloadManager)
                           : () => onPartTapped(idx),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                         decoration: BoxDecoration(
                           color: isPartDown
                               ? AppColors.successSurface
@@ -1389,27 +1364,18 @@ class YouTubeEpisodeCard extends StatelessWidget {
                                   ? AppColors.dangerSurface
                                   : (isPartFailed
                                       ? AppColors.warningSurface
-                                      : (isPartWatched ? AppColors.successMutedSurface : AppColors.surfaceInteractive))),
-                          borderRadius: BorderRadius.circular(AppRadius.chip),
+                                      : (isPartWatched ? AppColors.successMutedSurface : AppColors.surfacePrimary))),
+                          borderRadius: BorderRadius.circular(AppRadius.sm),
                           border: Border.all(
                             color: isPartDown
-                                ? AppColors.success
+                                ? AppColors.success.withValues(alpha: 0.75)
                                 : (isPartDownloading
                                     ? AppColors.accent
                                     : (isPartFailed
                                         ? AppColors.warning
-                                        : (isPartWatched ? AppColors.success.withValues(alpha: 0.6) : AppColors.borderSubtle))),
-                            width: (isPartDown || isPartFailed) ? 1.4 : 1.0,
+                                        : (isPartWatched ? AppColors.success.withValues(alpha: 0.5) : AppColors.borderSubtle))),
+                            width: (isPartDown || isPartFailed) ? 1.2 : 1.0,
                           ),
-                          boxShadow: isPartDown
-                              ? [
-                                  BoxShadow(
-                                    color: AppColors.success.withValues(alpha: 0.3),
-                                    blurRadius: 4,
-                                    spreadRadius: 0.5,
-                                  ),
-                                ]
-                              : null,
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
