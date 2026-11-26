@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/dylansalim3/dTVSteams/compare/v1.2.7...v1.3.0) (2026-11-26)
+
+
+### Features
+
+* **ui,player:** center play/pause, enable PiP playback controls, and redesign React & Flutter UI with BoardUI ([deb5379](https://github.com/dylansalim3/dTVSteams/commit/deb53795611e4a979ef4abe79047b40c0ff5381d))
+
 ## [1.2.7](https://github.com/dylansalim3/dTVSteams/compare/v1.2.6...v1.2.7) (2026-11-26)
 
 
