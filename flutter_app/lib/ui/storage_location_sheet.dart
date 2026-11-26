@@ -25,6 +25,7 @@ class StorageLocationHelper {
       isScrollControlled: true,
       useSafeArea: true,
       builder: (ctx) {
+        AppColors.watch(ctx);
         final mediaQuery = MediaQuery.of(ctx);
         final maxHeight = mediaQuery.size.height * 0.72;
         return ConstrainedBox(

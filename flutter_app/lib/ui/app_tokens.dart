@@ -30,6 +30,16 @@ abstract final class AppPrimitives {
   static const Color green500 = Color(0xFF46D369);
 }
 
+/// Inherited scope that notifies any dependent widget whenever [SettingsManager]
+/// changes theme so even `const` subtrees and pushed routes repaint immediately.
+class AppThemeScope extends InheritedNotifier<Listenable> {
+  const AppThemeScope({
+    super.key,
+    required Listenable notifier,
+    required super.child,
+  }) : super(notifier: notifier);
+}
+
 /// Semantic color roles dynamically backed by the active [AppThemePalette].
 abstract final class AppColors {
   static AppThemePalette _active = AppThemes.boardUiDefault;
@@ -37,6 +47,14 @@ abstract final class AppColors {
   static AppThemePalette get activeTheme => _active;
   static void setThemeById(String? id) {
     _active = AppThemes.byId(id);
+  }
+
+  /// Registers a build dependency on [AppThemeScope] (and [Theme.of]) so
+  /// any widget reading `AppColors.*` rebuilds synchronously on theme change.
+  static AppThemePalette watch(BuildContext context) {
+    context.dependOnInheritedWidgetOfExactType<AppThemeScope>();
+    Theme.of(context);
+    return _active;
   }
 
   static Brightness get brightness => _active.brightness;
@@ -272,6 +290,7 @@ class CompactSwitchTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.watch(context);
     final activeTrack = AppColors.accent;
     final activeThumb = AppColors.onAccent;
     final inactiveTrack = AppColors.surfaceInteractive;

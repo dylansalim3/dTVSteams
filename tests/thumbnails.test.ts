@@ -5,29 +5,8 @@ import path from "node:path";
 import { generateEpisodeThumbnailSvg } from "../scripts/thumbnail-generator.mjs";
 
 describe("Episode Thumbnails System Integrity", () => {
-  const webCatalogPath = path.resolve(__dirname, "../web-app/catalog.json");
   const tvCatalogPath = path.resolve(__dirname, "../tv-web/catalog.json");
-  const webCatalog = JSON.parse(fs.readFileSync(webCatalogPath, "utf-8"));
   const tvCatalog = JSON.parse(fs.readFileSync(tvCatalogPath, "utf-8"));
-
-  it("ensures web-app catalog has no broken tmdb or generic preview.png thumbnails", () => {
-    expect(webCatalog.episodes.length).toBeGreaterThan(0);
-    for (const ep of webCatalog.episodes) {
-      expect(ep.poster).toBeDefined();
-      expect(ep.poster).not.toContain("tmdb.org");
-      expect(ep.poster).not.toContain("preview.png");
-      expect(ep.backdrop).toBeDefined();
-      expect(ep.backdrop).not.toContain("tmdb.org");
-      expect(ep.backdrop).not.toContain("preview.png");
-
-      // Check physical file exists on disk
-      const filePath = path.resolve(__dirname, "../web-app", ep.poster.replace(/^\.\//, ""));
-      expect(fs.existsSync(filePath), `Thumbnail file missing: ${filePath}`).toBe(true);
-      const content = fs.readFileSync(filePath, "utf-8");
-      expect(content).toContain("<svg");
-      expect(content).toContain("綜藝玩很大");
-    }
-  });
 
   it("ensures tv-web catalog has no broken tmdb or generic preview.png thumbnails", () => {
     expect(tvCatalog.episodes.length).toBeGreaterThan(0);
@@ -35,9 +14,24 @@ describe("Episode Thumbnails System Integrity", () => {
       expect(ep.poster).toBeDefined();
       expect(ep.poster).not.toContain("tmdb.org");
       expect(ep.poster).not.toContain("preview.png");
+      expect(ep.backdrop).toBeDefined();
+      expect(ep.backdrop).not.toContain("tmdb.org");
+      expect(ep.backdrop).not.toContain("preview.png");
 
       const filePath = path.resolve(__dirname, "../tv-web", ep.poster.replace(/^\.\//, ""));
       expect(fs.existsSync(filePath), `TV thumbnail file missing: ${filePath}`).toBe(true);
+      const content = fs.readFileSync(filePath, "utf-8");
+      expect(content).toContain("<svg");
+      expect(content).toContain("綜藝玩很大");
+    }
+  });
+
+  it("ensures legacy normal web-app directory is removed and dist/react contains hydrated catalog", () => {
+    expect(fs.existsSync(path.resolve(__dirname, "../web-app"))).toBe(false);
+    const reactCatalogPath = path.resolve(__dirname, "../dist/react/catalog.json");
+    if (fs.existsSync(reactCatalogPath)) {
+      const reactCatalog = JSON.parse(fs.readFileSync(reactCatalogPath, "utf-8"));
+      expect(reactCatalog.episodes.length).toBeGreaterThan(0);
     }
   });
 
@@ -56,10 +50,8 @@ describe("Episode Thumbnails System Integrity", () => {
     expect(svg).toContain("1080P HD");
   });
 
-  it("provides reliable fallback thumbnail thumb-default.svg", () => {
-    const defaultWeb = path.resolve(__dirname, "../web-app/media/thumb-default.svg");
+  it("provides reliable fallback thumbnail thumb-default.svg in tv-web", () => {
     const defaultTv = path.resolve(__dirname, "../tv-web/media/thumb-default.svg");
-    expect(fs.existsSync(defaultWeb)).toBe(true);
     expect(fs.existsSync(defaultTv)).toBe(true);
   });
 });

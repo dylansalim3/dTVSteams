@@ -2036,6 +2036,7 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
 
   @override
   Widget build(BuildContext context) {
+    AppColors.watch(context);
     _syncSystemUiMode();
     final parts = _currentEpisode.parts;
     final currentPart = parts.isNotEmpty && _currentPartIndex < parts.length

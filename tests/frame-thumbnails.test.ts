@@ -4,7 +4,7 @@ import path from "node:path";
 import { JSDOM } from "jsdom";
 
 const scriptSource = fs.readFileSync(
-  path.resolve(__dirname, "../web-app/frame-thumbnails.js"),
+  path.resolve(__dirname, "../tv-web/frame-thumbnails.js"),
   "utf-8"
 );
 

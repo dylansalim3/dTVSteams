@@ -34,6 +34,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.watch(context);
     final records = _historyManager.allRecordsSorted;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -247,6 +248,7 @@ class _HistoryBodyState extends State<HistoryBody> {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.watch(context);
     final records = _historyManager.allRecordsSorted;
     return records.isEmpty ? _buildEmptyState() : _buildHistoryList(records);
   }

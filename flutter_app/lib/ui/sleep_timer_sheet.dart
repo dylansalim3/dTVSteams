@@ -19,6 +19,7 @@ void showSleepTimerSheet(BuildContext context, {VoidCallback? onTimerChanged}) {
       return AnimatedBuilder(
         animation: manager,
         builder: (context, _) {
+          AppColors.watch(context);
           final bottomInset = MediaQuery.of(context).padding.bottom;
           return SafeArea(
             top: true,

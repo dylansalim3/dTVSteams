@@ -49,9 +49,10 @@ describe("Video.js v10 React Implementation (https://videojs.org/docs/guides/ins
     expect(fallbackLinks.length).toBeGreaterThanOrEqual(1);
     expect(fallbackLinks[0].getAttribute("href")).toBe("https://videojs.org/help");
 
-    // Verify video element properties
+    // Verify video element properties (no duplicate native controls alongside VideoSkin)
     const videoEl = container.querySelector("video");
     expect(videoEl).not.toBeNull();
+    expect(videoEl?.hasAttribute("controls")).toBe(false);
     expect(videoEl?.getAttribute("src")).toBe("./media/sample-part1.mp4");
     expect(videoEl?.getAttribute("poster")).toBe("./preview.png");
     expect(videoEl?.getAttribute("crossorigin")).toBe("anonymous");
@@ -132,6 +133,8 @@ describe("Video.js v10 React Implementation (https://videojs.org/docs/guides/ins
     expect(demoSource).toContain("LATEST_APK_RELEASE_URL");
     expect(demoSource).toContain("RiShareForwardLine");
     expect(demoSource).toContain("RiSettings3Line");
+    expect(demoSource).toContain("./catalog.json");
+    expect(demoSource).not.toContain("返回經典網頁版");
     expect(demoSource.toLowerCase()).not.toContain("1080p");
   });
 });

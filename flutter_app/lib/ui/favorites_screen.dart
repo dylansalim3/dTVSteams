@@ -36,6 +36,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.watch(context);
     final favorites = _favoritesManager.favoriteEpisodes;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -184,6 +185,7 @@ class _FavoritesBodyState extends State<FavoritesBody> {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.watch(context);
     final favorites = _favoritesManager.favoriteEpisodes;
     if (favorites.isEmpty) {
       return Center(

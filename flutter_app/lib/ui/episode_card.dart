@@ -30,6 +30,7 @@ class TripleCircleDownloadButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.watch(context);
     final parts = episode.parts;
     final totalParts = parts.isNotEmpty ? parts.length : 3;
 
@@ -103,6 +104,7 @@ class TripleCircleDownloadButton extends StatelessWidget {
                       allDownloaded: allDownloaded,
                       anyDownloading: anyDownloading,
                       anyFailed: anyFailed,
+                      themeId: AppColors.activeTheme.id,
                     ),
                   ),
                 ),
@@ -124,6 +126,7 @@ class TripleRingPainter extends CustomPainter {
   final bool allDownloaded;
   final bool anyDownloading;
   final bool anyFailed;
+  final String themeId;
 
   TripleRingPainter({
     required this.progresses,
@@ -133,6 +136,7 @@ class TripleRingPainter extends CustomPainter {
     required this.allDownloaded,
     required this.anyDownloading,
     required this.anyFailed,
+    this.themeId = '',
   });
 
   @override
@@ -289,7 +293,8 @@ class TripleRingPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant TripleRingPainter oldDelegate) {
-    return allDownloaded != oldDelegate.allDownloaded ||
+    return themeId != oldDelegate.themeId ||
+        allDownloaded != oldDelegate.allDownloaded ||
         anyDownloading != oldDelegate.anyDownloading ||
         anyFailed != oldDelegate.anyFailed ||
         !listEquals(progresses, oldDelegate.progresses) ||
@@ -457,6 +462,7 @@ void showDownloadSelectionSheet(
       return ListenableBuilder(
         listenable: downloadManager,
         builder: (sheetContext, _) {
+          AppColors.watch(sheetContext);
           final showId = episode.showId.isNotEmpty
               ? episode.showId
               : CatalogParser.detectShowId('${episode.title} ${episode.id}');
@@ -923,6 +929,7 @@ class _TvFocusableButtonState extends State<TvFocusableButton> {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.watch(context);
     return Focus(
       autofocus: widget.autofocus,
       onFocusChange: (focused) => setState(() => _isFocused = focused),
@@ -985,6 +992,7 @@ class YouTubeEpisodeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.watch(context);
     final location = CatalogParser.extractLocation(episode.title);
     final showId = episode.showId.isNotEmpty
         ? episode.showId

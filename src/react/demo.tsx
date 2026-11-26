@@ -3,7 +3,6 @@ import { createRoot } from "react-dom/client";
 import {
   RiArrowDownLine,
   RiArrowDownSLine,
-  RiArrowLeftLine,
   RiArrowLeftSLine,
   RiArrowRightSLine,
   RiArrowUpLine,
@@ -176,7 +175,7 @@ function App() {
       let loaded: EpisodeItem[] = [];
       if (page === 1 && channel.id === "mr_player") {
         try {
-          const res = await fetch(`../catalog.json?_t=${Date.now()}`, { cache: "no-store" });
+          const res = await fetch(`./catalog.json?_t=${Date.now()}`, { cache: "no-store" });
           if (res.ok) {
             const data = await res.json();
             loaded = data.episodes || [];
@@ -493,7 +492,7 @@ function App() {
                 <div className="overflow-hidden rounded-xl border border-separator-border bg-black">
                   <VideoJs10Player
                     src={resolveStreamUrl(activePart)}
-                    poster="../preview.png"
+                    poster={activeEp.poster || "./media/thumb-default.svg"}
                     title={`${activeEp.title} · ${activePart.label}`}
                     episodeId={activeEp.id}
                     partIndex={safePartIndex}
@@ -816,12 +815,16 @@ function App() {
           <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-3 px-3 py-4 text-caption-1-regular text-text-secondary">
             <span>dTVSteams • Video.js 10 + BoardUI Design System</span>
             <LinkButton
-              href="../index.html"
+              href={
+                typeof window !== "undefined" && window.location.pathname.includes("/react")
+                  ? "../tv-web/index.html"
+                  : "https://dtvsteams-tv.pages.dev"
+              }
               variant="secondary"
               size="xs"
-              leadingIcon={RiArrowLeftLine}
+              leadingIcon={RiTv2Line}
             >
-              返回經典網頁版
+              10-Foot 電視版
             </LinkButton>
           </div>
         </footer>

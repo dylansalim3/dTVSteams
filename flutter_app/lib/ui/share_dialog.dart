@@ -87,6 +87,7 @@ class _ShareDialogState extends State<ShareDialog> {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.watch(context);
     final ep = widget.episode;
     final showId = ep.showId.isNotEmpty
         ? ep.showId

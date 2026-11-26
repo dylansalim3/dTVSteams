@@ -73,12 +73,12 @@ export function clearStoredResume(episodeId: string, storageKey = DEFAULT_STORAG
  */
 export const VideoJs10Player: React.FC<VideoJs10PlayerProps> = ({
   src,
-  poster = "./preview.png",
+  poster = "./media/thumb-default.svg",
   title = "綜藝玩很大",
   episodeId = "",
   partIndex = 0,
   autoPlay = false,
-  controls = true,
+  controls = false,
   className = "",
   style,
   onEnded,
@@ -208,7 +208,7 @@ export const VideoJs10Player: React.FC<VideoJs10PlayerProps> = ({
             playsInline
             crossOrigin="anonymous"
             autoPlay={autoPlay}
-            controls={controls}
+            controls={Boolean(controls)}
             onTimeUpdate={handleTimeUpdate}
             onEnded={handleEnded}
             onPlay={onPlay}

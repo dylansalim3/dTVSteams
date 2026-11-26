@@ -34,27 +34,32 @@ class DTVSteamsApp extends StatelessWidget {
       listenable: settings,
       builder: (context, _) {
         AppColors.setThemeById(settings.themeId);
-        return MaterialApp(
-          title: 'dTVSteams',
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            brightness: AppColors.brightness,
-            scaffoldBackgroundColor: AppColors.canvas,
-            primaryColor: AppColors.accent,
-            dividerColor: AppColors.borderSeparator,
-            colorScheme: ColorScheme(
+        return AppThemeScope(
+          notifier: settings,
+          child: MaterialApp(
+            title: 'dTVSteams',
+            debugShowCheckedModeBanner: false,
+            theme: ThemeData(
               brightness: AppColors.brightness,
-              primary: AppColors.accent,
-              onPrimary: AppColors.onAccent,
-              secondary: AppColors.accent,
-              onSecondary: AppColors.onAccent,
-              error: AppPrimitives.red500,
-              onError: Colors.white,
-              surface: AppColors.surfaceSecondary,
-              onSurface: AppColors.textPrimary,
+              scaffoldBackgroundColor: AppColors.canvas,
+              canvasColor: AppColors.canvas,
+              cardColor: AppColors.cardBg,
+              primaryColor: AppColors.accent,
+              dividerColor: AppColors.borderSeparator,
+              colorScheme: ColorScheme(
+                brightness: AppColors.brightness,
+                primary: AppColors.accent,
+                onPrimary: AppColors.onAccent,
+                secondary: AppColors.accent,
+                onSecondary: AppColors.onAccent,
+                error: AppPrimitives.red500,
+                onError: Colors.white,
+                surface: AppColors.surfaceSecondary,
+                onSurface: AppColors.textPrimary,
+              ),
             ),
+            home: const HomeScreen(),
           ),
-          home: const HomeScreen(),
         );
       },
     );
@@ -107,6 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _updateManager.init();
     _favoritesManager.addListener(_onDownloadUpdate);
     _favoritesManager.init();
+    SettingsManager().init();
     _loadCatalog();
     _checkRemoteUpdate();
   }
@@ -278,6 +284,7 @@ class _HomeScreenState extends State<HomeScreen> {
       isScrollControlled: true,
       useSafeArea: true,
       builder: (ctx) {
+        AppColors.watch(ctx);
         final bottomInset = MediaQuery.of(ctx).padding.bottom;
         return Container(
           decoration: BoxDecoration(
@@ -684,6 +691,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.watch(context);
     if (isLoading) {
       return Scaffold(
         body: Center(
@@ -1217,6 +1225,7 @@ class GooglePaginationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.watch(context);
     final effectiveTotal = totalPages < 1 ? 1 : totalPages;
     const windowSize = 5;
     // Sliding 5-page window centered on current page

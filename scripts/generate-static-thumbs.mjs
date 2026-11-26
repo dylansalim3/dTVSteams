@@ -2,12 +2,11 @@ import fs from "node:fs";
 import path from "node:path";
 import { generateEpisodeThumbnailSvg } from "./thumbnail-generator.mjs";
 
-const catalog = JSON.parse(fs.readFileSync("web-app/catalog.json", "utf-8"));
+const catalog = JSON.parse(fs.readFileSync("tv-web/catalog.json", "utf-8"));
 
 const dirs = [
-  "web-app/media/thumbnails",
   "tv-web/media/thumbnails",
-  "dist/web-app/media/thumbnails",
+  "dist/react/media/thumbnails",
   "dist/tv-web/media/thumbnails"
 ];
 
@@ -19,7 +18,6 @@ const defaultSvg = generateEpisodeThumbnailSvg({
   date: "最新播出",
   id: "default"
 });
-fs.writeFileSync("web-app/media/thumb-default.svg", defaultSvg, "utf-8");
 fs.writeFileSync("tv-web/media/thumb-default.svg", defaultSvg, "utf-8");
 
 // 2. Generate per-episode SVGs for the 10 catalog episodes

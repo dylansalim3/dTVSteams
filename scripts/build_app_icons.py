@@ -104,8 +104,8 @@ def process():
     im.resize((512, 512), Image.Resampling.LANCZOS).save(os.path.join(web_icons, "Icon-maskable-512.png"), "PNG")
     print("Updated flutter_app/web/icons")
     
-    # Web-app and tv-web favicons
-    for target in ["web-app", "tv-web"]:
+    # tv-web favicons
+    for target in ["tv-web"]:
         t_dir = os.path.join(ROOT, target)
         if os.path.exists(t_dir):
             im.resize((32, 32), Image.Resampling.LANCZOS).save(os.path.join(t_dir, "favicon.png"), "PNG")

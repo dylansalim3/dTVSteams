@@ -455,5 +455,118 @@ void main() {
         expect(tester.takeException(), isNull, reason: 'Unexpected error rendering views under theme $themeId');
       }
     });
+
+    testWidgets('live theme switch repaints HomeScreen header, episode cards, and pagination without switching TV show', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(412, 915));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      final settings = SettingsManager();
+      await tester.pumpWidget(
+        ListenableBuilder(
+          listenable: settings,
+          builder: (context, _) {
+            AppColors.setThemeById(settings.themeId);
+            return AppThemeScope(
+              notifier: settings,
+              child: MaterialApp(
+                theme: ThemeData(
+                  brightness: AppColors.brightness,
+                  scaffoldBackgroundColor: AppColors.canvas,
+                  primaryColor: AppColors.accent,
+                ),
+                home: HomeScreen(
+                  autoRefresh: false,
+                  initialEpisodes: sampleEpisodes,
+                ),
+              ),
+            );
+          },
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Verify initial BoardUI crimson colors on Header Bar, EpisodeCard, and active pagination button
+      final headerFinder = find.byWidgetPredicate(
+        (w) => w is Container && w.decoration is BoxDecoration && ((w.decoration as BoxDecoration).border as Border?)?.bottom != null && (w.decoration as BoxDecoration).color != null,
+      );
+      expect((tester.widget<Container>(headerFinder.first).decoration as BoxDecoration).color, AppThemes.boardUiDefault.surfaceSecondary);
+
+      final cardContainer = tester.widget<Container>(
+        find.descendant(
+          of: find.byType(YouTubeEpisodeCard).first,
+          matching: find.byWidgetPredicate(
+            (w) => w is Container && w.decoration is BoxDecoration && (w.decoration as BoxDecoration).borderRadius == BorderRadius.circular(AppRadius.card),
+          ),
+        ).first,
+      );
+      final initialCardBg = (cardContainer.decoration as BoxDecoration).color;
+      expect(initialCardBg, AppThemes.boardUiDefault.surfaceSecondary);
+
+      final initialPage1Box = tester.widget<Container>(
+        find.descendant(
+          of: find.byKey(const Key('page_btn_1')),
+          matching: find.byWidgetPredicate(
+            (w) => w is Container && w.decoration is BoxDecoration && (w.decoration as BoxDecoration).color != null,
+          ),
+        ).first,
+      );
+      expect((initialPage1Box.decoration as BoxDecoration).color, AppThemes.boardUiDefault.accent);
+
+      // Switch to Light theme ('vercel') without changing channel/episodes
+      await tester.runAsync(() => settings.setThemeId('vercel'));
+      await tester.pumpAndSettle();
+
+      final lightPalette = AppThemes.byId('vercel');
+      expect((tester.widget<Container>(headerFinder.first).decoration as BoxDecoration).color, lightPalette.surfaceSecondary);
+      final lightCard = tester.widget<Container>(
+        find.descendant(
+          of: find.byType(YouTubeEpisodeCard).first,
+          matching: find.byWidgetPredicate(
+            (w) => w is Container && w.decoration is BoxDecoration && (w.decoration as BoxDecoration).borderRadius == BorderRadius.circular(AppRadius.card),
+          ),
+        ).first,
+      );
+      expect((lightCard.decoration as BoxDecoration).color, lightPalette.surfaceSecondary);
+
+      final lightPage1Box = tester.widget<Container>(
+        find.descendant(
+          of: find.byKey(const Key('page_btn_1')),
+          matching: find.byWidgetPredicate(
+            (w) => w is Container && w.decoration is BoxDecoration && (w.decoration as BoxDecoration).color != null,
+          ),
+        ).first,
+      );
+      expect((lightPage1Box.decoration as BoxDecoration).color, lightPalette.accent);
+
+      final lightTitle = tester.widget<Text>(find.text('最新劇集與節目 (Episodes)'));
+      expect(lightTitle.style?.color, lightPalette.textPrimary);
+
+      // Switch to Dark theme ('tokyo-night') without changing channel/episodes
+      await tester.runAsync(() => settings.setThemeId('tokyo-night'));
+      await tester.pumpAndSettle();
+
+      final tokyoPalette = AppThemes.byId('tokyo-night');
+      expect((tester.widget<Container>(headerFinder.first).decoration as BoxDecoration).color, tokyoPalette.surfaceSecondary);
+      final tokyoCard = tester.widget<Container>(
+        find.descendant(
+          of: find.byType(YouTubeEpisodeCard).first,
+          matching: find.byWidgetPredicate(
+            (w) => w is Container && w.decoration is BoxDecoration && (w.decoration as BoxDecoration).borderRadius == BorderRadius.circular(AppRadius.card),
+          ),
+        ).first,
+      );
+      expect((tokyoCard.decoration as BoxDecoration).color, tokyoPalette.surfaceSecondary);
+
+      final tokyoPage1Box = tester.widget<Container>(
+        find.descendant(
+          of: find.byKey(const Key('page_btn_1')),
+          matching: find.byWidgetPredicate(
+            (w) => w is Container && w.decoration is BoxDecoration && (w.decoration as BoxDecoration).color != null,
+          ),
+        ).first,
+      );
+      expect((tokyoPage1Box.decoration as BoxDecoration).color, tokyoPalette.accent);
+      expect(tester.takeException(), isNull);
+    });
   });
 }

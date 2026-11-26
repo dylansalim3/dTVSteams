@@ -50,8 +50,14 @@ class SettingsManager extends ChangeNotifier {
         }
         if (json.containsKey('themeId')) {
           final loadedId = json['themeId'] as String?;
-          _themeId = AppThemes.byId(loadedId).id;
+          final resolved = AppThemes.byId(loadedId).id;
+          final changed = _themeId != resolved;
+          _themeId = resolved;
           AppColors.setThemeById(_themeId);
+          AppSystemUi.restoreNormalChrome();
+          if (changed) {
+            notifyListeners();
+          }
         }
       }
     } catch (e) {

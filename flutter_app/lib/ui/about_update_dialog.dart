@@ -114,6 +114,7 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.watch(context);
     final mgr = widget.updateManager;
     final update = mgr.latestUpdate;
 
@@ -892,6 +893,7 @@ class _NewVersionDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.watch(context);
     final update = updateManager.latestUpdate;
     if (update == null) return const SizedBox.shrink();
 

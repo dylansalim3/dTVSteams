@@ -22,7 +22,7 @@ process.on("unhandledRejection", (reason) => {
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const repo = path.resolve(root, "..");
-const dir = path.resolve(repo, process.argv[2] || "web-app");
+const dir = path.resolve(repo, process.argv[2] || "dist/react");
 const port = Number(process.argv[3] || 8000);
 
 const MIME = {

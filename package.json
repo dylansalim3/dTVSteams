@@ -4,19 +4,19 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node scripts/serve.mjs web-app 8000",
+    "dev": "npm run build && node scripts/serve.mjs dist/react 8000",
     "dev:tv": "node scripts/serve.mjs tv-web 8100",
     "build": "tsc --noEmit && node scripts/build.mjs",
     "build:prod": "tsc --noEmit && node scripts/build.mjs",
     "preview": "node scripts/serve.mjs dist 5000",
-    "preview:web": "node scripts/serve.mjs dist/web-app 8000",
+    "preview:web": "node scripts/serve.mjs dist/react 8000",
     "preview:tv": "node scripts/serve.mjs dist/tv-web 8100",
-    "start": "node scripts/serve.mjs web-app 8000",
+    "start": "node scripts/serve.mjs dist/react 8000",
     "start:tv": "node scripts/serve.mjs tv-web 8100",
     "test": "vitest run --coverage",
     "lint": "tsc --noEmit",
     "deploy": "npm run build && wrangler pages deploy dist --project-name=dtvsteams",
-    "deploy:web": "npm run build && wrangler pages deploy dist/web-app --project-name=dtvsteams-web",
+    "deploy:web": "npm run build && wrangler pages deploy dist/react --project-name=dtvsteams-web",
     "deploy:tv": "npm run build && wrangler pages deploy dist/tv-web --project-name=dtvsteams-tv"
   },
   "devDependencies": {

@@ -193,6 +193,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.watch(context);
     final completedList = _manager.completedDownloads;
     final activeList = _manager.activeDownloads;
     final failedList = _manager.failedDownloads;
