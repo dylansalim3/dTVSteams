@@ -384,17 +384,25 @@ class _NativePlayerScreenState extends State<NativePlayerScreen>
       return;
     }
 
-    final isPlaying = _controller?.value.isPlaying ?? false;
+    final value = _controller?.value;
+    final isPlaying = value?.isPlaying ?? false;
+    final isActivePlayback = isPlaying || (value?.isBuffering ?? false);
 
     // 1. Keep Screen Awake
-    if (isPlaying && _settingsManager.keepScreenAwake) {
+    if (isActivePlayback && _settingsManager.keepScreenAwake) {
       _playbackBridge.setKeepScreenOn(true);
     } else {
       _playbackBridge.setKeepScreenOn(false);
     }
 
-    // 2. Background Audio Service (Keeps CPU awake & media notification on lock screen)
-    if (isPlaying && _settingsManager.backgroundPlay) {
+    // 2. Background Audio Service: start once playback begins and keep active
+    // across seeks, buffering, and transient pauses until player exit or disabled.
+    final isInitialized = value?.isInitialized ?? false;
+    final shouldKeepBackgroundService = _settingsManager.backgroundPlay &&
+        isInitialized &&
+        (isPlaying || _playbackBridge.isBackgroundServiceRunning);
+
+    if (shouldKeepBackgroundService) {
       final parts = widget.episode.parts;
       final partLabel = parts.isNotEmpty && _currentPartIndex < parts.length
           ? parts[_currentPartIndex].label

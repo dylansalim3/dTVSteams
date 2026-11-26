@@ -11,6 +11,7 @@ import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
 import android.os.PowerManager
+import java.util.concurrent.atomic.AtomicInteger
 
 class BackgroundAudioService : Service() {
     companion object {
@@ -24,6 +25,11 @@ class BackgroundAudioService : Service() {
         @Volatile
         var isRunning = false
             private set
+
+        @Volatile
+        var pendingStop = false
+
+        val pendingStarts = AtomicInteger(0)
     }
 
     private var wakeLock: PowerManager.WakeLock? = null
@@ -36,18 +42,27 @@ class BackgroundAudioService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (intent?.action == ACTION_STOP) {
+        val title = intent?.getStringExtra(EXTRA_TITLE) ?: "dTV 影音播放"
+        val part = intent?.getStringExtra(EXTRA_PART) ?: "背景播放中"
+
+        // Always call startForeground() first to satisfy every queued startForegroundService()
+        // promise before stopping, preventing ForegroundServiceDidNotStartInTimeException.
+        startForegroundNotification(title, part)
+
+        if (intent?.action != ACTION_STOP) {
+            pendingStarts.updateAndGet { cur -> if (cur > 0) cur - 1 else 0 }
+        }
+
+        if (intent?.action == ACTION_STOP || (pendingStop && pendingStarts.get() <= 0)) {
+            pendingStop = false
+            pendingStarts.set(0)
             stopBackgroundAudio()
             return START_NOT_STICKY
         }
 
-        val title = intent?.getStringExtra(EXTRA_TITLE) ?: "dTV 影音播放"
-        val part = intent?.getStringExtra(EXTRA_PART) ?: "背景播放中"
-
-        startForegroundNotification(title, part)
         acquireWakeLock()
         isRunning = true
-        return START_STICKY
+        return START_NOT_STICKY
     }
 
     private fun startForegroundNotification(title: String, part: String) {

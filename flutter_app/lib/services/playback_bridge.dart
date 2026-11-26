@@ -10,6 +10,8 @@ class PlaybackBridge {
 
   bool _isScreenAwake = false;
   bool _isBackgroundServiceRunning = false;
+  String? _activeBackgroundTitle;
+  String? _activeBackgroundPart;
 
   bool get isScreenAwake => _isScreenAwake;
   bool get isBackgroundServiceRunning => _isBackgroundServiceRunning;
@@ -54,7 +56,14 @@ class PlaybackBridge {
   /// Starts the Android Foreground MediaPlayback Service with a notification
   /// and acquires a CPU WakeLock so audio continues uninterrupted when locked.
   Future<void> startBackgroundPlay({required String title, required String part}) async {
+    if (_isBackgroundServiceRunning &&
+        _activeBackgroundTitle == title &&
+        _activeBackgroundPart == part) {
+      return;
+    }
     _isBackgroundServiceRunning = true;
+    _activeBackgroundTitle = title;
+    _activeBackgroundPart = part;
     try {
       await _channel.invokeMethod('startBackgroundPlay', {
         'title': title,
@@ -67,7 +76,10 @@ class PlaybackBridge {
 
   /// Stops the Android Foreground MediaPlayback Service and releases WakeLock.
   Future<void> stopBackgroundPlay() async {
+    if (!_isBackgroundServiceRunning) return;
     _isBackgroundServiceRunning = false;
+    _activeBackgroundTitle = null;
+    _activeBackgroundPart = null;
     try {
       await _channel.invokeMethod('stopBackgroundPlay');
     } catch (e) {
@@ -79,5 +91,7 @@ class PlaybackBridge {
   void resetForTesting() {
     _isScreenAwake = false;
     _isBackgroundServiceRunning = false;
+    _activeBackgroundTitle = null;
+    _activeBackgroundPart = null;
   }
 }

@@ -90,6 +90,25 @@ void main() {
       expect(calls.any((c) => c.method == 'stopBackgroundPlay'), isTrue);
       expect(bridge.isBackgroundServiceRunning, isFalse);
     });
+
+    test('startBackgroundPlay and stopBackgroundPlay deduplicate redundant platform calls', () async {
+      final bridge = PlaybackBridge();
+      bridge.resetForTesting();
+
+      // Stopping when not running is a no-op
+      await bridge.stopBackgroundPlay();
+      expect(calls, isEmpty);
+
+      // Repeated start with same title/part only dispatches once
+      await bridge.startBackgroundPlay(title: '綜藝玩很大 2026-11-21', part: 'Part 1');
+      await bridge.startBackgroundPlay(title: '綜藝玩很大 2026-11-21', part: 'Part 1');
+      expect(calls.where((c) => c.method == 'startBackgroundPlay').length, 1);
+
+      // Repeated stop only dispatches once
+      await bridge.stopBackgroundPlay();
+      await bridge.stopBackgroundPlay();
+      expect(calls.where((c) => c.method == 'stopBackgroundPlay').length, 1);
+    });
   });
 
   group('Settings UI Integration Tests', () {

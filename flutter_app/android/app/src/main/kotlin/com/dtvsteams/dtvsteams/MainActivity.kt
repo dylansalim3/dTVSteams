@@ -234,6 +234,8 @@ class MainActivity : FlutterActivity() {
                     val title = call.argument<String>("title") ?: "dTV 影音播放"
                     val part = call.argument<String>("part") ?: "背景播放中"
                     try {
+                        BackgroundAudioService.pendingStop = false
+                        BackgroundAudioService.pendingStarts.incrementAndGet()
                         val serviceIntent = Intent(this, BackgroundAudioService::class.java).apply {
                             action = BackgroundAudioService.ACTION_START
                             putExtra(BackgroundAudioService.EXTRA_TITLE, title)
@@ -246,15 +248,19 @@ class MainActivity : FlutterActivity() {
                         }
                         result.success(true)
                     } catch (e: Exception) {
+                        BackgroundAudioService.pendingStarts.updateAndGet { cur -> if (cur > 0) cur - 1 else 0 }
                         result.error("SERVICE_ERROR", e.message, null)
                     }
                 }
                 "stopBackgroundPlay" -> {
                     try {
-                        val serviceIntent = Intent(this, BackgroundAudioService::class.java).apply {
-                            action = BackgroundAudioService.ACTION_STOP
+                        BackgroundAudioService.pendingStop = true
+                        // Only call stopService immediately once no startForegroundService() is in flight;
+                        // otherwise onStartCommand will call startForeground() first and stop itself safely.
+                        if (BackgroundAudioService.isRunning && BackgroundAudioService.pendingStarts.get() <= 0) {
+                            BackgroundAudioService.pendingStop = false
+                            stopService(Intent(this, BackgroundAudioService::class.java))
                         }
-                        startService(serviceIntent)
                         result.success(true)
                     } catch (e: Exception) {
                         result.error("SERVICE_ERROR", e.message, null)
