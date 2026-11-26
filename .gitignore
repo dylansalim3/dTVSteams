@@ -12,7 +12,6 @@ checksums-sha256.txt
 
 # Agent / Tool cache
 .agents/
-.ui-craft/
 skills-lock.json
 
 # Environment / Logs

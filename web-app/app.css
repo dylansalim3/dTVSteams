@@ -1,5 +1,6 @@
 /* BoardUI + Flutter Mobile App Parity Design System */
 :root {
+  color-scheme: dark;
   --bg-canvas: #121212;
   --yt-bg: #121212;
   --yt-surface: #171717;
