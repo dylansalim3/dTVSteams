@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/dylansalim3/dTVSteams/compare/v1.3.0...v1.4.0) (2026-11-26)
+
+
+### Features
+
+* **ui,web:** match web to mobile layout with header share, APK link, 21st.dev themes, and sleek switches ([f0a9a42](https://github.com/dylansalim3/dTVSteams/commit/f0a9a42cc37b709ce3842034419574da1e5c5bbe))
+
 ## [1.3.0](https://github.com/dylansalim3/dTVSteams/compare/v1.2.7...v1.3.0) (2026-11-26)
 
 
