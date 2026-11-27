@@ -258,7 +258,19 @@
       }
     }
 
+    function isIosWebKit() {
+      const ua = navigator.userAgent || "";
+      if (/iPad|iPhone|iPod/i.test(ua)) return true;
+      return navigator.platform === "MacIntel" && (navigator.maxTouchPoints || 0) > 1;
+    }
+
     function initTvPlayer() {
+      const videoEl = document.getElementById("tv-player");
+      if (videoEl && isIosWebKit()) {
+        videoEl.removeAttribute("crossorigin");
+        videoEl.setAttribute("webkit-playsinline", "true");
+        videoEl.setAttribute("playsinline", "true");
+      }
       if (typeof videojs === "undefined") {
         console.warn("Video.js not loaded");
         return;
@@ -338,7 +350,7 @@
           const part = ep?.parts?.[activePartIndex];
           if (part?.url && window.location.protocol.startsWith("http")) {
             if (tvStreamStatus) tvStreamStatus.textContent = "串流重新獲取最新線路...";
-            const freshStream = `/api/stream?pageUrl=${encodeURIComponent(part.url)}&refresh=true`;
+            const freshStream = `/api/stream?pageUrl=${encodeURIComponent(part.url)}&refresh=true&proxy=true`;
             tvPlayer.src({ src: freshStream, type: "video/mp4" });
             tvPlayer.play().catch(() => {});
             return;
@@ -391,6 +403,7 @@
         const params = new URLSearchParams();
         if (streamUrl) params.set("url", streamUrl);
         if (pageUrl) params.set("pageUrl", pageUrl);
+        if (isIosWebKit()) params.set("proxy", "true");
         return `/api/stream?${params.toString()}`;
       }
       return streamUrl || part.fallbackStreamUrl || "./media/sample-part1.mp4";

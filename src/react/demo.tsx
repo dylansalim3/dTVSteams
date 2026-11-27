@@ -9,6 +9,7 @@ import {
   RiCheckLine,
   RiCloseLine,
   RiDownloadLine,
+  RiErrorWarningLine,
   RiExternalLinkLine,
   RiFileCopyLine,
   RiFilmLine,
@@ -16,6 +17,7 @@ import {
   RiHeartFill,
   RiHeartLine,
   RiHistoryLine,
+  RiInformationLine,
   RiMapPinLine,
   RiPlayFill,
   RiRefreshLine,
@@ -36,9 +38,16 @@ import {
   SegmentedControlItem,
 } from "@/components/base/segmented-control/segmented-control";
 import { Skeleton } from "@/components/base/skeleton/skeleton";
+import { Spinner } from "@/components/base/spinner/spinner";
 import { DirectionProvider } from "@/components/foundations/direction/direction";
 import { cx } from "@/utils/cx";
 import { VideoJs10Player, getStoredResume } from "./VideoJs10Player.js";
+import {
+  buildPartDownloadHref,
+  getDownloadFilename,
+  isIosDevice,
+  triggerBrowserDownload,
+} from "./download.js";
 import {
   EpisodeItem,
   EpisodePart,
@@ -102,7 +111,10 @@ function formatSeconds(sec: number): string {
   return `${String(m).padStart(2, "0")}:${String(r).padStart(2, "0")}`;
 }
 
-function resolveStreamUrl(part?: EpisodePart) {
+function resolveStreamUrl(
+  part?: EpisodePart,
+  options?: { forceProxy?: boolean; forceRefresh?: boolean },
+) {
   if (!part) return "../media/sample-part1.mp4";
   const pageUrl = part.url || "";
   let streamUrl = part.streamUrl || "";
@@ -113,6 +125,13 @@ function resolveStreamUrl(part?: EpisodePart) {
     const params = new URLSearchParams();
     if (streamUrl) params.set("url", streamUrl);
     if (pageUrl) params.set("pageUrl", pageUrl);
+    // iOS AVPlayer fails CORS/307 redirects when crossOrigin or Range preflight hits CDN 405 OPTIONS
+    if (options?.forceProxy || isIosDevice()) {
+      params.set("proxy", "true");
+    }
+    if (options?.forceRefresh) {
+      params.set("refresh", "true");
+    }
     return `/api/stream?${params.toString()}`;
   }
   return streamUrl || "../media/sample-part1.mp4";
@@ -149,11 +168,18 @@ function App() {
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
   const [isPlayerCollapsed, setIsPlayerCollapsed] = useState(false);
+  const [streamRetryLevel, setStreamRetryLevel] = useState(0);
   const [isChannelModalOpen, setIsChannelModalOpen] = useState(false);
   const [isLibraryModalOpen, setIsLibraryModalOpen] = useState(false);
   const [libraryTab, setLibraryTab] = useState<"favorites" | "history">("favorites");
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [copiedShareUrl, setCopiedShareUrl] = useState(false);
+  const [downloadTargetEp, setDownloadTargetEp] = useState<EpisodeItem | null>(null);
+  const [resolvedDownloadUrls, setResolvedDownloadUrls] = useState<Record<number, string>>({});
+  const [partResolveStates, setPartResolveStates] = useState<Record<number, "idle" | "resolving" | "ready" | "error">>({});
+  const [partDownloadStarted, setPartDownloadStarted] = useState<Record<number, boolean>>({});
+  const [downloadBackendUnavailable, setDownloadBackendUnavailable] = useState(false);
+  const [downloadModalNotice, setDownloadModalNotice] = useState<string | null>(null);
 
   const [favorites, setFavorites] = useState<EpisodeItem[]>(() => readFavorites());
   const [historyEntries, setHistoryEntries] = useState<HistoryEntry[]>(() => readHistoryList());
@@ -224,11 +250,84 @@ function App() {
         setIsChannelModalOpen(false);
         setIsLibraryModalOpen(false);
         setIsShareModalOpen(false);
+        setDownloadTargetEp(null);
       }
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
+
+  useEffect(() => {
+    if (!downloadTargetEp) return;
+    const targetParts = downloadTargetEp.parts?.length ? downloadTargetEp.parts : [];
+    const isHttp = typeof window !== "undefined" && window.location.protocol.startsWith("http");
+    let cancelled = false;
+
+    setResolvedDownloadUrls({});
+    setPartDownloadStarted({});
+    setDownloadBackendUnavailable(false);
+    setDownloadModalNotice(null);
+
+    if (!isHttp || targetParts.every((p) => !p.url)) {
+      const readyMap: Record<number, "ready"> = {};
+      targetParts.forEach((_, idx) => {
+        readyMap[idx] = "ready";
+      });
+      setPartResolveStates(readyMap);
+      return;
+    }
+
+    const initialStates: Record<number, "resolving" | "ready"> = {};
+    targetParts.forEach((p, idx) => {
+      initialStates[idx] = p.url ? "resolving" : "ready";
+    });
+    setPartResolveStates(initialStates);
+
+    void Promise.all(
+      targetParts.map(async (p, idx) => {
+        if (!p.url) return { idx, ok: true, status: 200, streamUrl: p.streamUrl || "" };
+        try {
+          const res = await fetch(`/api/resolve-stream?url=${encodeURIComponent(p.url)}`);
+          if (!res.ok) {
+            return { idx, ok: false, status: res.status, streamUrl: "" };
+          }
+          const data = (await res.json()) as { ok?: boolean; streamUrl?: string };
+          return {
+            idx,
+            ok: Boolean(data?.ok && data?.streamUrl),
+            status: res.status,
+            streamUrl: data?.streamUrl || "",
+          };
+        } catch {
+          return { idx, ok: false, status: 0, streamUrl: "" };
+        }
+      }),
+    ).then((results) => {
+      if (cancelled) return;
+      const nextUrls: Record<number, string> = {};
+      const nextStates: Record<number, "ready" | "error"> = {};
+      let all404 = results.length > 0;
+      for (const r of results) {
+        if (r.status !== 404) all404 = false;
+        if (r.ok && r.streamUrl) {
+          nextUrls[r.idx] = r.streamUrl;
+          nextStates[r.idx] = "ready";
+        } else {
+          // Proxy endpoint /api/stream can still resolve pageUrl at download time unless backend is 404
+          nextStates[r.idx] = r.status === 404 ? "error" : "ready";
+        }
+      }
+      setResolvedDownloadUrls(nextUrls);
+      setPartResolveStates(nextStates);
+      if (all404) {
+        setDownloadBackendUnavailable(true);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [downloadTargetEp]);
 
   const filteredEpisodes = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
@@ -258,6 +357,10 @@ function App() {
   const safePartIndex = partIndex < parts.length ? partIndex : 0;
   const activePart = parts[safePartIndex] || parts[0];
 
+  useEffect(() => {
+    setStreamRetryLevel(0);
+  }, [activeEp.id, safePartIndex]);
+
   const handleToggleFavorite = (ep: EpisodeItem) => {
     const exists = favorites.some((f) => f.id === ep.id);
     const next = exists ? favorites.filter((f) => f.id !== ep.id) : [ep, ...favorites];
@@ -276,17 +379,37 @@ function App() {
     void loadChannelPage(ch, 1);
   };
 
-  const handleDownloadPart = (ep: EpisodeItem, idx = 0) => {
+  const handleDownloadPart = (ep: EpisodeItem, idx = 0): boolean => {
     const p = ep.parts?.[idx] || ep.parts?.[0];
-    if (!p?.url) return;
-    const href = `/api/stream?pageUrl=${encodeURIComponent(p.url)}&download=true`;
-    const a = document.createElement("a");
-    a.href = href;
-    a.target = "_blank";
-    a.rel = "noopener noreferrer";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    if (!p) return false;
+    const filename = getDownloadFilename(ep, idx);
+    const resolved = resolvedDownloadUrls[idx];
+    const href = buildPartDownloadHref(p, filename, resolved);
+    if (!href) return false;
+    triggerBrowserDownload(href, filename, idx);
+    setPartDownloadStarted((prev) => ({ ...prev, [idx]: true }));
+    return true;
+  };
+
+  const handleConfirmDownloadAll = (ep: EpisodeItem) => {
+    const epParts = ep.parts?.length ? ep.parts : [];
+    if (!epParts.length) return;
+    let startedCount = 0;
+    epParts.forEach((_, idx) => {
+      if (handleDownloadPart(ep, idx)) {
+        startedCount += 1;
+      }
+    });
+    if (startedCount > 0) {
+      setStatusMessage(`已開始下載 ${startedCount} 個影片分段`);
+      setDownloadModalNotice(
+        startedCount > 1
+          ? `已送出全部 ${startedCount} 個分段下載！若瀏覽器僅開始下載第 1 個檔案，請點選「允許下載多個檔案」，或直接點擊下方各分段按鈕單獨下載。`
+          : "已送出影片下載，請查看瀏覽器下載進度。",
+      );
+    } else {
+      setDownloadModalNotice("目前無法取得下載連結，請稍後再試或檢查網路連線。");
+    }
   };
 
   const shareUrl = useMemo(() => buildShareUrl(activeEp, safePartIndex), [activeEp, safePartIndex]);
@@ -491,13 +614,22 @@ function App() {
               <div className="mt-3 flex flex-col gap-3">
                 <div className="overflow-hidden rounded-xl border border-separator-border bg-black">
                   <VideoJs10Player
-                    src={resolveStreamUrl(activePart)}
+                    src={resolveStreamUrl(activePart, {
+                      forceProxy: streamRetryLevel > 0,
+                      forceRefresh: streamRetryLevel > 0,
+                    })}
                     poster={activeEp.poster || "./media/thumb-default.svg"}
                     title={`${activeEp.title} · ${activePart.label}`}
                     episodeId={activeEp.id}
                     partIndex={safePartIndex}
                     autoPlay={false}
                     onTimeUpdate={() => setHistoryEntries(readHistoryList())}
+                    onError={() => {
+                      if (streamRetryLevel === 0 && activePart?.url) {
+                        setStreamRetryLevel(1);
+                        setStatusMessage("正在切換至相容串流線路...");
+                      }
+                    }}
                     onEnded={() => {
                       if (safePartIndex < parts.length - 1) {
                         setPartIndex(safePartIndex + 1);
@@ -701,12 +833,12 @@ function App() {
 
                           <button
                             type="button"
-                            aria-label="下載此集分段"
-                            title="下載此集"
+                            aria-label="下載此集影片"
+                            title={`下載此集（共 ${ep.parts?.length || 1} 個分段）`}
                             className="flex size-10 cursor-pointer items-center justify-center rounded-full"
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleDownloadPart(ep, 0);
+                              setDownloadTargetEp(ep);
                             }}
                           >
                             <span className="flex size-9 items-center justify-center rounded-full bg-background-tertiary-default text-foreground-icon-secondary hover:text-text-primary">
@@ -1002,6 +1134,189 @@ function App() {
           </dialog>
         ) : null}
 
+        {/* Download Confirmation Modal (prompts multi-part download count & per-part controls) */}
+        {downloadTargetEp ? (
+          <dialog
+            open
+            aria-modal="true"
+            aria-label="下載集數確認"
+            className="fixed inset-0 z-50 m-0 flex size-full max-h-none max-w-none items-end justify-center border-0 bg-black/75 p-3 backdrop-blur-xs sm:items-center"
+            onClick={() => setDownloadTargetEp(null)}
+          >
+            <div
+              className="w-full max-w-md rounded-3xl border border-border-button-default bg-background-secondary-default p-5 shadow-xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {(() => {
+                const targetParts = downloadTargetEp.parts?.length ? downloadTargetEp.parts : [];
+                const partCount = targetParts.length;
+                const partLabels = targetParts.map((p, i) => p.label || `Part ${i + 1}`).join("、");
+                const isAnyResolving = Object.values(partResolveStates).some((s) => s === "resolving");
+                const allStarted = partCount > 0 && targetParts.every((_, idx) => partDownloadStarted[idx]);
+
+                return (
+                  <>
+                    <div className="mb-3 flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-2.5">
+                        <div className="flex size-9 shrink-0 items-center justify-center rounded-2lg border border-accent-500/35 bg-accent-500/15 text-accent-500">
+                          <RiDownloadLine className="size-4.5" aria-hidden="true" />
+                        </div>
+                        <div className="min-w-0">
+                          <h2 className="text-title-3-semibold text-text-primary">
+                            下載整集影片（共 {partCount} 個分段）
+                          </h2>
+                          <p className="line-clamp-1 text-caption-1-regular text-text-secondary">
+                            {downloadTargetEp.title}
+                          </p>
+                        </div>
+                      </div>
+                      <CloseButton
+                        onClick={() => setDownloadTargetEp(null)}
+                        aria-label="關閉下載確認視窗"
+                      />
+                    </div>
+
+                    <div className="mb-3 flex items-start gap-2.5 rounded-2xl border border-accent-500/35 bg-accent-500/10 p-3">
+                      <RiInformationLine
+                        className="mt-0.5 size-4 shrink-0 text-accent-500"
+                        aria-hidden="true"
+                      />
+                      <div className="flex flex-col gap-1 text-start">
+                        <p className="text-body-2-medium text-text-primary">
+                          將會下載 {partCount} 個影片分段{partLabels ? `（${partLabels}）` : ""}
+                        </p>
+                        <p className="text-caption-1-regular text-text-secondary">
+                          {partCount > 1
+                            ? `點擊下方「確認下載全部」將依序下載這 ${partCount} 個 MP4 影片檔；若瀏覽器提示允許下載多個檔案，請選擇「允許」。`
+                            : "點擊下方「確認下載」即可透過串流代理下載完整影片檔。"}
+                        </p>
+                      </div>
+                    </div>
+
+                    {downloadBackendUnavailable ? (
+                      <div className="mb-3 flex items-start gap-2 rounded-xl border border-border-error-default bg-background-primary-default p-3 text-start">
+                        <RiErrorWarningLine
+                          className="mt-0.5 size-4 shrink-0 text-text-error-primary"
+                          aria-hidden="true"
+                        />
+                        <p className="text-caption-1-regular text-text-error-primary">
+                          偵測不到 `/api/stream` 下載代理服務（純靜態伺服器環境不支援跨域影片下載代理）。請使用 `npm run dev` 或部署至 Cloudflare Pages。
+                        </p>
+                      </div>
+                    ) : null}
+
+                    {downloadModalNotice ? (
+                      <div
+                        role="status"
+                        className="mb-3 flex items-start gap-2 rounded-xl border border-separator-border bg-background-primary-default p-3 text-start"
+                      >
+                        <RiCheckLine
+                          className="mt-0.5 size-4 shrink-0 text-accent-500"
+                          aria-hidden="true"
+                        />
+                        <p className="text-caption-1-regular text-text-primary">
+                          {downloadModalNotice}
+                        </p>
+                      </div>
+                    ) : null}
+
+                    <div className="mb-4 flex max-h-60 flex-col gap-2 overflow-y-auto">
+                      {targetParts.map((part, idx) => {
+                        const filename = getDownloadFilename(downloadTargetEp, idx);
+                        const resolveState = partResolveStates[idx] || "idle";
+                        const started = Boolean(partDownloadStarted[idx]);
+                        const canDownload = Boolean(
+                          buildPartDownloadHref(part, filename, resolvedDownloadUrls[idx]),
+                        );
+
+                        return (
+                          <div
+                            key={(part.label || idx) + String(idx)}
+                            className="flex items-center justify-between gap-2.5 rounded-xl border border-separator-border bg-background-primary-default p-3"
+                          >
+                            <div className="min-w-0 flex-1 text-start">
+                              <div className="flex items-center gap-2">
+                                <span className="text-body-2-medium font-semibold text-text-primary">
+                                  {part.label || `Part ${idx + 1}`}
+                                </span>
+                                {part.duration ? (
+                                  <span className="text-caption-1-regular tabular-nums text-text-secondary">
+                                    {part.duration}
+                                  </span>
+                                ) : null}
+                                {started ? (
+                                  <Chip variant="caption" color="lime">
+                                    已開始下載
+                                  </Chip>
+                                ) : resolveState === "resolving" ? (
+                                  <span className="inline-flex items-center gap-1 text-caption-1-regular text-text-secondary">
+                                    <Spinner size="xs" aria-hidden />
+                                    準備中
+                                  </span>
+                                ) : resolveState === "error" ? (
+                                  <Chip variant="caption" color="rose">
+                                    代理無法使用
+                                  </Chip>
+                                ) : null}
+                              </div>
+                              <p
+                                title={filename}
+                                className="truncate font-mono text-caption-1-regular text-text-secondary"
+                              >
+                                {filename}
+                              </p>
+                            </div>
+
+                            <Button
+                              variant="secondary"
+                              size="xs"
+                              leadingIcon={started ? RiCheckLine : RiDownloadLine}
+                              disabled={!canDownload}
+                              onClick={() => {
+                                const ok = handleDownloadPart(downloadTargetEp, idx);
+                                if (ok) {
+                                  setStatusMessage(`已開始下載 ${part.label || `Part ${idx + 1}`}`);
+                                }
+                              }}
+                            >
+                              {started ? "再試" : "下載"}
+                            </Button>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    <Divider className="my-3" />
+
+                    <div className="flex flex-wrap items-center justify-end gap-2">
+                      <Button
+                        variant="secondary"
+                        size="small"
+                        onClick={() => setDownloadTargetEp(null)}
+                      >
+                        {allStarted ? "完成" : "取消"}
+                      </Button>
+                      <Button
+                        variant="primary"
+                        size="small"
+                        leadingIcon={RiDownloadLine}
+                        disabled={partCount === 0 || downloadBackendUnavailable}
+                        onClick={() => handleConfirmDownloadAll(downloadTargetEp)}
+                      >
+                        {isAnyResolving
+                          ? `確認下載全部 (${partCount} 個分段)...`
+                          : allStarted
+                            ? `重新下載全部 (${partCount} 個分段)`
+                            : `確認下載全部 (${partCount} 個分段)`}
+                      </Button>
+                    </div>
+                  </>
+                );
+              })()}
+            </div>
+          </dialog>
+        ) : null}
+
         {/* Share Dialog Modal (triggered from Top Header Share button) */}
         {isShareModalOpen ? (
           <dialog
@@ -1071,6 +1386,8 @@ function App() {
     </DirectionProvider>
   );
 }
+
+export { App };
 
 const rootEl = document.getElementById("root");
 if (rootEl) {

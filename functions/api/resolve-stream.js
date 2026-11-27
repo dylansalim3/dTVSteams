@@ -34,7 +34,7 @@ export async function onRequestGet(context) {
       });
     }
     const html = await res.text();
-    const match = html.match(/<source\s+src=['"]([^'"]+)['"]/i);
+    const match = html.match(/<source[^>]+src=['"]([^'"]+)['"]/i) || html.match(/<video[^>]+src=['"]([^'"]+)['"]/i);
     if (match && match[1]) {
       resolveCache.set(targetUrl, { streamUrl: match[1], timestamp: Date.now() });
       return new Response(JSON.stringify({ ok: true, streamUrl: match[1] }), {

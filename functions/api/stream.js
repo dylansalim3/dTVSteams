@@ -12,7 +12,7 @@ async function resolveFreshStreamUrl(pageUrl, bypassCache = false) {
     const res = await fetch(pageUrl, { headers: { "User-Agent": USER_AGENT } });
     if (!res.ok) return null;
     const html = await res.text();
-    const match = html.match(/<source\s+src=['"]([^'"]+)['"]/i);
+    const match = html.match(/<source[^>]+src=['"]([^'"]+)['"]/i) || html.match(/<video[^>]+src=['"]([^'"]+)['"]/i);
     if (match && match[1]) {
       const freshUrl = match[1];
       streamCache.set(pageUrl, { streamUrl: freshUrl, timestamp: Date.now() });
@@ -22,6 +22,16 @@ async function resolveFreshStreamUrl(pageUrl, bypassCache = false) {
     console.warn("Failed to resolve stream from", pageUrl, err.message);
   }
   return null;
+}
+
+function buildContentDisposition(rawFilename) {
+  const cleanName = (rawFilename || "video.mp4").replace(/[\r\n"/\\:*?<>|]/g, "_").trim() || "video.mp4";
+  const asciiName = cleanName
+    .replace(/[^\x20-\x7E]/g, "_")
+    .replace(/_+/g, "_")
+    .replace(/^_+|_+$/g, "");
+  const safeAscii = asciiName && !/^\.mp4$/i.test(asciiName) ? asciiName : "video.mp4";
+  return `attachment; filename="${safeAscii}"; filename*=UTF-8''${encodeURIComponent(cleanName)}`;
 }
 
 export async function onRequest(context) {
@@ -94,7 +104,7 @@ export async function onRequest(context) {
     });
 
     if ((upstream.status === 403 || upstream.status === 404 || upstream.status === 410) && pageUrl) {
-      const freshUrl = await resolveFreshStreamUrl(pageUrl);
+      const freshUrl = await resolveFreshStreamUrl(pageUrl, true);
       if (freshUrl && freshUrl !== targetUrl) {
         targetUrl = freshUrl;
         upstream = await fetch(targetUrl, {
@@ -105,15 +115,16 @@ export async function onRequest(context) {
     }
 
     const outHeaders = new Headers();
-    outHeaders.set("Content-Type", upstream.headers.get("content-type") || "video/mp4");
+    outHeaders.set("Content-Type", upstream.ok ? (upstream.headers.get("content-type") || "video/mp4") : (upstream.headers.get("content-type") || "text/plain"));
     outHeaders.set("Accept-Ranges", "bytes");
+    outHeaders.set("Cache-Control", "no-store");
     outHeaders.set("Access-Control-Allow-Origin", "*");
     outHeaders.set("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS");
     outHeaders.set("Access-Control-Allow-Headers", "Range, Content-Type, Accept");
     outHeaders.set("Access-Control-Expose-Headers", "Content-Range, Content-Length, Accept-Ranges, Content-Disposition");
 
-    if (download) {
-      outHeaders.set("Content-Disposition", `attachment; filename="${encodeURIComponent(filename)}"; filename*=UTF-8''${encodeURIComponent(filename)}`);
+    if (download && upstream.ok) {
+      outHeaders.set("Content-Disposition", buildContentDisposition(filename));
     }
 
     if (upstream.headers.has("content-range")) {

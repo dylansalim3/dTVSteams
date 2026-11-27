@@ -57,7 +57,7 @@ async function resolveFreshStreamUrl(pageUrl, bypassCache = false) {
     const res = await fetch(pageUrl, { headers: { "User-Agent": USER_AGENT } });
     if (!res.ok) return null;
     const html = await res.text();
-    const match = html.match(/<source\s+src=['"]([^'"]+)['"]/i);
+    const match = html.match(/<source[^>]+src=['"]([^'"]+)['"]/i) || html.match(/<video[^>]+src=['"]([^'"]+)['"]/i);
     if (match && match[1]) {
       const freshUrl = match[1];
       resolvedStreamCache.set(pageUrl, { streamUrl: freshUrl, timestamp: Date.now() });
@@ -160,6 +160,16 @@ async function fetchEpisodesPage(page = 1, rawShow = "mr_player") {
 
   pageCache.set(cacheKey, episodes);
   return episodes;
+}
+
+function buildContentDisposition(rawFilename) {
+  const cleanName = (rawFilename || "video.mp4").replace(/[\r\n"/\\:*?<>|]/g, "_").trim() || "video.mp4";
+  const asciiName = cleanName
+    .replace(/[^\x20-\x7E]/g, "_")
+    .replace(/_+/g, "_")
+    .replace(/^_+|_+$/g, "");
+  const safeAscii = asciiName && !/^\.mp4$/i.test(asciiName) ? asciiName : "video.mp4";
+  return `attachment; filename="${safeAscii}"; filename*=UTF-8''${encodeURIComponent(cleanName)}`;
 }
 
 const server = http.createServer(async (req, res) => {
@@ -280,27 +290,29 @@ const server = http.createServer(async (req, res) => {
     }
 
     try {
-      let upstream = await fetch(targetUrl, { headers });
+      const fetchMethod = req.method === "HEAD" ? "HEAD" : "GET";
+      let upstream = await fetch(targetUrl, { method: fetchMethod, headers });
 
       // If token expired (403, 404, 410) and pageUrl is available, re-resolve live stream automatically bypassing cache
       if ((upstream.status === 403 || upstream.status === 404 || upstream.status === 410) && pageUrl) {
         const freshUrl = await resolveFreshStreamUrl(pageUrl, true);
         if (freshUrl && freshUrl !== targetUrl) {
           targetUrl = freshUrl;
-          upstream = await fetch(targetUrl, { headers });
+          upstream = await fetch(targetUrl, { method: fetchMethod, headers });
         }
       }
 
       const outHeaders = {
-        "Content-Type": upstream.headers.get("content-type") || "video/mp4",
+        "Content-Type": upstream.ok ? (upstream.headers.get("content-type") || "video/mp4") : (upstream.headers.get("content-type") || "text/plain"),
         "Accept-Ranges": "bytes",
+        "Cache-Control": "no-store",
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
         "Access-Control-Allow-Headers": "Range, Content-Type, Accept",
         "Access-Control-Expose-Headers": "Content-Range, Content-Length, Accept-Ranges, Content-Disposition",
       };
-      if (download) {
-        outHeaders["Content-Disposition"] = `attachment; filename="${encodeURIComponent(filename)}"; filename*=UTF-8''${encodeURIComponent(filename)}`;
+      if (download && upstream.ok) {
+        outHeaders["Content-Disposition"] = buildContentDisposition(filename);
       }
       if (upstream.headers.has("content-range")) {
         outHeaders["Content-Range"] = upstream.headers.get("content-range");
@@ -309,7 +321,7 @@ const server = http.createServer(async (req, res) => {
         outHeaders["Content-Length"] = upstream.headers.get("content-length");
       }
       res.writeHead(upstream.status, outHeaders);
-      if (!upstream.body) {
+      if (fetchMethod === "HEAD" || !upstream.body) {
         res.end();
         return;
       }

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import "@videojs/react/video/skin.css";
 import { VideoPlayer, VideoSkin, Video } from "@videojs/react/video";
+import { isIosDevice } from "./download.js";
 
 export interface VideoJs10ResumeRecord {
   episodeId: string;
@@ -89,9 +90,28 @@ export const VideoJs10Player: React.FC<VideoJs10PlayerProps> = ({
   storageKey = DEFAULT_STORAGE_KEY,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const prevSrcRef = useRef<string>(src);
   const [resumedNotice, setResumedNotice] = useState<string | null>(null);
   const [hasResumed, setHasResumed] = useState<boolean>(false);
   const lastSaveTimeRef = useRef<number>(0);
+  const isIos = isIosDevice();
+
+  // Ensure legacy iOS WebKit inline attributes and reload on src changes
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (isIos) {
+      video.setAttribute("webkit-playsinline", "true");
+      video.setAttribute("x-webkit-airplay", "allow");
+      video.removeAttribute("crossorigin");
+    }
+    if (prevSrcRef.current !== src) {
+      prevSrcRef.current = src;
+      if (typeof video.load === "function") {
+        video.load();
+      }
+    }
+  }, [src, isIos]);
 
   // Resume playback on media loaded / mount
   useEffect(() => {
@@ -103,22 +123,29 @@ export const VideoJs10Player: React.FC<VideoJs10PlayerProps> = ({
       if (saved.partIndex === partIndex || saved.partIndex === undefined) {
         const video = videoRef.current;
         if (video) {
-          const handleLoadedMetadata = () => {
-            if (saved.currentTime < video.duration - 2) {
+          const applyResumeSeek = () => {
+            if (!Number.isFinite(video.duration) || video.duration <= 2) return;
+            if (saved.currentTime >= video.duration - 2) return;
+            // iOS AVPlayer may report seekable.length === 0 at loadedmetadata; defer until canplay
+            if (isIos && video.seekable && video.seekable.length === 0) {
+              video.addEventListener("canplay", applyResumeSeek, { once: true });
+              return;
+            }
+            try {
               video.currentTime = saved.currentTime;
               setResumedNotice(`已為您自動回到上次觀看時間：${Math.floor(saved.currentTime / 60)}分${Math.floor(saved.currentTime % 60)}秒`);
               setTimeout(() => setResumedNotice(null), 5000);
-            }
+            } catch {}
           };
           if (video.readyState >= 1) {
-            handleLoadedMetadata();
+            applyResumeSeek();
           } else {
-            video.addEventListener("loadedmetadata", handleLoadedMetadata, { once: true });
+            video.addEventListener("loadedmetadata", applyResumeSeek, { once: true });
           }
         }
       }
     }
-  }, [src, episodeId, partIndex, storageKey]);
+  }, [src, episodeId, partIndex, storageKey, isIos]);
 
   // Handle time updates and periodic resume storage
   const handleTimeUpdate = useCallback(() => {
@@ -205,8 +232,9 @@ export const VideoJs10Player: React.FC<VideoJs10PlayerProps> = ({
             ref={videoRef}
             src={src}
             poster={poster}
+            preload="metadata"
             playsInline
-            crossOrigin="anonymous"
+            crossOrigin={isIos ? undefined : "anonymous"}
             autoPlay={autoPlay}
             controls={Boolean(controls)}
             onTimeUpdate={handleTimeUpdate}
