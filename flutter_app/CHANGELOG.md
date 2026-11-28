@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.0](https://github.com/dylansalim3/dTVSteams/compare/v1.4.1...v1.5.0) (2026-11-28)
+
+
+### Features
+
+* add settings light/dark mode switch and rounded borderless app icon ([babc86d](https://github.com/dylansalim3/dTVSteams/commit/babc86d9702a0daff96021cba3b8e92017649414))
+
 ## [1.4.1](https://github.com/dylansalim3/dTVSteams/compare/v1.4.0...v1.4.1) (2026-11-26)
 
 
