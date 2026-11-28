@@ -45,8 +45,8 @@ abstract final class AppColors {
   static AppThemePalette _active = AppThemes.boardUiDefault;
 
   static AppThemePalette get activeTheme => _active;
-  static void setThemeById(String? id) {
-    _active = AppThemes.byId(id);
+  static void setThemeById(String? id, {Brightness brightness = Brightness.dark}) {
+    _active = AppThemes.byId(id, brightness: brightness);
   }
 
   /// Registers a build dependency on [AppThemeScope] (and [Theme.of]) so
@@ -69,6 +69,7 @@ abstract final class AppColors {
 
   static Color get accent => _active.accent;
   static Color get onAccent => _active.onAccent;
+  static Color get accentForeground => _active.accentForeground;
   static Color get accentHover => _active.accentHover;
   static Color get accentSoft => _active.accentSoft;
 
@@ -219,16 +220,25 @@ abstract final class AppType {
       );
 }
 
-/// BoardUI dark-mode layered shadows.
+/// BoardUI layered shadows calibrated for active light/dark polarity.
 abstract final class AppShadows {
-  static const List<BoxShadow> card = [
-    BoxShadow(color: Color(0x24000000), blurRadius: 1, offset: Offset(0, 1)),
-  ];
+  static List<BoxShadow> get card => AppColors.brightness == Brightness.light
+      ? const [
+          BoxShadow(color: Color(0x0D000000), blurRadius: 2, offset: Offset(0, 1)),
+        ]
+      : const [
+          BoxShadow(color: Color(0x24000000), blurRadius: 1, offset: Offset(0, 1)),
+        ];
 
-  static const List<BoxShadow> dropdown = [
-    BoxShadow(color: Color(0x24000000), blurRadius: 1, offset: Offset(0, 1)),
-    BoxShadow(color: Color(0x1A000000), blurRadius: 4, offset: Offset(0, 4)),
-  ];
+  static List<BoxShadow> get dropdown => AppColors.brightness == Brightness.light
+      ? const [
+          BoxShadow(color: Color(0x0D000000), blurRadius: 2, offset: Offset(0, 1)),
+          BoxShadow(color: Color(0x0A000000), blurRadius: 6, offset: Offset(0, 4)),
+        ]
+      : const [
+          BoxShadow(color: Color(0x24000000), blurRadius: 1, offset: Offset(0, 1)),
+          BoxShadow(color: Color(0x1A000000), blurRadius: 4, offset: Offset(0, 4)),
+        ];
 }
 
 /// Motion durations aligned to BoardUI's 150-300ms transition budget.

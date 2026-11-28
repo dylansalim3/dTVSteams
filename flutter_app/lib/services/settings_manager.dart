@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import '../ui/app_themes.dart';
 import '../ui/app_tokens.dart';
@@ -16,13 +17,17 @@ class SettingsManager extends ChangeNotifier {
   bool _autoPlayNext = true; // Default ON: Auto-play next part/episode countdown
   String? _customDownloadPath; // Null means default app storage
   String _themeId = AppThemes.defaultThemeId;
+  Brightness _themeBrightness = Brightness.dark;
 
   bool get backgroundPlay => _backgroundPlay;
   bool get keepScreenAwake => _keepScreenAwake;
   bool get autoPlayNext => _autoPlayNext;
   String? get customDownloadPath => _customDownloadPath;
   String get themeId => _themeId;
-  AppThemePalette get activeTheme => AppThemes.byId(_themeId);
+  Brightness get themeBrightness => _themeBrightness;
+  bool get isDarkMode => _themeBrightness == Brightness.dark;
+  AppThemePalette get activeTheme =>
+      AppThemes.byId(_themeId, brightness: _themeBrightness);
 
   File? _settingsFile;
   bool _initialized = false;
@@ -48,16 +53,31 @@ class SettingsManager extends ChangeNotifier {
         if (json.containsKey('customDownloadPath')) {
           _customDownloadPath = json['customDownloadPath'] as String?;
         }
+
+        var appearanceChanged = false;
+        if (json.containsKey('themeBrightness')) {
+          final loadedBrightness =
+              (json['themeBrightness'] as String?) == 'light'
+                  ? Brightness.light
+                  : Brightness.dark;
+          if (_themeBrightness != loadedBrightness) {
+            _themeBrightness = loadedBrightness;
+            appearanceChanged = true;
+          }
+        }
         if (json.containsKey('themeId')) {
           final loadedId = json['themeId'] as String?;
-          final resolved = AppThemes.byId(loadedId).id;
-          final changed = _themeId != resolved;
-          _themeId = resolved;
-          AppColors.setThemeById(_themeId);
-          AppSystemUi.restoreNormalChrome();
-          if (changed) {
-            notifyListeners();
+          final resolved =
+              AppThemes.byId(loadedId, brightness: _themeBrightness).id;
+          if (_themeId != resolved) {
+            _themeId = resolved;
+            appearanceChanged = true;
           }
+        }
+        if (appearanceChanged) {
+          AppColors.setThemeById(_themeId, brightness: _themeBrightness);
+          AppSystemUi.restoreNormalChrome();
+          notifyListeners();
         }
       }
     } catch (e) {
@@ -96,14 +116,26 @@ class SettingsManager extends ChangeNotifier {
   }
 
   Future<void> setThemeId(String id) async {
-    final normalized = AppThemes.byId(id).id;
+    final normalized = AppThemes.byId(id, brightness: _themeBrightness).id;
     if (_themeId == normalized) return;
     _themeId = normalized;
-    AppColors.setThemeById(_themeId);
+    AppColors.setThemeById(_themeId, brightness: _themeBrightness);
     AppSystemUi.restoreNormalChrome();
     notifyListeners();
     await _persist();
   }
+
+  Future<void> setThemeBrightness(Brightness brightness) async {
+    if (_themeBrightness == brightness) return;
+    _themeBrightness = brightness;
+    AppColors.setThemeById(_themeId, brightness: _themeBrightness);
+    AppSystemUi.restoreNormalChrome();
+    notifyListeners();
+    await _persist();
+  }
+
+  Future<void> toggleThemeBrightness() =>
+      setThemeBrightness(isDarkMode ? Brightness.light : Brightness.dark);
 
   Future<void> _persist() async {
     try {
@@ -117,6 +149,7 @@ class SettingsManager extends ChangeNotifier {
         'autoPlayNext': _autoPlayNext,
         'customDownloadPath': _customDownloadPath,
         'themeId': _themeId,
+        'themeBrightness': _themeBrightness == Brightness.light ? 'light' : 'dark',
       };
       await _settingsFile!.writeAsString(jsonEncode(data));
     } catch (e) {
@@ -131,13 +164,15 @@ class SettingsManager extends ChangeNotifier {
     bool autoPlayNext = true,
     String? customDownloadPath,
     String themeId = AppThemes.defaultThemeId,
+    Brightness themeBrightness = Brightness.dark,
   }) {
     _backgroundPlay = backgroundPlay;
     _keepScreenAwake = keepScreenAwake;
     _autoPlayNext = autoPlayNext;
     _customDownloadPath = customDownloadPath;
-    _themeId = AppThemes.byId(themeId).id;
-    AppColors.setThemeById(_themeId);
+    _themeBrightness = themeBrightness;
+    _themeId = AppThemes.byId(themeId, brightness: _themeBrightness).id;
+    AppColors.setThemeById(_themeId, brightness: _themeBrightness);
     _initialized = true;
     notifyListeners();
   }

@@ -105,6 +105,7 @@ class TripleCircleDownloadButton extends StatelessWidget {
                       anyDownloading: anyDownloading,
                       anyFailed: anyFailed,
                       themeId: AppColors.activeTheme.id,
+                      brightness: AppColors.brightness,
                     ),
                   ),
                 ),
@@ -127,6 +128,7 @@ class TripleRingPainter extends CustomPainter {
   final bool anyDownloading;
   final bool anyFailed;
   final String themeId;
+  final Brightness brightness;
 
   TripleRingPainter({
     required this.progresses,
@@ -137,6 +139,7 @@ class TripleRingPainter extends CustomPainter {
     required this.anyDownloading,
     required this.anyFailed,
     this.themeId = '',
+    this.brightness = Brightness.dark,
   });
 
   @override
@@ -294,6 +297,7 @@ class TripleRingPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant TripleRingPainter oldDelegate) {
     return themeId != oldDelegate.themeId ||
+        brightness != oldDelegate.brightness ||
         allDownloaded != oldDelegate.allDownloaded ||
         anyDownloading != oldDelegate.anyDownloading ||
         anyFailed != oldDelegate.anyFailed ||
@@ -407,8 +411,8 @@ Future<void> _confirmDeletePart({
         ),
         OutlinedButton(
           style: OutlinedButton.styleFrom(
-            foregroundColor: AppColors.accent,
-            side: BorderSide(color: AppColors.accent),
+            foregroundColor: AppColors.accentForeground,
+            side: BorderSide(color: AppColors.accentForeground),
             minimumSize: const Size(0, 44),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.chip)),
           ),
@@ -511,7 +515,7 @@ void showDownloadSelectionSheet(
                             borderRadius: BorderRadius.circular(AppRadius.control),
                             border: Border.all(color: AppColors.accent.withValues(alpha: 0.35)),
                           ),
-                          child: Icon(Icons.download_for_offline, color: AppColors.accent, size: 20),
+                          child: Icon(Icons.download_for_offline, color: AppColors.accentForeground, size: 20),
                         ),
                         const SizedBox(width: AppSpacing.md),
                         Expanded(
@@ -521,7 +525,7 @@ void showDownloadSelectionSheet(
                               if (showName.isNotEmpty) ...[
                                 Text(
                                   '$showEmoji $showName',
-                                  style: AppType.caption1Semibold.copyWith(color: AppColors.accent),
+                                  style: AppType.caption1Semibold.copyWith(color: AppColors.accentForeground),
                                 ),
                                 const SizedBox(height: 2),
                               ],

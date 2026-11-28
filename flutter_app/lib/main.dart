@@ -33,7 +33,7 @@ class DTVSteamsApp extends StatelessWidget {
     return ListenableBuilder(
       listenable: settings,
       builder: (context, _) {
-        AppColors.setThemeById(settings.themeId);
+        AppColors.setThemeById(settings.themeId, brightness: settings.themeBrightness);
         return AppThemeScope(
           notifier: settings,
           child: MaterialApp(
@@ -830,7 +830,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   Icons.folder_special,
                                   size: 20,
                                   color: (activeCount > 0 || downloadedCount > 0)
-                                      ? AppColors.accent
+                                      ? AppColors.accentForeground
                                       : AppColors.textSecondary,
                                 ),
                                 tooltip: '下載庫',
@@ -869,7 +869,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       : Icons.settings_outlined,
                                   size: 20,
                                   color: _updateManager.updateAvailable
-                                      ? AppColors.accent
+                                      ? AppColors.accentForeground
                                       : AppColors.textSecondary,
                                 ),
                                 tooltip: '設定與關於',

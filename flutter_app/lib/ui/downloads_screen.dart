@@ -243,7 +243,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                 child: Text(
                   '$favoritesCount',
                   style: AppType.caption1Semibold.copyWith(
-                    color: AppColors.accent,
+                    color: AppColors.accentForeground,
                     fontFeatures: AppType.tabular,
                   ),
                 ),
@@ -305,8 +305,8 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                         ),
                         OutlinedButton(
                           style: OutlinedButton.styleFrom(
-                            foregroundColor: AppColors.accent,
-                            side: BorderSide(color: AppColors.accent),
+                            foregroundColor: AppColors.accentForeground,
+                            side: BorderSide(color: AppColors.accentForeground),
                           ),
                           onPressed: () async {
                             Navigator.of(ctx).pop();
@@ -586,7 +586,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
           currentIndex: _currentTabIndex,
           onTap: (idx) => setState(() => _currentTabIndex = idx),
           backgroundColor: AppColors.surfaceOverlay,
-          selectedItemColor: AppColors.accent,
+          selectedItemColor: AppColors.accentForeground,
           unselectedItemColor: AppColors.textSecondary,
           selectedFontSize: 12,
           unselectedFontSize: 11,

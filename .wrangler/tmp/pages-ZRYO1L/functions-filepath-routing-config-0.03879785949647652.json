@@ -1,0 +1,61 @@
+{
+  "routes": [
+    {
+      "routePath": "/api/episodes",
+      "mountPath": "/api",
+      "method": "GET",
+      "module": [
+        "api/episodes.js:onRequestGet"
+      ]
+    },
+    {
+      "routePath": "/api/episodes",
+      "mountPath": "/api",
+      "method": "OPTIONS",
+      "module": [
+        "api/episodes.js:onRequestOptions"
+      ]
+    },
+    {
+      "routePath": "/api/resolve-stream",
+      "mountPath": "/api",
+      "method": "GET",
+      "module": [
+        "api/resolve-stream.js:onRequestGet"
+      ]
+    },
+    {
+      "routePath": "/api/resolve-stream",
+      "mountPath": "/api",
+      "method": "OPTIONS",
+      "module": [
+        "api/resolve-stream.js:onRequestOptions"
+      ]
+    },
+    {
+      "routePath": "/api/thumbnail",
+      "mountPath": "/api",
+      "method": "GET",
+      "module": [
+        "api/thumbnail.js:onRequestGet"
+      ]
+    },
+    {
+      "routePath": "/api/thumbnail",
+      "mountPath": "/api",
+      "method": "OPTIONS",
+      "module": [
+        "api/thumbnail.js:onRequestOptions"
+      ]
+    },
+    {
+      "routePath": "/api/stream",
+      "mountPath": "/api",
+      "method": "",
+      "module": [
+        "api/stream.js:onRequest"
+      ]
+    }
+  ],
+  "baseURL": "/"
+}

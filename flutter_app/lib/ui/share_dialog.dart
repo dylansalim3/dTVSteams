@@ -122,7 +122,7 @@ class _ShareDialogState extends State<ShareDialog> {
                       borderRadius: BorderRadius.circular(AppRadius.control),
                       border: Border.all(color: AppColors.accent.withValues(alpha: 0.35)),
                     ),
-                    child: Icon(Icons.share, color: AppColors.accent, size: 20),
+                    child: Icon(Icons.share, color: AppColors.accentForeground, size: 20),
                   ),
                   const SizedBox(width: AppSpacing.md),
                   Expanded(
@@ -132,7 +132,7 @@ class _ShareDialogState extends State<ShareDialog> {
                         if (showName.isNotEmpty) ...[
                           Text(
                             '$showEmoji $showName · $partLabel',
-                            style: AppType.caption1Semibold.copyWith(color: AppColors.accent),
+                            style: AppType.caption1Semibold.copyWith(color: AppColors.accentForeground),
                           ),
                           const SizedBox(height: 2),
                         ],
@@ -208,7 +208,7 @@ class _ShareDialogState extends State<ShareDialog> {
                     const SizedBox(width: 6),
                     TextButton.icon(
                       style: TextButton.styleFrom(
-                        foregroundColor: _copied ? AppColors.success : AppColors.accent,
+                        foregroundColor: _copied ? AppColors.success : AppColors.accentForeground,
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         minimumSize: Size.zero,
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -218,7 +218,7 @@ class _ShareDialogState extends State<ShareDialog> {
                       label: Text(
                         _copied ? '已複製' : '複製',
                         style: AppType.caption1Semibold.copyWith(
-                          color: _copied ? AppColors.success : AppColors.accent,
+                          color: _copied ? AppColors.success : AppColors.accentForeground,
                         ),
                       ),
                     ),

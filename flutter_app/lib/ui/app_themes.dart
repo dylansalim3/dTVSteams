@@ -45,6 +45,22 @@ class AppThemePalette {
   Color get borderHover => borderDefault;
   Color get actionCircleBg => textPrimary.withValues(alpha: 0.06);
 
+  /// Contrast-safe foreground color when accent is rendered as text or icon
+  /// directly on canvas, surfaceSecondary, or surfaceRaised (WCAG AA >= 4.5:1).
+  Color get accentForeground {
+    bool passes(Color c) =>
+        contrastRatio(c, canvas) >= 4.5 &&
+        contrastRatio(c, surfaceSecondary) >= 4.5 &&
+        contrastRatio(c, surfaceRaised) >= 4.5;
+
+    if (passes(accent)) return accent;
+    for (int i = 1; i <= 20; i++) {
+      final candidate = Color.lerp(accent, textPrimary, i / 20)!;
+      if (passes(candidate)) return candidate;
+    }
+    return textPrimary;
+  }
+
   /// WCAG 2.1 relative luminance (0.0 - 1.0).
   static double relativeLuminance(Color c) {
     double lin(double v) => v <= 0.03928 ? v / 12.92 : math.pow((v + 0.055) / 1.055, 2.4).toDouble();
@@ -59,7 +75,26 @@ class AppThemePalette {
   }
 }
 
-/// Curated default BoardUI theme plus the first 20 community themes from https://21st.dev/themes.
+/// Paired light & dark palettes for a single named theme.
+class AppThemePair {
+  final AppThemePalette light;
+  final AppThemePalette dark;
+
+  const AppThemePair({
+    required this.light,
+    required this.dark,
+  });
+
+  String get id => dark.id;
+  String get name => dark.name;
+  String get source => dark.source;
+
+  AppThemePalette forBrightness(Brightness brightness) =>
+      brightness == Brightness.light ? light : dark;
+}
+
+/// Curated default BoardUI theme plus the first 20 community themes from https://21st.dev/themes,
+/// each with both a dark and light counterpart.
 abstract final class AppThemes {
   static const String defaultThemeId = 'boardui';
 
@@ -67,6 +102,7 @@ abstract final class AppThemes {
     id: 'boardui',
     name: 'BoardUI Crimson (預設)',
     source: 'BoardUI',
+    brightness: Brightness.dark,
     canvas: Color(0xFF121212),
     surfaceSecondary: Color(0xFF171717),
     surfacePrimary: Color(0xFF262626),
@@ -81,12 +117,32 @@ abstract final class AppThemes {
     borderDefault: Color(0xFF404040),
   );
 
-  /// First 20 themes sourced from https://21st.dev/themes
+  static const AppThemePalette boardUiDefaultLight = AppThemePalette(
+    id: 'boardui',
+    name: 'BoardUI Crimson (預設)',
+    source: 'BoardUI',
+    brightness: Brightness.light,
+    canvas: Color(0xFFFFFFFF),
+    surfaceSecondary: Color(0xFFF7F7F7),
+    surfacePrimary: Color(0xFFEBEBEB),
+    surfaceRaised: Color(0xFFFFFFFF),
+    surfaceSunken: Color(0xFFE5E5E5),
+    accent: Color(0xFFE50914),
+    onAccent: Color(0xFFFFFFFF),
+    textPrimary: Color(0xFF0A0A0A),
+    textSecondary: Color(0xFF525252),
+    textTertiary: Color(0xFF737373),
+    borderSeparator: Color(0xFFEBEBEB),
+    borderDefault: Color(0xFFD4D4D4),
+  );
+
+  /// First 20 dark themes sourced from https://21st.dev/themes
   static const List<AppThemePalette> twentyFirstDevThemes = [
     AppThemePalette(
       id: 'vercel',
       name: 'Vercel',
       source: '21st.dev',
+      brightness: Brightness.dark,
       canvas: Color(0xFF000000),
       surfaceSecondary: Color(0xFF090909),
       surfacePrimary: Color(0xFF1D1D1D),
@@ -104,6 +160,7 @@ abstract final class AppThemes {
       id: 'claude',
       name: 'Claude',
       source: '21st.dev',
+      brightness: Brightness.dark,
       canvas: Color(0xFF262624),
       surfaceSecondary: Color(0xFF2E2E2B),
       surfacePrimary: Color(0xFF1B1B19),
@@ -121,6 +178,7 @@ abstract final class AppThemes {
       id: 'supabase',
       name: 'Supabase',
       source: '21st.dev',
+      brightness: Brightness.dark,
       canvas: Color(0xFF121212),
       surfaceSecondary: Color(0xFF171717),
       surfacePrimary: Color(0xFF1F1F1F),
@@ -138,6 +196,7 @@ abstract final class AppThemes {
       id: 'catppuccin',
       name: 'Catppuccin',
       source: '21st.dev',
+      brightness: Brightness.dark,
       canvas: Color(0xFF181825),
       surfaceSecondary: Color(0xFF1E1E2E),
       surfacePrimary: Color(0xFF292C3C),
@@ -155,6 +214,7 @@ abstract final class AppThemes {
       id: 'solar-dusk',
       name: 'Solar Dusk',
       source: '21st.dev',
+      brightness: Brightness.dark,
       canvas: Color(0xFF1C1917),
       surfaceSecondary: Color(0xFF292524),
       surfacePrimary: Color(0xFF201D1A),
@@ -172,6 +232,7 @@ abstract final class AppThemes {
       id: 'lime-frost',
       name: 'Lime Frost',
       source: '21st.dev',
+      brightness: Brightness.dark,
       canvas: Color(0xFF020617),
       surfaceSecondary: Color(0xFF0F172A),
       surfacePrimary: Color(0xFF1E293B),
@@ -189,6 +250,7 @@ abstract final class AppThemes {
       id: 'ocean-breeze',
       name: 'Ocean Breeze',
       source: '21st.dev',
+      brightness: Brightness.dark,
       canvas: Color(0xFF0F172A),
       surfaceSecondary: Color(0xFF1E293B),
       surfacePrimary: Color(0xFF19212E),
@@ -206,6 +268,7 @@ abstract final class AppThemes {
       id: 'doom-64',
       name: 'Doom 64',
       source: '21st.dev',
+      brightness: Brightness.dark,
       canvas: Color(0xFF1A1A1A),
       surfaceSecondary: Color(0xFF2A2A2A),
       surfacePrimary: Color(0xFF252525),
@@ -223,6 +286,7 @@ abstract final class AppThemes {
       id: 'modern-minimal',
       name: 'Modern Minimal',
       source: '21st.dev',
+      brightness: Brightness.dark,
       canvas: Color(0xFF171717),
       surfaceSecondary: Color(0xFF262626),
       surfacePrimary: Color(0xFF1F1F1F),
@@ -240,6 +304,7 @@ abstract final class AppThemes {
       id: 'zen-linen',
       name: 'Zen Linen',
       source: '21st.dev',
+      brightness: Brightness.dark,
       canvas: Color(0xFF141414),
       surfaceSecondary: Color(0xFF1C1C1C),
       surfacePrimary: Color(0xFF2A2A2A),
@@ -257,6 +322,7 @@ abstract final class AppThemes {
       id: 'claude-amber',
       name: 'Claude Amber',
       source: '21st.dev',
+      brightness: Brightness.dark,
       canvas: Color(0xFF262624),
       surfaceSecondary: Color(0xFF2C2C2B),
       surfacePrimary: Color(0xFF1B1B19),
@@ -274,6 +340,7 @@ abstract final class AppThemes {
       id: 'sage-garden',
       name: 'Sage Garden',
       source: '21st.dev',
+      brightness: Brightness.dark,
       canvas: Color(0xFF0A0A0A),
       surfaceSecondary: Color(0xFF121212),
       surfacePrimary: Color(0xFF1A1A1A),
@@ -291,6 +358,7 @@ abstract final class AppThemes {
       id: 'elegant-luxury',
       name: 'Elegant Luxury',
       source: '21st.dev',
+      brightness: Brightness.dark,
       canvas: Color(0xFF1C1917),
       surfaceSecondary: Color(0xFF292524),
       surfacePrimary: Color(0xFF1F1C1A),
@@ -308,6 +376,7 @@ abstract final class AppThemes {
       id: 'twitter',
       name: 'Twitter',
       source: '21st.dev',
+      brightness: Brightness.dark,
       canvas: Color(0xFF000000),
       surfaceSecondary: Color(0xFF17181C),
       surfacePrimary: Color(0xFF181818),
@@ -325,6 +394,7 @@ abstract final class AppThemes {
       id: 'vintage-paper',
       name: 'Vintage Paper',
       source: '21st.dev',
+      brightness: Brightness.dark,
       canvas: Color(0xFF2D2621),
       surfaceSecondary: Color(0xFF3A322C),
       surfacePrimary: Color(0xFF312B26),
@@ -342,6 +412,7 @@ abstract final class AppThemes {
       id: 'graphite-mono',
       name: 'Graphite Mono',
       source: '21st.dev',
+      brightness: Brightness.dark,
       canvas: Color(0xFF171717),
       surfaceSecondary: Color(0xFF0E0E0E),
       surfacePrimary: Color(0xFF262626),
@@ -359,6 +430,7 @@ abstract final class AppThemes {
       id: 'amber-slate',
       name: 'Amber Slate',
       source: '21st.dev',
+      brightness: Brightness.dark,
       canvas: Color(0xFF1A1A1A),
       surfaceSecondary: Color(0xFF202020),
       surfacePrimary: Color(0xFF2A2A2A),
@@ -376,6 +448,7 @@ abstract final class AppThemes {
       id: 'azure-mono',
       name: 'Azure Mono',
       source: '21st.dev',
+      brightness: Brightness.dark,
       canvas: Color(0xFF000000),
       surfaceSecondary: Color(0xFF0F0F0F),
       surfacePrimary: Color(0xFF181818),
@@ -393,6 +466,7 @@ abstract final class AppThemes {
       id: 't3-chat',
       name: 'T3 Chat',
       source: '21st.dev',
+      brightness: Brightness.dark,
       canvas: Color(0xFF221D27),
       surfaceSecondary: Color(0xFF2C2632),
       surfacePrimary: Color(0xFF28222D),
@@ -410,6 +484,7 @@ abstract final class AppThemes {
       id: 'indigo-mono',
       name: 'Indigo Mono',
       source: '21st.dev',
+      brightness: Brightness.dark,
       canvas: Color(0xFF000000),
       surfaceSecondary: Color(0xFF181818),
       surfacePrimary: Color(0xFF1D1D1D),
@@ -425,16 +500,405 @@ abstract final class AppThemes {
     ),
   ];
 
+  /// Light mode counterparts for the 20 themes from https://21st.dev/themes
+  static const List<AppThemePalette> twentyFirstDevLightThemes = [
+    AppThemePalette(
+      id: 'vercel',
+      name: 'Vercel',
+      source: '21st.dev',
+      brightness: Brightness.light,
+      canvas: Color(0xFFFCFCFC),
+      surfaceSecondary: Color(0xFFF5F5F5),
+      surfacePrimary: Color(0xFFEBEBEB),
+      surfaceRaised: Color(0xFFFFFFFF),
+      surfaceSunken: Color(0xFFE4E4E4),
+      accent: Color(0xFF000000),
+      onAccent: Color(0xFFFFFFFF),
+      textPrimary: Color(0xFF000000),
+      textSecondary: Color(0xFF525252),
+      textTertiary: Color(0xFF6B6B6B),
+      borderSeparator: Color(0xFFE4E4E4),
+      borderDefault: Color(0xFFCCCCCC),
+    ),
+    AppThemePalette(
+      id: 'claude',
+      name: 'Claude',
+      source: '21st.dev',
+      brightness: Brightness.light,
+      canvas: Color(0xFFFAF9F5),
+      surfaceSecondary: Color(0xFFF2EFE6),
+      surfacePrimary: Color(0xFFE9E6DC),
+      surfaceRaised: Color(0xFFFFFFFF),
+      surfaceSunken: Color(0xFFE2DED2),
+      accent: Color(0xFFC96442),
+      onAccent: Color(0xFF0A0A0A),
+      textPrimary: Color(0xFF3D3929),
+      textSecondary: Color(0xFF5E5D57),
+      textTertiary: Color(0xFF73726C),
+      borderSeparator: Color(0xFFDAD9D4),
+      borderDefault: Color(0xFFB4B2A7),
+    ),
+    AppThemePalette(
+      id: 'supabase',
+      name: 'Supabase',
+      source: '21st.dev',
+      brightness: Brightness.light,
+      canvas: Color(0xFFFCFCFC),
+      surfaceSecondary: Color(0xFFF4F4F4),
+      surfacePrimary: Color(0xFFEDEDED),
+      surfaceRaised: Color(0xFFFFFFFF),
+      surfaceSunken: Color(0xFFE4E4E4),
+      accent: Color(0xFF72E3AD),
+      onAccent: Color(0xFF1E2723),
+      textPrimary: Color(0xFF171717),
+      textSecondary: Color(0xFF4A4A4A),
+      textTertiary: Color(0xFF6B6B6B),
+      borderSeparator: Color(0xFFDFDFDF),
+      borderDefault: Color(0xFFC7C7C7),
+    ),
+    AppThemePalette(
+      id: 'catppuccin',
+      name: 'Catppuccin',
+      source: '21st.dev',
+      brightness: Brightness.light,
+      canvas: Color(0xFFEFF1F5),
+      surfaceSecondary: Color(0xFFE6E9EF),
+      surfacePrimary: Color(0xFFDCE0E8),
+      surfaceRaised: Color(0xFFFFFFFF),
+      surfaceSunken: Color(0xFFCCD0DA),
+      accent: Color(0xFF8839EF),
+      onAccent: Color(0xFFFFFFFF),
+      textPrimary: Color(0xFF4C4F69),
+      textSecondary: Color(0xFF51546E),
+      textTertiary: Color(0xFF6C6F85),
+      borderSeparator: Color(0xFFBCC0CC),
+      borderDefault: Color(0xFFACB0BE),
+    ),
+    AppThemePalette(
+      id: 'solar-dusk',
+      name: 'Solar Dusk',
+      source: '21st.dev',
+      brightness: Brightness.light,
+      canvas: Color(0xFFFDFBF7),
+      surfaceSecondary: Color(0xFFF8F4EE),
+      surfacePrimary: Color(0xFFF1E9DA),
+      surfaceRaised: Color(0xFFFFFFFF),
+      surfaceSunken: Color(0xFFE7DEC8),
+      accent: Color(0xFFB45309),
+      onAccent: Color(0xFFFFFFFF),
+      textPrimary: Color(0xFF4A3B33),
+      textSecondary: Color(0xFF5C5652),
+      textTertiary: Color(0xFF78716C),
+      borderSeparator: Color(0xFFE4D9BC),
+      borderDefault: Color(0xFFCBBFA0),
+    ),
+    AppThemePalette(
+      id: 'lime-frost',
+      name: 'Lime Frost',
+      source: '21st.dev',
+      brightness: Brightness.light,
+      canvas: Color(0xFFFBFCF8),
+      surfaceSecondary: Color(0xFFF1F5F9),
+      surfacePrimary: Color(0xFFE6ECF2),
+      surfaceRaised: Color(0xFFFFFFFF),
+      surfaceSunken: Color(0xFFDCE3EC),
+      accent: Color(0xFFAFF33E),
+      onAccent: Color(0xFF000000),
+      textPrimary: Color(0xFF0F172A),
+      textSecondary: Color(0xFF475569),
+      textTertiary: Color(0xFF64748B),
+      borderSeparator: Color(0xFFE2E8F0),
+      borderDefault: Color(0xFFCBD5E1),
+    ),
+    AppThemePalette(
+      id: 'ocean-breeze',
+      name: 'Ocean Breeze',
+      source: '21st.dev',
+      brightness: Brightness.light,
+      canvas: Color(0xFFF0F8FF),
+      surfaceSecondary: Color(0xFFE6F2FC),
+      surfacePrimary: Color(0xFFDCECF8),
+      surfaceRaised: Color(0xFFFFFFFF),
+      surfaceSunken: Color(0xFFD0E3F3),
+      accent: Color(0xFF22C55E),
+      onAccent: Color(0xFF0A0A0A),
+      textPrimary: Color(0xFF1F2937),
+      textSecondary: Color(0xFF4B5563),
+      textTertiary: Color(0xFF6B7280),
+      borderSeparator: Color(0xFFD1DFEC),
+      borderDefault: Color(0xFFB8CCE0),
+    ),
+    AppThemePalette(
+      id: 'doom-64',
+      name: 'Doom 64',
+      source: '21st.dev',
+      brightness: Brightness.light,
+      canvas: Color(0xFFE6E6E6),
+      surfaceSecondary: Color(0xFFDCDCDC),
+      surfacePrimary: Color(0xFFD0D0D0),
+      surfaceRaised: Color(0xFFF0F0F0),
+      surfaceSunken: Color(0xFFC4C4C4),
+      accent: Color(0xFFB71C1C),
+      onAccent: Color(0xFFFFFFFF),
+      textPrimary: Color(0xFF1F1F1F),
+      textSecondary: Color(0xFF3D3D3D),
+      textTertiary: Color(0xFF555555),
+      borderSeparator: Color(0xFFB0B0B0),
+      borderDefault: Color(0xFF8F8F8F),
+    ),
+    AppThemePalette(
+      id: 'modern-minimal',
+      name: 'Modern Minimal',
+      source: '21st.dev',
+      brightness: Brightness.light,
+      canvas: Color(0xFFFFFFFF),
+      surfaceSecondary: Color(0xFFF9FAFB),
+      surfacePrimary: Color(0xFFF1F3F5),
+      surfaceRaised: Color(0xFFFFFFFF),
+      surfaceSunken: Color(0xFFE5E7EB),
+      accent: Color(0xFF2563EB),
+      onAccent: Color(0xFFFFFFFF),
+      textPrimary: Color(0xFF1F2937),
+      textSecondary: Color(0xFF4B5563),
+      textTertiary: Color(0xFF6B7280),
+      borderSeparator: Color(0xFFE5E7EB),
+      borderDefault: Color(0xFFD1D5DB),
+    ),
+    AppThemePalette(
+      id: 'zen-linen',
+      name: 'Zen Linen',
+      source: '21st.dev',
+      brightness: Brightness.light,
+      canvas: Color(0xFFEFECE4),
+      surfaceSecondary: Color(0xFFE6E1D5),
+      surfacePrimary: Color(0xFFDCD6C6),
+      surfaceRaised: Color(0xFFF7F4EC),
+      surfaceSunken: Color(0xFFCFC8B8),
+      accent: Color(0xFF2E2E2E),
+      onAccent: Color(0xFFF4EFE4),
+      textPrimary: Color(0xFF1E1E1E),
+      textSecondary: Color(0xFF4A463F),
+      textTertiary: Color(0xFF5E5A52),
+      borderSeparator: Color(0xFFD2CBBB),
+      borderDefault: Color(0xFFB8B09E),
+    ),
+    AppThemePalette(
+      id: 'claude-amber',
+      name: 'Claude Amber',
+      source: '21st.dev',
+      brightness: Brightness.light,
+      canvas: Color(0xFFFAF9F5),
+      surfaceSecondary: Color(0xFFF3F1EA),
+      surfacePrimary: Color(0xFFE9E6DC),
+      surfaceRaised: Color(0xFFFFFFFF),
+      surfaceSunken: Color(0xFFE1DDD1),
+      accent: Color(0xFFC96442),
+      onAccent: Color(0xFF0A0A0A),
+      textPrimary: Color(0xFF3D3929),
+      textSecondary: Color(0xFF595853),
+      textTertiary: Color(0xFF6E6D68),
+      borderSeparator: Color(0xFFDAD9D4),
+      borderDefault: Color(0xFFB4B2A7),
+    ),
+    AppThemePalette(
+      id: 'sage-garden',
+      name: 'Sage Garden',
+      source: '21st.dev',
+      brightness: Brightness.light,
+      canvas: Color(0xFFF8F7F4),
+      surfaceSecondary: Color(0xFFEFECE6),
+      surfacePrimary: Color(0xFFE5E2D9),
+      surfaceRaised: Color(0xFFFFFFFF),
+      surfaceSunken: Color(0xFFDBD7CC),
+      accent: Color(0xFF7C9082),
+      onAccent: Color(0xFF0A0A0A),
+      textPrimary: Color(0xFF1A1F2E),
+      textSecondary: Color(0xFF4B525E),
+      textTertiary: Color(0xFF6B7280),
+      borderSeparator: Color(0xFFE2DFD7),
+      borderDefault: Color(0xFFC9C5BA),
+    ),
+    AppThemePalette(
+      id: 'elegant-luxury',
+      name: 'Elegant Luxury',
+      source: '21st.dev',
+      brightness: Brightness.light,
+      canvas: Color(0xFFFAF7F5),
+      surfaceSecondary: Color(0xFFF3ECE8),
+      surfacePrimary: Color(0xFFEAE1DC),
+      surfaceRaised: Color(0xFFFFFFFF),
+      surfaceSunken: Color(0xFFE0D4CD),
+      accent: Color(0xFF9B2C2C),
+      onAccent: Color(0xFFFFFFFF),
+      textPrimary: Color(0xFF1A1A1A),
+      textSecondary: Color(0xFF57534E),
+      textTertiary: Color(0xFF78716C),
+      borderSeparator: Color(0xFFE9DDD2),
+      borderDefault: Color(0xFFD6C5B6),
+    ),
+    AppThemePalette(
+      id: 'twitter',
+      name: 'Twitter',
+      source: '21st.dev',
+      brightness: Brightness.light,
+      canvas: Color(0xFFFFFFFF),
+      surfaceSecondary: Color(0xFFF7F8F8),
+      surfacePrimary: Color(0xFFEBEEF0),
+      surfaceRaised: Color(0xFFFFFFFF),
+      surfaceSunken: Color(0xFFE1E5E8),
+      accent: Color(0xFF1E9DF1),
+      onAccent: Color(0xFF0A0A0A),
+      textPrimary: Color(0xFF0F1419),
+      textSecondary: Color(0xFF4A5560),
+      textTertiary: Color(0xFF68737E),
+      borderSeparator: Color(0xFFE1EAEF),
+      borderDefault: Color(0xFFC9D6DE),
+    ),
+    AppThemePalette(
+      id: 'vintage-paper',
+      name: 'Vintage Paper',
+      source: '21st.dev',
+      brightness: Brightness.light,
+      canvas: Color(0xFFF5F1E6),
+      surfaceSecondary: Color(0xFFEDE6D8),
+      surfacePrimary: Color(0xFFE3DAC8),
+      surfaceRaised: Color(0xFFFFFCF5),
+      surfaceSunken: Color(0xFFD9CEB8),
+      accent: Color(0xFFA67C52),
+      onAccent: Color(0xFF0A0A0A),
+      textPrimary: Color(0xFF4A3F35),
+      textSecondary: Color(0xFF5C4E40),
+      textTertiary: Color(0xFF7D6B56),
+      borderSeparator: Color(0xFFDBD0BA),
+      borderDefault: Color(0xFFC2B397),
+    ),
+    AppThemePalette(
+      id: 'graphite-mono',
+      name: 'Graphite Mono',
+      source: '21st.dev',
+      brightness: Brightness.light,
+      canvas: Color(0xFFFFFFFF),
+      surfaceSecondary: Color(0xFFF5F5F5),
+      surfacePrimary: Color(0xFFEAEAEA),
+      surfaceRaised: Color(0xFFFDFDFD),
+      surfaceSunken: Color(0xFFE0E0E0),
+      accent: Color(0xFF171717),
+      onAccent: Color(0xFFFAFAFA),
+      textPrimary: Color(0xFF0A0A0A),
+      textSecondary: Color(0xFF525252),
+      textTertiary: Color(0xFF737373),
+      borderSeparator: Color(0xFFE5E5E5),
+      borderDefault: Color(0xFFCCCCCC),
+    ),
+    AppThemePalette(
+      id: 'amber-slate',
+      name: 'Amber Slate',
+      source: '21st.dev',
+      brightness: Brightness.light,
+      canvas: Color(0xFFF5F6F7),
+      surfaceSecondary: Color(0xFFECEEF0),
+      surfacePrimary: Color(0xFFE2E5E8),
+      surfaceRaised: Color(0xFFFFFFFF),
+      surfaceSunken: Color(0xFFD6DAE0),
+      accent: Color(0xFFDF6035),
+      onAccent: Color(0xFF0A0A0A),
+      textPrimary: Color(0xFF1F242B),
+      textSecondary: Color(0xFF4B525C),
+      textTertiary: Color(0xFF6B7280),
+      borderSeparator: Color(0xFFD5D9DF),
+      borderDefault: Color(0xFFBAC0C9),
+    ),
+    AppThemePalette(
+      id: 'azure-mono',
+      name: 'Azure Mono',
+      source: '21st.dev',
+      brightness: Brightness.light,
+      canvas: Color(0xFFFCFCFC),
+      surfaceSecondary: Color(0xFFF3F5F8),
+      surfacePrimary: Color(0xFFE8ECF2),
+      surfaceRaised: Color(0xFFFFFFFF),
+      surfaceSunken: Color(0xFFDCE2EC),
+      accent: Color(0xFF2E67FF),
+      onAccent: Color(0xFFFFFFFF),
+      textPrimary: Color(0xFF0E142B),
+      textSecondary: Color(0xFF3D4663),
+      textTertiary: Color(0xFF5B6480),
+      borderSeparator: Color(0xFFE2E5EB),
+      borderDefault: Color(0xFFC6CBD6),
+    ),
+    AppThemePalette(
+      id: 't3-chat',
+      name: 'T3 Chat',
+      source: '21st.dev',
+      brightness: Brightness.light,
+      canvas: Color(0xFFFAF5FA),
+      surfaceSecondary: Color(0xFFF4E9F3),
+      surfacePrimary: Color(0xFFEEDBF0),
+      surfaceRaised: Color(0xFFFFFFFF),
+      surfaceSunken: Color(0xFFE6CBE7),
+      accent: Color(0xFFA84370),
+      onAccent: Color(0xFFFFFFFF),
+      textPrimary: Color(0xFF501854),
+      textSecondary: Color(0xFF6A2B6F),
+      textTertiary: Color(0xFF834588),
+      borderSeparator: Color(0xFFEBC4EB),
+      borderDefault: Color(0xFFD6A3D8),
+    ),
+    AppThemePalette(
+      id: 'indigo-mono',
+      name: 'Indigo Mono',
+      source: '21st.dev',
+      brightness: Brightness.light,
+      canvas: Color(0xFFFAFAFA),
+      surfaceSecondary: Color(0xFFF3F3F5),
+      surfacePrimary: Color(0xFFE8E9EE),
+      surfaceRaised: Color(0xFFFFFFFF),
+      surfaceSunken: Color(0xFFDCDDE4),
+      accent: Color(0xFF3F5EC2),
+      onAccent: Color(0xFFEFF6FF),
+      textPrimary: Color(0xFF0F172A),
+      textSecondary: Color(0xFF475569),
+      textTertiary: Color(0xFF64748B),
+      borderSeparator: Color(0xFFE4E4E7),
+      borderDefault: Color(0xFFCBD0DA),
+    ),
+  ];
+
   static const List<AppThemePalette> all = [
     boardUiDefault,
     ...twentyFirstDevThemes,
   ];
 
-  static AppThemePalette byId(String? id) {
-    if (id == null || id.isEmpty) return boardUiDefault;
-    for (final t in all) {
-      if (t.id == id) return t;
+  static const List<AppThemePalette> allLight = [
+    boardUiDefaultLight,
+    ...twentyFirstDevLightThemes,
+  ];
+
+  static const List<AppThemePalette> allPalettes = [
+    ...all,
+    ...allLight,
+  ];
+
+  static final List<AppThemePair> pairs = [
+    for (int i = 0; i < all.length; i++)
+      AppThemePair(
+        light: allLight[i],
+        dark: all[i],
+      ),
+  ];
+
+  static List<AppThemePalette> allForBrightness(Brightness brightness) =>
+      brightness == Brightness.light ? allLight : all;
+
+  static AppThemePair pairById(String? id) {
+    if (id == null || id.isEmpty) return pairs.first;
+    for (final p in pairs) {
+      if (p.id == id) return p;
     }
-    return boardUiDefault;
+    return pairs.first;
+  }
+
+  static AppThemePalette byId(String? id, {Brightness brightness = Brightness.dark}) {
+    return pairById(id).forBrightness(brightness);
   }
 }

@@ -95,9 +95,13 @@ void main() {
   });
 
   group('21st.dev Theme Catalog & Contrast Invariants', () {
-    test('contains default BoardUI theme plus exact first 20 themes from 21st.dev', () {
+    test('contains default BoardUI theme plus exact first 20 themes from 21st.dev, each with light & dark counterparts', () {
       expect(AppThemes.twentyFirstDevThemes.length, 20);
+      expect(AppThemes.twentyFirstDevLightThemes.length, 20);
       expect(AppThemes.all.length, 21);
+      expect(AppThemes.allLight.length, 21);
+      expect(AppThemes.pairs.length, 21);
+      expect(AppThemes.allPalettes.length, 42);
 
       final ids = AppThemes.all.map((t) => t.id).toSet();
       final names = AppThemes.all.map((t) => t.name).toSet();
@@ -105,11 +109,20 @@ void main() {
       expect(names.length, 21);
       expect(AppThemes.twentyFirstDevThemes.first.id, 'vercel');
       expect(AppThemes.twentyFirstDevThemes.last.id, 'indigo-mono');
+
+      for (final pair in AppThemes.pairs) {
+        expect(pair.light.id, pair.dark.id);
+        expect(pair.light.name, pair.dark.name);
+        expect(pair.light.brightness, Brightness.light);
+        expect(pair.dark.brightness, Brightness.dark);
+        expect(AppThemes.byId(pair.id, brightness: Brightness.light).brightness, Brightness.light);
+        expect(AppThemes.byId(pair.id, brightness: Brightness.dark).brightness, Brightness.dark);
+      }
     });
 
-    test('every theme satisfies WCAG AA >= 4.5:1 contrast for selected and unselected text', () {
-      for (final palette in AppThemes.all) {
-        AppColors.setThemeById(palette.id);
+    test('every theme (both light and dark counterparts) satisfies WCAG AA >= 4.5:1 contrast for selected and unselected text', () {
+      for (final palette in AppThemes.allPalettes) {
+        AppColors.setThemeById(palette.id, brightness: palette.brightness);
 
         // Selected text on accent surface (buttons, active chips, active pagination)
         final onAccentRatio = AppThemePalette.contrastRatio(AppColors.onAccent, AppColors.accent);
@@ -139,6 +152,20 @@ void main() {
             secondaryContrast,
             greaterThanOrEqualTo(4.5),
             reason: '${palette.name} textSecondary contrast too low: $secondaryContrast',
+          );
+        }
+
+        // Foreground accent text/icon contrast across primary surfaces
+        for (final surface in [
+          AppColors.canvas,
+          AppColors.surfaceSecondary,
+          AppColors.surfaceRaised,
+        ]) {
+          final accentFgContrast = AppThemePalette.contrastRatio(AppColors.accentForeground, surface);
+          expect(
+            accentFgContrast,
+            greaterThanOrEqualTo(4.5),
+            reason: '${palette.name} (${palette.brightness}) accentForeground contrast too low: $accentFgContrast',
           );
         }
 
@@ -258,6 +285,84 @@ void main() {
       expect(AppColors.activeTheme.id, 'lime-frost');
       expectVisibleContrast(tester, find.text('已選文字'), AppColors.accent, 'ThemePicker 已選文字 (lime-frost)');
       expectVisibleContrast(tester, find.text('未選文字'), AppColors.surfacePrimary, 'ThemePicker 未選文字 (lime-frost)');
+
+      // Switch to Light mode inside ThemePickerSheet and confirm light counterpart is applied
+      await tester.tap(find.byKey(const ValueKey('theme_picker_light_mode_button')));
+      await tester.pumpAndSettle();
+      expect(SettingsManager().themeBrightness, Brightness.light);
+      expect(AppColors.brightness, Brightness.light);
+      expect(AppColors.activeTheme.id, 'lime-frost');
+      expect(AppColors.canvas, AppThemes.byId('lime-frost', brightness: Brightness.light).canvas);
+      expectVisibleContrast(tester, find.text('已選文字'), AppColors.accent, 'ThemePicker 已選文字 (lime-frost light)');
+      expectVisibleContrast(tester, find.text('未選文字'), AppColors.surfacePrimary, 'ThemePicker 未選文字 (lime-frost light)');
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('Settings sheet provides light/dark mode switch button that updates current theme counterpart', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(412, 915));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      SettingsManager().resetForTesting(
+        themeId: 'catppuccin',
+        themeBrightness: Brightness.dark,
+      );
+
+      final updateManager = UpdateManager();
+      await tester.pumpWidget(
+        ListenableBuilder(
+          listenable: SettingsManager(),
+          builder: (context, _) {
+            AppColors.setThemeById(
+              SettingsManager().themeId,
+              brightness: SettingsManager().themeBrightness,
+            );
+            return AppThemeScope(
+              notifier: SettingsManager(),
+              child: MaterialApp(
+                theme: ThemeData(brightness: AppColors.brightness),
+                home: Builder(
+                  builder: (context) => Scaffold(
+                    body: ElevatedButton(
+                      onPressed: () => AboutUpdateDialog.show(context, updateManager),
+                      child: const Text('Open Settings'),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      );
+
+      await tester.tap(find.text('Open Settings'));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const ValueKey('settings_theme_mode_toggle')), findsOneWidget);
+      expect(find.byKey(const ValueKey('settings_light_mode_button')), findsOneWidget);
+      expect(find.byKey(const ValueKey('settings_dark_mode_button')), findsOneWidget);
+      expect(find.text('目前為深色模式'), findsOneWidget);
+      expect(AppColors.brightness, Brightness.dark);
+
+      // Switch to Light mode counterpart of Catppuccin
+      await tester.tap(find.byKey(const ValueKey('settings_light_mode_button')));
+      await tester.pumpAndSettle();
+
+      expect(SettingsManager().themeBrightness, Brightness.light);
+      expect(SettingsManager().isDarkMode, isFalse);
+      expect(SettingsManager().themeId, 'catppuccin');
+      expect(AppColors.brightness, Brightness.light);
+      expect(AppColors.canvas, AppThemes.byId('catppuccin', brightness: Brightness.light).canvas);
+      expect(find.text('目前為淺色模式'), findsOneWidget);
+
+      // Switch back to Dark mode counterpart of Catppuccin
+      await tester.tap(find.byKey(const ValueKey('settings_dark_mode_button')));
+      await tester.pumpAndSettle();
+
+      expect(SettingsManager().themeBrightness, Brightness.dark);
+      expect(SettingsManager().isDarkMode, isTrue);
+      expect(AppColors.brightness, Brightness.dark);
+      expect(AppColors.canvas, AppThemes.byId('catppuccin', brightness: Brightness.dark).canvas);
+      expect(find.text('目前為深色模式'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
@@ -272,17 +377,21 @@ void main() {
       // - zen-linen: warm light surface + soft linen accent
       // - vintage-paper: paper light surface + warm terracotta accent
       // - ocean-breeze: teal dark theme
-      final stressThemes = [
-        'boardui',
-        'vercel',
-        'lime-frost',
-        'zen-linen',
-        'vintage-paper',
-        'ocean-breeze',
+      final stressConfigs = <(String, Brightness)>[
+        ('boardui', Brightness.dark),
+        ('boardui', Brightness.light),
+        ('vercel', Brightness.dark),
+        ('vercel', Brightness.light),
+        ('lime-frost', Brightness.dark),
+        ('lime-frost', Brightness.light),
+        ('zen-linen', Brightness.light),
+        ('vintage-paper', Brightness.light),
+        ('catppuccin', Brightness.light),
+        ('ocean-breeze', Brightness.dark),
       ];
 
-      for (final themeId in stressThemes) {
-        SettingsManager().resetForTesting(themeId: themeId);
+      for (final (themeId, brightness) in stressConfigs) {
+        SettingsManager().resetForTesting(themeId: themeId, themeBrightness: brightness);
 
         // 1. HomeScreen + selected/unselected year FilterChips + Pagination + ChannelPicker
         await tester.pumpWidget(
@@ -465,7 +574,7 @@ void main() {
         ListenableBuilder(
           listenable: settings,
           builder: (context, _) {
-            AppColors.setThemeById(settings.themeId);
+            AppColors.setThemeById(settings.themeId, brightness: settings.themeBrightness);
             return AppThemeScope(
               notifier: settings,
               child: MaterialApp(
@@ -512,11 +621,18 @@ void main() {
       );
       expect((initialPage1Box.decoration as BoxDecoration).color, AppThemes.boardUiDefault.accent);
 
-      // Switch to Light theme ('vercel') without changing channel/episodes
+      // Switch to Vercel dark theme without changing channel/episodes
       await tester.runAsync(() => settings.setThemeId('vercel'));
       await tester.pumpAndSettle();
 
-      final lightPalette = AppThemes.byId('vercel');
+      final vercelDarkPalette = AppThemes.byId('vercel', brightness: Brightness.dark);
+      expect((tester.widget<Container>(headerFinder.first).decoration as BoxDecoration).color, vercelDarkPalette.surfaceSecondary);
+
+      // Switch to Vercel light counterpart without changing themeId or episodes
+      await tester.runAsync(() => settings.setThemeBrightness(Brightness.light));
+      await tester.pumpAndSettle();
+
+      final lightPalette = AppThemes.byId('vercel', brightness: Brightness.light);
       expect((tester.widget<Container>(headerFinder.first).decoration as BoxDecoration).color, lightPalette.surfaceSecondary);
       final lightCard = tester.widget<Container>(
         find.descendant(
@@ -541,13 +657,13 @@ void main() {
       final lightTitle = tester.widget<Text>(find.text('最新劇集與節目 (Episodes)'));
       expect(lightTitle.style?.color, lightPalette.textPrimary);
 
-      // Switch to Dark theme ('tokyo-night') without changing channel/episodes
-      await tester.runAsync(() => settings.setThemeId('tokyo-night'));
+      // Switch to Catppuccin while staying in Light mode -> gets Catppuccin Latte light counterpart
+      await tester.runAsync(() => settings.setThemeId('catppuccin'));
       await tester.pumpAndSettle();
 
-      final tokyoPalette = AppThemes.byId('tokyo-night');
-      expect((tester.widget<Container>(headerFinder.first).decoration as BoxDecoration).color, tokyoPalette.surfaceSecondary);
-      final tokyoCard = tester.widget<Container>(
+      final catppuccinLight = AppThemes.byId('catppuccin', brightness: Brightness.light);
+      expect((tester.widget<Container>(headerFinder.first).decoration as BoxDecoration).color, catppuccinLight.surfaceSecondary);
+      final catppuccinCard = tester.widget<Container>(
         find.descendant(
           of: find.byType(YouTubeEpisodeCard).first,
           matching: find.byWidgetPredicate(
@@ -555,9 +671,9 @@ void main() {
           ),
         ).first,
       );
-      expect((tokyoCard.decoration as BoxDecoration).color, tokyoPalette.surfaceSecondary);
+      expect((catppuccinCard.decoration as BoxDecoration).color, catppuccinLight.surfaceSecondary);
 
-      final tokyoPage1Box = tester.widget<Container>(
+      final catppuccinPage1Box = tester.widget<Container>(
         find.descendant(
           of: find.byKey(const Key('page_btn_1')),
           matching: find.byWidgetPredicate(
@@ -565,7 +681,7 @@ void main() {
           ),
         ).first,
       );
-      expect((tokyoPage1Box.decoration as BoxDecoration).color, tokyoPalette.accent);
+      expect((catppuccinPage1Box.decoration as BoxDecoration).color, catppuccinLight.accent);
       expect(tester.takeException(), isNull);
     });
   });

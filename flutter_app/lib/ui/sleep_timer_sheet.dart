@@ -64,7 +64,7 @@ void showSleepTimerSheet(BuildContext context, {VoidCallback? onTimerChanged}) {
                                   color: AppColors.accent.withValues(alpha: 0.35),
                                 ),
                               ),
-                              child: Icon(Icons.timer_outlined, color: AppColors.accent, size: 20),
+                              child: Icon(Icons.timer_outlined, color: AppColors.accentForeground, size: 20),
                             ),
                             const SizedBox(width: AppSpacing.md - 2),
                             Expanded(
@@ -84,7 +84,7 @@ void showSleepTimerSheet(BuildContext context, {VoidCallback? onTimerChanged}) {
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: AppType.caption1Semibold.copyWith(
-                                        color: AppColors.accent,
+                                        color: AppColors.accentForeground,
                                         fontFeatures: AppType.tabular,
                                       ),
                                     ),
@@ -152,7 +152,7 @@ void showSleepTimerSheet(BuildContext context, {VoidCallback? onTimerChanged}) {
                                 Icon(
                                   isSelected ? Icons.check_circle : Icons.radio_button_unchecked,
                                   size: 18,
-                                  color: isSelected ? AppColors.accent : AppColors.textTertiary,
+                                  color: isSelected ? AppColors.accentForeground : AppColors.textTertiary,
                                 ),
                                 const SizedBox(width: AppSpacing.md),
                                 Expanded(
@@ -167,7 +167,7 @@ void showSleepTimerSheet(BuildContext context, {VoidCallback? onTimerChanged}) {
                                   Text(
                                     manager.formattedTime,
                                     style: AppType.caption1Semibold.copyWith(
-                                      color: AppColors.accent,
+                                      color: AppColors.accentForeground,
                                       fontFeatures: AppType.tabular,
                                     ),
                                   ),

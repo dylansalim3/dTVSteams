@@ -3,6 +3,110 @@ import '../services/settings_manager.dart';
 import 'app_themes.dart';
 import 'app_tokens.dart';
 
+/// Segmented pill button to switch between Light and Dark theme counterparts.
+class ThemeBrightnessToggle extends StatelessWidget {
+  final Brightness brightness;
+  final ValueChanged<Brightness> onChanged;
+  final Key? lightKey;
+  final Key? darkKey;
+
+  const ThemeBrightnessToggle({
+    super.key,
+    required this.brightness,
+    required this.onChanged,
+    this.lightKey,
+    this.darkKey,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    AppColors.watch(context);
+    final isLight = brightness == Brightness.light;
+    return Container(
+      padding: const EdgeInsets.all(3),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceSunken,
+        borderRadius: BorderRadius.circular(AppRadius.control),
+        border: Border.all(color: AppColors.borderSubtle),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _SegmentButton(
+            key: lightKey,
+            icon: Icons.light_mode_outlined,
+            label: '淺色',
+            selected: isLight,
+            onTap: () => onChanged(Brightness.light),
+          ),
+          const SizedBox(width: 2),
+          _SegmentButton(
+            key: darkKey,
+            icon: Icons.dark_mode_outlined,
+            label: '深色',
+            selected: !isLight,
+            onTap: () => onChanged(Brightness.dark),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SegmentButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _SegmentButton({
+    super.key,
+    required this.icon,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: label,
+      child: Material(
+        color: selected ? AppColors.accent : Colors.transparent,
+        borderRadius: BorderRadius.circular(AppRadius.sm - 1),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  icon,
+                  size: 14,
+                  color: selected ? AppColors.onAccent : AppColors.textSecondary,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: selected ? AppColors.onAccent : AppColors.textSecondary,
+                    fontSize: 12,
+                    fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 /// Opens the live 21st.dev theme picker modal bottom sheet.
 Future<void> showThemePickerSheet(
   BuildContext context, [
@@ -24,12 +128,13 @@ class ThemePickerSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.watch(context);
     return ListenableBuilder(
       listenable: settingsManager,
       builder: (context, _) {
         final activeId = settingsManager.themeId;
         final activeTheme = settingsManager.activeTheme;
-        final themes = AppThemes.all;
+        final themes = AppThemes.allForBrightness(settingsManager.themeBrightness);
         final mediaQuery = MediaQuery.of(context);
         final maxHeight = mediaQuery.size.height * 0.84;
 
@@ -89,6 +194,23 @@ class ThemePickerSheet extends StatelessWidget {
                           tooltip: '關閉主題選擇',
                           icon: Icon(Icons.close, color: AppColors.textSecondary),
                           onPressed: () => Navigator.of(context).pop(),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          '色彩模式',
+                          style: AppType.caption1Semibold.copyWith(color: AppColors.textSecondary),
+                        ),
+                        ThemeBrightnessToggle(
+                          key: const ValueKey('theme_picker_brightness_toggle'),
+                          lightKey: const ValueKey('theme_picker_light_mode_button'),
+                          darkKey: const ValueKey('theme_picker_dark_mode_button'),
+                          brightness: settingsManager.themeBrightness,
+                          onChanged: settingsManager.setThemeBrightness,
                         ),
                       ],
                     ),

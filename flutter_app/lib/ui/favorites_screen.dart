@@ -52,7 +52,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         ),
         title: Row(
           children: [
-            Icon(Icons.favorite, color: AppColors.accent, size: 20),
+            Icon(Icons.favorite, color: AppColors.accentForeground, size: 20),
             const SizedBox(width: AppSpacing.sm),
             Text('我的收藏 (Favorites)', style: AppType.title3Semibold),
             if (favorites.isNotEmpty) ...[
@@ -67,7 +67,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 child: Text(
                   '${favorites.length}',
                   style: AppType.caption1Semibold.copyWith(
-                    color: AppColors.accent,
+                    color: AppColors.accentForeground,
                     fontFeatures: AppType.tabular,
                   ),
                 ),
@@ -105,7 +105,7 @@ class FavoritesBody extends StatefulWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.modal)),
         title: Row(
           children: [
-            Icon(Icons.warning_amber_rounded, color: AppColors.accent, size: 24),
+            Icon(Icons.warning_amber_rounded, color: AppColors.accentForeground, size: 24),
             const SizedBox(width: AppSpacing.sm),
             Text('清空所有收藏？', style: TextStyle(color: AppColors.textPrimary, fontSize: 18)),
           ],
@@ -125,8 +125,8 @@ class FavoritesBody extends StatefulWidget {
           ),
           OutlinedButton(
             style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.accent,
-              side: BorderSide(color: AppColors.accent),
+              foregroundColor: AppColors.accentForeground,
+              side: BorderSide(color: AppColors.accentForeground),
             ),
             onPressed: () {
               Navigator.of(ctx).pop();
@@ -205,7 +205,7 @@ class _FavoritesBodyState extends State<FavoritesBody> {
                 child: Icon(
                   Icons.favorite_border,
                   size: 28,
-                  color: AppColors.accent,
+                  color: AppColors.accentForeground,
                 ),
               ),
               const SizedBox(height: AppSpacing.lg),

@@ -37,6 +37,25 @@ void main() {
       // Re-setting to same value does not notify needlessly
       await manager.setBackgroundPlay(false);
       expect(notifyCount, 2);
+
+      // Brightness mode switching updates activeTheme counterpart and notifies
+      expect(manager.themeBrightness, Brightness.dark);
+      expect(manager.isDarkMode, isTrue);
+      await manager.setThemeId('claude');
+      expect(notifyCount, 3);
+      expect(manager.activeTheme.brightness, Brightness.dark);
+
+      await manager.setThemeBrightness(Brightness.light);
+      expect(manager.themeBrightness, Brightness.light);
+      expect(manager.isDarkMode, isFalse);
+      expect(manager.activeTheme.id, 'claude');
+      expect(manager.activeTheme.brightness, Brightness.light);
+      expect(notifyCount, 4);
+
+      await manager.toggleThemeBrightness();
+      expect(manager.themeBrightness, Brightness.dark);
+      expect(manager.activeTheme.brightness, Brightness.dark);
+      expect(notifyCount, 5);
     });
   });
 

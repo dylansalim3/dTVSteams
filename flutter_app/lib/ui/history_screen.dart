@@ -50,7 +50,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         ),
         title: Row(
           children: [
-            Icon(Icons.history, color: AppColors.accent, size: 20),
+            Icon(Icons.history, color: AppColors.accentForeground, size: 20),
             const SizedBox(width: AppSpacing.sm),
             Text('觀看紀錄', style: AppType.title3Semibold),
             if (records.isNotEmpty) ...[
@@ -102,7 +102,7 @@ class HistoryBody extends StatefulWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.modal)),
         title: Row(
           children: [
-            Icon(Icons.warning_amber_rounded, color: AppColors.accent, size: 24),
+            Icon(Icons.warning_amber_rounded, color: AppColors.accentForeground, size: 24),
             const SizedBox(width: AppSpacing.sm),
             Text('清空所有歷史紀錄？', style: TextStyle(color: AppColors.textPrimary, fontSize: 18)),
           ],
@@ -122,8 +122,8 @@ class HistoryBody extends StatefulWidget {
           ),
           OutlinedButton(
             style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.accent,
-              side: BorderSide(color: AppColors.accent),
+              foregroundColor: AppColors.accentForeground,
+              side: BorderSide(color: AppColors.accentForeground),
             ),
             onPressed: () {
               Navigator.of(ctx).pop();
@@ -510,7 +510,7 @@ class _HistoryBodyState extends State<HistoryBody> {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
-                                color: AppColors.accent,
+                                color: AppColors.accentForeground,
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
                               ),

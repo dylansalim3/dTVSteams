@@ -375,7 +375,7 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                                 leading: Icon(
                                   _sleepTimerManager.isActive ? Icons.alarm_on : Icons.timer_outlined,
                                   size: 20,
-                                  color: _sleepTimerManager.isActive ? AppColors.accent : AppColors.textSecondary,
+                                  color: _sleepTimerManager.isActive ? AppColors.accentForeground : AppColors.textSecondary,
                                 ),
                                 title: Text('睡眠定時器 (Sleep Timer)',
                                     style: TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w600)),
@@ -386,7 +386,7 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
-                                    color: _sleepTimerManager.isActive ? AppColors.accent : AppColors.textMuted,
+                                    color: _sleepTimerManager.isActive ? AppColors.accentForeground : AppColors.textMuted,
                                     fontSize: 11,
                                     fontFeatures: const [FontFeature.tabularFigures()],
                                   ),
@@ -484,6 +484,7 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
 
   Widget _buildThemeSelectionCard(BuildContext context) {
     final activeTheme = _settingsManager.activeTheme;
+    final isDark = _settingsManager.isDarkMode;
     return Material(
       color: AppColors.cardBg,
       shape: RoundedRectangleBorder(
@@ -491,59 +492,114 @@ class _AboutUpdateSheetState extends State<_AboutUpdateSheet> {
         side: BorderSide(color: AppColors.borderSubtle),
       ),
       clipBehavior: Clip.antiAlias,
-      child: ListTile(
-        key: const ValueKey('settings_theme_picker_tile'),
-        dense: true,
-        contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
-        leading: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _themeDot(activeTheme.canvas),
-            const SizedBox(width: 3),
-            _themeDot(activeTheme.surfaceSecondary),
-            const SizedBox(width: 3),
-            _themeDot(activeTheme.accent),
-          ],
-        ),
-        title: Text(
-          activeTheme.name,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            color: AppColors.textPrimary,
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        subtitle: Text(
-          '點擊從 ${AppThemes.all.length} 款主題即時切換',
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(color: AppColors.textMuted, fontSize: 11),
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-              decoration: BoxDecoration(
-                color: AppColors.accent,
-                borderRadius: BorderRadius.circular(AppRadius.badge),
-              ),
-              child: Text(
-                '更換主題',
-                style: TextStyle(
-                  color: AppColors.onAccent,
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            key: const ValueKey('settings_theme_picker_tile'),
+            dense: true,
+            contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
+            leading: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _themeDot(activeTheme.canvas),
+                const SizedBox(width: 3),
+                _themeDot(activeTheme.surfaceSecondary),
+                const SizedBox(width: 3),
+                _themeDot(activeTheme.accent),
+              ],
+            ),
+            title: Text(
+              activeTheme.name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: AppColors.textPrimary,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
               ),
             ),
-            const SizedBox(width: 4),
-            Icon(Icons.chevron_right, color: AppColors.textTertiary, size: 18),
-          ],
-        ),
-        onTap: () => showThemePickerSheet(context, _settingsManager),
+            subtitle: Text(
+              '點擊從 ${AppThemes.all.length} 款主題即時切換',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(color: AppColors.textMuted, fontSize: 11),
+            ),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: AppColors.accent,
+                    borderRadius: BorderRadius.circular(AppRadius.badge),
+                  ),
+                  child: Text(
+                    '更換主題',
+                    style: TextStyle(
+                      color: AppColors.onAccent,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Icon(Icons.chevron_right, color: AppColors.textTertiary, size: 18),
+              ],
+            ),
+            onTap: () => showThemePickerSheet(context, _settingsManager),
+          ),
+          Divider(color: AppColors.borderSubtle, height: 1),
+          InkWell(
+            key: const ValueKey('settings_brightness_row'),
+            onTap: () => _settingsManager.toggleThemeBrightness(),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+              child: Row(
+                children: [
+                  Icon(
+                    isDark ? Icons.dark_mode_outlined : Icons.light_mode_outlined,
+                    size: 20,
+                    color: AppColors.textSecondary,
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '色彩模式',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: AppColors.textPrimary,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          isDark ? '目前為深色模式' : '目前為淺色模式',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(color: AppColors.textMuted, fontSize: 11),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  ThemeBrightnessToggle(
+                    key: const ValueKey('settings_theme_mode_toggle'),
+                    lightKey: const ValueKey('settings_light_mode_button'),
+                    darkKey: const ValueKey('settings_dark_mode_button'),
+                    brightness: _settingsManager.themeBrightness,
+                    onChanged: _settingsManager.setThemeBrightness,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
