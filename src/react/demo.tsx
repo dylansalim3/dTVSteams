@@ -1,16 +1,14 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
-  RiArrowDownLine,
   RiArrowDownSLine,
   RiArrowLeftSLine,
   RiArrowRightSLine,
-  RiArrowUpLine,
   RiCheckLine,
   RiCloseLine,
+  RiDeleteBin6Line,
   RiDownloadLine,
   RiErrorWarningLine,
-  RiExternalLinkLine,
   RiFileCopyLine,
   RiFilmLine,
   RiFolderMusicLine,
@@ -19,17 +17,18 @@ import {
   RiHistoryLine,
   RiInformationLine,
   RiMapPinLine,
+  RiMoonLine,
   RiPlayFill,
   RiRefreshLine,
-  RiSettings3Line,
   RiShareForwardLine,
+  RiSunLine,
   RiTv2Line,
 } from "@remixicon/react";
 import { Chip } from "@/components/base/badges/chip";
 import { Counter } from "@/components/base/badges/counter";
 import { Button } from "@/components/base/buttons/button";
 import { CloseButton } from "@/components/base/buttons/close-button";
-import { IconButton, IconLinkButton } from "@/components/base/buttons/icon-button";
+import { IconButton } from "@/components/base/buttons/icon-button";
 import { LinkButton } from "@/components/base/buttons/link-button";
 import { Divider } from "@/components/base/divider/divider";
 import { SearchField } from "@/components/base/search-field/search-field";
@@ -41,7 +40,18 @@ import { Skeleton } from "@/components/base/skeleton/skeleton";
 import { Spinner } from "@/components/base/spinner/spinner";
 import { DirectionProvider } from "@/components/foundations/direction/direction";
 import { cx } from "@/utils/cx";
-import { VideoJs10Player, getStoredResume } from "./VideoJs10Player.js";
+import {
+  VideoJs10Player,
+  clearAllStoredResumes,
+  clearStoredResume,
+  getStoredResume,
+} from "./VideoJs10Player.js";
+import {
+  WebSettingsState,
+  applyWebTheme,
+  readWebSettings,
+  saveWebSettings,
+} from "./themes.js";
 import {
   buildPartDownloadHref,
   getDownloadFilename,
@@ -51,13 +61,10 @@ import {
 import {
   EpisodeItem,
   EpisodePart,
-  LATEST_APK_RELEASE_URL,
   SHOW_CHANNELS,
   ShowChannelMeta,
-  YEAR_OPTIONS,
   detectShowChannel,
   extractLocation,
-  matchesYearFilter,
   stripShowNameFromTitle,
 } from "./channels.js";
 
@@ -150,7 +157,35 @@ function buildShareUrl(ep: EpisodeItem, partIdx: number): string {
   return `${origin}/?${params.toString()}`;
 }
 
+function buildFallbackEpisodeFromUrl(epId: string): EpisodeItem {
+  const showMeta = detectShowChannel({ id: epId, title: epId, url: epId });
+  const cleanUrl = epId.endsWith("/") ? epId : `${epId}/`;
+  const dateMatch = epId.match(/\d{4}-\d{2}-\d{2}/);
+  let title = `${showMeta.name}${dateMatch ? ` ${dateMatch[0]}` : ""}`;
+  try {
+    const decoded = decodeURIComponent(epId);
+    const slug = decoded.replace(/\/+$/, "").split("/").pop() || "";
+    if (slug && !slug.startsWith("http")) {
+      title = slug.replace(/-/g, " ");
+    }
+  } catch {}
+  return {
+    id: epId,
+    title,
+    date: dateMatch ? dateMatch[0] : "",
+    url: epId,
+    showId: showMeta.id,
+    showName: showMeta.name,
+    parts: [
+      { label: "Part 1", url: cleanUrl },
+      { label: "Part 2", url: `${cleanUrl}2/` },
+      { label: "Part 3", url: `${cleanUrl}3/` },
+    ],
+  };
+}
+
 function App() {
+  const [webSettings, setWebSettings] = useState<WebSettingsState>(() => readWebSettings());
   const [currentChannel, setCurrentChannel] = useState<ShowChannelMeta>(SHOW_CHANNELS[0]);
   const [episodes, setEpisodes] = useState<EpisodeItem[]>([]);
   const [selectedEpId, setSelectedEpId] = useState<string>("");
@@ -159,15 +194,12 @@ function App() {
   const [pageCache, setPageCache] = useState<Record<string, EpisodeItem[]>>({});
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedYear, setSelectedYear] = useState<string>("全部");
-  const [isSortAscending, setIsSortAscending] = useState(false);
 
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [isLoadingPage, setIsLoadingPage] = useState(false);
   const [catalogError, setCatalogError] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
-  const [isPlayerCollapsed, setIsPlayerCollapsed] = useState(false);
   const [streamRetryLevel, setStreamRetryLevel] = useState(0);
   const [isChannelModalOpen, setIsChannelModalOpen] = useState(false);
   const [isLibraryModalOpen, setIsLibraryModalOpen] = useState(false);
@@ -184,9 +216,22 @@ function App() {
   const [favorites, setFavorites] = useState<EpisodeItem[]>(() => readFavorites());
   const [historyEntries, setHistoryEntries] = useState<HistoryEntry[]>(() => readHistoryList());
 
-  const loadChannelPage = async (channel: ShowChannelMeta, page = 1) => {
+  useEffect(() => {
+    applyWebTheme(webSettings.themeId, webSettings.brightness);
+    saveWebSettings(webSettings);
+  }, [webSettings]);
+
+  const updateWebSettings = (patch: Partial<WebSettingsState>) => {
+    setWebSettings((prev) => ({ ...prev, ...patch }));
+  };
+
+  const loadChannelPage = async (
+    channel: ShowChannelMeta,
+    page = 1,
+    options?: { forceRefresh?: boolean; deepLinkEpId?: string },
+  ) => {
     const cacheKey = `${channel.id}:${page}`;
-    if (pageCache[cacheKey]) {
+    if (!options?.forceRefresh && pageCache[cacheKey]) {
       setEpisodes(pageCache[cacheKey]);
       setCurrentPage(page);
       setIsInitialLoading(false);
@@ -197,43 +242,63 @@ function App() {
     setIsLoadingPage(true);
     setCatalogError(null);
 
+    let cachedStatic: EpisodeItem[] = [];
     try {
-      let loaded: EpisodeItem[] = [];
-      if (page === 1 && channel.id === "mr_player") {
+      if (page === 1 && channel.id === "mr_player" && !options?.forceRefresh) {
         try {
           const res = await fetch(`./catalog.json?_t=${Date.now()}`, { cache: "no-store" });
           if (res.ok) {
             const data = await res.json();
-            loaded = data.episodes || [];
+            cachedStatic = data.episodes || [];
           }
         } catch {}
       }
 
-      if (!loaded.length) {
-        const res = await fetch(
-          `/api/episodes?page=${page}&show=${encodeURIComponent(channel.id)}`,
-        );
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        loaded = data.episodes || [];
+      if (cachedStatic.length > 0) {
+        const listWithLink =
+          options?.deepLinkEpId && !cachedStatic.some((e) => e.id === options.deepLinkEpId)
+            ? [buildFallbackEpisodeFromUrl(options.deepLinkEpId), ...cachedStatic]
+            : cachedStatic;
+        setPageCache((prev) => ({ ...prev, [cacheKey]: listWithLink }));
+        setEpisodes(listWithLink);
+        setCurrentPage(page);
+        setSelectedEpId((prev) => options?.deepLinkEpId || prev || listWithLink[0]?.id || "");
+        setIsInitialLoading(false);
       }
 
-      if (!loaded.length) throw new Error("空集數清單");
+      const res = await fetch(
+        `/api/episodes?page=${page}&show=${encodeURIComponent(channel.id)}`,
+      );
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      const liveLoaded: EpisodeItem[] = data.episodes || [];
+      if (!liveLoaded.length) throw new Error("空集數清單");
 
-      setPageCache((prev) => ({ ...prev, [cacheKey]: loaded }));
-      setEpisodes(loaded);
+      const finalLoaded =
+        options?.deepLinkEpId && !liveLoaded.some((e) => e.id === options.deepLinkEpId)
+          ? [buildFallbackEpisodeFromUrl(options.deepLinkEpId), ...liveLoaded]
+          : liveLoaded;
+
+      setPageCache((prev) => ({ ...prev, [cacheKey]: finalLoaded }));
+      setEpisodes(finalLoaded);
       setCurrentPage(page);
       if (page === 1) {
-        setSelectedEpId((prev) => prev || loaded[0]?.id || "");
+        setSelectedEpId((prev) => options?.deepLinkEpId || prev || finalLoaded[0]?.id || "");
       }
-      setStatusMessage(`已同步 (${loaded.length} 集)`);
+      setStatusMessage(`已同步最新集數 (${finalLoaded.length} 集)`);
     } catch {
-      const fallback = page === 1 ? channel.fallbackEpisodes : episodes;
-      setEpisodes(fallback);
-      if (page === 1) {
-        setSelectedEpId(fallback[0]?.id || "");
+      if (!cachedStatic.length) {
+        const fallbackBase = page === 1 ? channel.fallbackEpisodes : episodes;
+        const fallback =
+          options?.deepLinkEpId && !fallbackBase.some((e) => e.id === options.deepLinkEpId)
+            ? [buildFallbackEpisodeFromUrl(options.deepLinkEpId), ...fallbackBase]
+            : fallbackBase;
+        setEpisodes(fallback);
+        if (page === 1) {
+          setSelectedEpId((prev) => options?.deepLinkEpId || prev || fallback[0]?.id || "");
+        }
+        setCatalogError("暫時無法連線至遠端目錄，已顯示離線預設清單。");
       }
-      setCatalogError("暫時無法連線至遠端目錄，已顯示離線預設清單。");
     } finally {
       setIsInitialLoading(false);
       setIsLoadingPage(false);
@@ -241,7 +306,24 @@ function App() {
   };
 
   useEffect(() => {
-    void loadChannelPage(SHOW_CHANNELS[0], 1);
+    const params =
+      typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+    const epParam = params?.get("ep")?.trim() || "";
+    const partParam = parseInt(params?.get("part") || "1", 10);
+
+    let initialChannel = SHOW_CHANNELS[0];
+    if (epParam) {
+      initialChannel = detectShowChannel({ id: epParam, title: epParam, url: epParam });
+      setCurrentChannel(initialChannel);
+      setSelectedEpId(epParam);
+      if (!Number.isNaN(partParam) && partParam >= 1) {
+        setPartIndex(partParam - 1);
+      }
+    }
+
+    void loadChannelPage(initialChannel, 1, {
+      deepLinkEpId: epParam || undefined,
+    });
   }, []);
 
   useEffect(() => {
@@ -332,18 +414,14 @@ function App() {
   const filteredEpisodes = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     const list = episodes.filter((ep) => {
-      const matchQuery =
-        !q ||
+      if (!q) return true;
+      return (
         ep.title.toLowerCase().includes(q) ||
-        (ep.date && ep.date.toLowerCase().includes(q));
-      const matchYear = matchesYearFilter(ep, selectedYear);
-      return matchQuery && matchYear;
+        Boolean(ep.date && ep.date.toLowerCase().includes(q))
+      );
     });
-    return [...list].sort((a, b) => {
-      const cmp = (b.date || "").localeCompare(a.date || "");
-      return isSortAscending ? -cmp : cmp;
-    });
-  }, [episodes, searchQuery, selectedYear, isSortAscending]);
+    return [...list].sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+  }, [episodes, searchQuery]);
 
   const activeEp = useMemo(
     () =>
@@ -372,7 +450,6 @@ function App() {
     setIsChannelModalOpen(false);
     if (ch.id === currentChannel.id) return;
     setCurrentChannel(ch);
-    setSelectedYear("全部");
     setSearchQuery("");
     setSelectedEpId("");
     setPartIndex(0);
@@ -440,7 +517,7 @@ function App() {
                 href="./"
                 className="flex shrink-0 items-center gap-1.5 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-border-focus-ring"
               >
-                <span className="rounded-md bg-accent-500 px-1.5 py-0.5 text-sm font-extrabold tracking-wide text-white">
+                <span className="rounded-md bg-accent-500 px-1.5 py-0.5 text-sm font-extrabold tracking-wide text-[var(--color-text-on-accent)]">
                   dTV
                 </span>
                 <span className="hidden text-caption-1-semibold tracking-widest text-text-secondary sm:inline">
@@ -487,12 +564,7 @@ function App() {
                 title="刷新集數"
                 disabled={isLoadingPage}
                 onClick={() => {
-                  setPageCache((prev) => {
-                    const copy = { ...prev };
-                    delete copy[`${currentChannel.id}:${currentPage}`];
-                    return copy;
-                  });
-                  void loadChannelPage(currentChannel, currentPage);
+                  void loadChannelPage(currentChannel, currentPage, { forceRefresh: true });
                 }}
               />
 
@@ -505,15 +577,18 @@ function App() {
                 onClick={() => setIsShareModalOpen(true)}
               />
 
-              {/* Settings gear links directly to GitHub Latest APK page */}
-              <IconLinkButton
-                href={LATEST_APK_RELEASE_URL}
-                target="_blank"
-                rel="noopener noreferrer"
+              {/* Compact 1-tap Light / Dark mode toggle */}
+              <IconButton
                 size="small"
-                icon={RiSettings3Line}
-                aria-label="前往 GitHub 下載最新 Android APK"
-                title="下載最新 Android APK (GitHub Releases)"
+                icon={webSettings.brightness === "dark" ? RiSunLine : RiMoonLine}
+                aria-label={webSettings.brightness === "dark" ? "切換為淺色模式" : "切換為深色模式"}
+                title={webSettings.brightness === "dark" ? "切換為淺色模式" : "切換為深色模式"}
+                onClick={() =>
+                  updateWebSettings({
+                    themeId: "boardui",
+                    brightness: webSettings.brightness === "dark" ? "light" : "dark",
+                  })
+                }
               />
             </div>
           </div>
@@ -531,51 +606,6 @@ function App() {
             onChange={setSearchQuery}
           />
 
-          {/* Horizontal Year Filter Chips + Chronological Sort Switch (matching Flutter) */}
-          <div className="flex items-center gap-2">
-            <div className="flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto py-0.5 [scrollbar-width:none]">
-              {YEAR_OPTIONS.map((year) => {
-                const isSelected = selectedYear === year;
-                return (
-                  <button
-                    key={year}
-                    type="button"
-                    onClick={() => setSelectedYear(year)}
-                    className={cx(
-                      "shrink-0 cursor-pointer rounded-md border px-3 py-1.5 text-caption-1-medium tabular-nums transition-colors",
-                      "outline-none focus-visible:ring-2 focus-visible:ring-border-focus-ring",
-                      isSelected
-                        ? "border-accent-500 bg-accent-500 font-semibold text-white"
-                        : "border-separator-border bg-background-secondary-default text-text-secondary hover:bg-background-tertiary-default hover:text-text-primary",
-                    )}
-                  >
-                    {year}
-                  </button>
-                );
-              })}
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setIsSortAscending((v) => !v)}
-              aria-label="切換集數排序"
-              className={cx(
-                "flex shrink-0 cursor-pointer items-center gap-1 rounded-2lg border px-2.5 py-1.5 text-caption-1-semibold transition-colors",
-                "outline-none focus-visible:ring-2 focus-visible:ring-border-focus-ring",
-                isSortAscending
-                  ? "border-accent-500 bg-accent-500 text-white"
-                  : "border-separator-border bg-background-secondary-default text-text-primary hover:bg-background-tertiary-default",
-              )}
-            >
-              {isSortAscending ? (
-                <RiArrowUpLine className="size-3.5" aria-hidden="true" />
-              ) : (
-                <RiArrowDownLine className="size-3.5" aria-hidden="true" />
-              )}
-              <span>{isSortAscending ? "舊到新" : "新到舊"}</span>
-            </button>
-          </div>
-
           {catalogError ? (
             <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-border-button-default bg-background-secondary-default px-3.5 py-2.5">
               <span className="text-caption-1-regular text-text-secondary">{catalogError}</span>
@@ -590,75 +620,76 @@ function App() {
             </div>
           ) : null}
 
-          {/* Collapsible Mobile-Styled Video Player Card */}
+          {/* Video Player Card */}
           <section className="rounded-2xl border border-separator-border bg-background-secondary-default p-3 shadow-card">
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex min-w-0 flex-wrap items-center gap-2">
-                <Chip variant="caption" color="rose" className="tabular-nums">
-                  {activePart.label}
-                </Chip>
-                <span className="truncate text-caption-1-semibold text-text-primary">
-                  {activeEp.title}
-                </span>
-              </div>
-              <Button
-                variant="secondary"
-                size="xs"
-                onClick={() => setIsPlayerCollapsed((c) => !c)}
-              >
-                {isPlayerCollapsed ? "展開播放器" : "收合播放器"}
-              </Button>
+            <div className="flex min-w-0 flex-wrap items-center gap-2">
+              <Chip variant="caption" color="rose" className="tabular-nums">
+                {activePart.label}
+              </Chip>
+              <span className="truncate text-caption-1-semibold text-text-primary">
+                {activeEp.title}
+              </span>
             </div>
 
-            {!isPlayerCollapsed ? (
-              <div className="mt-3 flex flex-col gap-3">
-                <div className="overflow-hidden rounded-xl border border-separator-border bg-black">
-                  <VideoJs10Player
-                    src={resolveStreamUrl(activePart, {
-                      forceProxy: streamRetryLevel > 0,
-                      forceRefresh: streamRetryLevel > 0,
-                    })}
-                    poster={activeEp.poster || "./media/thumb-default.svg"}
-                    title={`${activeEp.title} · ${activePart.label}`}
-                    episodeId={activeEp.id}
-                    partIndex={safePartIndex}
-                    autoPlay={false}
-                    onTimeUpdate={() => setHistoryEntries(readHistoryList())}
-                    onError={() => {
-                      if (streamRetryLevel === 0 && activePart?.url) {
-                        setStreamRetryLevel(1);
-                        setStatusMessage("正在切換至相容串流線路...");
-                      }
-                    }}
-                    onEnded={() => {
-                      if (safePartIndex < parts.length - 1) {
-                        setPartIndex(safePartIndex + 1);
-                      }
-                    }}
-                  />
-                </div>
-
-                <SegmentedControl
-                  aria-label="播放分段切換"
-                  selectedKeys={[String(safePartIndex)]}
-                  onSelectionChange={(keys) => {
-                    const next = Number(Array.from(keys)[0] ?? 0);
-                    if (!Number.isNaN(next)) setPartIndex(next);
+            <div className="mt-3 flex flex-col gap-3">
+              <div className="overflow-hidden rounded-xl border border-separator-border bg-black">
+                <VideoJs10Player
+                  src={resolveStreamUrl(activePart, {
+                    forceProxy: streamRetryLevel > 0,
+                    forceRefresh: streamRetryLevel > 0,
+                  })}
+                  poster={activeEp.poster || "./media/thumb-default.svg"}
+                  title={`${activeEp.title} · ${activePart.label}`}
+                  episodeTitle={activeEp.title}
+                  showName={detectShowChannel(activeEp).name}
+                  partLabel={activePart.label}
+                  episodeId={activeEp.id}
+                  partIndex={safePartIndex}
+                  autoPlay={false}
+                  onTimeUpdate={() => setHistoryEntries(readHistoryList())}
+                  onError={() => {
+                    if (streamRetryLevel === 0 && activePart?.url) {
+                      setStreamRetryLevel(1);
+                      setStatusMessage("正在切換至相容串流線路...");
+                    }
                   }}
-                  className="w-full"
-                >
-                  {parts.map((part, idx) => (
-                    <SegmentedControlItem
-                      key={part.label + idx}
-                      id={String(idx)}
-                      className="flex-1"
-                    >
-                      {part.label}
-                    </SegmentedControlItem>
-                  ))}
-                </SegmentedControl>
+                  onEnded={() => {
+                    if (!webSettings.autoPlayNext) return;
+                    if (safePartIndex < parts.length - 1) {
+                      setPartIndex(safePartIndex + 1);
+                      return;
+                    }
+                    const list = filteredEpisodes.length ? filteredEpisodes : episodes;
+                    const currentIdx = list.findIndex((e) => e.id === activeEp.id);
+                    if (currentIdx >= 0 && currentIdx + 1 < list.length) {
+                      const nextEp = list[currentIdx + 1];
+                      setSelectedEpId(nextEp.id);
+                      setPartIndex(0);
+                    }
+                  }}
+                />
               </div>
-            ) : null}
+
+              <SegmentedControl
+                aria-label="播放分段切換"
+                selectedKeys={[String(safePartIndex)]}
+                onSelectionChange={(keys) => {
+                  const next = Number(Array.from(keys)[0] ?? 0);
+                  if (!Number.isNaN(next)) setPartIndex(next);
+                }}
+                className="w-full"
+              >
+                {parts.map((part, idx) => (
+                  <SegmentedControlItem
+                    key={part.label + idx}
+                    id={String(idx)}
+                    className="flex-1"
+                  >
+                    {part.label}
+                  </SegmentedControlItem>
+                ))}
+              </SegmentedControl>
+            </div>
           </section>
 
           {/* Section Header Strip (identical to Flutter) */}
@@ -712,7 +743,7 @@ function App() {
                     找不到符合條件的集數
                   </h2>
                   <p className="text-body-2-regular text-text-secondary">
-                    請嘗試重設搜尋關鍵字或切換年份篩選。
+                    請嘗試重設搜尋關鍵字。
                   </p>
                 </div>
                 <Button
@@ -720,10 +751,9 @@ function App() {
                   size="small"
                   onClick={() => {
                     setSearchQuery("");
-                    setSelectedYear("全部");
                   }}
                 >
-                  重設篩選條件
+                  清除搜尋
                 </Button>
               </div>
             ) : (
@@ -747,37 +777,35 @@ function App() {
                           : "border-separator-border hover:border-border-button-hover",
                       )}
                       onClick={() => {
+                        const smartPart =
+                          resume &&
+                          !resume.completed &&
+                          resume.partIndex >= 0 &&
+                          resume.partIndex < (ep.parts?.length || 1)
+                            ? resume.partIndex
+                            : 0;
                         setSelectedEpId(ep.id);
-                        setPartIndex(0);
-                        setIsPlayerCollapsed(false);
+                        setPartIndex(smartPart);
                         window.scrollTo({ top: 0, behavior: "smooth" });
                       }}
                     >
-                      {/* Top Row: Play Circle + Metadata + Favorite & Download Actions */}
+                      {/* Top Row: Play Indicator + Metadata + Favorite & Download Actions */}
                       <div className="flex items-start gap-2.5">
-                        <button
-                          type="button"
-                          aria-label="播放節目"
+                        <span
+                          aria-hidden="true"
                           className="flex size-10 shrink-0 items-center justify-center"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedEpId(ep.id);
-                            setPartIndex(0);
-                            setIsPlayerCollapsed(false);
-                            window.scrollTo({ top: 0, behavior: "smooth" });
-                          }}
                         >
                           <span
                             className={cx(
                               "flex size-9 items-center justify-center rounded-full border",
                               isCompleted
                                 ? "border-border-button-default bg-background-tertiary-default text-text-primary"
-                                : "border-accent-500/40 bg-accent-500/15 text-accent-500",
+                                : "border-accent-500/40 bg-accent-500/15 text-[var(--color-accent-foreground)]",
                             )}
                           >
                             <RiPlayFill className="size-4.5" aria-hidden="true" />
                           </span>
-                        </button>
+                        </span>
 
                         <div className="min-w-0 flex-1">
                           <h3
@@ -797,7 +825,7 @@ function App() {
                               {showMeta.emoji} {showMeta.name}
                             </span>
                             {location ? (
-                              <span className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-accent-500">
+                              <span className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-[var(--color-accent-foreground)]">
                                 <RiMapPinLine className="size-3" aria-hidden="true" />
                                 {location}
                               </span>
@@ -824,7 +852,7 @@ function App() {
                           >
                             <span className="flex size-9 items-center justify-center rounded-full bg-background-tertiary-default text-foreground-icon-secondary hover:text-text-primary">
                               {isFav ? (
-                                <RiHeartFill className="size-4 text-accent-500" aria-hidden="true" />
+                                <RiHeartFill className="size-4 text-[var(--color-accent-foreground)]" aria-hidden="true" />
                               ) : (
                                 <RiHeartLine className="size-4" aria-hidden="true" />
                               )}
@@ -860,13 +888,12 @@ function App() {
                                 e.stopPropagation();
                                 setSelectedEpId(ep.id);
                                 setPartIndex(pIdx);
-                                setIsPlayerCollapsed(false);
                                 window.scrollTo({ top: 0, behavior: "smooth" });
                               }}
                               className={cx(
                                 "inline-flex cursor-pointer items-center gap-1 rounded-lg border px-2.5 py-1.5 text-[11px] font-bold tabular-nums transition-colors",
                                 isPlayingPart
-                                  ? "border-accent-500 bg-accent-500 text-white"
+                                  ? "border-accent-500 bg-accent-500 text-[var(--color-text-on-accent)]"
                                   : "border-separator-border bg-background-primary-default text-text-primary hover:border-border-button-hover",
                               )}
                             >
@@ -920,7 +947,7 @@ function App() {
                     className={cx(
                       "flex h-10 flex-[2] cursor-pointer items-center justify-center rounded-lg border text-body-medium tabular-nums transition-colors",
                       isCurr
-                        ? "border-accent-500 bg-accent-500 font-bold text-white"
+                        ? "border-accent-500 bg-accent-500 font-bold text-[var(--color-text-on-accent)]"
                         : "border-separator-border bg-background-secondary-default text-text-secondary hover:bg-background-tertiary-default hover:text-text-primary",
                     )}
                   >
@@ -945,7 +972,7 @@ function App() {
         {/* Minimal Footer */}
         <footer className="mt-6 border-t border-separator-border bg-background-secondary-default/40">
           <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-3 px-3 py-4 text-caption-1-regular text-text-secondary">
-            <span>dTVSteams • Video.js 10 + BoardUI Design System</span>
+            <span>dTVSteams</span>
             <LinkButton
               href={
                 typeof window !== "undefined" && window.location.pathname.includes("/react")
@@ -976,7 +1003,7 @@ function App() {
             >
               <div className="mb-3 flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2.5">
-                  <div className="flex size-8 items-center justify-center rounded-lg border border-accent-500/35 bg-accent-500/15 text-accent-500">
+                  <div className="flex size-8 items-center justify-center rounded-lg border border-accent-500/35 bg-accent-500/15 text-[var(--color-accent-foreground)]">
                     <RiTv2Line className="size-4.5" aria-hidden="true" />
                   </div>
                   <h2 className="text-title-3-semibold text-text-primary">切換節目頻道 (Channels)</h2>
@@ -1018,7 +1045,7 @@ function App() {
                         </p>
                       </div>
                       {isSelected ? (
-                        <RiCheckLine className="size-5 shrink-0 text-accent-50" aria-hidden="true" />
+                        <RiCheckLine className="size-5 shrink-0 text-[var(--color-accent-foreground)]" aria-hidden="true" />
                       ) : null}
                     </button>
                   );
@@ -1043,7 +1070,7 @@ function App() {
             >
               <div className="mb-3 flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
-                  <RiHistoryLine className="size-5 text-accent-500" aria-hidden="true" />
+                  <RiHistoryLine className="size-5 text-[var(--color-accent-foreground)]" aria-hidden="true" />
                   <h2 className="text-title-3-semibold text-text-primary">收藏與觀看紀錄</h2>
                 </div>
                 <CloseButton onClick={() => setIsLibraryModalOpen(false)} aria-label="關閉收藏與紀錄視窗" />
@@ -1086,7 +1113,6 @@ function App() {
                               setSelectedEpId(fav.id);
                               setPartIndex(0);
                               setIsLibraryModalOpen(false);
-                              setIsPlayerCollapsed(false);
                             }}
                           >
                             <div className="line-clamp-1 text-body-2-medium text-text-primary">
@@ -1112,19 +1138,62 @@ function App() {
                   </p>
                 ) : (
                   <div className="flex flex-col gap-2">
+                    <div className="flex justify-end">
+                      <Button
+                        variant="secondary"
+                        size="xs"
+                        leadingIcon={RiDeleteBin6Line}
+                        onClick={() => {
+                          clearAllStoredResumes();
+                          setHistoryEntries([]);
+                        }}
+                      >
+                        清空紀錄
+                      </Button>
+                    </div>
                     {historyEntries.map((rec) => (
                       <div
-                        key={rec.episodeId + rec.partIndex}
+                        key={`${rec.episodeId}:${rec.partIndex}`}
                         className="flex items-center justify-between gap-2 rounded-xl border border-separator-border bg-background-primary-default p-3"
                       >
-                        <div className="min-w-0 flex-1">
+                        <button
+                          type="button"
+                          className="min-w-0 flex-1 cursor-pointer text-start outline-none focus-visible:ring-2 focus-visible:ring-border-focus-ring"
+                          onClick={() => {
+                            const existing = episodes.find((e) => e.id === rec.episodeId);
+                            if (!existing) {
+                              const reconstructed = buildFallbackEpisodeFromUrl(rec.episodeId);
+                              if (rec.title) reconstructed.title = rec.title;
+                              if (rec.showName) reconstructed.showName = rec.showName;
+                              setEpisodes((prev) =>
+                                prev.some((e) => e.id === rec.episodeId)
+                                  ? prev
+                                  : [reconstructed, ...prev],
+                              );
+                            }
+                            setSelectedEpId(rec.episodeId);
+                            setPartIndex(Math.max(0, rec.partIndex || 0));
+                            setIsLibraryModalOpen(false);
+                            window.scrollTo({ top: 0, behavior: "smooth" });
+                          }}
+                        >
                           <div className="line-clamp-1 text-body-2-medium text-text-primary">
                             {rec.title || rec.episodeId}
                           </div>
                           <div className="text-caption-1-regular tabular-nums text-text-secondary">
+                            {rec.showName ? `${rec.showName} · ` : ""}
                             {rec.partLabel || `Part ${rec.partIndex + 1}`} · {formatSeconds(rec.currentTime)} / {formatSeconds(rec.duration)} ({rec.percentage}%)
                           </div>
-                        </div>
+                        </button>
+                        <IconButton
+                          size="small"
+                          icon={RiCloseLine}
+                          aria-label="移除觀看紀錄"
+                          onClick={() => {
+                            clearStoredResume(rec.episodeId);
+                            setHistoryEntries(readHistoryList());
+                          }}
+                        />
                       </div>
                     ))}
                   </div>
@@ -1158,7 +1227,7 @@ function App() {
                   <>
                     <div className="mb-3 flex items-start justify-between gap-2">
                       <div className="flex items-center gap-2.5">
-                        <div className="flex size-9 shrink-0 items-center justify-center rounded-2lg border border-accent-500/35 bg-accent-500/15 text-accent-500">
+                        <div className="flex size-9 shrink-0 items-center justify-center rounded-2lg border border-accent-500/35 bg-accent-500/15 text-[var(--color-accent-foreground)]">
                           <RiDownloadLine className="size-4.5" aria-hidden="true" />
                         </div>
                         <div className="min-w-0">
@@ -1178,7 +1247,7 @@ function App() {
 
                     <div className="mb-3 flex items-start gap-2.5 rounded-2xl border border-accent-500/35 bg-accent-500/10 p-3">
                       <RiInformationLine
-                        className="mt-0.5 size-4 shrink-0 text-accent-500"
+                        className="mt-0.5 size-4 shrink-0 text-[var(--color-accent-foreground)]"
                         aria-hidden="true"
                       />
                       <div className="flex flex-col gap-1 text-start">
@@ -1211,7 +1280,7 @@ function App() {
                         className="mb-3 flex items-start gap-2 rounded-xl border border-separator-border bg-background-primary-default p-3 text-start"
                       >
                         <RiCheckLine
-                          className="mt-0.5 size-4 shrink-0 text-accent-500"
+                          className="mt-0.5 size-4 shrink-0 text-[var(--color-accent-foreground)]"
                           aria-hidden="true"
                         />
                         <p className="text-caption-1-regular text-text-primary">
@@ -1332,7 +1401,7 @@ function App() {
             >
               <div className="mb-3 flex items-start justify-between gap-2">
                 <div className="flex items-center gap-2.5">
-                  <div className="flex size-9 items-center justify-center rounded-2lg border border-accent-500/35 bg-accent-500/15 text-accent-500">
+                  <div className="flex size-9 items-center justify-center rounded-2lg border border-accent-500/35 bg-accent-500/15 text-[var(--color-accent-foreground)]">
                     <RiShareForwardLine className="size-4.5" aria-hidden="true" />
                   </div>
                   <div className="min-w-0">
@@ -1365,19 +1434,6 @@ function App() {
                 >
                   {copiedShareUrl ? "已複製！" : "複製"}
                 </Button>
-              </div>
-
-              <div className="mt-4 flex justify-end">
-                <LinkButton
-                  href={LATEST_APK_RELEASE_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  variant="secondary"
-                  size="xs"
-                  trailingIcon={RiExternalLinkLine}
-                >
-                  下載最新 Android APK
-                </LinkButton>
               </div>
             </div>
           </dialog>

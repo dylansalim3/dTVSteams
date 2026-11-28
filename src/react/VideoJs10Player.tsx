@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import "@videojs/react/video/skin.css";
 import { VideoPlayer, VideoSkin, Video } from "@videojs/react/video";
+import { Button } from "@/components/base/buttons/button";
 import { isIosDevice } from "./download.js";
 
 export interface VideoJs10ResumeRecord {
@@ -11,12 +12,18 @@ export interface VideoJs10ResumeRecord {
   percentage: number;
   completed: boolean;
   updatedAt: number;
+  title?: string;
+  showName?: string;
+  partLabel?: string;
 }
 
 export interface VideoJs10PlayerProps {
   src: string;
   poster?: string;
   title?: string;
+  episodeTitle?: string;
+  showName?: string;
+  partLabel?: string;
   episodeId?: string;
   partIndex?: number;
   autoPlay?: boolean;
@@ -65,6 +72,13 @@ export function clearStoredResume(episodeId: string, storageKey = DEFAULT_STORAG
   } catch {}
 }
 
+export function clearAllStoredResumes(storageKey = DEFAULT_STORAGE_KEY): void {
+  if (typeof localStorage === "undefined") return;
+  try {
+    localStorage.removeItem(storageKey);
+  } catch {}
+}
+
 /**
  * Official Video.js 10 React Player implementation according to:
  * https://videojs.org/docs/guides/installation/react
@@ -76,6 +90,9 @@ export const VideoJs10Player: React.FC<VideoJs10PlayerProps> = ({
   src,
   poster = "./media/thumb-default.svg",
   title = "綜藝玩很大",
+  episodeTitle,
+  showName,
+  partLabel,
   episodeId = "",
   partIndex = 0,
   autoPlay = false,
@@ -92,9 +109,10 @@ export const VideoJs10Player: React.FC<VideoJs10PlayerProps> = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const prevSrcRef = useRef<string>(src);
   const [resumedNotice, setResumedNotice] = useState<string | null>(null);
-  const [hasResumed, setHasResumed] = useState<boolean>(false);
   const lastSaveTimeRef = useRef<number>(0);
   const isIos = isIosDevice();
+  const resolvedTitle = episodeTitle || title;
+  const resolvedPartLabel = partLabel || `Part ${partIndex + 1}`;
 
   // Ensure legacy iOS WebKit inline attributes and reload on src changes
   useEffect(() => {
@@ -115,7 +133,7 @@ export const VideoJs10Player: React.FC<VideoJs10PlayerProps> = ({
 
   // Resume playback on media loaded / mount
   useEffect(() => {
-    setHasResumed(false);
+    setResumedNotice(null);
     if (!episodeId) return;
 
     const saved = getStoredResume(episodeId, storageKey);
@@ -174,11 +192,14 @@ export const VideoJs10Player: React.FC<VideoJs10PlayerProps> = ({
           percentage: Math.min(100, Math.round((currentTime / duration) * 100)),
           completed,
           updatedAt: now,
+          title: resolvedTitle,
+          showName,
+          partLabel: resolvedPartLabel,
         },
         storageKey
       );
     }
-  }, [episodeId, partIndex, onTimeUpdate, storageKey]);
+  }, [episodeId, partIndex, onTimeUpdate, storageKey, resolvedTitle, showName, resolvedPartLabel]);
 
   const handleEnded = useCallback(() => {
     const video = videoRef.current;
@@ -193,12 +214,15 @@ export const VideoJs10Player: React.FC<VideoJs10PlayerProps> = ({
           percentage: 100,
           completed: true,
           updatedAt: Date.now(),
+          title: resolvedTitle,
+          showName,
+          partLabel: resolvedPartLabel,
         },
         storageKey
       );
     }
     if (onEnded) onEnded();
-  }, [episodeId, partIndex, onEnded, storageKey]);
+  }, [episodeId, partIndex, onEnded, storageKey, resolvedTitle, showName, resolvedPartLabel]);
 
   const handleRestart = useCallback(() => {
     const video = videoRef.current;
@@ -214,17 +238,8 @@ export const VideoJs10Player: React.FC<VideoJs10PlayerProps> = ({
 
   return (
     <div
-      className={`vjs10-player-container ${className}`}
-      style={{
-        position: "relative",
-        width: "100%",
-        maxWidth: "100%",
-        aspectRatio: "16 / 9",
-        background: "#000",
-        borderRadius: "8px",
-        overflow: "hidden",
-        ...style,
-      }}
+      className={`vjs10-player-container relative w-full max-w-full aspect-video overflow-hidden rounded-lg bg-black ${className}`}
+      style={style}
     >
       <VideoPlayer title={title} poster={poster}>
         <VideoSkin style={{ width: "100%", height: "100%", aspectRatio: "16 / 9" }}>
@@ -250,44 +265,17 @@ export const VideoJs10Player: React.FC<VideoJs10PlayerProps> = ({
         </VideoSkin>
       </VideoPlayer>
 
-      {/* Resume playback toast banner */}
+      {/* Resume playback toast banner (BoardUI semantic tokens) */}
       {resumedNotice && (
         <div
           role="status"
           aria-live="polite"
-          style={{
-            position: "absolute",
-            bottom: "70px",
-            left: "24px",
-            zIndex: 30,
-            background: "rgba(20, 20, 20, 0.92)",
-            border: "1px solid rgba(255, 255, 255, 0.2)",
-            borderRadius: "8px",
-            padding: "8px 16px",
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            color: "#fff",
-            fontSize: "0.9rem",
-            boxShadow: "0 6px 16px rgba(0, 0, 0, 0.6)",
-          }}
+          className="absolute bottom-14 start-4 z-30 flex max-w-[calc(100%-2rem)] flex-wrap items-center gap-3 rounded-xl border border-border-button-default bg-background-secondary-default/95 px-3.5 py-2 text-body-2-medium text-text-primary shadow-dropdown backdrop-blur-xs"
         >
           <span>{resumedNotice}</span>
-          <button
-            onClick={handleRestart}
-            style={{
-              background: "#ff0000",
-              color: "#fff",
-              border: "none",
-              padding: "4px 10px",
-              borderRadius: "4px",
-              cursor: "pointer",
-              fontWeight: 600,
-              fontSize: "0.85rem",
-            }}
-          >
+          <Button variant="primary" size="xs" onClick={handleRestart}>
             從頭播放
-          </button>
+          </Button>
         </div>
       )}
     </div>

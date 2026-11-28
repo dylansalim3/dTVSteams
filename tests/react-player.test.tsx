@@ -114,7 +114,7 @@ describe("Video.js v10 React Implementation (https://videojs.org/docs/guides/ins
     }
   });
 
-  it("matches mobile channel helpers and routes React settings to GitHub latest APK", () => {
+  it("matches mobile channel helpers and keeps trimmed BoardUI header controls", () => {
     expect(SHOW_CHANNELS.length).toBe(5);
     expect(LATEST_APK_RELEASE_URL).toBe(
       "https://github.com/dylansalim3/dTVSteams/releases/latest"
@@ -130,10 +130,12 @@ describe("Video.js v10 React Implementation (https://videojs.org/docs/guides/ins
       path.resolve(__dirname, "../src/react/demo.tsx"),
       "utf-8"
     );
-    expect(demoSource).toContain("LATEST_APK_RELEASE_URL");
     expect(demoSource).toContain("RiShareForwardLine");
-    expect(demoSource).toContain("RiSettings3Line");
+    expect(demoSource).toContain("RiSunLine");
+    expect(demoSource).toContain("RiMoonLine");
     expect(demoSource).toContain("./catalog.json");
+    expect(demoSource).not.toContain("RiSettings3Line");
+    expect(demoSource).not.toContain("LATEST_APK_RELEASE_URL");
     expect(demoSource).not.toContain("返回經典網頁版");
     expect(demoSource.toLowerCase()).not.toContain("1080p");
   });
